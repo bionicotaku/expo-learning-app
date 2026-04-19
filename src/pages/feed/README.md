@@ -1,10 +1,12 @@
 # Feed Page
 
-`pages/feed` 是首页 Feed 列表页的装配层。
+`pages/feed` 是 `/feed` 首页 Feed 列表页的装配层。
 
 当前职责：
 
 - 消费共享 feed source
+- 把 `FeedItem` 映射成 `MediaFeatureCard` 所需的展示 props
+- 当前映射 helper 落在 `ui/media-feature-card-props.ts`
 - 顶部下拉刷新，保留当前页面内容直到第一页成功返回后再整体替换
 - 滚动到底继续追加
 - 点击卡片后进入 `Fullscreen Video`
@@ -17,4 +19,7 @@
 
 - page 不直接实现 feed repository
 - page 不直接实现播放器细节
+- page 不拥有视频卡 JSX 本体；卡片复合视图由 `widgets/media-feature-card` 提供
+- page 负责派生当前 Feed 专属的展示字段，例如 `views / duration / tone / tag`
+- 这些展示字段不进入 `entities/feed`，也不进入 `widgets/media-feature-card` 的内部逻辑
 - page 不在 route 文件里展开路由参数解析

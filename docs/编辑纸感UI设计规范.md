@@ -9,7 +9,7 @@
 - 当前参考稿真正稳定下来的视觉语言是什么
 - 这套视觉语言在 Expo + React Native + 当前轻量 FSD 结构中应该如何抽象
 - 哪些内容属于 `shared/theme` 与 `shared/ui`，哪些应停留在 `features / widgets / pages / app`
-- 这套风格如何服务当前产品模型：当前最小运行态是 `Feed 列表页 -> Fullscreen Video 页`，并可继续扩展到收藏夹、我的、登录等页面
+- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> Feed 列表页 -> Fullscreen Video 页`，并可继续扩展到收藏夹、我的等页面
 
 本文档是实现导向规范，不是设计赏析文档。默认约束如下：
 
@@ -383,12 +383,13 @@ src/
 
 当前产品模型固定如下：
 
-1. App 首屏是 `YouTube-like Feed`
-2. 用户点击任意视频卡片
-3. 通过 `Stack push` 进入 `Fullscreen Video`
-4. `Fullscreen Video` 支持纵向滑动切视频
-5. 视频页滑到阈值时触发统一分页请求
-6. 返回 Feed 页后恢复到最后播放视频的卡片位置
+1. App 首屏是 `登录页`
+2. 用户通过登录页主按钮进入 `YouTube-like Feed`
+3. 用户点击任意视频卡片
+4. 通过 `Stack push` 进入 `Fullscreen Video`
+5. `Fullscreen Video` 支持纵向滑动切视频
+6. 视频页滑到阈值时触发统一分页请求
+7. 返回 Feed 页后恢复到最后播放视频的卡片位置
 
 ### 6.2 Feed 与 Video 的关系
 
@@ -596,5 +597,5 @@ widgets 至少要有以下变体语义：
 - 当前只设计 `light theme`
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
-- 当前最小运行态只落地 `Feed + Fullscreen Video`
+- 当前最小运行态只落地 `Auth + Feed + Fullscreen Video`
 - `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；若未来引入主导航，再在 `app` 内扩展 app shell

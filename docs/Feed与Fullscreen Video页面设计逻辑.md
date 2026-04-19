@@ -27,11 +27,12 @@
 
 用户路径固定如下：
 
-1. 用户打开 App 后，首先进入 `Feed 列表页`
-2. 用户浏览卡片流，选择感兴趣的视频
-3. 点击视频卡片后，通过 `Stack push` 进入 `Fullscreen Video 页`
-4. 在 `Fullscreen Video 页` 中继续上下滑动浏览视频
-5. 用户返回后，`Feed 列表页` 自动恢复到最后播放视频对应的卡片位置
+1. 用户打开 App 后，先进入 `登录入口页`
+2. 用户点击登录主按钮后进入 `Feed 列表页`
+3. 用户浏览卡片流，选择感兴趣的视频
+4. 点击视频卡片后，通过 `Stack push` 进入 `Fullscreen Video 页`
+5. 在 `Fullscreen Video 页` 中继续上下滑动浏览视频
+6. 用户返回后，`Feed 列表页` 自动恢复到最后播放视频对应的卡片位置
 
 ### 2.2 为什么需要两种页面
 
@@ -68,7 +69,7 @@
 
 ### 3.1 页面角色
 
-`Feed 列表页` 是 App 首屏，也是内容驱动型学习产品的低门槛入口。
+`Feed 列表页` 是登录后的主首页，也是内容驱动型学习产品的低门槛入口。
 
 它的设计目标不是“替代播放页”，而是：
 
@@ -272,7 +273,7 @@
 当前运行态的路由关系如下：
 
 - `Feed 列表页`
-  - App 首屏 route
+  - 登录后的主首页 route
 - `Fullscreen Video 页`
   - 由列表项点击后进入的 stack detail route
 
@@ -297,7 +298,7 @@
 
 因此当前结论固定为：
 
-- `Feed` 与 `Fullscreen Video` 构成当前最小运行态
+- `Auth`、`Feed` 与 `Fullscreen Video` 构成当前最小运行态
 - 若未来扩展收藏夹、我的等一级页面，主导航也只属于 `app shell`
 - `Fullscreen Video` 仍保持在 stack detail 体系内
 
@@ -481,7 +482,7 @@
 
 当前关于这两个页面，默认结论固定如下：
 
-- `Feed 列表页` 是 App 首屏
+- `Feed 列表页` 是登录后的主首页
 - `Fullscreen Video 页` 是 stack detail
 - 两个页面共享同一份 feed source
 - 视频页是列表页的沉浸式投影视图，不是另一套首页

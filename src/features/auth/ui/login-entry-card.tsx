@@ -13,12 +13,14 @@ type LoginEntryCardProps = {
   mode: AuthLoginMode;
   onChangeMode: (mode: AuthLoginMode) => void;
   onPressForgotPassword: () => void;
+  onPressSubmit: () => void;
 };
 
 export function LoginEntryCard({
   mode,
   onChangeMode,
   onPressForgotPassword,
+  onPressSubmit,
 }: LoginEntryCardProps) {
   const { tokens } = useEditorialPaperTheme();
 
@@ -38,7 +40,7 @@ export function LoginEntryCard({
         ) : (
           <AuthCodeRow />
         )}
-        <AuthPrimaryButton>登录</AuthPrimaryButton>
+        <AuthPrimaryButton onPress={onPressSubmit}>登录</AuthPrimaryButton>
         <Pressable
           accessibilityRole="button"
           onPress={onPressForgotPassword}

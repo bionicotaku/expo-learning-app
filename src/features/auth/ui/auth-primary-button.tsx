@@ -4,13 +4,17 @@ import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 
 type AuthPrimaryButtonProps = {
   children: string;
+  onPress?: () => void;
 };
 
-export function AuthPrimaryButton({ children }: AuthPrimaryButtonProps) {
+export function AuthPrimaryButton({
+  children,
+  onPress,
+}: AuthPrimaryButtonProps) {
   const { tokens } = useEditorialPaperTheme();
 
   return (
-    <Pressable accessibilityRole="button">
+    <Pressable accessibilityRole="button" onPress={onPress}>
       {({ pressed }) => (
         <View
           style={{

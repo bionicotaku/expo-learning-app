@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useReducer } from 'react';
 import { Pressable, Text } from 'react-native';
@@ -7,6 +8,7 @@ import {
   createInitialAuthUiState,
   LoginEntryCard,
   reduceAuthUiState,
+  resolveAuthPrimaryAction,
   StructuredAuthCard,
 } from '@/features/auth';
 import type { AuthScreenState } from '@/features/auth';
@@ -61,6 +63,7 @@ function AuthFooter({
 }
 
 export function AuthPage() {
+  const router = useRouter();
   const [state, dispatch] = useReducer(
     reduceAuthUiState,
     undefined,
@@ -81,9 +84,15 @@ export function AuthPage() {
         mode={state.loginMode}
         onChangeMode={(mode) => dispatch({ type: 'set-login-mode', mode })}
         onPressForgotPassword={() => dispatch({ type: 'show-forgot-password' })}
+        onPressSubmit={() => {
+          const action = resolveAuthPrimaryAction(state.screen);
+          if (action.type === 'navigate') {
+            router.replace(action.href);
+          }
+        }}
       />
     );
-  }, [state.loginMode, state.screen]);
+  }, [router, state.loginMode, state.screen]);
 
   return (
     <>

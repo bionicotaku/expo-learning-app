@@ -10,6 +10,7 @@
   - `login + code`
   - `forgotPassword`
   - `register`
+- 登录主按钮通过 `router.replace('/feed')` 进入主页
 - 复用 `Editorial Paper` 主题和 auth feature 组件组合页面
 
 边界约束：

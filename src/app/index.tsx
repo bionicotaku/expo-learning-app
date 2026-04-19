@@ -1,5 +1,5 @@
-import { FeedPage } from '@/pages/feed';
+import { AuthPage } from '@/pages/auth';
 
 export default function IndexRoute() {
-  return <FeedPage />;
+  return <AuthPage />;
 }
