@@ -36,7 +36,7 @@ export const fullscreenVideoOverlayActionItems: readonly FullscreenVideoOverlayA
   },
 ] as const;
 
-export function formatFullscreenVideoDebugLabel(
+export function formatFullscreenVideoCounterLabel(
   activeIndex: number | null,
   totalItems: number
 ) {

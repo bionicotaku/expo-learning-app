@@ -2,13 +2,13 @@ import { memo } from 'react';
 import { Text, View } from 'react-native';
 
 type PlaybackFeedbackOverlayProps = {
-  audioToastLabel: string | null;
+  playbackFeedbackLabel: string | null;
 };
 
 function PlaybackFeedbackOverlayComponent({
-  audioToastLabel,
+  playbackFeedbackLabel,
 }: PlaybackFeedbackOverlayProps) {
-  if (!audioToastLabel) {
+  if (!playbackFeedbackLabel) {
     return null;
   }
 
@@ -41,7 +41,7 @@ function PlaybackFeedbackOverlayComponent({
             textShadowRadius: 2,
           }}
         >
-          {audioToastLabel}
+          {playbackFeedbackLabel}
         </Text>
       </View>
     </View>

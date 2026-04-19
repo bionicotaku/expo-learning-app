@@ -2,20 +2,22 @@ import { memo } from 'react';
 import { Pressable, View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
+import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import {
   areFullscreenVideoItemRenderPropsEqual,
   type FullscreenVideoItemRenderProps,
 } from '../model/render-props';
 import { PlayableVideoSurface } from './playable-video-surface';
-import { RowBoundVideoOverlay } from './row-bound-video-overlay';
+import { RowOwnedVideoOverlay } from './row-owned-video-overlay';
 
 type FullscreenVideoItemProps = {
   bottomInset: number;
   height: number;
   isActive: boolean;
-  isMuted: boolean;
-  onToggleMuted: () => void;
+  onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
+  onTogglePlayback: () => void;
   shouldUsePlayer: boolean;
+  shouldPlay: boolean;
   video: FeedItem;
   width: number;
 };
@@ -26,13 +28,13 @@ function FullscreenVideoItemComponent({
   height,
   bottomInset,
   isActive,
-  isMuted,
-  onToggleMuted,
+  onActionPress,
+  onTogglePlayback,
   shouldUsePlayer,
+  shouldPlay,
 }: FullscreenVideoItemProps) {
   return (
-    <Pressable
-      onPress={onToggleMuted}
+    <View
       style={{
         width,
         height,
@@ -40,7 +42,7 @@ function FullscreenVideoItemComponent({
       }}
     >
       {shouldUsePlayer ? (
-        <PlayableVideoSurface video={video} isActive={isActive} isMuted={isMuted} />
+        <PlayableVideoSurface video={video} shouldPlay={shouldPlay} />
       ) : (
         <View
           style={{
@@ -50,12 +52,24 @@ function FullscreenVideoItemComponent({
         />
       )}
 
-      <RowBoundVideoOverlay
+      <Pressable
+        accessibilityLabel={shouldPlay ? 'Pause video' : 'Play video'}
+        accessibilityRole="button"
+        disabled={!isActive}
+        onPress={onTogglePlayback}
+        style={{
+          position: 'absolute',
+          inset: 0,
+        }}
+      />
+
+      <RowOwnedVideoOverlay
         bottomInset={bottomInset}
+        onActionPress={onActionPress}
         title={video.title}
         subtitle={video.subtitle}
       />
-    </Pressable>
+    </View>
   );
 }
 
@@ -68,16 +82,16 @@ function areFullscreenVideoItemComponentPropsEqual(
     width: previousProps.width,
     height: previousProps.height,
     isActive: previousProps.isActive,
-    isMuted: previousProps.isMuted,
     shouldUsePlayer: previousProps.shouldUsePlayer,
+    shouldPlay: previousProps.shouldPlay,
   };
   const nextRenderProps: FullscreenVideoItemRenderProps = {
     videoId: nextProps.video.id,
     width: nextProps.width,
     height: nextProps.height,
     isActive: nextProps.isActive,
-    isMuted: nextProps.isMuted,
     shouldUsePlayer: nextProps.shouldUsePlayer,
+    shouldPlay: nextProps.shouldPlay,
   };
 
   return (

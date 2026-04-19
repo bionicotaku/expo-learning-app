@@ -1,6 +1,6 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import {
   setPendingRestoreVideoId,
@@ -14,7 +14,6 @@ import {
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
 
 export function VideoDetailPage() {
-  const router = useRouter();
   const { videoId } = useLocalSearchParams<{ videoId?: string | string[] }>();
   const {
     data,
@@ -30,7 +29,6 @@ export function VideoDetailPage() {
     () => findFeedItemIndex(items, normalizedVideoId),
     [items, normalizedVideoId]
   );
-  const [isMuted, setIsMuted] = useState(true);
   const latestActiveItemIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -59,14 +57,6 @@ export function VideoDetailPage() {
     [fetchNextPage, hasNextPage, isFetchingNextPage, items.length]
   );
 
-  const handleToggleMuted = useCallback(() => {
-    setIsMuted((current) => !current);
-  }, []);
-
-  const handleBack = useCallback(() => {
-    router.back();
-  }, [router]);
-
   return (
     <>
       <StatusBar style="light" />
@@ -74,11 +64,8 @@ export function VideoDetailPage() {
         initialIndex={targetIndex >= 0 ? targetIndex : 0}
         isFetchingNextPage={isFetchingNextPage}
         isInitialLoading={isPending && items.length === 0}
-        isMuted={isMuted}
         items={items}
         onActiveItemChange={handleActiveItemChange}
-        onPressBack={handleBack}
-        onToggleMuted={handleToggleMuted}
       />
     </>
   );

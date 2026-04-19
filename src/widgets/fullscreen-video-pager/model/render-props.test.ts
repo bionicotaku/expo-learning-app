@@ -12,16 +12,16 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: true,
-          isMuted: true,
           shouldUsePlayer: true,
+          shouldPlay: true,
           videoId: 'feed-4',
           width: 393,
         },
         {
           height: 852,
           isActive: true,
-          isMuted: true,
           shouldUsePlayer: true,
+          shouldPlay: true,
           videoId: 'feed-4',
           width: 393,
         }
@@ -35,16 +35,16 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: true,
-          isMuted: true,
           shouldUsePlayer: true,
+          shouldPlay: true,
           videoId: 'feed-4',
           width: 393,
         },
         {
           height: 852,
           isActive: false,
-          isMuted: true,
           shouldUsePlayer: true,
+          shouldPlay: false,
           videoId: 'feed-4',
           width: 393,
         }
@@ -56,30 +56,26 @@ describe('fullscreen video render props', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
-          isActive: true,
-          isMuted: true,
+          shouldPlay: true,
           videoId: 'feed-4',
         },
         {
-          isActive: true,
-          isMuted: true,
+          shouldPlay: true,
           videoId: 'feed-4',
         }
       )
     ).toBe(true);
   });
 
-  it('re-renders the player surface when muted state changes', () => {
+  it('re-renders the player surface when playback intent changes', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
-          isActive: true,
-          isMuted: true,
+          shouldPlay: true,
           videoId: 'feed-4',
         },
         {
-          isActive: true,
-          isMuted: false,
+          shouldPlay: false,
           videoId: 'feed-4',
         }
       )

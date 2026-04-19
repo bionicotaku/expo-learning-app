@@ -164,40 +164,40 @@
 
 ### 4.2 页面结构
 
-参考稿中的 `CScreenVideoFull` 已经给出稳定结构，页面可拆为五层：
+当前落地结构可拆为五层：
 
 1. `Full-bleed video background`
    - 视频内容占据全部画面
-2. `Top controls`
-   - 返回按钮
-   - 可后续扩展其他轻动作
-3. `Right action rail`
-   - 收藏、分享、笔记、更多动作等
-4. `Bottom content block`
-   - 标题
-   - 简短说明或学习提示
-5. `Playback progress`
-   - 当前视频进度可视化
+2. `Top chrome overlay`
+   - 固定的当前序号 counter
+3. `Row-owned content overlay`
+   - 跟视频 row 一起滑动的右侧 action rail
+   - 跟视频 row 一起滑动的标题、说明和底部可读性 scrim
+4. `Active ephemeral overlay`
+   - 当前 active video 的播/停 HUD
+   - 未来继续承接字幕、手势反馈、临时提示
+5. `Pager shell loading pill`
+   - 首屏/分页时的底部 loading 提示
 
-这一结构说明该页面是“播放优先，信息叠加”的模式，而不是“图文详情页”。
+这一结构说明该页面是“播放优先，内容型 overlay 贴附视频、页面 chrome 独立固定”的模式，而不是图文详情页，也不是把所有交互都堆在 pager 顶层的一层壳上。
 
-具体到 overlay 的职责拆分，后续实现应遵循三层模型：
-
-- `Row-bound overlay`
-- `Active-only stable overlay`
-- `Active-only ephemeral overlay`
-
-详细规则见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
+详细分层规则见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
 
 ### 4.3 视频页的交互职责
 
 视频页必须承担：
 
-- 当前视频自动播放
+- 当前视频默认有声自动播放
 - 上下滑动切换视频
 - 到达预取阈值时继续请求 feed 数据
-- 支持系统返回手势与返回按钮
-- 在不打断沉浸感的前提下提供保存/分享等动作
+- 支持系统右滑返回手势
+- 通过点击 active row 的视频背景切换播/停
+- 在不打断沉浸感的前提下保留右侧动作位
+
+当前实现下还应明确两点：
+
+- 右侧 action rail 这轮只完成结构落位，不接真实收藏/分享/标注写操作
+- 静音切换本轮移除，不保留旧入口
 
 根据当前设计约束，预取策略固定为：
 
@@ -289,7 +289,6 @@
 
 返回方式：
 
-- 左上角返回按钮
 - 从左到右滑动的系统返回手势
 
 ### 6.2 为什么视频页不应内嵌主导航壳
@@ -473,7 +472,7 @@
 - 页面支持上下滑动切换视频
 - 预取阈值触发时能继续追加 feed 数据
 - 页面不显示 tab
-- 返回按钮和系统手势都可返回列表页
+- 系统右滑手势可返回列表页
 - 页面视觉保持沉浸，但动作层和文案层仍延续 `Editorial Paper`
 
 ### 9.3 系统级验收

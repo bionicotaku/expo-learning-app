@@ -1,8 +1,8 @@
 export type FullscreenVideoItemRenderProps = {
   height: number;
   isActive: boolean;
-  isMuted: boolean;
   shouldUsePlayer: boolean;
+  shouldPlay: boolean;
   videoId: string;
   width: number;
 };
@@ -16,14 +16,13 @@ export function areFullscreenVideoItemRenderPropsEqual(
     previousProps.width === nextProps.width &&
     previousProps.height === nextProps.height &&
     previousProps.isActive === nextProps.isActive &&
-    previousProps.isMuted === nextProps.isMuted &&
-    previousProps.shouldUsePlayer === nextProps.shouldUsePlayer
+    previousProps.shouldUsePlayer === nextProps.shouldUsePlayer &&
+    previousProps.shouldPlay === nextProps.shouldPlay
   );
 }
 
 export type PlayableVideoSurfaceRenderProps = {
-  isActive: boolean;
-  isMuted: boolean;
+  shouldPlay: boolean;
   videoId: string;
 };
 
@@ -33,7 +32,6 @@ export function arePlayableVideoSurfacePropsEqual(
 ): boolean {
   return (
     previousProps.videoId === nextProps.videoId &&
-    previousProps.isActive === nextProps.isActive &&
-    previousProps.isMuted === nextProps.isMuted
+    previousProps.shouldPlay === nextProps.shouldPlay
   );
 }

@@ -2,242 +2,143 @@
 
 ## 1. 文档目标
 
-本文档专门定义 `Fullscreen Video 页` 的 overlay 分层设计。
+本文档定义当前 `Fullscreen Video 页` 的 overlay 分层模型，重点回答：
 
-这份文档回答以下问题：
-
-- `Fullscreen Video` 的 overlay 为什么不应该只有一层
-- 哪些信息应该绑定在 row 上，哪些应该只为当前 active video 渲染
-- 为什么 active-only overlay 还要继续拆分为稳定层与瞬时层
-- 未来加入字幕、点赞、收藏、手势、提示反馈后，如何保持结构清晰和性能稳定
-- 在当前 Expo + 轻量 FSD 结构中，这套 overlay 应该如何落位
-
-本文档只讨论 `Fullscreen Video` 的 overlay 设计，不重复定义整套页面关系或全局视觉系统。
+- 哪些 UI 必须跟着视频 row 一起滑动
+- 哪些 UI 应固定在 pager 顶层
+- 哪些 UI 只服务当前 active video 的瞬时反馈
+- 在当前 Expo + 轻量 FSD 结构中，这些层分别落在哪个组件
 
 相关文档：
 
 - 页面关系与共享数据逻辑见 [Feed与Fullscreen Video页面设计逻辑](./Feed与Fullscreen%20Video页面设计逻辑.md)
 - 全局视觉系统见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)
 
-## 2. 设计前提
+## 2. 当前稳定前提
 
-### 2.1 页面前提
-
-当前产品中的 `Fullscreen Video 页` 具备以下稳定前提：
+当前 `Fullscreen Video 页` 有以下稳定前提：
 
 - 页面本质是纵向分页的沉浸式视频浏览器
-- 每次屏幕上真正处于消费焦点的只有一个 active video
+- 每次真正处于消费焦点的只有一个 active video
 - Feed 列表页与视频页共享同一份 feed source
-- 视频页可以继续上下滑动切换相邻视频
+- pager 只为当前/前后 1 个视频挂载 player
+- 当前视频默认有声自动播放
+- 背景主点击手势是播/停，不再承担静音切换
 
-这意味着：
+因此 overlay 设计必须同时满足两件事：
 
-- 不是所有“属于某个 video 的信息”都必须绑定在 row 上
-- 也不是所有“当前只显示一个”的 overlay 都应该放在同一层
+- 视觉上让“视频内容 + 内容型 UI”像同一个对象一起滑动
+- 工程上把页面 chrome、瞬时反馈和 row 内容拆开，避免把状态更新范围拉得过大
 
-### 2.2 性能前提
+## 3. 三层 Overlay 模型
 
-当前 `Fullscreen Video Pager` 的单个 row 成本本来就较高，因为它可能挂载：
+当前 `Fullscreen Video` 固定采用以下三层模型：
 
-- `VideoView`
-- `useVideoPlayer`
-- 播放状态监听
-- loading / error 覆盖层
+1. `Row-owned content overlay`
+2. `Top chrome overlay`
+3. `Active ephemeral overlay`
 
-因此 overlay 分层设计必须同时服务两个目标：
+这三层不是视觉稿名词，而是当前实现边界。
 
-- 视觉结构清晰
-- 避免高频状态把整批 row 拉进重复渲染
+## 4. Layer 1: Row-owned content overlay
 
-## 3. 总体原则
+### 4.1 定义
 
-`Fullscreen Video` 的 overlay 不应按“页面上有什么就都叠在一层”来设计，而应按下面三条原则分层：
+`Row-owned content overlay` 绑定在每个视频 row 上。
 
-1. 先判断内容是否应跟着 row 一起滚动
-2. 再判断内容是否只对当前 active video 有意义
-3. 最后判断该内容是低频稳定状态，还是高频瞬时状态
+它跟随该 row 一起出现、一起离开、一起滑动，视觉上属于这个视频本身，而不是播放器壳层。
 
-按这三个判断标准，`Fullscreen Video` 的 overlay 结构固定为三层：
+### 4.2 当前放入内容
 
-1. `Row-bound overlay`
-2. `Active-only stable overlay`
-3. `Active-only ephemeral overlay`
+- 标题
+- 说明文本
+- 底部可读性 scrim
+- 右侧 action rail
 
-## 4. 三层 Overlay 模型
+### 4.3 设计理由
 
-### 4.1 Layer 1: Row-bound overlay
+当前产品要更接近 TikTok-like 的内容归属感，所以底部文案和右侧 rail 都必须跟着视频走。
 
-#### 定义
+这样做的收益是：
 
-`Row-bound overlay` 是绑定在每个视频 row 上的内容层。
+- 用户会把“视频 + 文案 + 动作位”感知为一个完整内容单元
+- 翻页切换时，内容型 overlay 跟视频一起运动，沉浸感更自然
+- 顶层 pager 不再需要维护一整套稳定动作镜像
 
-它跟随该 row 一起出现、一起离开、一起滚动，天然属于这个视频本身，而不是当前播放会话的全局提示层。
+### 4.4 交互边界
 
-#### 适合放入的内容
+这一层里需要明确区分两类区域：
 
-- 视频 `title`
-- 视频 `description`
-- 轻量、低频的静态标签
-- 与视频本体强绑定的只读信息
-- 可选的小型“已点赞 / 已收藏”状态标记
+- `metadata block`
+  - 只读
+  - 不接收点击
+- `action rail`
+  - 独立接收事件
+  - 不能依赖整页背景点击层
 
-#### 不适合放入的内容
+因此当前实现里：
+
+- 文案层保持 `pointerEvents="none"`
+- rail 和按钮必须作为独立交互层存在
+- rail 即使本轮还没接真实业务动作，也必须有正确的命中区域和层级
+
+### 4.5 当前限制
+
+- rail 这轮只完成结构落位，不接真实收藏/分享/标注写操作
+- 这一层不承载字幕、HUD、时间轴驱动文案或全局页面控件
+
+## 5. Layer 2: Top chrome overlay
+
+### 5.1 定义
+
+`Top chrome overlay` 固定在 pager 顶层，不跟着 row 滑动。
+
+它只承载页面级 chrome，而不是视频内容型 UI。
+
+### 5.2 当前放入内容
+
+- 右上当前序号 counter
+
+### 5.3 设计理由
+
+当前保留在顶层的只有 counter，它的语义更接近观看位置提示，而不是视频内容本身。
+
+因此它应固定在顶部，而不是并入 row-owned content overlay。
+
+### 5.4 当前限制
+
+- 不在这一层放右侧 rail
+- 不在这一层放静音提示、播/停 HUD 或字幕
+- 不把它做成“当前视频所有稳定信息的总容器”
+
+## 6. Layer 3: Active ephemeral overlay
+
+### 6.1 定义
+
+`Active ephemeral overlay` 只服务当前 active video 的瞬时反馈层。
+
+它必须与 row-owned content overlay 和 top chrome overlay 隔离。
+
+### 6.2 当前放入内容
+
+- 播/停 HUD
+
+### 6.3 未来适合放入的内容
 
 - 字幕
 - 手势反馈
-- 当前播放中的 toast / HUD
-- 主要交互按钮列
-- 只对 active video 才需要出现的统一动作层
+- 临时提示
+- 其它时间轴或过程驱动的 HUD
 
-#### 设计理由
+### 6.4 设计理由
 
-`title` 和 `description` 视觉上天然属于当前视频内容本身，而不是“播放器外壳”。
+这类状态更新频率高、持续时间短，不能反向拖动 row 内容层或顶部 chrome 一起重渲。
 
-把它们绑定在 row 上有两个好处：
+## 7. 状态归属建议
 
-- 视频在翻页切换时，信息跟着视频一起运动，视觉关系自然
-- row 自己就能表达该视频最基础的内容上下文，而不必完全依赖页面级 overlay
+未来 Fullscreen Video 扩展时，状态应固定分为四类：
 
-#### 约束
-
-- 这一层只允许承载低频、稳定、视频自带的信息
-- 不允许让高频状态进入 row-bound overlay
-- 不允许把手势、字幕、当前播放反馈塞回每个 row
-
-### 4.2 Layer 2: Active-only stable overlay
-
-#### 定义
-
-`Active-only stable overlay` 只为当前 active video 渲染，但它表达的是低频、相对稳定的当前视频动作和状态。
-
-它不是绑定在每个 row 上，而是由 pager 顶层统一渲染一次，并根据 `activeItemId` 切换内容。
-
-#### 适合放入的内容
-
-- 点赞按钮
-- 收藏按钮
-- 当前视频的动作 rail
-- debug / counter 信息
-- mute / sound 状态提示
-- 与当前视频相关但更新频率较低的控制层
-
-#### 为什么点赞/收藏更适合放在这一层
-
-点赞和收藏虽然是“每个 video 不同”的状态，但它们的主要交互对象通常只有当前 active video。
-
-所以它们更适合做成：
-
-- 顶层只渲染一次的动作层
-- 通过 `activeItemId` 读取当前视频的状态
-- 当前视频变化时切换按钮状态
-
-而不是把整套交互按钮复制到每个 row 上。
-
-#### 设计理由
-
-这样做的核心收益是：
-
-- 点赞/收藏状态更新时，只影响当前 active overlay
-- 不会因为每个视频都有自己不同的互动状态，就强迫一批 row 跟着一起重渲
-- 行为入口更统一，后续扩展分享、更多、笔记、复习入口也更自然
-
-#### 约束
-
-- 这一层只承载低频、稳定、当前视频级别的动作与状态
-- 不承载逐帧变化的内容
-- 不承载依赖播放器当前时间轴的内容
-
-### 4.3 Layer 3: Active-only ephemeral overlay
-
-#### 定义
-
-`Active-only ephemeral overlay` 也只为当前 active video 渲染，但它承载的是高频、瞬时、播放过程中的反馈层。
-
-这一层必须与 row 和稳定动作层进一步隔离。
-
-#### 适合放入的内容
-
-- 字幕
-- 双击点赞反馈
-- 手势反馈
-- 音量/静音 toast
-- 拖动、长按、临时 HUD
-- 当前视频播放过程中的瞬时提示
-
-#### 为什么字幕必须在这一层
-
-字幕不是“某个视频的静态补充文本”，而是：
-
-- 依赖当前 active video
-- 依赖当前播放时间轴
-- 更新频率显著高于普通 UI 状态
-
-如果把字幕绑定在 row 上，或者和点赞/收藏、标题、动作 rail 混在同一个 overlay 里，会带来两个问题：
-
-- 字幕更新会带着其它低频 UI 一起频繁重渲
-- 结构上难以区分“当前视频级别的稳定信息”和“当前播放时刻的瞬时信息”
-
-#### 约束
-
-- 这一层只服务当前 active video
-- 不允许把它扩散到所有 visible rows
-- 不允许它反向拖动稳定 overlay 和 row-bound overlay 一起更新
-
-## 5. 为什么 Active-only 还要再拆两层
-
-虽然 `Active-only stable overlay` 和 `Active-only ephemeral overlay` 都只显示当前视频，但它们的状态来源和更新节奏完全不同。
-
-### 5.1 稳定层的状态来源
-
-稳定层通常依赖：
-
-- `activeItemId`
-- 当前视频对应的点赞/收藏状态
-- 当前视频级别的控制状态
-
-它的更新通常发生在：
-
-- 切到新视频时
-- 用户点击点赞/收藏时
-- 用户切静音时
-
-也就是说，它是低频、事件驱动的。
-
-### 5.2 瞬时层的状态来源
-
-瞬时层通常依赖：
-
-- 当前视频时间轴
-- 当前手势过程
-- 临时交互反馈
-
-它的更新可能非常频繁，例如：
-
-- 字幕持续变化
-- 手势过程中连续变化
-- toast 短时间出现又消失
-
-也就是说，它是高频、过程驱动的。
-
-### 5.3 不拆分会带来的问题
-
-如果把两类状态混在一起：
-
-- 字幕变化会连带动作 rail、点赞按钮、标题块一起更新
-- 手势反馈会把低频稳定状态一起拉进 render
-- 以后很难判断某次性能问题到底来自字幕、手势还是交互状态
-
-所以把 active-only 再拆成“稳定层”和“瞬时层”，不是抽象洁癖，而是为了：
-
-- 控制更新范围
-- 降低耦合
-- 保证后续功能扩展不会把 overlay 结构迅速污染
-
-## 6. 状态归属建议
-
-未来 overlay 扩展时，状态归属应固定为四类：
-
-### 6.1 Feed / Video 基础实体
+### 7.1 Feed / Video 基础实体
 
 属于 `FeedItem` 或 `video asset` 的基础内容：
 
@@ -245,130 +146,88 @@
 - `uri`
 - `title`
 - `subtitle`
-- 其它低频元数据
 
-这一层不应并入：
+### 7.2 当前播放会话状态
 
-- 点赞状态
-- 收藏状态
-- 播放时字幕内容
-- 当前播放会话状态
+只属于当前 fullscreen 播放会话：
 
-### 6.2 全局播放偏好
+- `activeIndex`
+- `pausedByUser`
+- 当前 HUD 文案
 
-适合作为全局偏好的内容：
+这类状态由 `widgets/fullscreen-video-pager` 持有，不回写到 page 或 feed source。
 
-- `isMuted`
-- `showSubtitles`
+### 7.3 播放规则纯逻辑
 
-这一层不按每个 video 分开建模。
+属于纯规则层而非 UI state：
 
-### 6.3 按 videoId 索引的交互状态
+- player window 策略
+- 背景点按后的播/停切换规则
+- active row 变化后的暂停重置规则
+- `activeIndex + pausedByUser -> shouldPlay`
 
-适合独立建模为 `videoId -> state` 的内容：
+这类逻辑归 `features/video-playback`。
+
+### 7.4 未来按 videoId 索引的交互状态
+
+未来真正接收藏/点赞/保存时，再独立建模：
 
 - `favoriteIds`
-- 未来的 `likedIds`
+- `likedIds`
+- 其它 `videoId -> state`
 
-这类状态不应回写进 feed source，而应通过独立 query / mutation 或独立状态源消费。
+这类状态不应直接塞回共享 feed source。
 
-### 6.4 当前播放会话中的瞬时状态
+## 8. 组件落位
 
-适合只为当前 active video 存在的内容：
+当前推荐组件层次如下：
 
-- 当前字幕片段
-- 当前手势反馈
-- 当前视频 loading / error HUD
-- 临时 toast
-
-这类状态不应成为共享列表数据的一部分。
-
-## 7. 组件落位建议
-
-推荐的组件层次如下：
-
-### 7.1 Row 层
-
-`FullscreenVideoItem`
+### 8.1 `FullscreenVideoItem`
 
 负责：
 
 - 视频画面
-- row-bound overlay
+- 背景点击层
+- row-owned content overlay
 - row 内最小 loading / error 覆盖层
 
-### 7.2 当前视频稳定动作层
-
-`ActiveVideoOverlay`
+### 8.2 `TopChromeOverlay`
 
 负责：
 
-- 点赞/收藏按钮
-- debug / counter
-- 动作 rail
-- 当前视频级别的低频控制信息
+- 顶部 counter
 
-### 7.3 当前视频瞬时反馈层
-
-`ActiveSubtitleOverlay`
+### 8.3 `PlaybackFeedbackOverlay`
 
 负责：
 
-- 字幕
-- 时间轴驱动的文本提示
+- 当前 active video 的播/停 HUD
+- 未来的字幕/手势/临时反馈
 
-`PlaybackFeedbackOverlay`
-
-负责：
-
-- 手势反馈
-- mute toast
-- 点按后的短暂 HUD
-
-## 8. 性能约束
-
-这套三层 overlay 设计的目标之一，就是为未来的性能优化提前设边界。
+## 9. 性能约束
 
 必须遵循以下约束：
 
-1. `Row-bound overlay` 只承载低频内容
-2. `Active-only stable overlay` 只根据 `activeItemId` 和低频交互状态更新
-3. `Active-only ephemeral overlay` 高度隔离，不得牵连 row 或稳定动作层一起更新
-4. 点赞/收藏等 per-video 状态即使按 video 不同，也不等于必须回写到 row 或 feed item
-5. 字幕不能进入每个 row，也不能并入共享 feed items
+1. row-owned content overlay 只承载低频、内容型 UI
+2. top chrome overlay 只承载固定页面 chrome
+3. active ephemeral overlay 的高频更新不得牵连前两层
+4. player 是否挂载由 `shouldMountPlayer()` 决定
+5. player 是否播放由 `shouldPlayVideo()` 决定
+6. active row 变化后，`pausedByUser` 必须重置为 `false`
 
-## 9. 与当前实现的对应关系
+## 10. 当前实现真相
 
-当前 `FullscreenVideoPager` 中已有的 overlay 关系可以作为过渡参考：
+当前落地实现已经收口为：
 
-- 左上角 debug overlay：未来应归入 `Active-only stable overlay`
-- 底部标题与描述：未来更适合回到 `Row-bound overlay`
-- mute toast：更适合归入 `Active-only ephemeral overlay`
+- `row-owned content overlay`
+  - 标题、说明、scrim、右侧 rail
+- `top chrome overlay`
+  - counter
+- `active ephemeral overlay`
+  - 播/停 HUD
 
-也就是说，当前实现不是推倒重来，而是沿下面的方向收口：
+不再保留的旧口径包括：
 
-- `title / description` 下放到 row
-- 当前动作和状态集中到稳定 active overlay
-- 字幕和手势反馈集中到瞬时 active overlay
-
-## 10. 验收标准
-
-这份设计真正落地后，应满足以下标准：
-
-- `title / description` 跟着视频 row 自然滚动
-- 点赞/收藏状态虽然按 video 不同，但只驱动当前 active 的主要交互层
-- 字幕和手势反馈不会把整批 row 拉进高频更新
-- overlay 结构清晰，不再把所有信息混在一层里
-- 新增点赞、收藏、字幕、手势功能后，`Fullscreen Video` 的组件边界仍然可维护
-
-## 11. 非目标
-
-本文档不定义以下内容：
-
-- 点赞/收藏 API 细节
-- 字幕数据获取协议
-- 播放器内核实现
-- Feed 列表页卡片设计
-- 整个 App 的统一 design system
-
-这些内容分别由实体层、feature 层、播放内核和全局 UI 规范文档负责。
+- 页面级 `isMuted`
+- “点击任意位置切换静音”
+- “右侧 rail 由 pager 顶层统一渲染”

@@ -22,10 +22,13 @@ function VideoOverlayActionButtonComponent({
     <Pressable
       accessibilityLabel={item.accessibilityLabel}
       accessibilityRole="button"
-      onPress={onPress}
+      accessibilityState={{ disabled: onPress === undefined }}
+      onPress={() => {
+        onPress?.();
+      }}
       style={({ pressed }) => ({
-        opacity: pressed ? 0.92 : 1,
-        transform: [{ scale: pressed ? 0.97 : 1 }],
+        opacity: pressed && onPress ? 0.92 : 1,
+        transform: [{ scale: pressed && onPress ? 0.97 : 1 }],
       })}
     >
       <AdaptiveGlass

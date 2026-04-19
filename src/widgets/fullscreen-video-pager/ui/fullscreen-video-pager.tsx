@@ -10,43 +10,44 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FeedItem } from '@/entities/feed';
-import { shouldMountPlayer } from '@/features/video-playback';
+import {
+  resolvePausedByUserAfterActiveChange,
+  shouldMountPlayer,
+  shouldPlayVideo,
+  togglePlaybackPausedByUser,
+} from '@/features/video-playback';
 import { resolveActiveVideoChange } from '../model/active-video-change';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
-import { ActiveVideoOverlay } from './active-video-overlay';
+import { getPlaybackFeedbackLabel } from '../model/playback-feedback';
 import { FullscreenVideoItem } from './fullscreen-video-item';
 import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
+import { TopChromeOverlay } from './top-chrome-overlay';
 
-const audioToastDurationMs = 700;
+const playbackFeedbackDurationMs = 700;
 
 export type FullscreenVideoPagerProps = {
   initialIndex: number;
   isFetchingNextPage: boolean;
   isInitialLoading: boolean;
-  isMuted: boolean;
   items: FeedItem[];
   onActiveItemChange: (itemId: string, index: number) => void;
-  onPressBack: () => void;
-  onToggleMuted: () => void;
 };
 
 export function FullscreenVideoPager({
   initialIndex,
   isFetchingNextPage,
   isInitialLoading,
-  isMuted,
   items,
   onActiveItemChange,
-  onPressBack,
-  onToggleMuted,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatListType<FeedItem>>(null);
-  const audioToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playbackFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
+  const pausedByUserRef = useRef(false);
   const activeSnapshotRef = useRef<{
     index: number | null;
     itemId: string | null;
@@ -55,7 +56,8 @@ export function FullscreenVideoPager({
     itemId: null,
   });
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [audioToastLabel, setAudioToastLabel] = useState<string | null>(null);
+  const [pausedByUser, setPausedByUser] = useState(false);
+  const [playbackFeedbackLabel, setPlaybackFeedbackLabel] = useState<string | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
     isFetchingNextPage,
@@ -84,6 +86,20 @@ export function FullscreenVideoPager({
         return;
       }
 
+      const nextPausedByUser = resolvePausedByUserAfterActiveChange({
+        currentActiveIndex: currentSnapshot.index,
+        nextActiveIndex: index,
+        pausedByUser: pausedByUserRef.current,
+      });
+
+      pausedByUserRef.current = nextPausedByUser;
+      setPausedByUser(nextPausedByUser);
+      if (playbackFeedbackTimeoutRef.current) {
+        clearTimeout(playbackFeedbackTimeoutRef.current);
+        playbackFeedbackTimeoutRef.current = null;
+      }
+      setPlaybackFeedbackLabel(null);
+
       activeSnapshotRef.current = {
         index,
         itemId,
@@ -96,8 +112,8 @@ export function FullscreenVideoPager({
 
   useEffect(() => {
     return () => {
-      if (audioToastTimeoutRef.current) {
-        clearTimeout(audioToastTimeoutRef.current);
+      if (playbackFeedbackTimeoutRef.current) {
+        clearTimeout(playbackFeedbackTimeoutRef.current);
       }
     };
   }, []);
@@ -133,19 +149,21 @@ export function FullscreenVideoPager({
     commitActiveVideo(nextItem.id, initialPosition.targetIndex);
   }, [commitActiveVideo, initialPosition.targetIndex, items]);
 
-  const handleToggleMuted = useCallback(() => {
-    const nextMutedValue = !isMuted;
-    onToggleMuted();
+  const handleTogglePlayback = useCallback(() => {
+    const nextPausedByUser = togglePlaybackPausedByUser(pausedByUserRef.current);
 
-    if (audioToastTimeoutRef.current) {
-      clearTimeout(audioToastTimeoutRef.current);
+    pausedByUserRef.current = nextPausedByUser;
+    setPausedByUser(nextPausedByUser);
+    setPlaybackFeedbackLabel(getPlaybackFeedbackLabel(nextPausedByUser));
+
+    if (playbackFeedbackTimeoutRef.current) {
+      clearTimeout(playbackFeedbackTimeoutRef.current);
     }
 
-    setAudioToastLabel(nextMutedValue ? 'Muted' : 'Sound On');
-    audioToastTimeoutRef.current = setTimeout(() => {
-      setAudioToastLabel(null);
-    }, audioToastDurationMs);
-  }, [isMuted, onToggleMuted]);
+    playbackFeedbackTimeoutRef.current = setTimeout(() => {
+      setPlaybackFeedbackLabel(null);
+    }, playbackFeedbackDurationMs);
+  }, []);
 
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
@@ -178,28 +196,42 @@ export function FullscreenVideoPager({
       activeIndex,
       bottomInset: insets.bottom,
       height,
-      isMuted,
+      pausedByUser,
       width,
     }),
-    [activeIndex, height, insets.bottom, isMuted, width]
+    [activeIndex, height, insets.bottom, pausedByUser, width]
   );
 
   const renderItem = useCallback(
     ({ item, index }: { item: FeedItem; index: number }) => {
+      const shouldPlay = shouldPlayVideo({
+        activeIndex,
+        itemIndex: index,
+        pausedByUser,
+      });
+
       return (
         <FullscreenVideoItem
           bottomInset={insets.bottom}
           height={height}
           isActive={item.id === activeItemId}
-          isMuted={isMuted}
-          onToggleMuted={handleToggleMuted}
+          onTogglePlayback={handleTogglePlayback}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
+          shouldPlay={shouldPlay}
           video={item}
           width={width}
         />
       );
     },
-    [activeIndex, activeItemId, handleToggleMuted, height, insets.bottom, isMuted, width]
+    [
+      activeIndex,
+      activeItemId,
+      handleTogglePlayback,
+      height,
+      insets.bottom,
+      pausedByUser,
+      width,
+    ]
   );
 
   return (
@@ -264,14 +296,12 @@ export function FullscreenVideoPager({
         </View>
       ) : null}
 
-      <ActiveVideoOverlay
+      <TopChromeOverlay
         activeIndex={activeIndex}
-        bottomInset={insets.bottom}
-        onPressBack={onPressBack}
         topInset={insets.top}
         totalItems={items.length}
       />
-      <PlaybackFeedbackOverlay audioToastLabel={audioToastLabel} />
+      <PlaybackFeedbackOverlay playbackFeedbackLabel={playbackFeedbackLabel} />
     </View>
   );
 }

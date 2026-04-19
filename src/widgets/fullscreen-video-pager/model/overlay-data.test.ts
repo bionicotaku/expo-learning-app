@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  formatFullscreenVideoDebugLabel,
+  formatFullscreenVideoCounterLabel,
   fullscreenVideoOverlayActionItems,
 } from './overlay-data';
 
@@ -15,9 +15,9 @@ describe('fullscreen overlay data', () => {
     ]);
   });
 
-  it('formats the debug label from the active item index', () => {
-    expect(formatFullscreenVideoDebugLabel(0, 8)).toBe('1 / 8');
-    expect(formatFullscreenVideoDebugLabel(3, 8)).toBe('4 / 8');
-    expect(formatFullscreenVideoDebugLabel(null, 8)).toBeNull();
+  it('formats the top chrome counter from the active item index', () => {
+    expect(formatFullscreenVideoCounterLabel(0, 8)).toBe('1 / 8');
+    expect(formatFullscreenVideoCounterLabel(3, 8)).toBe('4 / 8');
+    expect(formatFullscreenVideoCounterLabel(null, 8)).toBeNull();
   });
 });

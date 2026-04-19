@@ -10,19 +10,17 @@ import {
 } from '../model/render-props';
 
 type PlayableVideoSurfaceProps = {
-  isActive: boolean;
-  isMuted: boolean;
+  shouldPlay: boolean;
   video: FeedItem;
 };
 
 function PlayableVideoSurfaceComponent({
   video,
-  isActive,
-  isMuted,
+  shouldPlay,
 }: PlayableVideoSurfaceProps) {
   const player = useVideoPlayer(video.uri, (instance) => {
     instance.loop = true;
-    instance.muted = isMuted;
+    instance.muted = false;
   });
 
   const { status, error } = useEvent(player, 'statusChange', {
@@ -31,11 +29,7 @@ function PlayableVideoSurfaceComponent({
   });
 
   useEffect(() => {
-    player.muted = isMuted;
-  }, [isMuted, player]);
-
-  useEffect(() => {
-    if (!isActive) {
+    if (!shouldPlay) {
       player.pause();
       return;
     }
@@ -43,13 +37,12 @@ function PlayableVideoSurfaceComponent({
     if (status === 'readyToPlay') {
       player.play();
     }
-  }, [isActive, player, status]);
+  }, [player, shouldPlay, status]);
 
   const handleRetry = async () => {
     await player.replaceAsync(video.uri);
-    player.muted = isMuted;
 
-    if (isActive) {
+    if (shouldPlay) {
       player.play();
     }
   };
@@ -139,13 +132,11 @@ function arePlayableVideoSurfaceComponentPropsEqual(
 ): boolean {
   const previousRenderProps: PlayableVideoSurfaceRenderProps = {
     videoId: previousProps.video.id,
-    isActive: previousProps.isActive,
-    isMuted: previousProps.isMuted,
+    shouldPlay: previousProps.shouldPlay,
   };
   const nextRenderProps: PlayableVideoSurfaceRenderProps = {
     videoId: nextProps.video.id,
-    isActive: nextProps.isActive,
-    isMuted: nextProps.isMuted,
+    shouldPlay: nextProps.shouldPlay,
   };
 
   return (

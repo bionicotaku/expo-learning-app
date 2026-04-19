@@ -1,17 +1,20 @@
 import { memo } from 'react';
 import { View } from 'react-native';
 
-import { fullscreenVideoOverlayActionItems } from '../model/overlay-data';
+import {
+  fullscreenVideoOverlayActionItems,
+  type FullscreenVideoOverlayActionItem,
+} from '../model/overlay-data';
 import { VideoOverlayActionButton } from './video-overlay-action-button';
-
-const noop = () => {};
 
 type VideoOverlayActionRailProps = {
   bottomInset: number;
+  onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
 };
 
 function VideoOverlayActionRailComponent({
   bottomInset,
+  onActionPress,
 }: VideoOverlayActionRailProps) {
   return (
     <View
@@ -28,7 +31,13 @@ function VideoOverlayActionRailComponent({
         <VideoOverlayActionButton
           key={item.id}
           item={item}
-          onPress={noop}
+          onPress={
+            onActionPress
+              ? () => {
+                  onActionPress(item);
+                }
+              : undefined
+          }
         />
       ))}
     </View>
