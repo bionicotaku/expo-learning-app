@@ -27,4 +27,10 @@ describe('structured auth title fonts', () => {
       resolveStructuredAuthTitleFontFamily('注册', 'Fraunces', 'TW-Kai-98_1')
     ).toBe('TW-Kai-98_1');
   });
+
+  it('falls back to the system title font while the cjk font is still loading', () => {
+    expect(
+      resolveStructuredAuthTitleFontFamily('忘记密码', 'Fraunces', 'TW-Kai-98_1', false)
+    ).toBeUndefined();
+  });
 });

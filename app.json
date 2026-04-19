@@ -26,14 +26,26 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/editorial-paper/fraunces-variable.ttf"
+          ]
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#F4EFE6",
+          "image": "./assets/images/splash-lockup.png",
+          "imageWidth": 172,
           "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
+            "resizeMode": "contain"
+          },
+          "ios": {
+            "resizeMode": "contain"
           }
         }
       ],

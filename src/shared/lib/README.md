@@ -4,6 +4,8 @@
 
 当前目录包括：
 
+- `startup/`
+  - root 启动阶段的状态机与时间常量
 - `react-query/`
   - QueryClient 初始化与应用级数据缓存基础设施
 - `toast/`

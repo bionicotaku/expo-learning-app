@@ -16,11 +16,12 @@ export function AuthCardTitle({
   children,
   marginBottom = 18,
 }: AuthCardTitleProps) {
-  const { tokens } = useEditorialPaperTheme();
+  const { tokens, fontsLoaded } = useEditorialPaperTheme();
   const titleFontFamily = resolveStructuredAuthTitleFontFamily(
     children,
     tokens.typography.title.fontFamily,
-    editorialPaperCjkTitleFontFamily
+    editorialPaperCjkTitleFontFamily,
+    fontsLoaded
   );
 
   return (

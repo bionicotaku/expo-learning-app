@@ -4,6 +4,7 @@ export {
   editorialPaperCjkTitleFontFamily,
   editorialPaperDisplayFontAssetPath,
   editorialPaperDisplayFontFamily,
+  getEditorialPaperDeferredFontSources,
   getEditorialPaperFontSources,
 } from './fonts';
 export { editorialPaperLightTokens } from './tokens';

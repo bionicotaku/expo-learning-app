@@ -45,6 +45,7 @@
   - 收藏夹与学习沉淀页
   - 我的页与学习概览页
   - 登录与认证入口页
+  - app 启动阶段的 native splash / JS launch screen
 
 不适用范围：
 
@@ -227,6 +228,8 @@ src/shared/ui/editorial-paper/
   soft-action-button.tsx
   segmented-filter-bar.tsx
   icon-pill.tsx
+src/shared/ui/startup/
+  launch-screen.tsx
 ```
 
 原语职责固定如下：
@@ -247,6 +250,9 @@ src/shared/ui/editorial-paper/
   负责筛选/模式切换容器与选中态外壳
 - `IconPill`
   负责小型圆角图标胶囊或圆形 icon capsule
+- `LaunchScreen`
+  负责 app 启动后的正式 JS 过渡屏
+  不承担业务页面模板职责，但必须复用 `Editorial Paper` 主题和品牌语言
 
 ### 4.3 Shared 层禁止进入的内容
 
@@ -342,6 +348,7 @@ src/shared/ui/editorial-paper/
   - `feed / video / favorite` 的实体与映射
 - `shared/`
   - token、原语、底层视觉能力
+  - app 启动期的共享视觉与状态基础设施
 
 ### 5.5 推荐目录形态
 

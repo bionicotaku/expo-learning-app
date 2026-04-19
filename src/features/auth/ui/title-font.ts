@@ -8,8 +8,13 @@ export function shouldUseEditorialDisplayFont(title: string) {
 export function resolveStructuredAuthTitleFontFamily(
   title: string,
   editorialDisplayFontFamily: string,
-  editorialCjkTitleFontFamily: string
+  editorialCjkTitleFontFamily: string,
+  editorialCjkTitleFontLoaded = true
 ) {
+  if (!shouldUseEditorialDisplayFont(title) && !editorialCjkTitleFontLoaded) {
+    return undefined;
+  }
+
   return shouldUseEditorialDisplayFont(title)
     ? editorialDisplayFontFamily
     : editorialCjkTitleFontFamily;
