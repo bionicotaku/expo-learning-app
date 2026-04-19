@@ -456,6 +456,7 @@ src/
 - 不重复创造新的播放器壳
 - 视频切换、预取阈值、active item 选择继续依附现有 feed/video 能力模型
 - 该页面的工作重点是 page template、overlay、动作布局与导航关系，而不是推翻现有播放内核
+- 其中 `Fullscreen Video` 的 overlay 分层设计单独定义在 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)
 
 ### 7.6 Theme 收口要求
 

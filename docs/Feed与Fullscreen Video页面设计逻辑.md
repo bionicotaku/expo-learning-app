@@ -14,6 +14,8 @@
 
 本文档是页面设计逻辑说明，不单独定义整套风格系统。视觉系统与组件抽象总规范见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)。
 
+`Fullscreen Video` 的 overlay 分层设计已单独收口到 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
+
 ## 2. 页面关系总览
 
 ### 2.1 一句话模型
@@ -172,6 +174,14 @@
    - 当前视频进度可视化
 
 这一结构说明该页面是“播放优先，信息叠加”的模式，而不是“图文详情页”。
+
+具体到 overlay 的职责拆分，后续实现应遵循三层模型：
+
+- `Row-bound overlay`
+- `Active-only stable overlay`
+- `Active-only ephemeral overlay`
+
+详细规则见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
 
 ### 4.3 视频页的交互职责
 
@@ -479,4 +489,3 @@
 - 返回列表页时恢复到最后播放视频对应卡片
 - 列表页负责内容发现，视频页负责沉浸消费
 - 两个页面共同构成主内容区的完整闭环
-
