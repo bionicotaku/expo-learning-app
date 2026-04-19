@@ -30,7 +30,8 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/editorial-paper/fraunces-variable.ttf"
+            "./assets/fonts/editorial-paper/fraunces-variable.ttf",
+            "./assets/fonts/editorial-paper/TW-Kai-98_1.ttf"
           ]
         }
       ],

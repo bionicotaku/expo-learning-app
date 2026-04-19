@@ -60,10 +60,9 @@ describe('Editorial Paper foundation', () => {
   });
 
   it('builds a stable theme context value', () => {
-    expect(createEditorialPaperThemeContextValue(true)).toEqual({
+    expect(createEditorialPaperThemeContextValue()).toEqual({
       themeKey: 'light',
       tokens: editorialPaperLightTokens,
-      fontsLoaded: true,
     });
   });
 });

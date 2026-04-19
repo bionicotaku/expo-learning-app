@@ -9,9 +9,3 @@ export function getEditorialPaperFontSources() {
     [editorialPaperCjkTitleFontFamily]: require('../../../../assets/fonts/editorial-paper/TW-Kai-98_1.ttf'),
   } as const;
 }
-
-export function getEditorialPaperDeferredFontSources() {
-  return {
-    [editorialPaperCjkTitleFontFamily]: require('../../../../assets/fonts/editorial-paper/TW-Kai-98_1.ttf'),
-  } as const;
-}

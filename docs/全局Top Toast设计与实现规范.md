@@ -359,7 +359,7 @@ store 不负责：
 
 ```tsx
 <GestureHandlerRootView style={{ flex: 1 }}>
-  <EditorialPaperThemeProvider fontsLoaded={fontsLoaded}>
+  <EditorialPaperThemeProvider>
     <QueryClientProvider client={queryClient}>
       <Stack screenOptions={{ headerShown: false }} />
       <ToastHost />

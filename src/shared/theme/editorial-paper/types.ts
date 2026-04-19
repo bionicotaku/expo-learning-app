@@ -74,5 +74,4 @@ export type EditorialPaperTokens = {
 export type EditorialPaperThemeContextValue = {
   themeKey: EditorialPaperThemeKey;
   tokens: EditorialPaperTokens;
-  fontsLoaded: boolean;
 };

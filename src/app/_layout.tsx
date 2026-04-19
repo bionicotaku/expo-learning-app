@@ -1,5 +1,4 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import * as Font from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
@@ -16,7 +15,6 @@ import { createQueryClient } from '@/shared/lib/react-query/query-client';
 import {
   EditorialPaperThemeProvider,
   editorialPaperLightTokens,
-  getEditorialPaperDeferredFontSources,
 } from '@/shared/theme/editorial-paper';
 import { LaunchScreen } from '@/shared/ui/startup';
 import { ToastHost } from '@/shared/ui/toast';
@@ -27,7 +25,6 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
 
 export default function RootLayout() {
   const [queryClient] = useState(() => createQueryClient());
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [bootstrapState, dispatch] = useReducer(
     reduceLaunchBootstrapState,
     undefined,
@@ -37,26 +34,6 @@ export default function RootLayout() {
   const launchOpacity = useRef(new Animated.Value(1)).current;
   const didLayoutLaunchScreen = useRef(false);
   const requestedNativeHide = useRef(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    void Font.loadAsync(getEditorialPaperDeferredFontSources())
-      .then(() => {
-        if (!cancelled) {
-          setFontsLoaded(true);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setFontsLoaded(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     if (!bootstrapState.nativeHideRequested || requestedNativeHide.current) {
@@ -141,7 +118,7 @@ export default function RootLayout() {
         backgroundColor: editorialPaperLightTokens.color.background,
       }}
     >
-      <EditorialPaperThemeProvider fontsLoaded={fontsLoaded}>
+      <EditorialPaperThemeProvider>
         <Animated.View
           style={{
             flex: 1,
