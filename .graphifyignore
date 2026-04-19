@@ -1,0 +1,47 @@
+# Keep graphify scoped to the project source corpus only.
+# This file is intentionally stricter than .gitignore:
+# graphify should only scan docs/, scripts/, and src/.
+
+# Existing gitignore-style exclusions
+.vscode
+.expo
+dist
+web-build
+node_modules
+expo-env.d.ts
+.kotlin
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+*.pem
+.env*.local
+.env
+*.tsbuildinfo
+app-example
+ios
+android
+
+# Graphify outputs and local agent state
+graphify-out
+.codex
+
+# Exclude all top-level files and folders outside docs/, scripts/, src/
+.git
+.gitignore
+AGENTS.md
+README.md
+app.json
+assets
+eslint.config.js
+package-lock.json
+package.json
+tsconfig.json
+vitest.config.ts
