@@ -2,12 +2,16 @@
 
 `shared/ui` 只放可跨页面复用的视觉原语，不放业务模板。
 
-当前正式入口是 `editorial-paper/`：
+当前正式入口包括：
 
 - `editorial-paper/`
   - `RaisedSurface`、`InsetSurface`、`AdaptiveGlass`
   - `EditorialTitle`、`MetaLabel`
   - `SoftActionButton`、`SegmentedFilterBar`、`IconPill`
+- `toast/`
+  - `ToastHost`
+  - 应用级全局 top toast 视图实现
+  - 独立于 `Editorial Paper`，不作为页面原语使用
 
 这里的组件只负责视觉壳和基础交互约束：
 
@@ -16,3 +20,9 @@
 - 不承载 `FeedCard`、`AuthCard`、`ProfileSummary` 这类页面模板
 
 页面级模板应继续放在 `widgets/`、`features/`、`pages/`，不要回流到 `shared/ui`。
+
+补充约束：
+
+- `toast/` 是全局 overlay UI，不是页面 primitive
+- `toast/` 不并入 `editorial-paper/`
+- Fullscreen Video 内部的局部 HUD 也不进入 `toast/`
