@@ -4,6 +4,7 @@
 .vscode/
 
 # agent
+.codex/
 
 # graphify
 graphify-out/cache/

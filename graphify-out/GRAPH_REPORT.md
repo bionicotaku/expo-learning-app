@@ -1,50 +1,54 @@
-# Graph Report - .  (2026-04-18)
+# Graph Report - .  (2026-04-19)
 
 ## Corpus Check
-- Corpus is ~7,510 words - fits in a single context window. You may not need a graph.
+- 50 files · ~13,664 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 102 nodes · 79 edges · 36 communities detected
-- Extraction: 63% EXTRACTED · 37% INFERRED · 0% AMBIGUOUS · INFERRED: 29 edges (avg confidence: 0.81)
+- 143 nodes · 117 edges · 39 communities detected
+- Extraction: 75% EXTRACTED · 25% INFERRED · 0% AMBIGUOUS · INFERRED: 29 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Product Learning Loop|Product Learning Loop]]
-- [[_COMMUNITY_Architecture Boundaries|Architecture Boundaries]]
-- [[_COMMUNITY_Theming Utilities|Theming Utilities]]
-- [[_COMMUNITY_Feed Screen State|Feed Screen State]]
-- [[_COMMUNITY_Mock Feed Data|Mock Feed Data]]
-- [[_COMMUNITY_App Routing Shell|App Routing Shell]]
-- [[_COMMUNITY_Native Animated Icon|Native Animated Icon]]
-- [[_COMMUNITY_External Link Helper|External Link Helper]]
-- [[_COMMUNITY_Web Animated Icon|Web Animated Icon]]
-- [[_COMMUNITY_Template Reset Script|Template Reset Script]]
-- [[_COMMUNITY_Feed Entry Route|Feed Entry Route]]
-- [[_COMMUNITY_React Query Client|React Query Client]]
-- [[_COMMUNITY_Hint Row UI|Hint Row UI]]
-- [[_COMMUNITY_Auth Strategy|Auth Strategy]]
-- [[_COMMUNITY_Global Type Decls|Global Type Decls]]
-- [[_COMMUNITY_Legacy Theme Constants|Legacy Theme Constants]]
-- [[_COMMUNITY_Playback Feature Exports|Playback Feature Exports]]
-- [[_COMMUNITY_Playback Reducer Tests|Playback Reducer Tests]]
-- [[_COMMUNITY_Player Window Tests|Player Window Tests]]
-- [[_COMMUNITY_Pagination Feature Exports|Pagination Feature Exports]]
-- [[_COMMUNITY_Pagination Policy Tests|Pagination Policy Tests]]
-- [[_COMMUNITY_Shared Color Tokens|Shared Color Tokens]]
-- [[_COMMUNITY_Collapsible UI|Collapsible UI]]
-- [[_COMMUNITY_Native Color Scheme|Native Color Scheme]]
-- [[_COMMUNITY_Feed Page Exports|Feed Page Exports]]
-- [[_COMMUNITY_Feed Selector Tests|Feed Selector Tests]]
-- [[_COMMUNITY_Video Feed Exports|Video Feed Exports]]
-- [[_COMMUNITY_Feed Loading Card|Feed Loading Card]]
-- [[_COMMUNITY_Feed Overlay UI|Feed Overlay UI]]
-- [[_COMMUNITY_Video Feed Model Exports|Video Feed Model Exports]]
-- [[_COMMUNITY_Video Entity Exports|Video Entity Exports]]
-- [[_COMMUNITY_Video Mock Catalog|Video Mock Catalog]]
-- [[_COMMUNITY_Video Entity Types|Video Entity Types]]
-- [[_COMMUNITY_Feed Entity Exports|Feed Entity Exports]]
-- [[_COMMUNITY_Feed Entity Types|Feed Entity Types]]
-- [[_COMMUNITY_Feed Repository Tests|Feed Repository Tests]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Target Source Layer Structure` - 9 edges
@@ -77,220 +81,234 @@
 
 ## Communities
 
-### Community 0 - "Product Learning Loop"
+### Community 0 - "Community 0"
+Cohesion: 0.07
+Nodes (0): 
+
+### Community 1 - "Community 1"
 Cohesion: 0.12
 Nodes (11): Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, MVP Closed Loop, Real Account System, Continuous Video Feed, expo-video Playback, shouldPrefetchNextPage() (+3 more)
 
-### Community 1 - "Architecture Boundaries"
+### Community 2 - "Community 2"
+Cohesion: 0.17
+Nodes (0): 
+
+### Community 3 - "Community 3"
 Cohesion: 0.2
 Nodes (9): One-Way Dependency Direction, Legacy Template Directories, Layer Boundaries Clarify Ownership, Target Source Layer Structure, Content-Driven Learning App, Follow Expo Defaults Rationale, Lightweight FSD, Mobile-First Expo Stack (+1 more)
 
-### Community 2 - "Theming Utilities"
+### Community 4 - "Community 4"
 Cohesion: 0.2
 Nodes (5): ThemedText(), ThemedView(), useColorScheme(), useTheme(), WebBadge()
 
-### Community 3 - "Feed Screen State"
+### Community 5 - "Community 5"
 Cohesion: 0.24
 Nodes (6): buildFeedScreenItems(), createFeedLoadingTailItem(), getFeedDebugLabel(), getFeedOverlayModel(), isFeedLoadingTailItem(), useFeedScreenController()
 
-### Community 4 - "Mock Feed Data"
+### Community 6 - "Community 6"
 Cohesion: 0.27
 Nodes (7): Mock Data Behaves Like Real Async Flow, Mock Business Data With Real Async Flow, React Query Feed Pagination, createMockFeedPage(), fetchFeedPage(), sleep(), useFeedInfiniteQuery()
 
-### Community 5 - "App Routing Shell"
+### Community 7 - "Community 7"
 Cohesion: 1.0
 Nodes (2): Route-Only App Layer, Expo Router
 
-### Community 6 - "Native Animated Icon"
+### Community 8 - "Community 8"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 7 - "External Link Helper"
+### Community 9 - "Community 9"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 8 - "Web Animated Icon"
+### Community 10 - "Community 10"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 9 - "Template Reset Script"
+### Community 11 - "Community 11"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 10 - "Feed Entry Route"
+### Community 12 - "Community 12"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 11 - "React Query Client"
+### Community 13 - "Community 13"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 12 - "Hint Row UI"
+### Community 14 - "Community 14"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 13 - "Auth Strategy"
+### Community 15 - "Community 15"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 16 - "Community 16"
 Cohesion: 1.0
 Nodes (2): Auth Coupling Stays Inside Auth Layer, Supabase Auth
 
-### Community 14 - "Global Type Decls"
+### Community 17 - "Community 17"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 15 - "Legacy Theme Constants"
+### Community 18 - "Community 18"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 16 - "Playback Feature Exports"
+### Community 19 - "Community 19"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 17 - "Playback Reducer Tests"
+### Community 20 - "Community 20"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 18 - "Player Window Tests"
+### Community 21 - "Community 21"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 19 - "Pagination Feature Exports"
+### Community 22 - "Community 22"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 20 - "Pagination Policy Tests"
+### Community 23 - "Community 23"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 21 - "Shared Color Tokens"
+### Community 24 - "Community 24"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 22 - "Collapsible UI"
+### Community 25 - "Community 25"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 23 - "Native Color Scheme"
+### Community 26 - "Community 26"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 24 - "Feed Page Exports"
+### Community 27 - "Community 27"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 25 - "Feed Selector Tests"
+### Community 28 - "Community 28"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 26 - "Video Feed Exports"
+### Community 29 - "Community 29"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 27 - "Feed Loading Card"
+### Community 30 - "Community 30"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 28 - "Feed Overlay UI"
+### Community 31 - "Community 31"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 29 - "Video Feed Model Exports"
+### Community 32 - "Community 32"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 30 - "Video Entity Exports"
+### Community 33 - "Community 33"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 31 - "Video Mock Catalog"
+### Community 34 - "Community 34"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 32 - "Video Entity Types"
+### Community 35 - "Community 35"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 33 - "Feed Entity Exports"
+### Community 36 - "Community 36"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 34 - "Feed Entity Types"
+### Community 37 - "Community 37"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 35 - "Feed Repository Tests"
+### Community 38 - "Community 38"
 Cohesion: 1.0
 Nodes (0): 
 
 ## Knowledge Gaps
 - **7 isolated node(s):** `One-Way Dependency Direction`, `Legacy Template Directories`, `Layer Boundaries Clarify Ownership`, `Supabase Auth`, `Follow Expo Defaults Rationale` (+2 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Template Reset Script`** (2 nodes): `moveDirectories()`, `reset-project.js`
+- **Thin community `Community 11`** (2 nodes): `readRelative()`, `structure.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Entry Route`** (2 nodes): `IndexRoute()`, `index.tsx`
+- **Thin community `Community 12`** (2 nodes): `moveDirectories()`, `reset-project.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `React Query Client`** (2 nodes): `createQueryClient()`, `query-client.ts`
+- **Thin community `Community 13`** (2 nodes): `IndexRoute()`, `index.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hint Row UI`** (2 nodes): `HintRow()`, `hint-row.tsx`
+- **Thin community `Community 14`** (2 nodes): `createQueryClient()`, `query-client.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Auth Strategy`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
+- **Thin community `Community 15`** (2 nodes): `HintRow()`, `hint-row.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Global Type Decls`** (1 nodes): `global.d.ts`
+- **Thin community `Community 16`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Legacy Theme Constants`** (1 nodes): `theme.ts`
+- **Thin community `Community 17`** (1 nodes): `global.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Playback Feature Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 18`** (1 nodes): `theme.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Playback Reducer Tests`** (1 nodes): `feed-playback.test.ts`
+- **Thin community `Community 19`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Player Window Tests`** (1 nodes): `player-window.test.ts`
+- **Thin community `Community 20`** (1 nodes): `feed-playback.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Pagination Feature Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 21`** (1 nodes): `player-window.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Pagination Policy Tests`** (1 nodes): `feed-pagination-policy.test.ts`
+- **Thin community `Community 22`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Shared Color Tokens`** (1 nodes): `colors.ts`
+- **Thin community `Community 23`** (1 nodes): `feed-pagination-policy.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Collapsible UI`** (1 nodes): `collapsible.tsx`
+- **Thin community `Community 24`** (1 nodes): `colors.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Native Color Scheme`** (1 nodes): `use-color-scheme.ts`
+- **Thin community `Community 25`** (1 nodes): `collapsible.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Page Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 26`** (1 nodes): `use-color-scheme.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Selector Tests`** (1 nodes): `feed-screen-selectors.test.ts`
+- **Thin community `Community 27`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Video Feed Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 28`** (1 nodes): `feed-screen-selectors.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Loading Card`** (1 nodes): `video-feed-loading-card.tsx`
+- **Thin community `Community 29`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Overlay UI`** (1 nodes): `video-feed-overlay.tsx`
+- **Thin community `Community 30`** (1 nodes): `video-feed-loading-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Video Feed Model Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 31`** (1 nodes): `video-feed-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Video Entity Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 32`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Video Mock Catalog`** (1 nodes): `videos.ts`
+- **Thin community `Community 33`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Video Entity Types`** (1 nodes): `types.ts`
+- **Thin community `Community 34`** (1 nodes): `videos.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Entity Exports`** (1 nodes): `index.ts`
+- **Thin community `Community 35`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Entity Types`** (1 nodes): `types.ts`
+- **Thin community `Community 36`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed Repository Tests`** (1 nodes): `mock-feed-repository.test.ts`
+- **Thin community `Community 37`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 38`** (1 nodes): `mock-feed-repository.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Continuous Video Feed` connect `Product Learning Loop` to `Architecture Boundaries`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
-- **Why does `Target Source Layer Structure` connect `Architecture Boundaries` to `Mock Feed Data`?**
-  _High betweenness centrality (0.086) - this node is a cross-community bridge._
-- **Why does `useFeedInfiniteQuery()` connect `Mock Feed Data` to `Feed Screen State`?**
-  _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **Are the 5 inferred relationships involving `Target Source Layer Structure` (e.g. with `feed-screen.tsx` and `video-feed.tsx`) actually correct?**
+- **Why does `Continuous Video Feed` connect `Community 1` to `Community 3`?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
+- **Why does `Target Source Layer Structure` connect `Community 3` to `Community 6`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `useFeedInfiniteQuery()` connect `Community 6` to `Community 5`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+- **Are the 5 inferred relationships involving `Target Source Layer Structure` (e.g. with `use-feed-infinite-query.ts` and `feed-screen.tsx`) actually correct?**
   _`Target Source Layer Structure` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `Continuous Video Feed` (e.g. with `expo-video Playback` and `VideoFeed()`) actually correct?**
+- **Are the 6 inferred relationships involving `Continuous Video Feed` (e.g. with `feedPlaybackReducer()` and `shouldMountPlayer()`) actually correct?**
   _`Continuous Video Feed` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `fetchFeedPage()` (e.g. with `Mock Data Behaves Like Real Async Flow` and `Mock Business Data With Real Async Flow`) actually correct?**
   _`fetchFeedPage()` has 2 INFERRED edges - model-reasoned connections that need verification._

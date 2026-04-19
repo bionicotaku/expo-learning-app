@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<title>Language App — Style C Reference</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; }
+  * { box-sizing: border-box; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="visual-reference-base.jsx"></script>
+<script type="text/babel" src="style-reference-main.jsx"></script>
+<script type="text/babel">
+  const { IOSDevice } = window;
+  const { DesignCanvas, DCSection, DCArtboard, DCPostIt } = window;
+
+  function Frame({ children, dark }) {
+    return (
+      <IOSDevice dark={dark} width={390} height={844}>
+        {children}
+      </IOSDevice>
+    );
+  }
+
+  function App() {
+    return (
+      <DesignCanvas>
+        <div style={{ padding: '10px 60px 40px', maxWidth: 960 }}>
+          <div style={{
+            fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+            fontSize: 11, letterSpacing: 1.4, color: 'rgba(60,50,40,0.6)',
+            textTransform: 'uppercase', marginBottom: 10,
+          }}>基于视频的语言学习 App · Style C Only</div>
+          <div style={{
+            fontFamily: '"Fraunces", Georgia, serif',
+            fontSize: 42, fontWeight: 500, letterSpacing: -1.2,
+            color: 'rgba(30,20,10,0.9)', lineHeight: 1.05,
+            marginBottom: 16,
+          }}>
+            Style C · Editorial Emboss
+          </div>
+          <div style={{
+            fontFamily: '"Inter", system-ui, sans-serif',
+            fontSize: 14, lineHeight: 1.6, color: 'rgba(60,50,40,0.8)',
+            maxWidth: 760, textWrap: 'pretty',
+          }}>
+            单独预览 `Style C`：保留暖纸面背景与卡片底色，交互按钮采用更浅的马卡龙色系。
+          </div>
+        </div>
+
+        <DCSection
+          title="Style C · Editorial Emboss（编辑压印 · 暖纸面）"
+          subtitle="Fraunces + Inter · A 的暖米白 / 砖橙 / 金色系 · D 的凹凸压印与大圆角"
+          gap={56}
+        >
+          <DCArtboard label="C.1 · Login" width={390} height={844}>
+            <Frame><CScreenLogin /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.2 · Feed（Reading Room）" width={390} height={844}>
+            <Frame><CScreenFeed /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.3 · 单词收藏夹（Clippings）" width={390} height={844}>
+            <Frame><CScreenVocab /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.4 · 我的（Desk）" width={390} height={844}>
+            <Frame><CScreenMe /></Frame>
+          </DCArtboard>
+
+          <DCPostIt top={-60} left={820} rotate={-1.5} width={230}>
+            A 的暖纸面色温 + D 的凹凸压印表面，只保留 Style C 单独查看。
+          </DCPostIt>
+        </DCSection>
+
+        <DCSection
+          title="Style C · Auth Variants（登录变体）"
+          subtitle="在同一套 Style C 语言里展开 4 个认证页面：密码登录、验证码登录、忘记密码、注册"
+          gap={56}
+        >
+          <DCArtboard label="C.V1 · 密码登录" width={390} height={844}>
+            <Frame><CScreenLoginPassword /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.V2 · 验证码登录" width={390} height={844}>
+            <Frame><CScreenLoginCode /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.V3 · 忘记密码" width={390} height={844}>
+            <Frame><CScreenForgotPassword /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.V4 · 注册" width={390} height={844}>
+            <Frame><CScreenRegister /></Frame>
+          </DCArtboard>
+
+          <DCPostIt top={-56} left={840} rotate={1.2} width={250}>
+            新增一组 Style C 认证页变体，放在主方案下方单独对比，不改原有 Feed / Clippings / Desk 页面。
+          </DCPostIt>
+        </DCSection>
+
+        <DCSection
+          title="Style C · Video Variants（视频变体）"
+          subtitle="保留当前 Feed 浏览页，并补一个 TikTok 风格的全屏短视频详情页"
+          gap={56}
+        >
+          <DCArtboard label="C.Video.1 · Feed Copy" width={390} height={844}>
+            <Frame><CScreenFeed /></Frame>
+          </DCArtboard>
+          <DCArtboard label="C.Video.2 · Fullscreen Video" width={390} height={844}>
+            <Frame><CScreenVideoFull /></Frame>
+          </DCArtboard>
+
+          <DCPostIt top={-54} left={558} rotate={-1.2} width={232}>
+            视频变体只补两页：第一页沿用现有 Feed，第二页切到全屏短视频观看态。
+          </DCPostIt>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
