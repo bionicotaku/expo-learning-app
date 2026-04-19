@@ -7,8 +7,10 @@
 - `model/types.ts`
   - `FeedItem`
   - `FeedPageResult`
+- `api/feed-repository.ts`
+  - feed 领域的公开读取入口
 - `api/mock-feed-repository.ts`
-  - mock feed 分页读取
+  - 当前 MVP 的 mock feed 分页读取实现
   - 5 个底层视频资源的轮转映射
 
 边界约束：
@@ -18,3 +20,5 @@
 - 不放播放状态、静音状态、可见项判定
 
 当前 MVP 阶段这里仍然是 mock repository，但接口语义按真实异步分页实现。
+
+后续接真实 feed API 时，应优先替换 `api/feed-repository.ts` 内部数据源，而不是重写上层 query 和页面控制逻辑。

@@ -1,2 +1,3 @@
-export { createMockFeedPage, fetchFeedPage } from './api/mock-feed-repository';
+export { fetchFeedPage } from './api/feed-repository';
+export type { FetchFeedPageParams } from './api/feed-repository';
 export type { FeedItem, FeedPageResult } from './model/types';

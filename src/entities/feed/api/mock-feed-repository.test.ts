@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { VIDEO_ASSETS } from '@/entities/video';
 
-import { createMockFeedPage, fetchFeedPage } from './mock-feed-repository';
+import { createMockFeedPage, fetchMockFeedPage } from './mock-feed-repository';
 
 describe('mock feed repository', () => {
   it('creates a page result with continuous feed ids, rotated assets, and next offset metadata', () => {
@@ -33,7 +33,7 @@ describe('mock feed repository', () => {
     vi.useFakeTimers();
 
     let resolved = false;
-    const request = fetchFeedPage({ offset: 0, limit: 10, delayMs: 3000 }).then((page) => {
+    const request = fetchMockFeedPage({ offset: 0, limit: 10, delayMs: 3000 }).then((page) => {
       resolved = true;
       return page;
     });

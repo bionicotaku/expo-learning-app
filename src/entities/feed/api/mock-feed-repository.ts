@@ -47,7 +47,7 @@ export function createMockFeedPage({
   };
 }
 
-export async function fetchFeedPage({
+export async function fetchMockFeedPage({
   offset,
   limit,
   delayMs = 0,
