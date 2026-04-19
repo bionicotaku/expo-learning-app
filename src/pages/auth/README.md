@@ -11,7 +11,8 @@
   - `login + code`
   - `forgotPassword`
   - `register`
-- 登录主按钮通过 `router.replace('/feed')` 进入主页
+- 登录主按钮通过 `router.replace('/feed')` 进入 NativeTabs 里的主页 tab
+- `/ -> /(tabs)` 的根栈转场显式使用 `fade`，避免 mock 登录进入主页时出现 stack 滑入感
 - 复用 `Editorial Paper` 主题和 auth feature 组件组合页面
 
 边界约束：

@@ -40,7 +40,16 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <EditorialPaperThemeProvider fontsLoaded={fontsLoaded}>
         <QueryClientProvider client={queryClient}>
-          <Stack screenOptions={{ headerShown: false }} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" options={{ animation: 'fade' }} />
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                animation: 'fade',
+                animationTypeForReplace: 'push',
+              }}
+            />
+          </Stack>
           {Platform.OS !== 'web' ? <ToastHost /> : null}
         </QueryClientProvider>
       </EditorialPaperThemeProvider>

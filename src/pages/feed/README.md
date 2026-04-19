@@ -1,6 +1,6 @@
 # Feed Page
 
-`pages/feed` 是 `/feed` 首页 Feed 列表页的装配层。
+`pages/feed` 是 `(tabs)` shell 下 `/feed` 首页 tab 的装配层。
 
 当前职责：
 
@@ -14,6 +14,7 @@
 - 恢复调度使用 `requestIdleCallback`，不再依赖已弃用的 `InteractionManager`
 - 恢复使用原生列表滚动动画，而不是无动画跳转
 - 只有目标卡片真正进入可见区后才清空恢复状态
+- NativeTabs 接管底部安全区后，page 不再手动为 tab bar 预留额外高度
 
 边界约束：
 

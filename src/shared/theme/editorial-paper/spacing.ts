@@ -10,5 +10,4 @@ export const editorialPaperSpacing: EditorialPaperTokens['spacing'] = {
   xxl: 32,
   pageX: 22,
   pageTop: 58,
-  pageBottomWithTab: 116,
 };

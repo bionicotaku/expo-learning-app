@@ -1,15 +1,11 @@
 import { Text, View } from 'react-native';
-
-import {
-  editorialPaperCjkTitleFontFamily,
-  useEditorialPaperTheme,
-} from '@/shared/theme/editorial-paper';
+import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { RaisedSurface } from '@/shared/ui/editorial-paper';
 
 import { AuthCodeRow } from './auth-code-row';
+import { AuthCardTitle } from './auth-card-title';
 import { AuthField } from './auth-field';
 import { AuthPrimaryButton } from './auth-primary-button';
-import { resolveStructuredAuthTitleFontFamily } from './title-font';
 
 type StructuredAuthCardProps = {
   title: string;
@@ -21,11 +17,6 @@ export function StructuredAuthCard({
   confirmLabel = '确认',
 }: StructuredAuthCardProps) {
   const { tokens } = useEditorialPaperTheme();
-  const titleFontFamily = resolveStructuredAuthTitleFontFamily(
-    title,
-    tokens.typography.title.fontFamily,
-    editorialPaperCjkTitleFontFamily
-  );
 
   return (
     <RaisedSurface
@@ -35,19 +26,7 @@ export function StructuredAuthCard({
         paddingVertical: 22,
       }}
     >
-      <Text
-        style={{
-          color: tokens.color.ink,
-          fontFamily: titleFontFamily,
-          fontSize: 28,
-          lineHeight: 30,
-          fontWeight: '500',
-          letterSpacing: -0.8,
-          marginBottom: 18,
-        }}
-      >
-        {title}
-      </Text>
+      <AuthCardTitle>{title}</AuthCardTitle>
       <AuthField label="邮箱" value="name@learnability.app" />
       <AuthCodeRow marginBottom={14} />
       <AuthField label="密码" value="•••••••••••" />

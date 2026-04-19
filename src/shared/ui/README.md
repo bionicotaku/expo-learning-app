@@ -8,6 +8,7 @@
   - `RaisedSurface`、`InsetSurface`、`AdaptiveGlass`
   - `EditorialTitle`、`MetaLabel`
   - `SoftActionButton`、`SegmentedFilterBar`、`IconPill`
+  - `SegmentedFilterBar` 负责共享的滑块 segmented 动画、tone 渐变切换，以及整条拖动后带轻微速度偏置的 spring 吸附切换
 - `toast/`
   - `ToastHost`
   - 应用级全局 top toast 视图实现

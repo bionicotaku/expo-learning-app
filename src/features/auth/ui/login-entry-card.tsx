@@ -4,6 +4,7 @@ import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { RaisedSurface } from '@/shared/ui/editorial-paper';
 
 import type { AuthLoginMode } from '../model/auth-ui-state';
+import { AuthCardTitle } from './auth-card-title';
 import { AuthCodeRow } from './auth-code-row';
 import { AuthField } from './auth-field';
 import { AuthModeTabs } from './auth-mode-tabs';
@@ -32,6 +33,7 @@ export function LoginEntryCard({
         paddingVertical: 22,
       }}
     >
+      <AuthCardTitle marginBottom={14}>登录</AuthCardTitle>
       <AuthModeTabs activeMode={mode} onChangeMode={onChangeMode} />
       <View style={{ marginTop: 16 }}>
         <AuthField label="邮箱" value="mika@folio-press.app" />

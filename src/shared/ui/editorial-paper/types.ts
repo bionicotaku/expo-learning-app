@@ -69,6 +69,8 @@ export type SegmentedFilterBarProps<T extends string | number> = {
   value: T;
   onChange: (nextValue: T) => void;
   tone?: EditorialPaperTone;
+  selectedTextColor?: string;
+  inactiveTextColor?: string;
   style?: StyleProp<ViewStyle>;
 };
 

@@ -163,7 +163,7 @@ export function FeedPage() {
         contentContainerStyle={{
           paddingHorizontal: tokens.spacing.pageX,
           paddingTop: tokens.spacing.pageTop,
-          paddingBottom: tokens.spacing.pageBottomWithTab,
+          paddingBottom: tokens.spacing.xxl,
           gap: tokens.spacing.lg,
         }}
         style={{ flex: 1, backgroundColor: tokens.color.background }}

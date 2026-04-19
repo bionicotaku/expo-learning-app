@@ -51,7 +51,6 @@ export type EditorialPaperTokens = {
     xxl: number;
     pageX: number;
     pageTop: number;
-    pageBottomWithTab: number;
   };
   radius: {
     cardLg: number;

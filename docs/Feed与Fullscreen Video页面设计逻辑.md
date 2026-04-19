@@ -89,7 +89,12 @@
    - 多张视频内容卡片顺序排列
    - 每张卡片都同时表达主题、调性、时长和点击意图
 
-如果未来重新引入多一级主导航，底部 tab 仍应属于 `app shell`，而不是页面内容本身。
+当前最小实现已经通过 `NativeTabs` 引入一级主导航：
+
+- `Feed` 是主首页 tab
+- `Save` 与 `Me` 暂时是空白占位 tab
+
+底部 tab 仍应属于 `app shell`，而不是页面内容本身。
 
 这一结构决定了列表页不是“瀑布流资讯页”，也不是“短视频全屏播放器”。
 
@@ -289,17 +294,17 @@
 
 ### 6.2 为什么视频页不应内嵌主导航壳
 
-当前最小运行态没有底部 tab。
+当前最小运行态已经通过 `NativeTabs` 提供底部 tab。
 
-如果未来重新引入 `app shell` 主导航，`Fullscreen Video 页` 仍应保持为 stack detail，不应内嵌 tab。理由有两个：
+`Fullscreen Video 页` 仍应保持为 stack detail，不应内嵌 tab。理由有两个：
 
 - 视觉上会破坏沉浸感
 - 导航语义上它不是一级页面，而是内容详情层
 
 因此当前结论固定为：
 
-- `Auth`、`Feed` 与 `Fullscreen Video` 构成当前最小运行态
-- 若未来扩展收藏夹、我的等一级页面，主导航也只属于 `app shell`
+- `Auth`、`Feed / Save / Me` tabs 与 `Fullscreen Video` 构成当前最小运行态
+- 底部主导航只属于 `app shell`
 - `Fullscreen Video` 仍保持在 stack detail 体系内
 
 ### 6.3 返回恢复规则
@@ -373,7 +378,7 @@
 - header / toolbar 配置
 - 页面切换动画和原生导航关系
 
-如未来扩展多一级主导航，再由 `app/` 引入 app shell / tabs。
+当前最小运行态已经在 `app/` 中引入 app shell / tabs。
 
 不负责：
 

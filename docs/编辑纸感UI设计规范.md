@@ -9,7 +9,7 @@
 - 当前参考稿真正稳定下来的视觉语言是什么
 - 这套视觉语言在 Expo + React Native + 当前轻量 FSD 结构中应该如何抽象
 - 哪些内容属于 `shared/theme` 与 `shared/ui`，哪些应停留在 `features / widgets / pages / app`
-- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> Feed 列表页 -> Fullscreen Video 页`，并可继续扩展到收藏夹、我的等页面
+- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> NativeTabs(Feed / Save / Me) -> Fullscreen Video 页`
 
 本文档是实现导向规范，不是设计赏析文档。默认约束如下：
 
@@ -330,8 +330,8 @@ src/shared/ui/editorial-paper/
 `Editorial Paper` 在当前仓库中的正式落位应遵循：
 
 - `app/`
-  - 路由壳、stack、modal、header 配置
-  - 如未来扩展多一级主导航，再引入 tabs / app shell
+  - 路由壳、stack、NativeTabs、modal、header 配置
+  - 当前最小运行态已在 `app/` 中引入 tabs / app shell
 - `pages/`
   - 页面组合与模板实例
 - `widgets/`
@@ -407,8 +407,9 @@ src/
 
 ### 6.3 路由壳归属
 
-- 当前最小运行态没有底部 tab bar
-- 若未来引入主导航，底部 tab bar 只属于 `app shell`，不是 shared 组件
+- 当前最小运行态先使用 `NativeTabs` 承担底部 tab bar
+- 若未来需要更高品牌化的悬浮玻璃胶囊，再评估 custom tab shell
+- 底部 tab bar 只属于 `app shell`，不是 shared 组件
 - `Fullscreen Video` 是 stack detail，不显示 tab
 - 页面自定义 header 不能替代全部原生导航能力
 - 一级页面允许保留 editorial header block
@@ -597,5 +598,5 @@ widgets 至少要有以下变体语义：
 - 当前只设计 `light theme`
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
-- 当前最小运行态只落地 `Auth + Feed + Fullscreen Video`
-- `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；若未来引入主导航，再在 `app` 内扩展 app shell
+- 当前最小运行态只落地 `Auth + NativeTabs(Feed / Save / Me) + Fullscreen Video`
+- `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；当前 tabs 也只允许落在 `app` 这一层
