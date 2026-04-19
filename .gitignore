@@ -3,6 +3,8 @@
 # vscode
 .vscode/
 
+# agent
+
 # graphify
 graphify-out/cache/
 
