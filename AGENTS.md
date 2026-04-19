@@ -27,7 +27,7 @@ Rules:
 2. 日常编码过程中的快速回归，默认先执行 `npm run quick-check`。
 3. 如果改动涉及相关模块的 integration 测试范围，补跑对应的 integration test。
 4. 标准最终验收必须执行 `npm run check`。只变更了文档等非代码部分则不用。
-5. 任务若有额外验收要求，在 `npm run check` 之外补跑；如果改动影响 Expo 页面、路由或原生播放行为，补做一次 `npm run ios` 启动验证。
+5. 任务若有额外验收要求，在 `npm run check` 之外补跑；如果改动影响 Expo 页面、路由或原生播放行为，补做一次 `npx expo prebuild -p ios` 验证。
 6. 改动前先确认模块边界，不跨模块偷放职责。
 7. 能删除的旧实现就直接删除，不留“后面再清理”。
 8. 调用 Subagent 完全不允许自定义模型, 必须直接继承当前会话模型
