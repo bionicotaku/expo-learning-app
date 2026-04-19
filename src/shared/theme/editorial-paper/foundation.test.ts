@@ -4,6 +4,8 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  editorialPaperCjkTitleFontAssetPath,
+  editorialPaperCjkTitleFontFamily,
   createEditorialPaperThemeContextValue,
   editorialPaperDisplayFontAssetPath,
   editorialPaperDisplayFontFamily,
@@ -45,9 +47,11 @@ describe('Editorial Paper foundation', () => {
     expect(editorialPaperLightTokens).not.toHaveProperty('dark');
   });
 
-  it('exposes only the local display font asset', () => {
+  it('exposes the local title font assets', () => {
     expect(editorialPaperDisplayFontFamily).toBe('Fraunces');
+    expect(editorialPaperCjkTitleFontFamily).toBe('TW-Kai-98_1');
     expect(existsSync(path.resolve(process.cwd(), editorialPaperDisplayFontAssetPath))).toBe(true);
+    expect(existsSync(path.resolve(process.cwd(), editorialPaperCjkTitleFontAssetPath))).toBe(true);
   });
 
   it('uses native sans fonts for body and meta typography', () => {

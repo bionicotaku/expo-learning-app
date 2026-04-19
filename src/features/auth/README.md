@@ -13,3 +13,4 @@
 - 不接 API，不做表单校验，不维护真实输入值
 - 不把 auth 专属组合沉到 `shared/ui`
 - 不负责 Expo Router 路由文件
+- `Fraunces` 不承担中文；结构化卡片标题遇到 CJK 时显式使用 `TW-Kai-98_1`

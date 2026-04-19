@@ -5,6 +5,7 @@
 当前职责：
 
 - 只实现登录页的视觉和页面内导航
+- 使用固定页壳，不做整页滚动；通过紧凑 spacing 保证 footer 留在屏幕内
 - 在单一路由里切换 4 个 UI 状态：
   - `login + password`
   - `login + code`

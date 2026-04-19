@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { EditorialTitle } from '@/shared/ui/editorial-paper';
+
+import { resolveAuthPageShellLayout } from './layout';
 
 type AuthPageShellProps = {
   card: ReactNode;
@@ -16,19 +18,20 @@ export function AuthPageShell({ card, footer, socialRow = null }: AuthPageShellP
   const { tokens } = useEditorialPaperTheme();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
-  const minContentHeight = Math.max(0, height - insets.top - insets.bottom);
+  const layout = resolveAuthPageShellLayout(height);
 
   return (
-    <ScrollView
+    <View
       style={{ flex: 1, backgroundColor: tokens.color.background }}
-      contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{
-        flexGrow: 1,
-        minHeight: minContentHeight,
-        paddingHorizontal: 24,
-        paddingBottom: Math.max(insets.bottom, 28),
-      }}
     >
+      <View
+        style={{
+          flex: 1,
+          paddingTop: Math.max(insets.top, 20),
+          paddingBottom: Math.max(insets.bottom, 24),
+          paddingHorizontal: 24,
+        }}
+      >
       <View
         style={{
           flex: 1,
@@ -45,16 +48,16 @@ export function AuthPageShell({ card, footer, socialRow = null }: AuthPageShellP
             <EditorialTitle
               variant="display"
               style={{
-                fontSize: 48,
-                lineHeight: 47,
-                letterSpacing: -1.6,
+                fontSize: layout.displayFontSize,
+                lineHeight: layout.displayLineHeight,
+                letterSpacing: layout.displayLetterSpacing,
               }}
             >
               learnability
             </EditorialTitle>
             <Text
               style={{
-                marginTop: 16,
+                marginTop: layout.subtitleMarginTop,
                 maxWidth: 302,
                 fontSize: 14.5,
                 lineHeight: 23,
@@ -65,20 +68,21 @@ export function AuthPageShell({ card, footer, socialRow = null }: AuthPageShellP
               AI 加速学习系统
             </Text>
 
-            <View style={{ marginTop: 30 }}>{card}</View>
+            <View style={{ marginTop: layout.cardMarginTop }}>{card}</View>
             {socialRow ? <View>{socialRow}</View> : null}
           </View>
         </View>
 
         <View
           style={{
-            paddingTop: 16,
+            paddingTop: layout.footerPaddingTop,
             alignItems: 'center',
           }}
         >
           {footer}
         </View>
       </View>
-    </ScrollView>
+      </View>
+    </View>
   );
 }
