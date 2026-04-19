@@ -1,0 +1,20 @@
+# Auth Page
+
+`pages/auth` 是 `/auth` 路由的页面装配层。
+
+当前职责：
+
+- 只实现登录页的视觉和页面内导航
+- 在单一路由里切换 4 个 UI 状态：
+  - `login + password`
+  - `login + code`
+  - `forgotPassword`
+  - `register`
+- 复用 `Editorial Paper` 主题和 auth feature 组件组合页面
+
+边界约束：
+
+- 不接真实登录、注册、找回密码业务
+- 不维护真实表单值
+- 不把 auth 状态扩散到全局
+- 不把 auth 变体拆成多个 route

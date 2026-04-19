@@ -1,108 +1,118 @@
 # Graph Report - .  (2026-04-19)
 
 ## Corpus Check
-- Corpus is ~26,097 words - fits in a single context window. You may not need a graph.
+- 118 files · ~28,698 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 284 nodes · 243 edges · 90 communities detected
-- Extraction: 84% EXTRACTED · 16% INFERRED · 0% AMBIGUOUS · INFERRED: 39 edges (avg confidence: 0.81)
+- 308 nodes · 259 edges · 99 communities detected
+- Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 44 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Cauthcoderow Cauthfield Cauthmodetabs|Cauthcoderow Cauthfield Cauthmodetabs]]
-- [[_COMMUNITY_Route App Layer|Route App Layer]]
-- [[_COMMUNITY_Createeditorialpaperthemecontextvalue Editorialpaperthemeprovider Useeditorialpapertheme|Createeditorialpaperthemecontextvalue Editorialpaperthemeprovider Useeditorialpapertheme]]
-- [[_COMMUNITY_List Pending Restore|List Pending Restore]]
-- [[_COMMUNITY_Mock Data Layer|Mock Data Layer]]
-- [[_COMMUNITY_Visual Reference Base|Visual Reference Base]]
-- [[_COMMUNITY_Persistent Assets Need|Persistent Assets Need]]
-- [[_COMMUNITY_Overlay Active Ephemeral|Overlay Active Ephemeral]]
-- [[_COMMUNITY_Repository Fetchfeedpage Createfeeditem|Repository Fetchfeedpage Createfeeditem]]
-- [[_COMMUNITY_Applyfavoritestate Buildfavoriteoperationkey Createsetfavoritemutationoptions|Applyfavoritestate Buildfavoriteoperationkey Createsetfavoritemutationoptions]]
-- [[_COMMUNITY_Buildapiurl Isaborterror Normalizepath|Buildapiurl Isaborterror Normalizepath]]
-- [[_COMMUNITY_Clearpendingrestorevideoid Getpendingrestorevideoid Resetfeedsession|Clearpendingrestorevideoid Getpendingrestorevideoid Resetfeedsession]]
-- [[_COMMUNITY_Glass Adaptiveglass Resolvevariantpadding|Glass Adaptiveglass Resolvevariantpadding]]
-- [[_COMMUNITY_Store Createtoastid Createtoastrecord|Store Createtoastid Createtoastrecord]]
-- [[_COMMUNITY_Fetchfavoriteids Resetfavoritestorefortests Setfavoritestate|Fetchfavoriteids Resetfavoritestorefortests Setfavoritestate]]
-- [[_COMMUNITY_Buildfirstpagefeeddata Findfeeditemindex Flattenfeedpages|Buildfirstpagefeeddata Findfeeditemindex Flattenfeedpages]]
-- [[_COMMUNITY_Shoulddismisstoastgesture Withtoastalpha|Shoulddismisstoastgesture Withtoastalpha]]
-- [[_COMMUNITY_Apierror Constructor Api|Apierror Constructor Api]]
-- [[_COMMUNITY_Clampinitialindex Resolveinitialfullscreenpagerposition Initial|Clampinitialindex Resolveinitialfullscreenpagerposition Initial]]
-- [[_COMMUNITY_Arefullscreenvideoitemrenderpropsequal Areplayablevideosurfacepropsequal Render|Arefullscreenvideoitemrenderpropsequal Areplayablevideosurfacepropsequal Render]]
-- [[_COMMUNITY_Fetchfavoriteids Setfavoritestate Favorite|Fetchfavoriteids Setfavoritestate Favorite]]
-- [[_COMMUNITY_Readrelative Structure|Readrelative Structure]]
-- [[_COMMUNITY_Movedirectories Reset Project|Movedirectories Reset Project]]
-- [[_COMMUNITY_Indexroute Index Tsx|Indexroute Index Tsx]]
-- [[_COMMUNITY_Videoid Tsx Videoroute|Videoid Tsx Videoroute]]
-- [[_COMMUNITY_Geteditorialpaperfontsources Fonts|Geteditorialpaperfontsources Fonts]]
-- [[_COMMUNITY_Createqueryclient Query Client|Createqueryclient Query Client]]
-- [[_COMMUNITY_Store Createtestidfactory|Store Createtestidfactory]]
-- [[_COMMUNITY_Buildfeedrestorescrollparams Restore Scroll|Buildfeedrestorescrollparams Restore Scroll]]
-- [[_COMMUNITY_Schedulefeedrestore Restore Scheduler|Schedulefeedrestore Restore Scheduler]]
-- [[_COMMUNITY_Getfeedlistloadingstate Loading State|Getfeedlistloadingstate Loading State]]
-- [[_COMMUNITY_Playbackfeedbackoverlaycomponent Playback Feedback|Playbackfeedbackoverlaycomponent Playback Feedback]]
-- [[_COMMUNITY_Activevideooverlaycomponent Active Overlay|Activevideooverlaycomponent Active Overlay]]
-- [[_COMMUNITY_Resolveactivevideochange Active Change|Resolveactivevideochange Active Change]]
-- [[_COMMUNITY_Getfullscreenvideoloadingstate Loading State|Getfullscreenvideoloadingstate Loading State]]
-- [[_COMMUNITY_Auth Coupling Stays|Auth Coupling Stays]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Feed-Session Test Ts|Feed-Session Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Player-Window Test Ts|Player-Window Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Feed-Pagination-Policy Test Ts|Feed-Pagination-Policy Test Ts]]
-- [[_COMMUNITY_Toastcard Tsx|Toastcard Tsx]]
-- [[_COMMUNITY_Toast-Design Test Ts|Toast-Design Test Ts]]
-- [[_COMMUNITY_Toasthost Tsx|Toasthost Tsx]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Segmented-Filter-Bar Tsx|Segmented-Filter-Bar Tsx]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Glass-Support Test Ts|Glass-Support Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Foundation Test Ts|Foundation Test Ts]]
-- [[_COMMUNITY_Glass Ts|Glass Ts]]
-- [[_COMMUNITY_Radius Ts|Radius Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Elevation Ts|Elevation Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Typography Ts|Typography Ts]]
-- [[_COMMUNITY_Spacing Ts|Spacing Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Constants Ts|Constants Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Service Ts|Service Ts]]
-- [[_COMMUNITY_Request Test Ts|Request Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Restore-Scroll Test Ts|Restore-Scroll Test Ts]]
-- [[_COMMUNITY_Restore-Scheduler Test Ts|Restore-Scheduler Test Ts]]
-- [[_COMMUNITY_Loading-State Test Ts|Loading-State Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Fullscreen-Video-Item Tsx|Fullscreen-Video-Item Tsx]]
-- [[_COMMUNITY_Row-Bound-Video-Overlay Tsx|Row-Bound-Video-Overlay Tsx]]
-- [[_COMMUNITY_Fullscreen-Video-Pager Tsx|Fullscreen-Video-Pager Tsx]]
-- [[_COMMUNITY_Initial-Positioning Test Ts|Initial-Positioning Test Ts]]
-- [[_COMMUNITY_Active-Video-Change Test Ts|Active-Video-Change Test Ts]]
-- [[_COMMUNITY_Render-Props Test Ts|Render-Props Test Ts]]
-- [[_COMMUNITY_Loading-State Test Ts|Loading-State Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Videos Ts|Videos Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Mock-Favorite-Repository Test Ts|Mock-Favorite-Repository Test Ts]]
-- [[_COMMUNITY_Index Ts|Index Ts]]
-- [[_COMMUNITY_Types Ts|Types Ts]]
-- [[_COMMUNITY_Feed-Repository Test Ts|Feed-Repository Test Ts]]
-- [[_COMMUNITY_Mock-Feed-Repository Test Ts|Mock-Feed-Repository Test Ts]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+- [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 98|Community 98]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `TanStack React Query` - 11 edges
-2. `useEditorialPaperTheme()` - 9 edges
+1. `useEditorialPaperTheme()` - 14 edges
+2. `TanStack React Query` - 13 edges
 3. `Target Source Layer Structure` - 7 edges
 4. `Fullscreen Video Page` - 7 edges
 5. `Global Top Toast System` - 6 edges
@@ -119,10 +129,10 @@
   src/features/feed-pagination/model/feed-pagination-policy.ts → docs/项目整体需求与应用概览.md
 - `useFeedInfiniteQuery()` --implements--> `React Query Feed Pagination`  [INFERRED]
   src/features/feed-pagination/model/use-feed-infinite-query.ts → docs/技术栈选型.md
-- `FeedCard()` --calls--> `useEditorialPaperTheme()`  [INFERRED]
-  src/pages/feed/ui/feed-page.tsx → src/shared/theme/editorial-paper/context.tsx
-- `AdaptiveGlass()` --calls--> `useEditorialPaperTheme()`  [INFERRED]
-  src/shared/ui/editorial-paper/adaptive-glass.tsx → src/shared/theme/editorial-paper/context.tsx
+- `useEditorialPaperTheme()` --calls--> `FeedCard()`  [INFERRED]
+  src/shared/theme/editorial-paper/context.tsx → src/pages/feed/ui/feed-page.tsx
+- `AuthSocialRow()` --calls--> `useEditorialPaperTheme()`  [INFERRED]
+  src/features/auth/ui/auth-social-row.tsx → src/shared/theme/editorial-paper/context.tsx
 
 ## Hyperedges (group relationships)
 - **Feed and Video Shared Sequence** — Feed与Fullscreen Video页面设计逻辑_feed_page, Feed与Fullscreen Video页面设计逻辑_fullscreen_video_page, Feed与Fullscreen Video页面设计逻辑_shared_feed_source, Feed与Fullscreen Video页面设计逻辑_pending_restore_video_id [EXTRACTED 1.00]
@@ -132,522 +142,574 @@
 
 ## Communities
 
-### Community 0 - "Cauthcoderow Cauthfield Cauthmodetabs"
+### Community 0 - "Community 0"
+Cohesion: 0.08
+Nodes (16): AuthField(), AuthFooter(), AuthPrimaryButton(), AuthProviderButton(), AuthSocialRow(), useEditorialPaperTheme(), EditorialTitle(), IconPill() (+8 more)
+
+### Community 1 - "Community 1"
 Cohesion: 0.07
 Nodes (0): 
 
-### Community 1 - "Route App Layer"
-Cohesion: 0.09
-Nodes (13): Route-Only App Layer, Expo Router, FeedCard(), createFeedPage(), createInfiniteFeedData(), Auth Coupling Containment Rationale, Expo Router, expo-video (+5 more)
+### Community 2 - "Community 2"
+Cohesion: 0.12
+Nodes (14): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, Mock Business Data With Real Async Flow, MVP Closed Loop, Real Account System, Continuous Video Feed (+6 more)
 
-### Community 2 - "Createeditorialpaperthemecontextvalue Editorialpaperthemeprovider Useeditorialpapertheme"
-Cohesion: 0.13
-Nodes (11): useEditorialPaperTheme(), EditorialTitle(), IconPill(), InsetSurface(), MetaLabel(), RaisedSurface(), SoftActionButton(), resolveEditorialPaperControlHeight() (+3 more)
+### Community 3 - "Community 3"
+Cohesion: 0.14
+Nodes (7): buildFirstPageFeedData(), refreshFeedSource(), createFeedPage(), createInfiniteFeedData(), TanStack React Query, Interactive Read, Query Key
 
-### Community 3 - "List Pending Restore"
+### Community 4 - "Community 4"
+Cohesion: 0.16
+Nodes (12): One-Way Dependency Direction, Legacy Template Directories, Layer Boundaries Clarify Ownership, Target Source Layer Structure, Content-Driven Learning App, Follow Expo Defaults Rationale, Lightweight FSD, Mobile-First Expo Stack (+4 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.15
-Nodes (20): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, Dedicated Toast Architecture Rationale, Toast Host, Toast Service (+12 more)
+Nodes (7): Route-Only App Layer, Expo Router, FeedCard(), Auth Coupling Containment Rationale, Expo Router, Supabase Auth, Recommended Tech Stack
 
-### Community 4 - "Mock Data Layer"
-Cohesion: 0.15
-Nodes (13): One-Way Dependency Direction, Legacy Template Directories, Mock Data Behaves Like Real Async Flow, Layer Boundaries Clarify Ownership, Target Source Layer Structure, Content-Driven Learning App, Mock Business Data With Real Async Flow, Follow Expo Defaults Rationale (+5 more)
+### Community 6 - "Community 6"
+Cohesion: 0.19
+Nodes (14): Dedicated Toast Architecture Rationale, Toast Host, Toast Service, Toast Store, Global Top Toast System, Editorial Paper UI System, Light Only Editorial Rationale, Light Theme Only (+6 more)
 
-### Community 5 - "Visual Reference Base"
+### Community 7 - "Community 7"
 Cohesion: 0.17
 Nodes (0): 
 
-### Community 6 - "Persistent Assets Need"
-Cohesion: 0.2
-Nodes (9): Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, MVP Closed Loop, Real Account System, Continuous Video Feed, expo-video Playback, shouldPrefetchNextPage() (+1 more)
-
-### Community 7 - "Overlay Active Ephemeral"
+### Community 8 - "Community 8"
 Cohesion: 0.2
 Nodes (10): Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model, Overlay Split Rationale, Row-bound Overlay, Interactive Write, Network and Telemetry Layer, Pending Operation Key (+2 more)
 
-### Community 8 - "Repository Fetchfeedpage Createfeeditem"
-Cohesion: 0.38
-Nodes (4): fetchFeedPage(), createMockFeedPage(), fetchMockFeedPage(), sleep()
+### Community 9 - "Community 9"
+Cohesion: 0.33
+Nodes (7): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, expo-video, Page Shell Templates
 
-### Community 9 - "Applyfavoritestate Buildfavoriteoperationkey Createsetfavoritemutationoptions"
+### Community 10 - "Community 10"
 Cohesion: 0.4
 Nodes (2): createSetFavoriteMutationOptions(), useSetFavoriteMutation()
 
-### Community 10 - "Buildapiurl Isaborterror Normalizepath"
+### Community 11 - "Community 11"
 Cohesion: 0.6
 Nodes (5): buildApiUrl(), isAbortError(), normalizePath(), parseJsonBody(), requestJson()
 
-### Community 11 - "Clearpendingrestorevideoid Getpendingrestorevideoid Resetfeedsession"
+### Community 12 - "Community 12"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 12 - "Glass Adaptiveglass Resolvevariantpadding"
+### Community 13 - "Community 13"
 Cohesion: 0.5
 Nodes (3): AdaptiveGlass(), resolveVariantPadding(), resolveEditorialPaperGlassSupport()
 
-### Community 13 - "Store Createtoastid Createtoastrecord"
+### Community 14 - "Community 14"
 Cohesion: 0.5
 Nodes (2): createToastRecord(), resolveToastDuration()
 
-### Community 14 - "Fetchfavoriteids Resetfavoritestorefortests Setfavoritestate"
+### Community 15 - "Community 15"
 Cohesion: 0.5
 Nodes (2): fetchFavoriteIds(), toSortedArray()
 
-### Community 15 - "Buildfirstpagefeeddata Findfeeditemindex Flattenfeedpages"
-Cohesion: 0.5
-Nodes (2): buildFirstPageFeedData(), refreshFeedSource()
-
-### Community 16 - "Shoulddismisstoastgesture Withtoastalpha"
+### Community 16 - "Community 16"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 17 - "Apierror Constructor Api"
+### Community 17 - "Community 17"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 18 - "Community 18"
 Cohesion: 0.67
 Nodes (1): ApiError
 
-### Community 18 - "Clampinitialindex Resolveinitialfullscreenpagerposition Initial"
+### Community 19 - "Community 19"
 Cohesion: 1.0
 Nodes (2): clampInitialIndex(), resolveInitialFullscreenPagerPosition()
 
-### Community 19 - "Arefullscreenvideoitemrenderpropsequal Areplayablevideosurfacepropsequal Render"
+### Community 20 - "Community 20"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 20 - "Fetchfavoriteids Setfavoritestate Favorite"
+### Community 21 - "Community 21"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 21 - "Readrelative Structure"
+### Community 22 - "Community 22"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 22 - "Movedirectories Reset Project"
+### Community 23 - "Community 23"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 23 - "Indexroute Index Tsx"
+### Community 24 - "Community 24"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 24 - "Videoid Tsx Videoroute"
+### Community 25 - "Community 25"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 25 - "Geteditorialpaperfontsources Fonts"
+### Community 26 - "Community 26"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 26 - "Createqueryclient Query Client"
+### Community 27 - "Community 27"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 27 - "Store Createtestidfactory"
+### Community 28 - "Community 28"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 28 - "Buildfeedrestorescrollparams Restore Scroll"
+### Community 29 - "Community 29"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 29 - "Schedulefeedrestore Restore Scheduler"
+### Community 30 - "Community 30"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 30 - "Getfeedlistloadingstate Loading State"
+### Community 31 - "Community 31"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 31 - "Playbackfeedbackoverlaycomponent Playback Feedback"
+### Community 32 - "Community 32"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 32 - "Activevideooverlaycomponent Active Overlay"
+### Community 33 - "Community 33"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 33 - "Resolveactivevideochange Active Change"
+### Community 34 - "Community 34"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 34 - "Getfullscreenvideoloadingstate Loading State"
+### Community 35 - "Community 35"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 35 - "Auth Coupling Stays"
+### Community 36 - "Community 36"
 Cohesion: 1.0
 Nodes (2): Auth Coupling Stays Inside Auth Layer, Supabase Auth
 
-### Community 36 - "Index Ts"
+### Community 37 - "Community 37"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 37 - "Index Ts"
+### Community 38 - "Community 38"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 38 - "Feed-Session Test Ts"
+### Community 39 - "Community 39"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 39 - "Index Ts"
+### Community 40 - "Community 40"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 40 - "Player-Window Test Ts"
+### Community 41 - "Community 41"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 41 - "Index Ts"
+### Community 42 - "Community 42"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 42 - "Feed-Pagination-Policy Test Ts"
+### Community 43 - "Community 43"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 43 - "Toastcard Tsx"
+### Community 44 - "Community 44"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 44 - "Toast-Design Test Ts"
+### Community 45 - "Community 45"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 45 - "Toasthost Tsx"
+### Community 46 - "Community 46"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 46 - "Index Ts"
+### Community 47 - "Community 47"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 47 - "Segmented-Filter-Bar Tsx"
+### Community 48 - "Community 48"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 48 - "Types Ts"
+### Community 49 - "Community 49"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 49 - "Glass-Support Test Ts"
+### Community 50 - "Community 50"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 50 - "Index Ts"
+### Community 51 - "Community 51"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 51 - "Foundation Test Ts"
+### Community 52 - "Community 52"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 52 - "Glass Ts"
+### Community 53 - "Community 53"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 53 - "Radius Ts"
+### Community 54 - "Community 54"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 54 - "Types Ts"
+### Community 55 - "Community 55"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 55 - "Elevation Ts"
+### Community 56 - "Community 56"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 56 - "Index Ts"
+### Community 57 - "Community 57"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 57 - "Typography Ts"
+### Community 58 - "Community 58"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 58 - "Spacing Ts"
+### Community 59 - "Community 59"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 59 - "Types Ts"
+### Community 60 - "Community 60"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 60 - "Constants Ts"
+### Community 61 - "Community 61"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 61 - "Index Ts"
+### Community 62 - "Community 62"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 62 - "Service Ts"
+### Community 63 - "Community 63"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 63 - "Request Test Ts"
+### Community 64 - "Community 64"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 64 - "Index Ts"
+### Community 65 - "Community 65"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 65 - "Index Ts"
+### Community 66 - "Community 66"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 66 - "Types Ts"
+### Community 67 - "Community 67"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 67 - "Index Ts"
+### Community 68 - "Community 68"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 68 - "Index Ts"
+### Community 69 - "Community 69"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 69 - "Restore-Scroll Test Ts"
+### Community 70 - "Community 70"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 70 - "Restore-Scheduler Test Ts"
+### Community 71 - "Community 71"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 71 - "Loading-State Test Ts"
+### Community 72 - "Community 72"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 72 - "Index Ts"
+### Community 73 - "Community 73"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 73 - "Fullscreen-Video-Item Tsx"
+### Community 74 - "Community 74"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 74 - "Row-Bound-Video-Overlay Tsx"
+### Community 75 - "Community 75"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 75 - "Fullscreen-Video-Pager Tsx"
+### Community 76 - "Community 76"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 76 - "Initial-Positioning Test Ts"
+### Community 77 - "Community 77"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 77 - "Active-Video-Change Test Ts"
+### Community 78 - "Community 78"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 78 - "Render-Props Test Ts"
+### Community 79 - "Community 79"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 79 - "Loading-State Test Ts"
+### Community 80 - "Community 80"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 80 - "Index Ts"
+### Community 81 - "Community 81"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 81 - "Videos Ts"
+### Community 82 - "Community 82"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 82 - "Types Ts"
+### Community 83 - "Community 83"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 83 - "Index Ts"
+### Community 84 - "Community 84"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 84 - "Types Ts"
+### Community 85 - "Community 85"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 85 - "Mock-Favorite-Repository Test Ts"
+### Community 86 - "Community 86"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 86 - "Index Ts"
+### Community 87 - "Community 87"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 87 - "Types Ts"
+### Community 88 - "Community 88"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 88 - "Feed-Repository Test Ts"
+### Community 89 - "Community 89"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 89 - "Mock-Feed-Repository Test Ts"
+### Community 90 - "Community 90"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 91 - "Community 91"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 92 - "Community 92"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 93 - "Community 93"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 94 - "Community 94"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 95 - "Community 95"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 96 - "Community 96"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 97 - "Community 97"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 98 - "Community 98"
 Cohesion: 1.0
 Nodes (0): 
 
 ## Knowledge Gaps
 - **17 isolated node(s):** `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow`, `Layer Boundaries Clarify Ownership`, `Supabase Auth` (+12 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Readrelative Structure`** (2 nodes): `readRelative()`, `structure.test.ts`
+- **Thin community `Community 22`** (2 nodes): `readRelative()`, `structure.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Movedirectories Reset Project`** (2 nodes): `moveDirectories()`, `reset-project.js`
+- **Thin community `Community 23`** (2 nodes): `moveDirectories()`, `reset-project.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Indexroute Index Tsx`** (2 nodes): `IndexRoute()`, `index.tsx`
+- **Thin community `Community 24`** (2 nodes): `IndexRoute()`, `index.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Videoid Tsx Videoroute`** (2 nodes): `[videoId].tsx`, `VideoRoute()`
+- **Thin community `Community 25`** (2 nodes): `AuthRoute()`, `auth.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Geteditorialpaperfontsources Fonts`** (2 nodes): `getEditorialPaperFontSources()`, `fonts.ts`
+- **Thin community `Community 26`** (2 nodes): `[videoId].tsx`, `VideoRoute()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Createqueryclient Query Client`** (2 nodes): `createQueryClient()`, `query-client.ts`
+- **Thin community `Community 27`** (2 nodes): `getEditorialPaperFontSources()`, `fonts.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Store Createtestidfactory`** (2 nodes): `store.test.ts`, `createTestIdFactory()`
+- **Thin community `Community 28`** (2 nodes): `store.test.ts`, `createTestIdFactory()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Buildfeedrestorescrollparams Restore Scroll`** (2 nodes): `buildFeedRestoreScrollParams()`, `restore-scroll.ts`
+- **Thin community `Community 29`** (2 nodes): `buildFeedRestoreScrollParams()`, `restore-scroll.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Schedulefeedrestore Restore Scheduler`** (2 nodes): `scheduleFeedRestore()`, `restore-scheduler.ts`
+- **Thin community `Community 30`** (2 nodes): `scheduleFeedRestore()`, `restore-scheduler.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Getfeedlistloadingstate Loading State`** (2 nodes): `getFeedListLoadingState()`, `loading-state.ts`
+- **Thin community `Community 31`** (2 nodes): `getFeedListLoadingState()`, `loading-state.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Playbackfeedbackoverlaycomponent Playback Feedback`** (2 nodes): `PlaybackFeedbackOverlayComponent()`, `playback-feedback-overlay.tsx`
+- **Thin community `Community 32`** (2 nodes): `PlaybackFeedbackOverlayComponent()`, `playback-feedback-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Activevideooverlaycomponent Active Overlay`** (2 nodes): `ActiveVideoOverlayComponent()`, `active-video-overlay.tsx`
+- **Thin community `Community 33`** (2 nodes): `ActiveVideoOverlayComponent()`, `active-video-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Resolveactivevideochange Active Change`** (2 nodes): `resolveActiveVideoChange()`, `active-video-change.ts`
+- **Thin community `Community 34`** (2 nodes): `resolveActiveVideoChange()`, `active-video-change.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Getfullscreenvideoloadingstate Loading State`** (2 nodes): `getFullscreenVideoLoadingState()`, `loading-state.ts`
+- **Thin community `Community 35`** (2 nodes): `getFullscreenVideoLoadingState()`, `loading-state.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Auth Coupling Stays`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
+- **Thin community `Community 36`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 37`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 38`** (1 nodes): `auth-code-row.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed-Session Test Ts`** (1 nodes): `feed-session.test.ts`
+- **Thin community `Community 39`** (1 nodes): `auth-mode-tabs.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 40`** (1 nodes): `structured-auth-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Player-Window Test Ts`** (1 nodes): `player-window.test.ts`
+- **Thin community `Community 41`** (1 nodes): `login-entry-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 42`** (1 nodes): `auth-ui-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed-Pagination-Policy Test Ts`** (1 nodes): `feed-pagination-policy.test.ts`
+- **Thin community `Community 43`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Toastcard Tsx`** (1 nodes): `ToastCard.tsx`
+- **Thin community `Community 44`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Toast-Design Test Ts`** (1 nodes): `toast-design.test.ts`
+- **Thin community `Community 45`** (1 nodes): `feed-session.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Toasthost Tsx`** (1 nodes): `ToastHost.tsx`
+- **Thin community `Community 46`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 47`** (1 nodes): `player-window.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Segmented-Filter-Bar Tsx`** (1 nodes): `segmented-filter-bar.tsx`
+- **Thin community `Community 48`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 49`** (1 nodes): `feed-pagination-policy.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Glass-Support Test Ts`** (1 nodes): `glass-support.test.ts`
+- **Thin community `Community 50`** (1 nodes): `ToastCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 51`** (1 nodes): `toast-design.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Foundation Test Ts`** (1 nodes): `foundation.test.ts`
+- **Thin community `Community 52`** (1 nodes): `ToastHost.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Glass Ts`** (1 nodes): `glass.ts`
+- **Thin community `Community 53`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Radius Ts`** (1 nodes): `radius.ts`
+- **Thin community `Community 54`** (1 nodes): `segmented-filter-bar.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 55`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Elevation Ts`** (1 nodes): `elevation.ts`
+- **Thin community `Community 56`** (1 nodes): `glass-support.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 57`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Typography Ts`** (1 nodes): `typography.ts`
+- **Thin community `Community 58`** (1 nodes): `foundation.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Spacing Ts`** (1 nodes): `spacing.ts`
+- **Thin community `Community 59`** (1 nodes): `glass.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 60`** (1 nodes): `radius.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Constants Ts`** (1 nodes): `constants.ts`
+- **Thin community `Community 61`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 62`** (1 nodes): `elevation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Service Ts`** (1 nodes): `service.ts`
+- **Thin community `Community 63`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Request Test Ts`** (1 nodes): `request.test.ts`
+- **Thin community `Community 64`** (1 nodes): `typography.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 65`** (1 nodes): `spacing.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 66`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 67`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 68`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 69`** (1 nodes): `service.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restore-Scroll Test Ts`** (1 nodes): `restore-scroll.test.ts`
+- **Thin community `Community 70`** (1 nodes): `request.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restore-Scheduler Test Ts`** (1 nodes): `restore-scheduler.test.ts`
+- **Thin community `Community 71`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Loading-State Test Ts`** (1 nodes): `loading-state.test.ts`
+- **Thin community `Community 72`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 73`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Fullscreen-Video-Item Tsx`** (1 nodes): `fullscreen-video-item.tsx`
+- **Thin community `Community 74`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Row-Bound-Video-Overlay Tsx`** (1 nodes): `row-bound-video-overlay.tsx`
+- **Thin community `Community 75`** (1 nodes): `auth-page-shell.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Fullscreen-Video-Pager Tsx`** (1 nodes): `fullscreen-video-pager.tsx`
+- **Thin community `Community 76`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Initial-Positioning Test Ts`** (1 nodes): `initial-positioning.test.ts`
+- **Thin community `Community 77`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Active-Video-Change Test Ts`** (1 nodes): `active-video-change.test.ts`
+- **Thin community `Community 78`** (1 nodes): `restore-scroll.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Render-Props Test Ts`** (1 nodes): `render-props.test.ts`
+- **Thin community `Community 79`** (1 nodes): `restore-scheduler.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Loading-State Test Ts`** (1 nodes): `loading-state.test.ts`
+- **Thin community `Community 80`** (1 nodes): `loading-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 81`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Videos Ts`** (1 nodes): `videos.ts`
+- **Thin community `Community 82`** (1 nodes): `fullscreen-video-item.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 83`** (1 nodes): `row-bound-video-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 84`** (1 nodes): `fullscreen-video-pager.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 85`** (1 nodes): `initial-positioning.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Mock-Favorite-Repository Test Ts`** (1 nodes): `mock-favorite-repository.test.ts`
+- **Thin community `Community 86`** (1 nodes): `active-video-change.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index Ts`** (1 nodes): `index.ts`
+- **Thin community `Community 87`** (1 nodes): `render-props.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Types Ts`** (1 nodes): `types.ts`
+- **Thin community `Community 88`** (1 nodes): `loading-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Feed-Repository Test Ts`** (1 nodes): `feed-repository.test.ts`
+- **Thin community `Community 89`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Mock-Feed-Repository Test Ts`** (1 nodes): `mock-feed-repository.test.ts`
+- **Thin community `Community 90`** (1 nodes): `videos.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 91`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 92`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 93`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 94`** (1 nodes): `mock-favorite-repository.test.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 95`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 96`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 97`** (1 nodes): `feed-repository.test.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 98`** (1 nodes): `mock-feed-repository.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Expo Router` connect `Route App Layer` to `List Pending Restore`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `TanStack React Query` connect `Route App Layer` to `Applyfavoritestate Buildfavoriteoperationkey Createsetfavoritemutationoptions`, `List Pending Restore`, `Buildfirstpagefeeddata Findfeeditemindex Flattenfeedpages`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
-- **Are the 8 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `SoftActionButton()` and `MetaLabel()`) actually correct?**
-  _`useEditorialPaperTheme()` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `TanStack React Query` connect `Community 3` to `Community 9`, `Community 10`, `Community 2`, `Community 5`?**
+  _High betweenness centrality (0.129) - this node is a cross-community bridge._
+- **Why does `useEditorialPaperTheme()` connect `Community 0` to `Community 5`, `Community 13`?**
+  _High betweenness centrality (0.087) - this node is a cross-community bridge._
+- **Why does `FeedCard()` connect `Community 5` to `Community 0`?**
+  _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Are the 13 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `AuthSocialRow()` and `AuthField()`) actually correct?**
+  _`useEditorialPaperTheme()` has 13 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `Target Source Layer Structure` (e.g. with `use-feed-infinite-query.ts` and `mock-feed-repository.ts`) actually correct?**
   _`Target Source Layer Structure` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow` to the rest of the system?**
   _17 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Cauthcoderow Cauthfield Cauthmodetabs` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
-- **Should `Route App Layer` be split into smaller, more focused modules?**
-  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._

@@ -1,8 +1,5 @@
 # Agents
 
-本文件定义本仓库内 agent 的默认执行规则。
-调用 Subagent 完全不允许自定义模型, 必须直接继承当前会话模型
-
 ## graphify
 
 This project will have a graphify knowledge graph at graphify-out/.
@@ -17,6 +14,7 @@ Rules:
 
 ## 工作原则
 
+0. 尽量参考 expo 相关 skill
 1. 先读文档，再读代码，再动手实现。
 2. 先搜索已有实现，不重复造轮子。
 3. 不做向后兼容；以当前结构最优为准。
@@ -32,6 +30,7 @@ Rules:
 5. 任务若有额外验收要求，在 `npm run check` 之外补跑；如果改动影响 Expo 页面、路由或原生播放行为，补做一次 `npm run ios` 启动验证。
 6. 改动前先确认模块边界，不跨模块偷放职责。
 7. 能删除的旧实现就直接删除，不留“后面再清理”。
+8. 调用 Subagent 完全不允许自定义模型, 必须直接继承当前会话模型
 
 ## 文档规则
 
