@@ -9,7 +9,7 @@
 - 当前参考稿真正稳定下来的视觉语言是什么
 - 这套视觉语言在 Expo + React Native + 当前轻量 FSD 结构中应该如何抽象
 - 哪些内容属于 `shared/theme` 与 `shared/ui`，哪些应停留在 `features / widgets / pages / app`
-- 这套风格如何服务当前产品模型：`Feed 列表页 -> Fullscreen Video 页 -> 收藏夹 -> 我的 -> 登录`
+- 这套风格如何服务当前产品模型：当前最小运行态是 `Feed 列表页 -> Fullscreen Video 页`，并可继续扩展到收藏夹、我的、登录等页面
 
 本文档是实现导向规范，不是设计赏析文档。默认约束如下：
 
@@ -38,11 +38,13 @@
 
 `Editorial Paper` 适用于以下页面与视觉场景：
 
-- `YouTube-like Feed` 首页
-- `Fullscreen Video` 详情/沉浸式播放页
-- 收藏夹与学习沉淀页
-- 我的页与学习概览页
-- 登录与认证入口页
+- 当前已落地：
+  - `YouTube-like Feed` 首页
+  - `Fullscreen Video` 详情/沉浸式播放页
+- 后续可扩展：
+  - 收藏夹与学习沉淀页
+  - 我的页与学习概览页
+  - 登录与认证入口页
 
 不适用范围：
 
@@ -277,9 +279,10 @@ src/shared/ui/editorial-paper/
 
 - `EditorialFeedPageTemplate`
 - `FullscreenVideoPagerTemplate`
-- `CollectionListPageTemplate`
-- `ProfileDashboardPageTemplate`
-- `AuthEntryPageTemplate`
+- 后续扩展模板：
+  - `CollectionListPageTemplate`
+  - `ProfileDashboardPageTemplate`
+  - `AuthEntryPageTemplate`
 
 推荐职责：
 
@@ -327,7 +330,8 @@ src/shared/ui/editorial-paper/
 `Editorial Paper` 在当前仓库中的正式落位应遵循：
 
 - `app/`
-  - 路由壳、tabs、stack、modal、header 配置
+  - 路由壳、stack、modal、header 配置
+  - 如未来扩展多一级主导航，再引入 tabs / app shell
 - `pages/`
   - 页面组合与模板实例
 - `widgets/`
@@ -349,6 +353,7 @@ src/
   pages/
     feed/
     video-detail/
+    # 后续扩展候选
     vocab/
     me/
     auth/
@@ -401,7 +406,8 @@ src/
 
 ### 6.3 路由壳归属
 
-- 底部 tab bar 属于 `app shell`，不是 shared 组件
+- 当前最小运行态没有底部 tab bar
+- 若未来引入主导航，底部 tab bar 只属于 `app shell`，不是 shared 组件
 - `Fullscreen Video` 是 stack detail，不显示 tab
 - 页面自定义 header 不能替代全部原生导航能力
 - 一级页面允许保留 editorial header block
@@ -411,14 +417,11 @@ src/
 
 从 `Fullscreen Video` 返回 `Feed` 后，Feed 页面必须自动恢复到最后播放视频对应的卡片位置。
 
-为此必须存在单独的 session 语义：
+当前最小实现下，这层 session 语义只需要：
 
-- `enteredVideoId`
-- `lastPlayedVideoId`
-- `lastFeedAnchorId`
-- `entrySource`
+- `pendingRestoreVideoId`
 
-这些状态不属于 theme，不属于单个 widget，也不属于 entity 持久字段。
+它不属于 theme，不属于单个 widget，也不属于 entity 持久字段，而是页面间恢复滚动位置所需的短期状态。
 
 ## 7. Expo 实现约束
 
@@ -432,7 +435,8 @@ src/
 ### 7.2 Scroll 与 Safe Area
 
 - 页面 route 首子节点优先使用 `ScrollView` / `FlatList`
-- 必须开启 `contentInsetAdjustmentBehavior="automatic"`
+- 普通滚动页面默认优先开启 `contentInsetAdjustmentBehavior="automatic"`
+- `FullscreenVideoPager` 因整页定位依赖 `initialScrollIndex + pagingEnabled`，必须禁用自动 content inset
 - 页面模板需要显式考虑顶部与底部 safe area
 - 内容滚动留白与 tab shell 留白由页面模板统一处理
 
@@ -453,6 +457,7 @@ src/
 ### 7.5 Fullscreen Video 的实现边界
 
 - `FullscreenVideoPagerTemplate` 以现有视频 feed/pager 能力为基础
+- 当前真实实现落在 `pages/video-detail + widgets/fullscreen-video-pager`；这里的 template 是页面级抽象名，不等同于单个组件文件
 - 不重复创造新的播放器壳
 - 视频切换、预取阈值、active item 选择继续依附现有 feed/video 能力模型
 - 该页面的工作重点是 page template、overlay、动作布局与导航关系，而不是推翻现有播放内核
@@ -519,9 +524,7 @@ type EditorialPaperTokens = {
 
 应至少表达：
 
-- `lastPlayedVideoId`
-- `lastFeedAnchorId`
-- `entrySource`
+- `pendingRestoreVideoId`
 - Feed 页返回恢复滚动位置的依据
 
 ### 8.4 PageTemplateContract
@@ -576,7 +579,8 @@ widgets 至少要有以下变体语义：
 
 后续按本规范实现时，应满足：
 
-- Feed、Fullscreen Video、收藏夹、我的、登录共享同一套 `Editorial Paper` token 和表面语言
+- 当前已落地的 Feed 与 Fullscreen Video 共享同一套 `Editorial Paper` token 和表面语言
+- 后续扩展到收藏夹、我的、登录时，也继续复用这套 token 和表面语言
 - Feed list 与 Fullscreen Video 共用全局 feed source
 - 从 Fullscreen Video 返回 Feed 后恢复到对应卡片位置
 - tab shell 只出现在主页面，不侵入 Fullscreen Video
@@ -592,4 +596,5 @@ widgets 至少要有以下变体语义：
 - 当前只设计 `light theme`
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
-- `shared/theme + shared/ui + widgets + features + pages + app shell` 是正式抽象层次
+- 当前最小运行态只落地 `Feed + Fullscreen Video`
+- `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；若未来引入主导航，再在 `app` 内扩展 app shell

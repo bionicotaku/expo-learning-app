@@ -9,7 +9,7 @@
 - 首页 Feed 应该长什么样，它解决什么问题
 - Fullscreen Video 页应该长什么样，它解决什么问题
 - 两个页面为什么不是冲突关系，而是同一套内容系统的两种视图
-- 它们如何共享 feed 数据、播放状态和返回定位
+- 它们如何共享 feed 数据、页面间恢复状态和返回定位
 - 在 Expo + 当前轻量 FSD 结构中，这套逻辑应该落在哪些层
 
 本文档是页面设计逻辑说明，不单独定义整套风格系统。视觉系统与组件抽象总规范见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)。
@@ -78,7 +78,7 @@
 
 ### 3.2 页面结构
 
-从参考稿看，列表页结构固定为三段：
+当前最小实现下，列表页结构固定为两段：
 
 1. `Header block`
    - 日期或轻量 meta 信息
@@ -87,8 +87,8 @@
 2. `Card stream`
    - 多张视频内容卡片顺序排列
    - 每张卡片都同时表达主题、调性、时长和点击意图
-3. `App shell bottom tab`
-   - 属于应用壳，而不是页面内容本身
+
+如果未来重新引入多一级主导航，底部 tab 仍应属于 `app shell`，而不是页面内容本身。
 
 这一结构决定了列表页不是“瀑布流资讯页”，也不是“短视频全屏播放器”。
 
@@ -253,19 +253,15 @@
 
 除了共享 feed source，还必须有一层轻量 session 状态，用于页面间衔接。
 
-至少应包含：
+当前最小实现中，这层状态只需要：
 
-- `enteredVideoId`
-- `lastPlayedVideoId`
-- `lastFeedAnchorId`
-- `entrySource`
+- `pendingRestoreVideoId`
 
-作用分别是：
+作用固定为：
 
-- 进入视频页时确定起始视频
-- 离开视频页时记录最后播放位置
-- 返回列表页时恢复滚动锚点
-- 区分是从 feed 列表进入，还是从收藏/历史等入口进入
+- 在 `Fullscreen Video` 离开时记录最后一次活跃的视频 id
+- 在 `Feed` 重新获得 focus 时恢复滚动锚点
+- 只有目标卡片真正进入可见区后才清空恢复目标
 
 这层状态不属于主题系统，也不属于实体持久化字段，而是页面导航与会话联动所需的短期状态。
 
@@ -273,10 +269,10 @@
 
 ### 6.1 路由模型
 
-推荐路由关系如下：
+当前运行态的路由关系如下：
 
 - `Feed 列表页`
-  - 主应用区 tab 下的首页 route
+  - App 首屏 route
 - `Fullscreen Video 页`
   - 由列表项点击后进入的 stack detail route
 
@@ -290,19 +286,20 @@
 - 左上角返回按钮
 - 从左到右滑动的系统返回手势
 
-### 6.2 为什么视频页不应带 tab
+### 6.2 为什么视频页不应内嵌主导航壳
 
-底部 tab 属于 `app shell`。
+当前最小运行态没有底部 tab。
 
-而 `Fullscreen Video 页` 是 stack detail，有两个理由不应带 tab：
+如果未来重新引入 `app shell` 主导航，`Fullscreen Video 页` 仍应保持为 stack detail，不应内嵌 tab。理由有两个：
 
 - 视觉上会破坏沉浸感
 - 导航语义上它不是一级页面，而是内容详情层
 
-因此：
+因此当前结论固定为：
 
-- `Feed / 收藏夹 / 我的` 在 tab 体系内
-- `Fullscreen Video` 在 stack detail 体系内
+- `Feed` 与 `Fullscreen Video` 构成当前最小运行态
+- 若未来扩展收藏夹、我的等一级页面，主导航也只属于 `app shell`
+- `Fullscreen Video` 仍保持在 stack detail 体系内
 
 ### 6.3 返回恢复规则
 
@@ -313,7 +310,7 @@
 - 返回后，列表页自动滚动到最后播放视频所在卡片
 - 如果用户从列表页点击第 N 个卡片进入视频页
 - 在视频页滑到第 N+K 个视频后返回
-- 列表页应恢复到 `lastPlayedVideoId` 对应卡片位置，而不是最初点击的卡片位置
+- 列表页应恢复到 `pendingRestoreVideoId` 对应卡片位置，而不是最初点击的卡片位置
 
 这条规则保证用户的上下文感连续。
 
@@ -370,10 +367,12 @@
 
 `app/` 负责：
 
-- tabs 壳
+- route entry
 - stack detail route
 - header / toolbar 配置
 - 页面切换动画和原生导航关系
+
+如未来扩展多一级主导航，再由 `app/` 引入 app shell / tabs。
 
 不负责：
 
@@ -475,7 +474,7 @@
 
 - Feed 与 Fullscreen Video 共用全局 feed source
 - 两个页面不维护独立的列表数据
-- 返回定位基于 `lastPlayedVideoId`
+- 返回定位基于 `pendingRestoreVideoId`
 - 导航壳、页面模板、数据模型、视觉原语四层边界清楚
 
 ## 10. 默认实现结论

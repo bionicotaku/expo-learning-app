@@ -1,11 +1,8 @@
-import { useEvent } from 'expo';
-import { VideoView, useVideoPlayer } from 'expo-video';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FlatList as FlatListType, ViewToken } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   Text,
   useWindowDimensions,
   View,
@@ -14,60 +11,85 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FeedItem } from '@/entities/feed';
 import { shouldMountPlayer } from '@/features/video-playback';
+import { resolveActiveVideoChange } from '../model/active-video-change';
+import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
+import { ActiveVideoOverlay } from './active-video-overlay';
+import { FullscreenVideoItem } from './fullscreen-video-item';
+import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
 
 const audioToastDurationMs = 700;
 
-type FullscreenVideoPagerProps = {
-  activeIndex: number | null;
-  activeItemId: string | null;
-  targetIndex: number;
+export type FullscreenVideoPagerProps = {
+  initialIndex: number;
   isFetchingNextPage: boolean;
   isInitialLoading: boolean;
   isMuted: boolean;
   items: FeedItem[];
-  onSetActiveItem: (itemId: string, index: number) => void;
+  onActiveItemChange: (itemId: string, index: number) => void;
   onToggleMuted: () => void;
 };
 
 export function FullscreenVideoPager({
-  activeIndex,
-  activeItemId,
-  targetIndex,
+  initialIndex,
   isFetchingNextPage,
   isInitialLoading,
   isMuted,
   items,
-  onSetActiveItem,
+  onActiveItemChange,
   onToggleMuted,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatListType<FeedItem>>(null);
   const audioToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasAlignedInitialIndexRef = useRef(false);
+  const mountedWithItemsRef = useRef(items.length > 0);
+  const hasCompletedPostLoadAlignmentRef = useRef(false);
+  const activeSnapshotRef = useRef<{
+    index: number | null;
+    itemId: string | null;
+  }>({
+    index: null,
+    itemId: null,
+  });
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [audioToastLabel, setAudioToastLabel] = useState<string | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
     isFetchingNextPage,
     isInitialLoading,
   });
+  const initialPosition = useMemo(
+    () =>
+      resolveInitialFullscreenPagerPosition({
+        initialIndex,
+        itemCount: items.length,
+        mountedWithItems: mountedWithItemsRef.current,
+        hasCompletedPostLoadAlignment: hasCompletedPostLoadAlignmentRef.current,
+      }),
+    [initialIndex, items.length]
+  );
   const activeItem = activeIndex === null ? null : (items[activeIndex] ?? null);
+  const activeItemId = activeItem?.id ?? null;
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
-      const currentItem = viewableItems.find(
-        (item) => item.isViewable && typeof item.index === 'number'
-      );
 
-      if (!currentItem?.item || typeof currentItem.index !== 'number') {
+  const commitActiveVideo = useCallback(
+    (itemId: string, index: number) => {
+      const currentSnapshot = activeSnapshotRef.current;
+      if (currentSnapshot.index === index && currentSnapshot.itemId === itemId) {
         return;
       }
 
-      onSetActiveItem(currentItem.item.id, currentItem.index);
-    }
+      activeSnapshotRef.current = {
+        index,
+        itemId,
+      };
+      setActiveIndex(index);
+      onActiveItemChange(itemId, index);
+    },
+    [onActiveItemChange]
   );
 
   useEffect(() => {
@@ -79,25 +101,37 @@ export function FullscreenVideoPager({
   }, []);
 
   useEffect(() => {
-    if (items.length === 0 || hasAlignedInitialIndexRef.current) {
+    if (!initialPosition.shouldRunPostLoadAlignment) {
       return;
     }
 
-    const nextIndex = Math.max(0, Math.min(targetIndex, items.length - 1));
     const timer = setTimeout(() => {
       listRef.current?.scrollToIndex({
         animated: false,
-        index: nextIndex,
+        index: initialPosition.targetIndex,
       });
-      hasAlignedInitialIndexRef.current = true;
+      hasCompletedPostLoadAlignmentRef.current = true;
     }, 0);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [items.length, targetIndex]);
+  }, [initialPosition]);
 
-  const handleToggleMuted = () => {
+  useEffect(() => {
+    if (items.length === 0 || activeSnapshotRef.current.index !== null) {
+      return;
+    }
+
+    const nextItem = items[initialPosition.targetIndex];
+    if (!nextItem) {
+      return;
+    }
+
+    commitActiveVideo(nextItem.id, initialPosition.targetIndex);
+  }, [commitActiveVideo, initialPosition.targetIndex, items]);
+
+  const handleToggleMuted = useCallback(() => {
     const nextMutedValue = !isMuted;
     onToggleMuted();
 
@@ -109,7 +143,62 @@ export function FullscreenVideoPager({
     audioToastTimeoutRef.current = setTimeout(() => {
       setAudioToastLabel(null);
     }, audioToastDurationMs);
-  };
+  }, [isMuted, onToggleMuted]);
+
+  const handleViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+      const nextActiveVideo = resolveActiveVideoChange({
+        currentActiveIndex: activeSnapshotRef.current.index,
+        currentActiveItemId: activeSnapshotRef.current.itemId,
+        viewableItems,
+      });
+
+      if (!nextActiveVideo) {
+        return;
+      }
+
+      commitActiveVideo(nextActiveVideo.itemId, nextActiveVideo.index);
+    },
+    [commitActiveVideo]
+  );
+
+  const handleScrollToIndexFailed = useCallback(({ index }: { index: number }) => {
+    setTimeout(() => {
+      listRef.current?.scrollToIndex({
+        animated: false,
+        index,
+      });
+    }, 60);
+  }, []);
+
+  const renderState = useMemo(
+    () => ({
+      activeIndex,
+      bottomInset: insets.bottom,
+      height,
+      isMuted,
+      width,
+    }),
+    [activeIndex, height, insets.bottom, isMuted, width]
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: FeedItem; index: number }) => {
+      return (
+        <FullscreenVideoItem
+          bottomInset={insets.bottom}
+          height={height}
+          isActive={item.id === activeItemId}
+          isMuted={isMuted}
+          onToggleMuted={handleToggleMuted}
+          shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
+          video={item}
+          width={width}
+        />
+      );
+    },
+    [activeIndex, activeItemId, handleToggleMuted, height, insets.bottom, isMuted, width]
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
@@ -117,47 +206,27 @@ export function FullscreenVideoPager({
         ref={listRef}
         data={items}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => {
-          return (
-            <FullscreenVideoItem
-              height={height}
-              isActive={item.id === activeItemId}
-              isMuted={isMuted}
-              onToggleMuted={handleToggleMuted}
-              shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
-              video={item}
-              width={width}
-            />
-          );
-        }}
+        renderItem={renderItem}
         // Fullscreen paging relies on exact viewport-sized items. Automatic
         // content insets shift the initial offset and break first-entry snap.
         bounces={false}
         decelerationRate="fast"
+        extraData={renderState}
         getItemLayout={(_, index) => ({
           length: height,
           offset: height * index,
           index,
         })}
         initialNumToRender={3}
-        initialScrollIndex={
-          items.length > 0 ? Math.max(0, Math.min(targetIndex, items.length - 1)) : undefined
-        }
+        initialScrollIndex={initialPosition.initialScrollIndex}
         maxToRenderPerBatch={4}
         pagingEnabled
-        onScrollToIndexFailed={({ index }) => {
-          setTimeout(() => {
-            listRef.current?.scrollToIndex({
-              animated: false,
-              index,
-            });
-          }, 60);
-        }}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
         removeClippedSubviews
         showsVerticalScrollIndicator={false}
         viewabilityConfig={viewabilityConfigRef.current}
         windowSize={5}
-        onViewableItemsChanged={onViewableItemsChanged.current}
+        onViewableItemsChanged={handleViewableItemsChanged}
       />
 
       {loadingState.showInitialBottomLoader || loadingState.showPaginationBottomLoader ? (
@@ -193,266 +262,8 @@ export function FullscreenVideoPager({
         </View>
       ) : null}
 
-      {activeItem && activeIndex !== null ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: insets.top + 20,
-            left: 18,
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 999,
-            backgroundColor: 'rgba(0,0,0,0.42)',
-          }}
-        >
-          <Text
-            selectable
-            style={{
-              color: '#FFFFFF',
-              fontSize: 14,
-              fontVariant: ['tabular-nums'],
-              fontWeight: '700',
-            }}
-          >
-            {`${activeIndex + 1} / ${items.length}`}
-          </Text>
-        </View>
-      ) : null}
-
-      {activeItem ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            left: 18,
-            right: 18,
-            bottom: insets.bottom + 28,
-            gap: 8,
-          }}
-        >
-          <Text selectable style={{ color: '#FFFFFF', fontSize: 24, fontWeight: '800' }}>
-            {activeItem.title}
-          </Text>
-          <Text
-            selectable
-            style={{
-              color: 'rgba(255,255,255,0.74)',
-              fontSize: 15,
-              lineHeight: 20,
-              fontWeight: '500',
-            }}
-          >
-            {activeItem.subtitle}
-          </Text>
-        </View>
-      ) : null}
-
-      {audioToastLabel ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              paddingHorizontal: 18,
-              paddingVertical: 12,
-              borderRadius: 999,
-              backgroundColor: 'rgba(0,0,0,0.68)',
-            }}
-          >
-            <Text selectable style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800' }}>
-              {audioToastLabel}
-            </Text>
-          </View>
-        </View>
-      ) : null}
+      <ActiveVideoOverlay activeIndex={activeIndex} topInset={insets.top} totalItems={items.length} />
+      <PlaybackFeedbackOverlay audioToastLabel={audioToastLabel} />
     </View>
-  );
-}
-
-function FullscreenVideoItem({
-  video,
-  width,
-  height,
-  isActive,
-  isMuted,
-  onToggleMuted,
-  shouldUsePlayer,
-}: {
-  video: FeedItem;
-  width: number;
-  height: number;
-  isActive: boolean;
-  isMuted: boolean;
-  onToggleMuted: () => void;
-  shouldUsePlayer: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onToggleMuted}
-      style={{
-        width,
-        height,
-        backgroundColor: '#000000',
-      }}
-    >
-      {shouldUsePlayer ? (
-        <PlayableVideoSurface
-          video={video}
-          isActive={isActive}
-          isMuted={isMuted}
-        />
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: '#000000',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 40,
-          }}
-        >
-          <Text
-            selectable
-            style={{
-              color: 'rgba(255,255,255,0.72)',
-              fontSize: 14,
-              fontWeight: '600',
-              textAlign: 'center',
-            }}
-          >
-            {video.title}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
-function PlayableVideoSurface({
-  video,
-  isActive,
-  isMuted,
-}: {
-  video: FeedItem;
-  isActive: boolean;
-  isMuted: boolean;
-}) {
-  const player = useVideoPlayer(video.uri, (instance) => {
-    instance.loop = true;
-    instance.muted = isMuted;
-  });
-
-  const { status, error } = useEvent(player, 'statusChange', {
-    status: player.status,
-    error: undefined,
-  });
-
-  useEffect(() => {
-    player.muted = isMuted;
-  }, [isMuted, player]);
-
-  useEffect(() => {
-    if (!isActive) {
-      player.pause();
-      return;
-    }
-
-    if (status === 'readyToPlay') {
-      player.play();
-    }
-  }, [isActive, player, status]);
-
-  const handleRetry = async () => {
-    await player.replaceAsync(video.uri);
-    player.muted = isMuted;
-
-    if (isActive) {
-      player.play();
-    }
-  };
-
-  return (
-    <>
-      <VideoView
-        player={player}
-        nativeControls={false}
-        contentFit="cover"
-        style={{ width: '100%', height: '100%' }}
-      />
-
-      {status !== 'readyToPlay' && status !== 'error' ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.68)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          <Text selectable style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700' }}>
-            Loading video...
-          </Text>
-          <Text selectable style={{ color: 'rgba(255,255,255,0.72)', fontSize: 13 }}>
-            {video.title}
-          </Text>
-        </View>
-      ) : null}
-
-      {status === 'error' ? (
-        <View
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.78)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 32,
-            gap: 12,
-          }}
-        >
-          <Text
-            selectable
-            style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '700', textAlign: 'center' }}
-          >
-            Video unavailable
-          </Text>
-          <Text
-            selectable
-            style={{
-              color: 'rgba(255,255,255,0.74)',
-              fontSize: 14,
-              textAlign: 'center',
-            }}
-          >
-            {error?.message ?? 'The player could not load this video.'}
-          </Text>
-          <Pressable
-            onPress={() => {
-              void handleRetry();
-            }}
-            style={({ pressed }) => ({
-              paddingHorizontal: 18,
-              paddingVertical: 12,
-              borderRadius: 999,
-              backgroundColor: pressed ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.18)',
-            })}
-          >
-            <Text selectable style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
-              Retry
-            </Text>
-          </Pressable>
-        </View>
-      ) : null}
-    </>
   );
 }
