@@ -1,3 +1,7 @@
+/**
+ * @deprecated This file only exists to keep pre-Editorial Paper pages running.
+ * New code must use `@/shared/theme/editorial-paper`.
+ */
 export const colors = {
   background: '#000000',
   overlay: 'rgba(0, 0, 0, 0.42)',

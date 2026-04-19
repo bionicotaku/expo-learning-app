@@ -1,4 +1,8 @@
 /**
+ * @deprecated Legacy template hook. New code must use
+ * `@/shared/theme/editorial-paper`.
+ */
+/**
  * Learn more about light and dark modes:
  * https://docs.expo.dev/guides/color-schemes/
  */

@@ -23,8 +23,8 @@ const C = {
   lightSh: '#FFFFFFCC',
   darkSh: '#D7CCBB',
   serif: '"Fraunces", "Source Serif Pro", Georgia, serif',
-  sans: '"Inter", -apple-system, system-ui, sans-serif',
-  mono: '"JetBrains Mono", "SF Mono", ui-monospace, monospace',
+  sans: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+  mono: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
 };
 
 function CRaised({ children, radius = 28, pad = 0, style = {}, soft = false, bg = C.bg }) {

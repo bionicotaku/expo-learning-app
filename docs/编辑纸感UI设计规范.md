@@ -70,19 +70,19 @@
 排版固定为三层：
 
 - `Display / Title`：`Fraunces`
-- `Body / UI text`：`Inter`
-- `Meta / Data / Tag`：`JetBrains Mono`
+- `Body / UI text`：平台原生 sans-serif
+- `Meta / Data / Tag`：平台原生 sans-serif（通过字重、字距、大小形成标签感）
 
 使用规则：
 
 - 页面主标题、卡片标题、关键 section title 使用 `Fraunces`
-- 正文、按钮、列表、解释文本使用 `Inter`
-- 日期、标签、计数、状态、小型辅助文案使用 `Mono`
+- 正文、按钮、列表、解释文本使用 iOS / Android 各自原生 sans-serif
+- 日期、标签、计数、状态、小型辅助文案也使用原生 sans-serif，但通过 `uppercase + spacing + weight` 形成 meta 语气
 
 禁止事项：
 
 - 不允许为单个页面再引入第四套风格字体
-- 不允许把 `Mono` 扩大成正文主字体
+- 不允许为 meta 文本重新引入另一套展示性字体
 - 不允许让所有文本都只用同一套 sans-serif
 
 ### 3.3 色彩系统
@@ -592,4 +592,3 @@ widgets 至少要有以下变体语义：
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
 - `shared/theme + shared/ui + widgets + features + pages + app shell` 是正式抽象层次
-

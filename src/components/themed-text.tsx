@@ -1,3 +1,7 @@
+/**
+ * @deprecated Legacy template component. New UI work should build on
+ * `@/shared/ui/editorial-paper` and `@/shared/theme/editorial-paper`.
+ */
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
 import { Fonts, ThemeColor } from '@/constants/theme';
