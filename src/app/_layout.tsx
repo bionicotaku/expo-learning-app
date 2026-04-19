@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { createQueryClient } from '@/shared/lib/react-query/query-client';
@@ -10,6 +11,7 @@ import {
   EditorialPaperThemeProvider,
   getEditorialPaperFontSources,
 } from '@/shared/theme/editorial-paper';
+import { ToastHost } from '@/shared/ui/toast';
 
 void SplashScreen.preventAutoHideAsync().catch(() => {
   // Ignore duplicate calls during fast refresh.
@@ -39,6 +41,7 @@ export default function RootLayout() {
       <EditorialPaperThemeProvider fontsLoaded={fontsLoaded}>
         <QueryClientProvider client={queryClient}>
           <Stack screenOptions={{ headerShown: false }} />
+          {Platform.OS !== 'web' ? <ToastHost /> : null}
         </QueryClientProvider>
       </EditorialPaperThemeProvider>
     </GestureHandlerRootView>
