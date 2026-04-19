@@ -16,26 +16,62 @@ export function RowBoundVideoOverlay({
       pointerEvents="none"
       style={{
         position: 'absolute',
-        left: 18,
-        right: 18,
-        bottom: bottomInset + 28,
-        gap: 8,
+        inset: 0,
+        justifyContent: 'flex-end',
       }}
     >
-      <Text selectable style={{ color: '#FFFFFF', fontSize: 24, fontWeight: '800' }}>
-        {title}
-      </Text>
-      <Text
-        selectable
+      <View
         style={{
-          color: 'rgba(255,255,255,0.74)',
-          fontSize: 15,
-          lineHeight: 20,
-          fontWeight: '500',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: bottomInset + 182,
+          experimental_backgroundImage:
+            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 42%, rgba(0,0,0,0.22) 74%, rgba(0,0,0,0.34) 100%)',
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          left: 22,
+          right: 92,
+          bottom: bottomInset + 40,
         }}
       >
-        {subtitle}
-      </Text>
+        <Text
+          selectable
+          style={{
+            fontSize: 15,
+            lineHeight: 22,
+            letterSpacing: -0.08,
+            fontWeight: '700',
+            color: 'rgba(251,247,238,0.97)',
+            textShadowColor: 'rgba(17,13,10,0.26)',
+            textShadowOffset: { width: 1, height: 1 },
+            textShadowRadius: 3,
+            maxWidth: 260,
+            marginBottom: 12,
+          }}
+          numberOfLines={2}
+        >
+          {title}
+        </Text>
+        <Text
+          selectable
+          style={{
+            fontSize: 13.5,
+            lineHeight: 21,
+            color: 'rgba(251,247,238,0.9)',
+            textShadowColor: 'rgba(17,13,10,0.24)',
+            textShadowOffset: { width: 1, height: 1 },
+            textShadowRadius: 3,
+            maxWidth: 248,
+          }}
+        >
+          {subtitle}
+        </Text>
+      </View>
     </View>
   );
 }

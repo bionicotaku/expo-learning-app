@@ -30,7 +30,17 @@ function PlaybackFeedbackOverlayComponent({
           backgroundColor: 'rgba(0,0,0,0.68)',
         }}
       >
-        <Text selectable style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800' }}>
+        <Text
+          selectable
+          style={{
+            color: '#FFFFFF',
+            fontSize: 16,
+            fontWeight: '800',
+            textShadowColor: 'rgba(0,0,0,0.24)',
+            textShadowOffset: { width: 1, height: 1 },
+            textShadowRadius: 2,
+          }}
+        >
           {audioToastLabel}
         </Text>
       </View>

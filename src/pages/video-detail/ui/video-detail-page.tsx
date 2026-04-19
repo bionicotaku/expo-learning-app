@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -14,6 +14,7 @@ import {
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
 
 export function VideoDetailPage() {
+  const router = useRouter();
   const { videoId } = useLocalSearchParams<{ videoId?: string | string[] }>();
   const {
     data,
@@ -62,6 +63,10 @@ export function VideoDetailPage() {
     setIsMuted((current) => !current);
   }, []);
 
+  const handleBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
   return (
     <>
       <StatusBar style="light" />
@@ -72,6 +77,7 @@ export function VideoDetailPage() {
         isMuted={isMuted}
         items={items}
         onActiveItemChange={handleActiveItemChange}
+        onPressBack={handleBack}
         onToggleMuted={handleToggleMuted}
       />
     </>

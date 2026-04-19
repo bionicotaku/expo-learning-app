@@ -27,6 +27,7 @@ export type FullscreenVideoPagerProps = {
   isMuted: boolean;
   items: FeedItem[];
   onActiveItemChange: (itemId: string, index: number) => void;
+  onPressBack: () => void;
   onToggleMuted: () => void;
 };
 
@@ -37,6 +38,7 @@ export function FullscreenVideoPager({
   isMuted,
   items,
   onActiveItemChange,
+  onPressBack,
   onToggleMuted,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
@@ -262,7 +264,13 @@ export function FullscreenVideoPager({
         </View>
       ) : null}
 
-      <ActiveVideoOverlay activeIndex={activeIndex} topInset={insets.top} totalItems={items.length} />
+      <ActiveVideoOverlay
+        activeIndex={activeIndex}
+        bottomInset={insets.bottom}
+        onPressBack={onPressBack}
+        topInset={insets.top}
+        totalItems={items.length}
+      />
       <PlaybackFeedbackOverlay audioToastLabel={audioToastLabel} />
     </View>
   );

@@ -76,6 +76,7 @@ export type SegmentedFilterBarProps<T extends string | number> = {
 
 export type AdaptiveGlassProps = ViewProps & {
   children?: ReactNode;
+  appearance?: 'default' | 'clear';
   variant?: 'overlay' | 'chrome' | 'pill';
   interactive?: boolean;
   fallbackMode?: 'auto' | 'blur' | 'translucent';

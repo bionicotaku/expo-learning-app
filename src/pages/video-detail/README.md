@@ -9,6 +9,7 @@
 - 维护页面级 `isMuted`
 - 初次进入时也通过 pager 列表自身的 loading item 等待第一页，不额外渲染全屏 loading 页
 - 通过 `onActiveItemChange(itemId, index)` 接收 pager 当前 active video 的变化
+- 通过 `onPressBack` 把页面层的真实返回行为注入 pager 左上 overlay 按钮
 - 根据 pager 上报的 active index 触发下一页预取
 - 在离开页面时把最后一次上报的 `activeItemId` 写入 `pendingRestoreVideoId`
 

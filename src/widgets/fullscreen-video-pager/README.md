@@ -10,8 +10,8 @@
 - 在 widget 内部维护单一 `activeIndex` 状态，并从它派生当前 active item
 - 在 widget 内部维护 `audioToastLabel`
 - 采用三层 overlay 结构：
-  - row-bound overlay：每个 row 自己的标题与描述
-  - active-only stable overlay：当前只包含左上角 debug / counter
+  - row-bound overlay：每个 row 自己的标题、说明和底部可读性 scrim
+  - active-only stable overlay：左上返回按钮、右上 debug / counter、右侧 clear glass action rail
   - active-only ephemeral overlay：当前只包含静音 toast
 - 底部 loading pill 继续保留在 pager shell，而不是并入任何 video overlay
 - 首屏定位拆成两条明确路径：
@@ -24,5 +24,6 @@
 - widget 不直接请求 feed 数据
 - widget 不直接决定何时分页
 - widget 只通过 `onActiveItemChange(itemId, index)` 向页面上报 active video 变化
+- widget 通过 `onPressBack` 接收页面层注入的返回行为，而不是自己直接持有路由
 - widget 不持有跨页面恢复定位状态
 - widget 不使用自动 safe-area content inset；否则会破坏 `initialScrollIndex` 的首屏整页吸附

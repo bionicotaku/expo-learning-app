@@ -5,6 +5,7 @@ import type { ViewStyle } from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 
+import { resolveAdaptiveGlassAppearance } from './adaptive-glass-appearance';
 import { resolveEditorialPaperGlassSupport } from './glass-support';
 import type { AdaptiveGlassProps } from './types';
 
@@ -22,6 +23,7 @@ function resolveVariantPadding(variant: NonNullable<AdaptiveGlassProps['variant'
 
 export function AdaptiveGlass({
   children,
+  appearance = 'default',
   variant = 'overlay',
   interactive = false,
   fallbackMode = 'auto',
@@ -30,6 +32,7 @@ export function AdaptiveGlass({
   ...viewProps
 }: AdaptiveGlassProps) {
   const { tokens } = useEditorialPaperTheme();
+  const appearanceTokens = resolveAdaptiveGlassAppearance(tokens.glass, appearance);
   const isWeb = process.env.EXPO_OS === 'web';
   const support = resolveEditorialPaperGlassSupport({
     isWeb,
@@ -44,7 +47,7 @@ export function AdaptiveGlass({
     overflow: 'hidden',
     padding: resolveVariantPadding(variant),
     borderWidth: 1,
-    borderColor: tokens.glass.borderColor,
+    borderColor: appearanceTokens.borderColor,
   };
   const baseStyle = [
     baseSurfaceStyle,
@@ -54,6 +57,7 @@ export function AdaptiveGlass({
   if (mode === 'glass' && !isWeb) {
     return (
       <GlassView
+        glassEffectStyle={appearanceTokens.glassEffectStyle}
         isInteractive={interactive}
         style={baseStyle}
         {...viewProps}
@@ -66,8 +70,8 @@ export function AdaptiveGlass({
   if (mode === 'blur' && !isWeb) {
     return (
       <BlurView
-        tint={tokens.glass.tint}
-        intensity={tokens.glass.intensity}
+        tint={appearanceTokens.tint}
+        intensity={appearanceTokens.intensity}
         style={baseStyle}
         {...viewProps}
       >
@@ -80,7 +84,7 @@ export function AdaptiveGlass({
     <View
       style={[
         {
-          backgroundColor: tokens.glass.translucentBackground,
+          backgroundColor: appearanceTokens.translucentBackground,
         },
         ...baseStyle,
       ]}
