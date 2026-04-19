@@ -2,7 +2,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -39,14 +38,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <EditorialPaperThemeProvider fontsLoaded={fontsLoaded}>
         <QueryClientProvider client={queryClient}>
-          <StatusBar style="light" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'none',
-              contentStyle: { backgroundColor: '#000000' },
-            }}
-          />
+          <Stack screenOptions={{ headerShown: false }} />
         </QueryClientProvider>
       </EditorialPaperThemeProvider>
     </GestureHandlerRootView>

@@ -9,6 +9,10 @@
   - `NETWORK_DELAY_MS`
   - `PREFETCH_THRESHOLD`
   - `shouldPrefetchNextPage(...)`
+- `model/feed-source.ts`
+  - feed pages 扁平化
+  - `videoId -> index` 映射
+  - refresh 成功后把共享 source 替换成新第一页
 - `model/use-feed-infinite-query.ts`
   - `useInfiniteQuery` 接入 mock feed repository
   - query key: `['feed', 'main']`

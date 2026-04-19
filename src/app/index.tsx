@@ -1,5 +1,5 @@
-import { FeedScreen } from '@/pages/feed';
+import { FeedPage } from '@/pages/feed';
 
 export default function IndexRoute() {
-  return <FeedScreen />;
+  return <FeedPage />;
 }

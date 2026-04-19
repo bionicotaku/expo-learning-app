@@ -9,11 +9,6 @@ module.exports = defineConfig([
   },
   {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: [
-      "src/components/**",
-      "src/constants/**",
-      "src/hooks/**",
-    ],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -34,6 +29,10 @@ module.exports = defineConfig([
             {
               name: "@/hooks/use-theme",
               message: "Legacy theme hooks are frozen. Use useEditorialPaperTheme instead.",
+            },
+            {
+              name: "@/shared/theme/colors",
+              message: "Legacy feed colors are removed. New pages must use Editorial Paper tokens or local page-specific styling.",
             },
           ],
         },

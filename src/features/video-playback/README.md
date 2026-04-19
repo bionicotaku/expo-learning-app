@@ -1,13 +1,9 @@
 # Video Playback Feature
 
-`features/video-playback` 负责 feed 场景里的播放状态与播放策略。
+`features/video-playback` 当前只保留视频窗口策略。
 
-当前结构：
+当前职责：
 
-- `model/feed-playback.ts`
-  - 当前激活项
-  - 当前激活索引
-  - 全局静音状态
 - `model/player-window.ts`
   - 只为当前/上一条/下一条挂载 player 的窗口策略
 
@@ -15,5 +11,5 @@
 
 - 不直接发起 feed 数据请求
 - 不定义页面 overlay 文案
-- 不持有视频列表实体
+- 不持有跨页面播放状态
 - 不在这里渲染播放器 UI
