@@ -1,10 +1,9 @@
-export { VideoFeed } from './ui/video-feed';
 export {
   isFeedLoadingTailItem,
   isVideoFeedItem,
-} from './model/types';
+} from './types';
 export type {
   FeedLoadingTailItem,
   VideoFeedOverlayModel,
   VideoFeedRenderItem,
-} from './model/types';
+} from './types';

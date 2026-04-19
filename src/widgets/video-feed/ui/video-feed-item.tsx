@@ -3,11 +3,11 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import type { FeedVideoItem } from '@/entities/video';
+import type { FeedItem } from '@/entities/feed';
 import { colors } from '@/shared/theme/colors';
 
 type VideoFeedItemProps = {
-  video: FeedVideoItem;
+  video: FeedItem;
   width: number;
   height: number;
   isActive: boolean;
@@ -66,7 +66,7 @@ export function VideoFeedItem({
 }
 
 type PlayableVideoSurfaceProps = {
-  video: FeedVideoItem;
+  video: FeedItem;
   isActive: boolean;
   isMuted: boolean;
 };

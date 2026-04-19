@@ -9,9 +9,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "quick-check": "npm test && npx tsc --noEmit",
+    "check": "npm run quick-check && npm run lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
