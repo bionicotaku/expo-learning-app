@@ -23,6 +23,8 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
   // Ignore duplicate calls during fast refresh.
 });
 
+const FULLSCREEN_VIDEO_ROUTE_SINGULAR_ID = 'fullscreen-video';
+
 export default function RootLayout() {
   const [queryClient] = useState(() => createQueryClient());
   const [bootstrapState, dispatch] = useReducer(
@@ -30,7 +32,6 @@ export default function RootLayout() {
     undefined,
     createInitialLaunchBootstrapState
   );
-  const appOpacity = useRef(new Animated.Value(0)).current;
   const launchOpacity = useRef(new Animated.Value(1)).current;
   const didLayoutLaunchScreen = useRef(false);
   const requestedNativeHide = useRef(false);
@@ -79,24 +80,16 @@ export default function RootLayout() {
       return;
     }
 
-    Animated.parallel([
-      Animated.timing(appOpacity, {
-        toValue: 1,
-        duration: LAUNCH_SCREEN_FADE_DURATION_MS,
-        useNativeDriver: true,
-      }),
-      Animated.timing(launchOpacity, {
-        toValue: 0,
-        duration: LAUNCH_SCREEN_FADE_DURATION_MS,
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
+    Animated.timing(launchOpacity, {
+      toValue: 0,
+      duration: LAUNCH_SCREEN_FADE_DURATION_MS,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
       if (finished) {
         dispatch({ type: 'exit-animation-complete' });
       }
     });
   }, [
-    appOpacity,
     bootstrapState.exitAnimationComplete,
     bootstrapState.minimumDurationComplete,
     launchOpacity,
@@ -122,7 +115,6 @@ export default function RootLayout() {
         <Animated.View
           style={{
             flex: 1,
-            opacity: bootstrapState.appVisible ? appOpacity : 0,
             backgroundColor: editorialPaperLightTokens.color.background,
           }}
         >
@@ -135,6 +127,10 @@ export default function RootLayout() {
                   animation: 'fade',
                   animationTypeForReplace: 'push',
                 }}
+              />
+              <Stack.Screen
+                name="video/[videoId]"
+                dangerouslySingular={() => FULLSCREEN_VIDEO_ROUTE_SINGULAR_ID}
               />
             </Stack>
             {Platform.OS !== 'web' ? <ToastHost /> : null}

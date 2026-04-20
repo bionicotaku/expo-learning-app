@@ -113,7 +113,7 @@ export function FeedPage() {
 
   const handleOpenVideo = useCallback(
     (item: FeedItem) => {
-      router.push(`/video/${item.id}` as never);
+      router.navigate(`/video/${item.id}` as never);
     },
     [router]
   );

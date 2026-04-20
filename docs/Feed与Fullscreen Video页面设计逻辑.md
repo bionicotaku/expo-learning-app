@@ -30,7 +30,7 @@
 1. 用户打开 App 后，先进入 `登录入口页`
 2. 用户点击登录主按钮后进入 `Feed 列表页`
 3. 用户浏览卡片流，选择感兴趣的视频
-4. 点击视频卡片后，通过 `Stack push` 进入 `Fullscreen Video 页`
+4. 点击视频卡片后，通过 `router.navigate()` 进入根 `Stack` 上的 `video/[videoId]` singular detail route
 5. 在 `Fullscreen Video 页` 中继续上下滑动浏览视频
 6. 用户返回后，`Feed 列表页` 自动恢复到最后播放视频对应的卡片位置
 
@@ -284,14 +284,43 @@
 
 进入方式：
 
-- 点击卡片后 `Stack push`
+- 点击卡片后使用 `router.navigate()`
+- 根 `Stack` 对 `video/[videoId]` 启用 `dangerouslySingular`
 - 默认使用从右到左的原生 iOS push 动画
 
 返回方式：
 
 - 从左到右滑动的系统返回手势
 
-### 6.2 为什么视频页不应内嵌主导航壳
+### 6.2 为什么要给 `video/[videoId]` 启用 `dangerouslySingular`
+
+单靠 `router.navigate()` 并不能保证“快速连点卡片时只出现一个 fullscreen stack”。
+
+原因是：
+
+- `navigate()` 的复用前提是目标 route 已经在当前已提交的栈状态里存在
+- 当用户在第一次跳转真正完成前连续点击卡片，第二次导航发生时，栈里可能还没有可复用的 fullscreen route
+- 这类问题的本质是导航时序，而不是 feed page 的点击逻辑本身
+
+因此当前设计把“fullscreen video 只保留一个栈实例”的约束放到根 `Stack`：
+
+- `video/[videoId]` 在 `app/_layout.tsx` 中显式声明
+- 通过 `dangerouslySingular` 为该 route 指定固定 singular id
+- 这样无论当前是从哪个 feed card 进入，导航层都优先复用同一个 fullscreen route，而不是继续叠加新的 stack entry
+
+这条设计意味着：
+
+- 去重责任属于导航层，不属于 `Feed page`
+- `Feed page` 仍只负责发起“进入某个视频”的意图，不额外维护点击 gate
+- `Fullscreen Video page` 仍只负责消费 `videoId`、装配 pager 和回写 `pendingRestoreVideoId`
+
+这也同时限定了当前运行态的语义：
+
+- `Fullscreen Video` 是单实例 stack detail
+- 它不是“允许同一时刻压入多个 `/video/:id` detail 层”的多实例详情栈
+- 如果后续产品改成真正的多层视频详情导航，这个 singular 约束必须重新评估
+
+### 6.3 为什么视频页不应内嵌主导航壳
 
 当前最小运行态已经通过 `NativeTabs` 提供底部 tab。
 
@@ -306,7 +335,7 @@
 - 底部主导航只属于 `app shell`
 - `Fullscreen Video` 仍保持在 stack detail 体系内
 
-### 6.3 返回恢复规则
+### 6.4 返回恢复规则
 
 从视频页返回列表页时，页面不应该回到顶部，也不应该丢失上下文。
 
@@ -374,6 +403,7 @@
 
 - route entry
 - stack detail route
+- `video/[videoId]` 的 singular route 约束
 - header / toolbar 配置
 - 页面切换动画和原生导航关系
 

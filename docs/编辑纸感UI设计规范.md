@@ -462,6 +462,8 @@ src/
 - iOS 26+ 优先 `expo-glass-effect`
 - fallback 使用 `expo-blur`
 - 不允许在普通页面结构内层层嵌套 glass
+- `NativeTabs`、`AdaptiveGlass` 及其祖先节点不允许通过 `opacity: 0 -> 1` 的启动淡入来显隐；物理机上这会导致 liquid glass 整体不渲染
+- app 启动阶段若需要过渡，只允许淡出最上层 launch overlay，底下的 app shell 必须从首帧开始保持非透明
 
 ### 7.5 Fullscreen Video 的实现边界
 
