@@ -26,21 +26,23 @@ import { resolveActiveVideoChange } from '../model/active-video-change';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
 import {
-  createPlaybackToggleFeedback,
   createRateFeedback,
   createSeekFeedback,
   shouldAutoDismissPlaybackFeedback,
   type FullscreenPlaybackFeedback,
 } from '../model/playback-feedback';
+import { shouldShowPausedPlaybackIndicator } from '../model/paused-playback-indicator';
 import type {
   FullscreenActivePlayerController,
   FullscreenActivePlayerSurfaceState,
 } from '../model/active-player-controller';
 import { FullscreenVideoItem } from './fullscreen-video-item';
+import { PausedPlaybackIndicatorOverlay } from './paused-playback-indicator-overlay';
 import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
 import { TopChromeOverlay } from './top-chrome-overlay';
 
 const playbackFeedbackDurationMs = 700;
+const pauseIndicatorVisibilityDurationMs = 3000;
 
 export type FullscreenVideoPagerProps = {
   initialIndex: number;
@@ -59,11 +61,13 @@ export function FullscreenVideoPager({
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatListType<FeedItem>>(null);
   const playbackFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pauseIndicatorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
   const activePlayerControllerRef = useRef<FullscreenActivePlayerController | null>(null);
   const basePausedByUserRef = useRef(false);
   const transientHoldStateRef = useRef<FullscreenTransientHoldState | null>(null);
+  const previousPauseIndicatorEligibilityRef = useRef(false);
   const activeSnapshotRef = useRef<{
     index: number | null;
     itemId: string | null;
@@ -77,6 +81,7 @@ export function FullscreenVideoPager({
     useState<FullscreenTransientHoldState | null>(null);
   const [activeSurfaceState, setActiveSurfaceState] =
     useState<FullscreenActivePlayerSurfaceState | null>(null);
+  const [isPauseIndicatorVisible, setIsPauseIndicatorVisible] = useState(false);
   const [playbackFeedback, setPlaybackFeedback] =
     useState<FullscreenPlaybackFeedback | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
@@ -95,6 +100,23 @@ export function FullscreenVideoPager({
   );
   const activeItem = activeIndex === null ? null : (items[activeIndex] ?? null);
   const activeItemId = activeItem?.videoId ?? null;
+  const activeEffectivePlaybackState = useMemo(
+    () =>
+      activeIndex === null
+        ? null
+        : resolveEffectivePlaybackState({
+            activeIndex,
+            basePausedByUser,
+            itemIndex: activeIndex,
+            transientHoldState,
+          }),
+    [activeIndex, basePausedByUser, transientHoldState]
+  );
+  const shouldShowPauseIndicator = shouldShowPausedPlaybackIndicator({
+    activeItemId,
+    activeSurfaceState,
+    shouldPlay: activeEffectivePlaybackState?.shouldPlay ?? true,
+  });
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
@@ -107,6 +129,18 @@ export function FullscreenVideoPager({
 
     setPlaybackFeedback(null);
   }, []);
+
+  const clearPauseIndicatorTimeout = useCallback(() => {
+    if (pauseIndicatorTimeoutRef.current) {
+      clearTimeout(pauseIndicatorTimeoutRef.current);
+      pauseIndicatorTimeoutRef.current = null;
+    }
+  }, []);
+
+  const hidePauseIndicator = useCallback(() => {
+    clearPauseIndicatorTimeout();
+    setIsPauseIndicatorVisible(false);
+  }, [clearPauseIndicatorTimeout]);
 
   const showPlaybackFeedback = useCallback((nextFeedback: FullscreenPlaybackFeedback) => {
     if (playbackFeedbackTimeoutRef.current) {
@@ -150,6 +184,7 @@ export function FullscreenVideoPager({
       setBasePausedByUser(nextBasePausedByUser);
       setTransientHoldState(nextTransientHoldState);
       clearPlaybackFeedback();
+      hidePauseIndicator();
 
       activeSnapshotRef.current = {
         index,
@@ -158,7 +193,7 @@ export function FullscreenVideoPager({
       setActiveIndex(index);
       onActiveItemChange(itemId, index);
     },
-    [clearPlaybackFeedback, onActiveItemChange]
+    [clearPlaybackFeedback, hidePauseIndicator, onActiveItemChange]
   );
 
   useEffect(() => {
@@ -166,8 +201,30 @@ export function FullscreenVideoPager({
       if (playbackFeedbackTimeoutRef.current) {
         clearTimeout(playbackFeedbackTimeoutRef.current);
       }
+      clearPauseIndicatorTimeout();
     };
-  }, []);
+  }, [clearPauseIndicatorTimeout]);
+
+  useEffect(() => {
+    const wasPauseIndicatorEligible = previousPauseIndicatorEligibilityRef.current;
+    previousPauseIndicatorEligibilityRef.current = shouldShowPauseIndicator;
+
+    if (!shouldShowPauseIndicator) {
+      hidePauseIndicator();
+      return;
+    }
+
+    if (wasPauseIndicatorEligible) {
+      return;
+    }
+
+    clearPauseIndicatorTimeout();
+    setIsPauseIndicatorVisible(true);
+    pauseIndicatorTimeoutRef.current = setTimeout(() => {
+      setIsPauseIndicatorVisible(false);
+      pauseIndicatorTimeoutRef.current = null;
+    }, pauseIndicatorVisibilityDurationMs);
+  }, [clearPauseIndicatorTimeout, hidePauseIndicator, shouldShowPauseIndicator]);
 
   useEffect(() => {
     if (!initialPosition.shouldRunPostLoadAlignment) {
@@ -218,8 +275,7 @@ export function FullscreenVideoPager({
     );
     basePausedByUserRef.current = nextBasePausedByUser;
     setBasePausedByUser(nextBasePausedByUser);
-    showPlaybackFeedback(createPlaybackToggleFeedback(nextBasePausedByUser));
-  }, [showPlaybackFeedback]);
+  }, []);
 
   const handleDoubleTap = useCallback((zone: FullscreenTapZone) => {
     if (isGestureLocked(transientHoldStateRef.current)) {
@@ -422,6 +478,7 @@ export function FullscreenVideoPager({
         topInset={insets.top}
         totalItems={items.length}
       />
+      <PausedPlaybackIndicatorOverlay isVisible={isPauseIndicatorVisible} />
       <PlaybackFeedbackOverlay playbackFeedback={playbackFeedback} />
     </View>
   );

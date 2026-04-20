@@ -13,4 +13,12 @@ describe('playable video surface source', () => {
     expect(source).toContain('registerActiveController');
     expect(source).toContain('surfaceState:');
   });
+
+  it('renders loading as a centered glass spinner without copy or fullscreen scrim', () => {
+    expect(source).toContain('ActivityIndicator');
+    expect(source).toContain('AdaptiveGlass');
+    expect(source).not.toContain('Loading video...');
+    expect(source).not.toContain("backgroundColor: 'rgba(0,0,0,0.68)'");
+    expect(source).not.toContain('{video.title}');
+  });
 });

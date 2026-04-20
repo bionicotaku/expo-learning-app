@@ -1,9 +1,10 @@
 import { useEvent } from 'expo';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
+import { AdaptiveGlass } from '@/shared/ui/editorial-paper';
 import {
   resolveActivePlayerSurfaceState,
   type FullscreenActivePlayerController,
@@ -21,6 +22,10 @@ type PlayableVideoSurfaceProps = {
   shouldPlay: boolean;
   video: FeedItem;
 };
+
+const loadingSpinnerTint = 'rgba(251,247,238,0.96)';
+const loadingGlassShadow =
+  '6px 9px 18px rgba(17,13,10,0.16), inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(17,13,10,0.08)';
 
 function PlayableVideoSurfaceComponent({
   playbackRate,
@@ -105,18 +110,24 @@ function PlayableVideoSurfaceComponent({
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.68)',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 8,
           }}
         >
-          <Text selectable style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700' }}>
-            Loading video...
-          </Text>
-          <Text selectable style={{ color: 'rgba(255,255,255,0.72)', fontSize: 13 }}>
-            {video.title}
-          </Text>
+          <AdaptiveGlass
+            appearance="clear"
+            radius={28}
+            style={{
+              width: 56,
+              height: 56,
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: loadingGlassShadow,
+            }}
+            variant="pill"
+          >
+            <ActivityIndicator color={loadingSpinnerTint} size="small" />
+          </AdaptiveGlass>
         </View>
       ) : null}
 

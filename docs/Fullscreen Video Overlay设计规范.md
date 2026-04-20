@@ -122,13 +122,15 @@
 
 ### 6.1 定义
 
-`Active ephemeral overlay` 只服务当前 active video 的瞬时反馈层。
+`Active ephemeral overlay` 只服务当前 active video 的播放状态指示和瞬时反馈层。
 
 它必须与 row-owned content overlay 和 top chrome overlay 隔离。
 
 ### 6.2 当前放入内容
 
-- 播/停 HUD
+- 中心 pause indicator
+- 左右 seek HUD
+- 顶部约 `15%` 屏高位置的临时 `2x` HUD
 
 ### 6.3 未来适合放入的内容
 
@@ -139,7 +141,7 @@
 
 ### 6.4 设计理由
 
-这类状态更新频率高、持续时间短或只跟随当前 hold 生命周期，不能反向拖动 row 内容层或顶部 chrome 一起重渲。
+这类状态要么是当前 active video 的短生命周期反馈，要么是暂停态这种只属于 active row 的播放状态指示，不能反向拖动 row 内容层或顶部 chrome 一起重渲。
 
 ## 7. 状态归属建议
 
@@ -201,6 +203,8 @@
 - row-owned content overlay
 - row 内最小 loading / error 覆盖层
 
+其中 loading 覆盖层当前只保留中心 glass spinner，不再使用文案或整屏暗幕。
+
 其中 error 覆盖层需要拥有自己的点击恢复路径，因此当前 active row 进入 `error` 时，背景 gesture surface 必须撤掉，不能继续盖在 `Retry` 上面。
 
 ### 8.2 `TopChromeOverlay`
@@ -213,10 +217,21 @@
 
 负责：
 
-- 当前 active video 的播/停、seek、临时 `2x` HUD
+- 当前 active video 的左右 seek HUD
+- 当前 active video 的顶部约 `15%` 屏高位置的临时 `2x` HUD
 - 未来的字幕/手势/临时反馈
 
 其中当前 `2x` HUD 不走统一短 toast 定时器，而是跟随左右长按生命周期持续显示。
+
+### 8.4 `PausedPlaybackIndicatorOverlay`
+
+负责：
+
+- 当前 active video 进入暂停态时的中心 glass pause indicator
+
+它不复用 `PlaybackFeedbackOverlay` 的短时 toast 逻辑，也不进入 `playbackFeedback` union。
+
+当前实现里它不是“无限常驻状态指示”，而是暂停后显示约 `3s` 的短暂状态提示。
 
 ## 9. 性能约束
 
@@ -242,7 +257,7 @@
 - `top chrome overlay`
   - counter
 - `active ephemeral overlay`
-  - 播/停、seek、临时 `2x` HUD
+  - 中心 pause indicator、左右 seek HUD、顶部约 `15%` 屏高位置的临时 `2x` HUD
 
 不再保留的旧口径包括：
 

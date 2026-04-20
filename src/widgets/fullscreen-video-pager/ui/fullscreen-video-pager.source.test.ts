@@ -24,4 +24,26 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('activePlayerControllerRef.current = null');
     expect(source).toContain('setActiveSurfaceState(null)');
   });
+
+  it('splits paused state indication from transient seek and rate feedback', () => {
+    const source = readFileSync(
+      new URL('./fullscreen-video-pager.tsx', import.meta.url).pathname,
+      'utf8'
+    );
+
+    expect(source).toContain('PausedPlaybackIndicatorOverlay');
+    expect(source).not.toContain('createPlaybackToggleFeedback');
+  });
+
+  it('auto-dismisses the pause indicator after a short visibility window', () => {
+    const source = readFileSync(
+      new URL('./fullscreen-video-pager.tsx', import.meta.url).pathname,
+      'utf8'
+    );
+
+    expect(source).toContain('pauseIndicatorVisibilityDurationMs = 3000');
+    expect(source).toContain('pauseIndicatorTimeoutRef');
+    expect(source).toContain('setIsPauseIndicatorVisible(true)');
+    expect(source).toContain('setIsPauseIndicatorVisible(false)');
+  });
 });

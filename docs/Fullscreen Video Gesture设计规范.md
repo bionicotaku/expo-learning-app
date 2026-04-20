@@ -291,19 +291,26 @@ controller 的注册与清理必须使用同步生命周期，避免 active row 
 
 ## 9. HUD 模型
 
-当前 HUD 数据不再用单字符串，而固定采用判别联合：
+当前 HUD 模型拆成两类：
 
-- `{ kind: 'playback'; label: 'Playing' | 'Paused' }`
-- `{ kind: 'seek'; deltaSeconds: -5 | 5 }`
-- `{ kind: 'rate'; label: '2x' }`
+1. `playbackFeedback` 判别联合
+   - `{ kind: 'seek'; deltaSeconds: -5 | 5 }`
+   - `{ kind: 'rate'; label: '2x' }`
+2. 独立的 pause indicator 可见性
+   - 由当前 active row 的 `effectiveShouldPlay` 直接派生
+   - 不进入 `playbackFeedback` union
 
 显示策略固定为：
 
-- `playback`：短暂显示后自动消失
-- `seek`：短暂显示后自动消失
+- `seek`：短暂显示后自动消失；左右分置为方向型 glass icon HUD
 - `rate`：左右 hold 期间持续显示；只有 `hold end`、active row 切换或页面卸载才清掉
+- `pause indicator`：进入暂停态时显示，并在约 `3s` 后自动消失；恢复播放、active row 切换或 surface 进入 `error` 时立即消失
 
-`PlaybackFeedbackOverlay` 只负责渲染。
+`PlaybackFeedbackOverlay` 只负责渲染 `seek / rate` HUD。
+
+`PausedPlaybackIndicatorOverlay` 只负责渲染中心 pause indicator。
+
+当前 pause indicator 不进入 `playbackFeedback` union，而是由 pager 在 pause 生命周期开始时单独拉起一个约 `3s` 的可见窗口。
 
 它不负责：
 
