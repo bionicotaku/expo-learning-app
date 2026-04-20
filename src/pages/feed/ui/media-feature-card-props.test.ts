@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { FeedItem } from '@/entities/feed';
-import { createFeedMediaFeatureCardProps } from './media-feature-card-props';
+import type { VideoListItem } from '@/entities/video';
+import { createVideoMediaFeatureCardProps } from './media-feature-card-props';
 
-function createFeedItem(overrides: Partial<FeedItem> = {}): FeedItem {
+function createVideoListItem(overrides: Partial<VideoListItem> = {}): VideoListItem {
   return {
     videoId: 'the-office-health-care-clip-1',
     title: 'A useful phrase that still sounds natural in daily conversation.',
@@ -19,9 +19,9 @@ function createFeedItem(overrides: Partial<FeedItem> = {}): FeedItem {
   };
 }
 
-describe('createFeedMediaFeatureCardProps', () => {
-  it('maps a feed item into the display props expected by MediaFeatureCard', () => {
-    expect(createFeedMediaFeatureCardProps(createFeedItem())).toEqual({
+describe('createVideoMediaFeatureCardProps', () => {
+  it('maps a canonical video item into the display props expected by MediaFeatureCard', () => {
+    expect(createVideoMediaFeatureCardProps(createVideoListItem())).toEqual({
       accessibilityLabel:
         'Open video: A useful phrase that still sounds natural in daily conversation.',
       coverImageUrl: 'https://example.com/cover.webp',
@@ -34,8 +34,8 @@ describe('createFeedMediaFeatureCardProps', () => {
 
   it('falls back to a stable tone and default tag when the feed item has no cover or tags', () => {
     expect(
-      createFeedMediaFeatureCardProps(
-        createFeedItem({
+      createVideoMediaFeatureCardProps(
+        createVideoListItem({
           videoId: 'the-office-health-care-clip-4',
           coverImageUrl: null,
           tags: [],

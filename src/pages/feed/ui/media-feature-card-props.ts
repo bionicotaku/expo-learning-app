@@ -1,4 +1,4 @@
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 import type {
   MediaFeatureCardFallbackTone,
   MediaFeatureCardProps,
@@ -50,7 +50,7 @@ function resolveFallbackTone(videoId: string): MediaFeatureCardFallbackTone {
   return fallbackTones[((stableIndex % fallbackTones.length) + fallbackTones.length) % fallbackTones.length];
 }
 
-export function createFeedMediaFeatureCardProps(item: FeedItem): MediaFeatureCardProps {
+export function createVideoMediaFeatureCardProps(item: VideoListItem): MediaFeatureCardProps {
   return {
     title: item.title,
     statsLabel: `${formatViewCount(item.viewCount)} · ${formatDuration(item.durationSeconds)}`,

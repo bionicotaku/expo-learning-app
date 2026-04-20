@@ -7,6 +7,8 @@ import { VideoOverlayActionRail } from './video-overlay-action-rail';
 type RowOwnedVideoOverlayProps = {
   bottomInset: number;
   description: string;
+  isFavorited: boolean;
+  isLiked: boolean;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   title: string;
 };
@@ -14,6 +16,8 @@ type RowOwnedVideoOverlayProps = {
 function RowOwnedVideoOverlayComponent({
   bottomInset,
   description,
+  isFavorited,
+  isLiked,
   onActionPress,
   title,
 }: RowOwnedVideoOverlayProps) {
@@ -89,6 +93,8 @@ function RowOwnedVideoOverlayComponent({
 
       <VideoOverlayActionRail
         bottomInset={bottomInset}
+        isFavorited={isFavorited}
+        isLiked={isLiked}
         onActionPress={onActionPress}
       />
     </View>

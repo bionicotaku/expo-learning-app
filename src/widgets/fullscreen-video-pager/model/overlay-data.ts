@@ -1,7 +1,7 @@
 export type FullscreenVideoOverlayActionItem = {
   accessibilityLabel: string;
   fallbackGlyph: string;
-  id: 'favorite' | 'save' | 'share' | 'annotate';
+  id: 'like' | 'favorite' | 'share' | 'annotate';
   iosSymbol:
     | 'heart.fill'
     | 'star.fill'
@@ -11,14 +11,14 @@ export type FullscreenVideoOverlayActionItem = {
 
 export const fullscreenVideoOverlayActionItems: readonly FullscreenVideoOverlayActionItem[] = [
   {
-    id: 'favorite',
-    accessibilityLabel: 'Favorite',
+    id: 'like',
+    accessibilityLabel: 'Like',
     iosSymbol: 'heart.fill',
     fallbackGlyph: '♥',
   },
   {
-    id: 'save',
-    accessibilityLabel: 'Save',
+    id: 'favorite',
+    accessibilityLabel: 'Favorite',
     iosSymbol: 'star.fill',
     fallbackGlyph: '★',
   },

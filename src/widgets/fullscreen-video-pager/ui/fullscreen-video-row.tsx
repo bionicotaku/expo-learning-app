@@ -1,7 +1,8 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
+import { useVideoRuntimeState } from '@/features/video-runtime';
 import type {
   FullscreenHoldZone,
   FullscreenTapZone,
@@ -32,7 +33,7 @@ type FullscreenVideoRowProps = {
   height: number;
   hudState: FullscreenRowPlaybackHudState;
   isActive: boolean;
-  onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
+  onActionPress?: (videoId: string, item: FullscreenVideoOverlayActionItem) => void;
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
@@ -45,7 +46,7 @@ type FullscreenVideoRowProps = {
   shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
-  video: FeedItem;
+  video: VideoListItem;
   width: number;
 };
 
@@ -74,6 +75,11 @@ function FullscreenVideoRowComponent({
   const [pauseCenterReserved, setPauseCenterReserved] = useState(false);
   const pauseCenterReservationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
+  const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
+    baseIsFavorited: video.isFavorited,
+    baseIsLiked: video.isLiked,
+    videoId: video.videoId,
+  });
   const showCenteredPause = shouldReserveCenterForPause({
     pauseVisible: hudState.pauseIndicatorVisible,
     transientFeedbackKind: hudState.transientFeedback?.kind ?? null,
@@ -119,6 +125,20 @@ function FullscreenVideoRowComponent({
     }, rowHudFadeOutDurationMs);
   }, [pauseCenterReserved, showCenteredPause]);
 
+  const handleActionPress = (item: FullscreenVideoOverlayActionItem) => {
+    if (item.id === 'like') {
+      toggleLiked();
+      return;
+    }
+
+    if (item.id === 'favorite') {
+      toggleFavorited();
+      return;
+    }
+
+    onActionPress?.(video.videoId, item);
+  };
+
   return (
     <View
       style={{
@@ -156,7 +176,9 @@ function FullscreenVideoRowComponent({
       <RowOwnedVideoOverlay
         bottomInset={bottomInset}
         description={video.description}
-        onActionPress={onActionPress}
+        isFavorited={isFavorited}
+        isLiked={isLiked}
+        onActionPress={handleActionPress}
         title={video.title}
       />
       <RowPlaybackHudOverlay
@@ -211,6 +233,8 @@ function areFullscreenVideoRowComponentPropsEqual(
   return (
     areFullscreenVideoRowRenderPropsEqual(previousRenderProps, nextRenderProps) &&
     previousProps.bottomInset === nextProps.bottomInset &&
+    previousProps.video.isLiked === nextProps.video.isLiked &&
+    previousProps.video.isFavorited === nextProps.video.isFavorited &&
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description

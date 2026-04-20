@@ -4,6 +4,12 @@
 
 本文档用于定义当前项目 `feed` 读取接口的当前设计基线。
 
+需要先明确一条边界：
+
+- 本文档只定义 `feed source` 契约
+- 不定义 source-agnostic 的 `video truth`
+- 不定义前端本地 `video runtime`
+
 这份文档只覆盖一个接口：
 
 - `feed` 列表读取
@@ -31,6 +37,9 @@
 
 1. 当前仓库实现已经按本文档对齐到无状态 batch 读取语义。
 2. 如果其他旧文档仍然把 feed 描述成“带分页参数、带 `nextOffset/hasMore` 的接口”，在 **feed API 契约** 这一点上以本文档为准。
+3. 如果其他文档需要定义 source-agnostic video 模型或 runtime 状态，以 [Video 真值与 Runtime 设计规范](./Video%20%E7%9C%9F%E5%80%BC%E4%B8%8E%20Runtime%20%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.md) 为准，而不是以本文档为准。
+4. 当前前端实现中，`features/feed-source` 会把 `FeedItem[]` 映射成 canonical `VideoListItem[]`；本地 runtime override 由 `features/video-runtime` 负责，不属于 feed API 契约。
+5. 当前 fullscreen 的 `like / favorite` 只切本地 `video-runtime`，还没有真实写 API；因此本文件仍然只定义 feed 读取，不定义写回协议。
 
 ## 3. 核心结论
 
@@ -174,13 +183,17 @@ type FeedItem = {
 
 - 当前用户是否已 like
 - 属于用户态布尔字段
-- 本轮先作为读取字段进入 feed item，后续再单独定义写接口
+- 这是 feed source 返回时的读取快照
+- 当前前端会在 `video-runtime` 里对它做本地 runtime override
+- 真实写接口后续再单独定义，不属于本文件
 
 #### `isFavorited`
 
 - 当前用户是否已收藏
-- 命名对齐当前仓库里已有的 `favorite` 语义
-- 本轮先作为读取字段进入 feed item，后续再单独定义写接口
+- 对应当前 UI 的 `favorite` 语义，而不是旧的 `save`
+- 这是 feed source 返回时的读取快照
+- 当前前端会在 `video-runtime` 里对它做本地 runtime override
+- 真实写接口后续再单独定义，不属于本文件
 
 ## 6. 字段取舍说明
 
@@ -216,6 +229,24 @@ type FeedItem = {
 
 ## 7. 与当前 UI 的映射关系
 
+### 7.0 当前前端读取链
+
+当前前端的读取链已经固定为：
+
+```text
+FeedResponse.items (FeedItem[])
+-> mapFeedItemToVideoListItem()
+-> canonical VideoListItem[]
+-> useEffectiveVideoItems()
+-> FeedPage / VideoDetailPage / Fullscreen Video
+```
+
+也就是说：
+
+- `FeedItem` 仍然是 feed API 契约
+- 但它不再是页面长期直接消费的最终模型
+- 页面最终消费的是 canonical/effective video item
+
 ### 7.1 Feed 卡片
 
 当前卡片四个核心展示字段按以下规则映射：
@@ -249,6 +280,13 @@ type FeedItem = {
 
 - 为后续 like / favorite 状态展示提供读模型
 - 避免视频页或卡片还要额外再发一份状态读取请求
+- 允许前端在 `video-runtime` 层做本地 runtime override，而不改 feed API 契约
+
+但需要明确：
+
+- 它们在这里仍然只是 `feed` 返回时的用户态 snapshot
+- 它们不等于前端当前会话里的 runtime 真值
+- 前端最终显示状态未来仍应由 canonical video truth + runtime override 合成
 
 ## 8. 封面图 fallback 规则
 

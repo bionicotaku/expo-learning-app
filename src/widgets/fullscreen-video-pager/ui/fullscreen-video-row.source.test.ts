@@ -22,6 +22,12 @@ describe('fullscreen video row source', () => {
     expect(source).not.toContain('const [isScrubbing, setIsScrubbing]');
     expect(source).toContain('resolveRowHudCenterOwner');
     expect(source).toContain('shouldReserveCenterForPause');
+    expect(source).toContain('useVideoRuntimeState');
+    expect(source).toContain("if (item.id === 'like')");
+    expect(source).toContain("if (item.id === 'favorite')");
+    expect(source).toContain('onActionPress?.(video.videoId, item);');
+    expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
+    expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('showCenteredPause={showCenteredPause}');
     expect(source).toContain('centerOwner={centerOwner}');
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');

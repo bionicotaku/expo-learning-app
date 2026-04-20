@@ -11,6 +11,9 @@ describe('feed page source', () => {
 
     expect(source).toContain('router.navigate(`/video/${item.videoId}` as never);');
     expect(source).toContain('requestMore');
+    expect(source).not.toContain('useEffectiveVideoItems');
+    expect(source).toContain('createVideoMediaFeatureCardProps');
+    expect(source).not.toContain('createFeedMediaFeatureCardProps');
     expect(source).not.toContain('createFeedVideoOpenGate');
     expect(source).not.toContain('fetchNextPage');
     expect(source).not.toContain('cursor');

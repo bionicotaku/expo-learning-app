@@ -12,5 +12,7 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('memo');
     expect(source).toContain('export const RowOwnedVideoOverlay = memo(');
     expect(source).toContain('VideoOverlayActionRail');
+    expect(source).toContain('isLiked');
+    expect(source).toContain('isFavorited');
   });
 });

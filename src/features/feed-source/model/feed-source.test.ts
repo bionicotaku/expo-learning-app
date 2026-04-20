@@ -1,7 +1,10 @@
 import { QueryClient } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as feedEntity from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
+import { mapFeedItemToVideoListItem, type VideoListItem } from '@/entities/video';
+import { useVideoRuntimeStore } from '@/features/video-runtime';
 
 import * as feedSource from './feed-source';
 
@@ -34,19 +37,42 @@ describe('feed source helpers', () => {
         },
       },
     });
+    useVideoRuntimeStore.getState().clearAll();
   });
 
   it('uses a stable query key for the main feed snapshot', () => {
     expect(feedSource.FEED_QUERY_KEY).toEqual(['feed', 'main']);
   });
 
-  it('finds the index of a feed item by video id', () => {
-    const items = Array.from({ length: 8 }, (_, index) => createFeedItem(index));
+  it('lets the initial successful feed fetch replace local runtime overrides for returned video ids', async () => {
+    const fetchFeedSpy = vi.spyOn(feedEntity, 'fetchFeed').mockResolvedValue({
+      items: [createFeedItem(0), createFeedItem(1)],
+    });
 
-    expect(feedSource.findFeedItemIndex(items, 'the-office-health-care-video-1')).toBe(0);
-    expect(feedSource.findFeedItemIndex(items, 'the-office-health-care-video-8')).toBe(7);
-    expect(feedSource.findFeedItemIndex(items, 'missing-video')).toBe(-1);
-    expect(feedSource.findFeedItemIndex(items, null)).toBe(-1);
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
+      { isLiked: true },
+      { isLiked: false, isFavorited: false }
+    );
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-3',
+      { isFavorited: true },
+      { isLiked: false, isFavorited: false }
+    );
+
+    const snapshot = await feedSource.fetchInitialFeedSourceSnapshot();
+
+    expect(snapshot.items).toEqual([
+      mapFeedItemToVideoListItem(createFeedItem(0)),
+      mapFeedItemToVideoListItem(createFeedItem(1)),
+    ]);
+    expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-3': {
+        isFavorited: true,
+      },
+    });
+
+    fetchFeedSpy.mockRestore();
   });
 
   it('appends another unique batch into the shared source and exposes an extending flag while the request is in flight', async () => {
@@ -58,7 +84,7 @@ describe('feed source helpers', () => {
         requestMore: (queryClient: QueryClient) => Promise<void>;
       };
       getFeedSourceSnapshot: (queryClient: QueryClient) => {
-        items: FeedItem[];
+        items: VideoListItem[];
         isExtending: boolean;
         isRefreshing: boolean;
       };
@@ -80,7 +106,7 @@ describe('feed source helpers', () => {
     expect(
       (feedSource as typeof feedSource & {
         getFeedSourceSnapshot: (queryClient: QueryClient) => {
-          items: FeedItem[];
+          items: VideoListItem[];
           isExtending: boolean;
           isRefreshing: boolean;
         };
@@ -97,13 +123,16 @@ describe('feed source helpers', () => {
     expect(
       (feedSource as typeof feedSource & {
         getFeedSourceSnapshot: (queryClient: QueryClient) => {
-          items: FeedItem[];
+          items: VideoListItem[];
           isExtending: boolean;
           isRefreshing: boolean;
         };
       }).getFeedSourceSnapshot(queryClient)
     ).toEqual({
-      items: [createFeedItem(0), createFeedItem(1)],
+      items: [
+        mapFeedItemToVideoListItem(createFeedItem(0)),
+        mapFeedItemToVideoListItem(createFeedItem(1)),
+      ],
       isExtending: false,
       isRefreshing: false,
     });
@@ -133,7 +162,7 @@ describe('feed source helpers', () => {
         refresh: (queryClient: QueryClient) => Promise<void>;
       };
       getFeedSourceSnapshot: (queryClient: QueryClient) => {
-        items: FeedItem[];
+        items: VideoListItem[];
         isExtending: boolean;
         isRefreshing: boolean;
       };
@@ -149,15 +178,63 @@ describe('feed source helpers', () => {
     expect(
       (feedSource as typeof feedSource & {
         getFeedSourceSnapshot: (queryClient: QueryClient) => {
-          items: FeedItem[];
+          items: VideoListItem[];
           isExtending: boolean;
           isRefreshing: boolean;
         };
       }).getFeedSourceSnapshot(queryClient)
     ).toEqual({
-      items: [createFeedItem(8)],
+      items: [mapFeedItemToVideoListItem(createFeedItem(8))],
       isExtending: false,
       isRefreshing: false,
+    });
+  });
+
+  it('lets fetched source truth override local runtime overrides for the returned video ids', async () => {
+    const controller = (feedSource as typeof feedSource & {
+      createFeedSourceController: (repository: {
+        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+      }) => {
+        requestMore: (queryClient: QueryClient) => Promise<void>;
+        refresh: (queryClient: QueryClient) => Promise<void>;
+      };
+    }).createFeedSourceController({
+      fetchFeed: vi.fn().mockResolvedValue({
+        items: [createFeedItem(0), createFeedItem(1)],
+      }),
+    });
+
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
+      { isLiked: true },
+      { isLiked: false, isFavorited: false }
+    );
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-3',
+      { isFavorited: true },
+      { isLiked: false, isFavorited: false }
+    );
+
+    await controller.requestMore(queryClient);
+
+    expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-3': {
+        isFavorited: true,
+      },
+    });
+
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-2',
+      { isLiked: true },
+      { isLiked: false, isFavorited: false }
+    );
+
+    await controller.refresh(queryClient);
+
+    expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-3': {
+        isFavorited: true,
+      },
     });
   });
 });

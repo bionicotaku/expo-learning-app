@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 import {
   createTransientHoldState,
   isGestureLocked,
@@ -34,7 +34,7 @@ const transientSeekDurationMs = 700;
 const pauseIndicatorVisibilityDurationMs = 3000;
 
 type FullscreenPlaybackSessionArgs = {
-  items: FeedItem[];
+  items: VideoListItem[];
   onActiveItemChange: (itemId: string, index: number) => void;
 };
 

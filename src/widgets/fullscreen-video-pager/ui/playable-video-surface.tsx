@@ -3,7 +3,7 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 import {
   resolveActivePlayerSurfaceState,
   type FullscreenActivePlayerController,
@@ -34,7 +34,7 @@ type PlayableVideoSurfaceProps = {
     | ((controller: FullscreenRowSeekController | null) => void)
     | undefined;
   shouldPlay: boolean;
-  video: FeedItem;
+  video: VideoListItem;
 };
 
 function PlayableVideoSurfaceComponent({

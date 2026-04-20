@@ -10,6 +10,10 @@ describe('video detail page source', () => {
     );
 
     expect(source).toContain('requestMore');
+    expect(source).toContain('items={canonicalItems}');
+    expect(source).not.toContain('useVideoRuntimeStore');
+    expect(source).not.toContain('handleActionPress');
+    expect(source).not.toContain('onActionPress=');
     expect(source).not.toContain('fetchNextPage');
     expect(source).not.toContain('cursor');
     expect(source).not.toContain('offset');

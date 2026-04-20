@@ -5,7 +5,7 @@
 当前职责：
 
 - 消费共享 feed source
-- 把 `FeedItem` 映射成 `MediaFeatureCard` 所需的展示 props
+- 把 canonical `VideoListItem[]` 映射成 `MediaFeatureCard` 所需的展示 props
 - 顶部下拉刷新，保留当前页面内容直到新的 source 成功替换
 - 当当前已加载尾 item 进入可见区时请求下一批
 - 在续接读取进行中显示底部 footer loader
@@ -18,8 +18,9 @@
 边界约束：
 
 - page 不直接实现 feed repository
+- page 不直接实现 `videoId -> runtime override`
 - page 不直接实现播放器细节
 - page 不拥有视频卡 JSX 本体；卡片复合视图由 `widgets/media-feature-card` 提供
-- page 负责派生当前 Feed 专属的展示字段，例如 `statsLabel / tagLabel / fallbackTone`
+- page 负责派生当前列表展示字段，例如 `statsLabel / tagLabel / fallbackTone`
 - page 不在 route 文件里展开路由参数解析
 - page 不定义 `dangerouslySingular`；这属于 `app/_layout.tsx` 的导航层职责

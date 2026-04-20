@@ -6,6 +6,8 @@ import { AdaptiveGlass } from '@/shared/ui/editorial-paper';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 
 type VideoOverlayActionButtonProps = {
+  activeTintColor?: string;
+  isActive?: boolean;
   item: FullscreenVideoOverlayActionItem;
   onPress?: () => void;
   size?: number;
@@ -14,10 +16,14 @@ type VideoOverlayActionButtonProps = {
 const iconTint = 'rgba(251,247,238,0.96)';
 
 function VideoOverlayActionButtonComponent({
+  activeTintColor,
+  isActive = false,
   item,
   onPress,
   size = 54,
 }: VideoOverlayActionButtonProps) {
+  const resolvedTintColor = isActive ? (activeTintColor ?? iconTint) : iconTint;
+
   return (
     <Pressable
       accessibilityLabel={item.accessibilityLabel}
@@ -56,7 +62,7 @@ function VideoOverlayActionButtonComponent({
             fallback={
               <Text
                 style={{
-                  color: iconTint,
+                  color: resolvedTintColor,
                   fontSize: 22,
                   lineHeight: 22,
                   fontWeight: '700',
@@ -70,7 +76,7 @@ function VideoOverlayActionButtonComponent({
             }
             name={{ ios: item.iosSymbol }}
             size={22}
-            tintColor={iconTint}
+            tintColor={resolvedTintColor}
             type="hierarchical"
             weight="semibold"
           />

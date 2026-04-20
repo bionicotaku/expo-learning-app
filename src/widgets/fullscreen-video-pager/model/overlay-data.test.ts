@@ -8,8 +8,8 @@ import {
 describe('fullscreen overlay data', () => {
   it('defines the four action rail items in a stable order', () => {
     expect(fullscreenVideoOverlayActionItems.map((item) => item.id)).toEqual([
+      'like',
       'favorite',
-      'save',
       'share',
       'annotate',
     ]);

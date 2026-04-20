@@ -15,15 +15,36 @@
 - [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
 - [Fullscreen Video Gesture设计规范](./Fullscreen%20Video%20Gesture设计规范.md)
 - [Fullscreen Video Seek Bar Overlay设计规范](./Fullscreen%20Video%20Seek%20Bar%20Overlay设计规范.md)
+- [Video 真值与 Runtime 设计规范](./Video%20%E7%9C%9F%E5%80%BC%E4%B8%8E%20Runtime%20%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.md)
 
 ## 2. 页面关系总览
 
-`Feed 列表页` 与 `Fullscreen Video 页` 不是两套独立产品，而是同一份 feed source 的两种页面投影：
+`Feed 列表页` 与 `Fullscreen Video 页` 不是两套独立产品，而是同一套 canonical video truth 的两种页面投影。当前实现仍然共享 `feed source`，但两边的长期依赖模型已经不再是 `FeedItem`，而是：
+
+- source 输出的 canonical `VideoListItem`
+- 再叠加 `video-runtime` 的本地 override
+
+也就是说，这两个页面当前共享的是：
 
 - `Feed 列表页`
   - 负责内容发现、比较与进入
 - `Fullscreen Video 页`
   - 负责沉浸式播放、连续浏览与播放中交互
+
+当前共享数据链固定为：
+
+```text
+feed source snapshot (FeedItem[])
+-> canonical VideoListItem[]
+-> effectiveVideoItem[]
+-> FeedPage / VideoDetailPage / Fullscreen Video
+```
+
+其中：
+
+- `features/feed-source` 负责前两段
+- `features/video-runtime` 负责 `canonical -> effective` 聚合
+- 页面和 widget 不自己做局部 merge
 
 ## 3. Feed 列表页职责
 
@@ -82,6 +103,10 @@ fullscreen 页固定承担：
   - rail + thumb 的 `tap-to-seek`
   - drag preview
   - release commit
+- 右侧 action rail 做：
+  - `like` 本地 toggle
+  - `favorite` 本地 toggle
+  - `share / annotate` 的现有 UI 行为
 
 ### 5.1 背景区职责
 
@@ -105,9 +130,24 @@ fullscreen 页固定承担：
 - 不触发背景双击 `±5s`
 - 不触发背景长按 `2x`
 
+### 5.3 右侧 action rail 的数据语义
+
+fullscreen 右侧 action rail 当前固定消费 `effective video item`：
+
+- `isLiked === true`
+  - heart 显示为红色
+- `isFavorited === true`
+  - star 显示为黄色
+
+当前这两个动作都只修改 `features/video-runtime`：
+
+- 不调 API
+- 不复用旧的 `features/favorite`
+- 不把本地 toggle 混回 `feed-source`
+
 ## 6. Shared Feed Source
 
-`Feed 列表页` 与 `Fullscreen Video 页` 必须继续共享同一份 feed source：
+`Feed 列表页` 与 `Fullscreen Video 页` 当前共享同一份 `feed source`，并且页面长期消费模型已经收口为 canonical/effective video：
 
 - `feed items`
 - source state
@@ -119,6 +159,9 @@ fullscreen 页固定承担：
 
 - fullscreen 不是独立播放器数据源
 - feed 返回定位仍以同一份 source 为准
+- fullscreen 不再长期直接依赖 `FeedItem`
+- 未来多个 source 进入 UI 时，应先映射到同一套 `VideoListItem`
+- 页面最终渲染态统一来自 `effectiveVideoItem`
 
 ## 7. 目标结构中的关键设计结论
 

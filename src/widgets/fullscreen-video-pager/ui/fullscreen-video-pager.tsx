@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 import { shouldMountPlayer } from '@/features/video-playback';
 import { resolveActiveVideoChange } from '../model/active-video-change';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
+import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import { useFullscreenPlaybackSession } from '../model/use-fullscreen-playback-session';
 import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
@@ -21,19 +22,24 @@ import { TopChromeOverlay } from './top-chrome-overlay';
 export type FullscreenVideoPagerProps = {
   initialIndex: number;
   isInitialLoading: boolean;
-  items: FeedItem[];
+  items: VideoListItem[];
   onActiveItemChange: (itemId: string, index: number) => void;
+  onActionPress?: (
+    videoId: string,
+    item: FullscreenVideoOverlayActionItem
+  ) => void;
 };
 
 export function FullscreenVideoPager({
   initialIndex,
   isInitialLoading,
   items,
+  onActionPress,
   onActiveItemChange,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const listRef = useRef<FlatListType<FeedItem>>(null);
+  const listRef = useRef<FlatListType<VideoListItem>>(null);
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
   const loadingState = getFullscreenVideoLoadingState({
@@ -101,7 +107,7 @@ export function FullscreenVideoPager({
   }, [activeIndex, commitActiveVideo, initialPosition.targetIndex, items]);
 
   const handleViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
       const nextActiveVideo = resolveActiveVideoChange({
         currentActiveIndex: activeIndex,
         currentActiveItemId: activeItemId,
@@ -139,7 +145,7 @@ export function FullscreenVideoPager({
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: FeedItem; index: number }) => {
+    ({ item, index }: { item: VideoListItem; index: number }) => {
       const rowRenderState = getRowRenderState(item.videoId, index);
       const isCurrentActiveItem = item.videoId === activeItemId;
 
@@ -150,6 +156,7 @@ export function FullscreenVideoPager({
           height={height}
           hudState={rowRenderState.hudState}
           isActive={isCurrentActiveItem}
+          onActionPress={onActionPress}
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleHoldStart}
@@ -178,6 +185,7 @@ export function FullscreenVideoPager({
       handleSingleTap,
       height,
       insets.bottom,
+      onActionPress,
       registerActiveController,
       width,
     ]

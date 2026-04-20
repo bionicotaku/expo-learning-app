@@ -345,7 +345,7 @@ src/shared/ui/startup/
 - `features/`
   - 用户动作与能力相关 UI
 - `entities/`
-  - `feed / video / favorite` 的实体与映射
+  - `feed / video / transcript` 的实体与映射
 - `shared/`
   - token、原语、底层视觉能力
   - app 启动期的共享视觉与状态基础设施
@@ -373,12 +373,12 @@ src/
     grouped-action-list/
   features/
     auth/ui/
-    favorite/ui/
+    video-runtime/
     video-playback/ui/
   entities/
     feed/
     video/
-    favorite/
+    transcript/
   shared/
     theme/editorial-paper/
     ui/editorial-paper/

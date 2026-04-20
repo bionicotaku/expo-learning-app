@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 
 import type { FullscreenActivePlayerController } from '../model/active-player-controller';
 import type {
@@ -21,7 +21,7 @@ type RowPlaybackMediaLayerProps = {
   seekBarStore: RowPlaybackSeekBarStore;
   shouldPlay: boolean;
   shouldUsePlayer: boolean;
-  video: FeedItem;
+  video: VideoListItem;
 };
 
 function RowPlaybackMediaLayerComponent({

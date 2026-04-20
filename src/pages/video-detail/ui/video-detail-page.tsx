@@ -6,9 +6,9 @@ import {
   setPendingRestoreVideoId,
 } from '@/features/feed-session';
 import {
-  findFeedItemIndex,
-  useFeedSource,
-} from '@/features/feed-source';
+  findVideoListItemIndex,
+} from '@/entities/video';
+import { useFeedSource } from '@/features/feed-source';
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
 
 const trailingRequestThreshold = 3;
@@ -17,14 +17,14 @@ export function VideoDetailPage() {
   const { videoId } = useLocalSearchParams<{ videoId?: string | string[] }>();
   const {
     isInitialLoading,
-    items,
+    items: canonicalItems,
     requestMore,
   } = useFeedSource();
   const normalizedVideoId =
     typeof videoId === 'string' ? videoId : Array.isArray(videoId) ? videoId[0] : null;
   const targetIndex = useMemo(
-    () => findFeedItemIndex(items, normalizedVideoId),
-    [items, normalizedVideoId]
+    () => findVideoListItemIndex(canonicalItems, normalizedVideoId),
+    [canonicalItems, normalizedVideoId]
   );
   const latestActiveItemIdRef = useRef<string | null>(null);
   const lastRequestedTailVideoIdRef = useRef<string | null>(null);
@@ -38,12 +38,12 @@ export function VideoDetailPage() {
   const handleActiveItemChange = useCallback((itemId: string, index: number) => {
     latestActiveItemIdRef.current = itemId;
 
-    const tailVideoId = items[items.length - 1]?.videoId ?? null;
+    const tailVideoId = canonicalItems[canonicalItems.length - 1]?.videoId ?? null;
     if (!tailVideoId) {
       return;
     }
 
-    if (index < Math.max(0, items.length - trailingRequestThreshold)) {
+    if (index < Math.max(0, canonicalItems.length - trailingRequestThreshold)) {
       return;
     }
 
@@ -53,7 +53,7 @@ export function VideoDetailPage() {
 
     lastRequestedTailVideoIdRef.current = tailVideoId;
     void requestMore();
-  }, [items, requestMore]);
+  }, [canonicalItems, requestMore]);
 
   return (
     <>
@@ -61,7 +61,7 @@ export function VideoDetailPage() {
       <FullscreenVideoPager
         initialIndex={targetIndex >= 0 ? targetIndex : 0}
         isInitialLoading={isInitialLoading}
-        items={items}
+        items={canonicalItems}
         onActiveItemChange={handleActiveItemChange}
       />
     </>

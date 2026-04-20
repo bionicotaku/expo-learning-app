@@ -1,6 +1,5 @@
 export {
   FEED_QUERY_KEY,
-  findFeedItemIndex,
   getFeedSourceSnapshot,
   refreshFeedSource,
   requestMoreFeedSource,

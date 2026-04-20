@@ -11,20 +11,22 @@ import {
   View,
 } from 'react-native';
 
-import type { FeedItem } from '@/entities/feed';
+import {
+  findVideoListItemIndex,
+  type VideoListItem,
+} from '@/entities/video';
 import {
   clearPendingRestoreVideoId,
   getPendingRestoreVideoId,
 } from '@/features/feed-session';
 import {
-  findFeedItemIndex,
   useFeedSource,
 } from '@/features/feed-source';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { EditorialTitle, MetaLabel } from '@/shared/ui/editorial-paper';
 import { MediaFeatureCard } from '@/widgets/media-feature-card';
 import { getFeedListLoadingState } from './loading-state';
-import { createFeedMediaFeatureCardProps } from './media-feature-card-props';
+import { createVideoMediaFeatureCardProps } from './media-feature-card-props';
 import { buildFeedRestoreScrollParams } from './restore-scroll';
 import { scheduleFeedRestore } from './restore-scheduler';
 
@@ -109,11 +111,11 @@ function FeedStatePanel({
 export function FeedPage() {
   const router = useRouter();
   const { tokens } = useEditorialPaperTheme();
-  const listRef = useRef<FlatList<FeedItem>>(null);
+  const listRef = useRef<FlatList<VideoListItem>>(null);
   const restoreTargetVideoIdRef = useRef<string | null>(null);
   const lastRequestedTailVideoIdRef = useRef<string | null>(null);
   const visibleItemIdsRef = useRef<Set<string>>(new Set());
-  const itemsRef = useRef<FeedItem[]>([]);
+  const itemsRef = useRef<VideoListItem[]>([]);
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 50,
   });
@@ -162,7 +164,7 @@ export function FeedPage() {
       return;
     }
 
-    const restoreIndex = findFeedItemIndex(items, restoreTargetVideoId);
+    const restoreIndex = findVideoListItemIndex(items, restoreTargetVideoId);
     if (restoreIndex < 0) {
       return;
     }
@@ -186,14 +188,14 @@ export function FeedPage() {
   }, [refresh]);
 
   const handleOpenVideo = useCallback(
-    (item: FeedItem) => {
+    (item: VideoListItem) => {
       router.navigate(`/video/${item.videoId}` as never);
     },
     [router]
   );
 
   const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
       visibleItemIdsRef.current = new Set(
         viewableItems
           .filter((item) => item.isViewable && item.item?.videoId)
@@ -279,7 +281,7 @@ export function FeedPage() {
         keyExtractor={(item) => item.videoId}
         renderItem={({ item }) => (
           <MediaFeatureCard
-            {...createFeedMediaFeatureCardProps(item)}
+            {...createVideoMediaFeatureCardProps(item)}
             onPress={() => {
               handleOpenVideo(item);
             }}

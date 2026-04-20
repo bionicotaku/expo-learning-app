@@ -26,9 +26,12 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('FullscreenVideoRow');
     expect(source).not.toContain('PausedPlaybackIndicatorOverlay');
     expect(source).not.toContain('PlaybackFeedbackOverlay');
+    expect(source).toContain('const renderState = useMemo');
+    expect(source).toContain('extraData={renderState}');
     expect(source).toContain(
       'registerActiveController={\n            isCurrentActiveItem ? registerActiveController : undefined'
     );
+    expect(source).toContain('onActionPress={onActionPress}');
     expect(source).not.toContain('progressSnapshot');
   });
 });

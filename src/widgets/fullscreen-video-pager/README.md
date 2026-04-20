@@ -2,6 +2,11 @@
 
 `widgets/fullscreen-video-pager` 负责沉浸式纵向视频页的 widget 壳层、播放会话和 row 装配。
 
+当前输入模型已经对齐为：
+
+- canonical `VideoListItem`
+- 再叠加 `video-runtime` 后的 `effective` item
+
 ## 当前结构
 
 当前 fullscreen 不再采用“pager 顶层统一 HUD”的旧结构，而是固定分成三类附着域：
@@ -64,6 +69,7 @@ FullscreenVideoPager
   - FlatList 壳层
   - 初始定位与 post-load alignment
   - active row 切换装配
+  - 透传 row action rail 的本地动作
   - page-attached overlays 渲染
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
@@ -115,6 +121,7 @@ FullscreenVideoPager
 - 全局 toast
 - pager 顶层播放器 HUD
 - 多 row 的播放器实例管理策略以外的业务逻辑
+- runtime store 本身的定义
 
 ## 播放会话模型
 
@@ -227,6 +234,38 @@ row-local seek bar 是独立于 `RowPlaybackHudOverlay` 的持续型 playback co
 - 松手时只做一次 row-local `seekTo(seconds)`
 - scrubbing 期间继续播放视频，但背景区因几何分离不会命中
 - `error` 时隐藏
+
+## 当前动作状态
+
+fullscreen 右侧 action rail 当前固定为：
+
+- `like`
+  - 对应 `isLiked`
+  - active 时 heart 变红
+- `favorite`
+  - 对应 `isFavorited`
+  - active 时 star 变黄
+- `share`
+- `annotate`
+
+当前 `like / favorite` 只做本地 runtime toggle，不调真实 API。
+
+但这层 runtime toggle 不是长期真值：
+
+- 当前会话里，点击后会立即覆盖当前 row 的 canonical 值
+- 只要后续 `feed` 成功 fetch 到同一 `videoId` 的新数据，就重新以新的 source 值为准
+- fullscreen 不再保留“本地状态永远压过后续 source refresh”的语义
+
+当前颜色更新链固定为：
+
+- `FullscreenVideoPager`
+  - 继续消费 canonical `VideoListItem[]`
+- `FullscreenVideoRow`
+  - 通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
+  - `like / favorite` 也在 row 内直接写入 runtime
+  - `share / annotate` 如有外部 handler 再向外冒泡
+
+也就是说，fullscreen 的 action active state 不再依赖整表 effective items、page relay 或 `FlatList.extraData` 才能刷新。
 
 ## Row HUD 布局
 

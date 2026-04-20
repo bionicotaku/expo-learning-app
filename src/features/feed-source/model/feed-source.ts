@@ -1,11 +1,16 @@
 import type { QueryClient } from '@tanstack/react-query';
 
 import { fetchFeed, type FeedItem, type FeedResponse } from '@/entities/feed';
+import {
+  mapFeedItemToVideoListItem,
+  type VideoListItem,
+} from '@/entities/video';
+import { useVideoRuntimeStore } from '@/features/video-runtime';
 
 export const FEED_QUERY_KEY = ['feed', 'main'] as const;
 
 export type FeedSourceSnapshot = {
-  items: FeedItem[];
+  items: VideoListItem[];
   isRefreshing: boolean;
   isExtending: boolean;
 };
@@ -20,8 +25,8 @@ const emptyFeedSourceSnapshot: FeedSourceSnapshot = {
   isExtending: false,
 };
 
-function uniqueFeedItems(items: FeedItem[]) {
-  const nextItemsById = new Map<string, FeedItem>();
+function uniqueVideoListItems(items: VideoListItem[]) {
+  const nextItemsById = new Map<string, VideoListItem>();
 
   for (const item of items) {
     nextItemsById.set(item.videoId, item);
@@ -30,16 +35,26 @@ function uniqueFeedItems(items: FeedItem[]) {
   return Array.from(nextItemsById.values());
 }
 
+function mapFeedItemsToVideoListItems(items: FeedItem[]) {
+  return items.map(mapFeedItemToVideoListItem);
+}
+
+function acceptFetchedSourceTruth(items: FeedItem[]) {
+  useVideoRuntimeStore
+    .getState()
+    .acceptSourceTruth(items.map((item) => item.videoId));
+}
+
 function createFeedSourceSnapshot(items: FeedItem[]): FeedSourceSnapshot {
   return {
-    items: uniqueFeedItems(items),
+    items: uniqueVideoListItems(mapFeedItemsToVideoListItems(items)),
     isRefreshing: false,
     isExtending: false,
   };
 }
 
-function mergeFeedSourceItems(currentItems: FeedItem[], nextItems: FeedItem[]) {
-  return uniqueFeedItems([...currentItems, ...nextItems]);
+function mergeFeedSourceItems(currentItems: VideoListItem[], nextItems: FeedItem[]) {
+  return uniqueVideoListItems([...currentItems, ...mapFeedItemsToVideoListItems(nextItems)]);
 }
 
 function getCurrentFeedSourceSnapshot(queryClient: QueryClient): FeedSourceSnapshot {
@@ -55,11 +70,6 @@ function setFeedSourceSnapshot(
   queryClient.setQueryData<FeedSourceSnapshot>(FEED_QUERY_KEY, (currentSnapshot) =>
     updater(currentSnapshot ?? emptyFeedSourceSnapshot)
   );
-}
-
-async function buildInitialFeedSourceSnapshot(repository: FeedSourceRepository) {
-  const response = await repository.fetchFeed();
-  return createFeedSourceSnapshot(response.items);
 }
 
 export function createFeedSourceController(repository: FeedSourceRepository) {
@@ -80,6 +90,7 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
         isExtending: false,
         isRefreshing: false,
       }));
+      acceptFetchedSourceTruth(response.items);
     } catch (error) {
       setFeedSourceSnapshot(queryClient, (snapshot) => ({
         ...snapshot,
@@ -119,8 +130,10 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
           }));
 
           try {
-            const snapshot = await buildInitialFeedSourceSnapshot(repository);
+            const response = await repository.fetchFeed();
+            const snapshot = createFeedSourceSnapshot(response.items);
             queryClient.setQueryData<FeedSourceSnapshot>(FEED_QUERY_KEY, snapshot);
+            acceptFetchedSourceTruth(response.items);
           } catch (error) {
             setFeedSourceSnapshot(queryClient, (snapshot) => ({
               ...snapshot,
@@ -147,7 +160,9 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
 const feedSourceController = createFeedSourceController({ fetchFeed });
 
 export async function fetchInitialFeedSourceSnapshot() {
-  return buildInitialFeedSourceSnapshot({ fetchFeed });
+  const response = await fetchFeed();
+  acceptFetchedSourceTruth(response.items);
+  return createFeedSourceSnapshot(response.items);
 }
 
 export function getFeedSourceSnapshot(queryClient: QueryClient): FeedSourceSnapshot {
@@ -160,15 +175,4 @@ export function requestMoreFeedSource(queryClient: QueryClient) {
 
 export function refreshFeedSource(queryClient: QueryClient) {
   return feedSourceController.refresh(queryClient);
-}
-
-export function findFeedItemIndex(
-  items: FeedItem[],
-  videoId: string | null | undefined
-): number {
-  if (!videoId) {
-    return -1;
-  }
-
-  return items.findIndex((item) => item.videoId === videoId);
 }
