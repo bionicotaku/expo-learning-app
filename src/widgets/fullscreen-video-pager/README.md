@@ -13,8 +13,10 @@
   - `RowOwnedVideoOverlay`
   - `RowPlaybackHudOverlay`
   - `RowSurfaceStatusOverlay`
-- `row-local input surface`
-  - `ActiveVideoGestureSurface`
+- `row-local interaction layer`
+  - `RowPlaybackInteractionLayer`
+    - `BackgroundGestureRegion`
+    - `RowPlaybackSeekBarOverlay`
 
 对应的组件树是：
 
@@ -22,8 +24,10 @@
 FullscreenVideoPager
 ├── FlatList
 │   └── FullscreenVideoRow
-│       ├── PlayableVideoSurface
-│       ├── ActiveVideoGestureSurface
+│       ├── RowPlaybackMediaLayer
+│       │   └── PlayableVideoSurface
+│       ├── RowPlaybackInteractionLayer
+│       │   └── RowPlaybackSeekBarOverlay
 │       ├── RowOwnedVideoOverlay
 │       ├── RowPlaybackHudOverlay
 │       └── RowSurfaceStatusOverlay
@@ -47,6 +51,13 @@ FullscreenVideoPager
   - row HUD slot 派生 helper
 - `model/row-surface-presentation.ts`
   - row surface presenter contract
+- `model/row-progress-snapshot.ts`
+  - row-local progress snapshot shape
+  - `timeUpdate` payload -> seek bar display snapshot
+- `model/row-playback-seek-bar-store.ts`
+  - row-local seek bar runtime store
+  - 持有真实 `progressSnapshot` 与 row-local `seekController`
+  - 支持 optimistic seek 和外部订阅
 - `model/render-props.ts`
   - row 与 player surface 的 memo compare contract
 - `ui/fullscreen-video-pager.tsx`
@@ -56,13 +67,27 @@ FullscreenVideoPager
   - page-attached overlays 渲染
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
-  - 装配 player、gesture、content overlay、HUD overlay、surface status overlay
+  - 装配 row-local media layer、interaction layer、content overlay、HUD overlay、surface status overlay
+- `ui/row-playback-media-layer.tsx`
+  - row 内 player / progress / seek controller 的局部装配层
+  - 持有 row-local `surfacePresentation`
+  - 把真实 `progressSnapshot` 与 row-local `seekController` 写入 seek bar store
+  - 把 progress 的高频更新限制在 media layer 内
+- `ui/row-playback-interaction-layer.tsx`
+  - row 内唯一正式 interaction owner
+  - 内部拆成 `BackgroundGestureRegion` 和底部 `SeekBarControlLane`
+  - 持有 seek bar draft state，并把背景手势与 seek bar 命中区几何分离
 - `ui/playable-video-surface.tsx`
   - 播放器执行层
   - 同步 `shouldPlay` / `playbackRate`
-  - 暴露 active controller 与 row-local surface presentation
+  - 暴露 active controller、row-local `seekController` 与 row-local surface presentation
+  - 通过 `timeUpdate + bounded resync` 向 active row 上报 progress snapshot
 - `ui/row-playback-hud-overlay.tsx`
   - row-local pause / seek / rate HUD
+- `ui/row-playback-seek-bar-overlay.tsx`
+  - interaction layer 内的 seek bar presenter/control strip
+  - 只负责渲染左当前时间、中间 rail + thumb、右总时长
+  - 不再直接订阅 store，也不再向背景层注册手势 blocker
 - `ui/row-hud-anchors.tsx`
   - row HUD 固定锚点布局
   - `center / leftCenter / rightCenter / top` 四个 slot
@@ -77,10 +102,11 @@ FullscreenVideoPager
 - 首屏定位与空列表回填后的 post-load alignment
 - 只为当前视频与前后 2 个视频挂载 player
 - 维护当前 fullscreen 播放会话
-- 只为当前 active row 挂真实背景手势层
+- 只为当前 active row 挂 row-local interaction layer
 - 把 HUD state 绑定到 `videoId`，但只在对应 row 内渲染
 - 把 player surface 的 loading / error / retry 收口到 row-local presenter
 - 在 row 内维护 center owner，避免 pause / loading / seek 之间的布局抖动
+- 只为 active row 订阅 progress，并在 row 内局部渲染底部 seek bar
 
 当前 widget 不承担：
 
@@ -141,14 +167,23 @@ type FullscreenRowPlaybackHudState = {
 
 ## 手势与播放器边界
 
-`ActiveVideoGestureSurface` 当前固定为 row-local input surface：
+`RowPlaybackInteractionLayer` 当前固定为 row 内唯一正式 interaction owner：
 
-- `single tap`
-  - 使用 `Pressable`
-  - 等待 double tap / long press 失败后才触发
-- `double tap + long press`
-  - 使用 `GestureDetector`
-  - 只挂在 active row
+- `BackgroundGestureRegion`
+  - 只覆盖视频背景，不覆盖底部 seek bar control lane
+  - `single tap` 使用 `Pressable`
+  - `double tap + long press` 使用 `GestureDetector`
+- `SeekBarControlLane`
+  - 只负责 rail + thumb 的 `tap-to-seek`
+  - 只负责 drag preview 和 release commit
+  - 左右时间文本属于底部 control lane，但保持 inert
+
+当前实现不再依赖 `railGestureBlockers` / `externalGestureBlockers` 这类跨组件 bridge。背景区和底部 control lane 因几何上不重叠而天然隔离：
+
+- 点视频空白背景：pause / resume
+- 点 rail 或 thumb：seek
+- 点左右时间文本：不 seek，也不 pause
+- drag 期间背景手势不会命中 seek bar lane
 
 `PlayableVideoSurface` 当前固定为执行层，不再直接渲染 loading / error UI。它只负责：
 
@@ -157,12 +192,41 @@ type FullscreenRowPlaybackHudState = {
 - 同步 `playbackRate`
 - 暴露最小 active controller `{ seekBy, surfaceState }`
 - 向 row 上报 `surfacePresentation`
+- 仅在 active row 存在 progress callback 时开启 `timeUpdate`，向 row 上报 progress snapshot
 
 `RowSurfaceStatusOverlay` 负责：
 
 - loading 时显示中心 glass spinner
 - error 时显示 dark scrim + error message + `Retry`
 - 在 active row error 时自然压住背景手势与 HUD
+
+## Row Seek Bar
+
+row-local seek bar 是独立于 `RowPlaybackHudOverlay` 的持续型 playback control layer：
+
+- 只绑定 active row
+- 不进入 `useFullscreenPlaybackSession`
+- 不进入 pager-level render props compare contract
+- 由 `PlayableVideoSurface` 通过 `timeUpdate` 向 `RowPlaybackMediaLayer` 上报真实 `progressSnapshot`
+- 由 `RowPlaybackMediaLayer` 把真实 `progressSnapshot` 与 row-local `seekController` 写入 `row-playback-seek-bar-store`
+- `seekBy()`、`seekTo()` 与 `readyToPlay` 边界都会触发受控 resync，避免暂停态 seek 卡在旧位置
+- 由 `RowPlaybackInteractionLayer` 持有 draft state 和 seek 交互
+- 由 `RowPlaybackSeekBarOverlay` 在底部 control lane 内渲染左当前时间、中间 rail + thumb、右总时长
+
+这一层当前固定为：
+
+- 常驻显示
+- 左时间 + 中间 rail + thumb + 右总时长
+- 非 glass
+- rail + thumb 区域支持 tap-to-seek
+- 左右时间文本继续只读，不参与 seek
+- rail + thumb 区域可直接开始拖动
+- 拖动过程中只更新本地 preview，不实时 seek
+- tap-to-seek 与 drag release 共用同一条 rail-local 几何换算和 `commitSeek` 链
+- tap 后立即做一次 row-local `seekTo(seconds)`，不显示额外 seek HUD
+- 松手时只做一次 row-local `seekTo(seconds)`
+- scrubbing 期间继续播放视频，但背景区因几何分离不会命中
+- `error` 时隐藏
 
 ## Row HUD 布局
 
@@ -188,21 +252,21 @@ row 内 HUD 不再靠各组件各自定位，而是走固定 slot：
 
 ### Single tap
 
-1. `ActiveVideoGestureSurface` 识别单击
+1. `RowPlaybackInteractionLayer` 的 `BackgroundGestureRegion` 识别单击
 2. session hook toggle `basePausedByUser`
 3. session hook 为当前 `videoId` 写入 pause HUD
 4. `FullscreenVideoRow` 把该 state 交给 `RowPlaybackHudOverlay`
 
 ### Double tap
 
-1. `ActiveVideoGestureSurface` 识别左右区
+1. `RowPlaybackInteractionLayer` 的 `BackgroundGestureRegion` 识别左右区
 2. session hook 通过当前 active controller 调 `seekBy(±5)`
 3. 成功后只给当前 `videoId` 写入 seek HUD
 4. HUD 跟随所属 row 渲染并自动消失
 
 ### Long press
 
-1. `ActiveVideoGestureSurface` 识别左右/中间区
+1. `RowPlaybackInteractionLayer` 的 `BackgroundGestureRegion` 识别左右/中间区
 2. session hook 写入 `transientHoldState`
 3. 左右区写入 `rate` HUD
 4. row 内持续显示 `2x` HUD，直到 `hold end`

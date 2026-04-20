@@ -221,6 +221,39 @@ describe('fullscreen video render props', () => {
     ).toBe(true);
   });
 
+  it('keeps the pager-level row compare free of progress snapshot concerns', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        },
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        }
+      )
+    ).toBe(true);
+  });
+
   it('re-renders the player surface when playback intent changes', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(

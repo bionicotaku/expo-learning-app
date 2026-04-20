@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
@@ -17,11 +17,12 @@ import {
   type FullscreenVideoRowRenderProps,
 } from '../model/render-props';
 import type { FullscreenRowPlaybackHudState } from '../model/row-playback-hud-state';
+import { createRowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
 import type { FullscreenRowSurfacePresentation } from '../model/row-surface-presentation';
 import type { FullscreenActivePlayerController } from '../model/active-player-controller';
-import { ActiveVideoGestureSurface } from './active-video-gesture-surface';
-import { PlayableVideoSurface } from './playable-video-surface';
 import { RowPlaybackHudOverlay } from './row-playback-hud-overlay';
+import { RowPlaybackInteractionLayer } from './row-playback-interaction-layer';
+import { RowPlaybackMediaLayer } from './row-playback-media-layer';
 import { RowOwnedVideoOverlay } from './row-owned-video-overlay';
 import { RowSurfaceStatusOverlay } from './row-surface-status-overlay';
 
@@ -55,6 +56,7 @@ function FullscreenVideoRowComponent({
   height,
   bottomInset,
   hudState,
+  isActive,
   onActionPress,
   onDoubleTap,
   onHoldEnd,
@@ -71,6 +73,7 @@ function FullscreenVideoRowComponent({
     useState<FullscreenRowSurfacePresentation | null>(null);
   const [pauseCenterReserved, setPauseCenterReserved] = useState(false);
   const pauseCenterReservationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
   const showCenteredPause = shouldReserveCenterForPause({
     pauseVisible: hudState.pauseIndicatorVisible,
     transientFeedbackKind: hudState.transientFeedback?.kind ?? null,
@@ -94,12 +97,6 @@ function FullscreenVideoRowComponent({
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!shouldUsePlayer) {
-      setSurfacePresentation(null);
-    }
-  }, [shouldUsePlayer]);
 
   useEffect(() => {
     if (pauseCenterReservationTimeoutRef.current) {
@@ -130,30 +127,28 @@ function FullscreenVideoRowComponent({
         backgroundColor: '#000000',
       }}
     >
-      {shouldUsePlayer ? (
-        <PlayableVideoSurface
-          onSurfacePresentationChange={setSurfacePresentation}
-          playbackRate={playbackRate}
-          registerActiveController={registerActiveController}
-          shouldPlay={shouldPlay}
-          video={video}
-        />
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: '#000000',
-          }}
-        />
-      )}
+      <RowPlaybackMediaLayer
+        isActive={isActive}
+        onSurfacePresentationChange={setSurfacePresentation}
+        playbackRate={playbackRate}
+        registerActiveController={registerActiveController}
+        seekBarStore={seekBarStore}
+        shouldPlay={shouldPlay}
+        shouldUsePlayer={shouldUsePlayer}
+        video={video}
+      />
 
-      {shouldEnableBackgroundGestures ? (
-        <ActiveVideoGestureSurface
+      {isActive ? (
+        <RowPlaybackInteractionLayer
           accessibilityLabel={accessibilityLabel}
+          bottomInset={bottomInset}
           onDoubleTap={onDoubleTap}
           onHoldEnd={onHoldEnd}
           onHoldStart={onHoldStart}
           onSingleTap={onSingleTap}
+          seekBarStore={seekBarStore}
+          shouldEnableBackgroundGestures={shouldEnableBackgroundGestures}
+          surfaceState={surfacePresentation?.surfaceState ?? null}
           width={width}
         />
       ) : null}

@@ -192,7 +192,6 @@ export function FullscreenVideoPager({
         renderItem={renderItem}
         // Fullscreen paging relies on exact viewport-sized items. Automatic
         // content insets shift the initial offset and break first-entry snap.
-        bounces={false}
         decelerationRate="fast"
         extraData={renderState}
         getItemLayout={(_, index) => ({

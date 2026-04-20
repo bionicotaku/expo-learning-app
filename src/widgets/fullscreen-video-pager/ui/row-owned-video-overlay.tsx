@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Text, View } from 'react-native';
 
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
@@ -10,7 +11,7 @@ type RowOwnedVideoOverlayProps = {
   title: string;
 };
 
-export function RowOwnedVideoOverlay({
+function RowOwnedVideoOverlayComponent({
   bottomInset,
   description,
   onActionPress,
@@ -38,7 +39,7 @@ export function RowOwnedVideoOverlay({
             left: 0,
             right: 0,
             bottom: 0,
-            height: bottomInset + 182,
+            height: bottomInset + 204,
             experimental_backgroundImage:
               'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 42%, rgba(0,0,0,0.22) 74%, rgba(0,0,0,0.34) 100%)',
           }}
@@ -48,7 +49,7 @@ export function RowOwnedVideoOverlay({
             position: 'absolute',
             left: 22,
             right: 92,
-            bottom: bottomInset + 40,
+            bottom: bottomInset + 58,
           }}
         >
           <Text
@@ -93,3 +94,5 @@ export function RowOwnedVideoOverlay({
     </View>
   );
 }
+
+export const RowOwnedVideoOverlay = memo(RowOwnedVideoOverlayComponent);

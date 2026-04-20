@@ -2,361 +2,236 @@
 
 ## 1. 文档目标
 
-本文档定义当前 `Fullscreen Video 页` 的手势设计、状态模型、组件落位与播放器控制边界。
+本文档定义 `Fullscreen Video 页` 的目标手势结构、命中区划分、状态归属与播放控制边界。
 
 这份文档重点回答：
 
-- 手势识别层到底放在哪一层，而不是放在哪个 overlay 里
-- 为什么 fullscreen 不使用 pager 顶层全局手势层
-- 单击、双击、长按分别如何与当前播放会话交互
-- 暂停状态下临时 `2x` 的恢复语义如何成立
-- 在当前 Expo + 轻量 FSD 结构里，哪些逻辑归 `features/video-playback`，哪些状态归 `widgets/fullscreen-video-pager`
+- fullscreen 的交互 owner 应该落在哪一层
+- 为什么 seek bar 与背景手势不应该继续靠 bridge 协调
+- 单击、双击、长按与底部 seek bar 的职责边界是什么
+- 哪些状态属于 pager 会话，哪些状态属于 row-local interaction layer
 
 相关文档：
 
 - overlay 架构见 [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
+- seek bar 设计见 [Fullscreen Video Seek Bar Overlay设计规范](./Fullscreen%20Video%20Seek%20Bar%20Overlay设计规范.md)
 - 页面关系见 [Feed与Fullscreen Video页面设计逻辑](./Feed与Fullscreen%20Video页面设计逻辑.md)
 
-## 2. 平台范围
+## 2. 正式交互模型
 
-当前手势契约的正式目标平台是：
+fullscreen 的目标结构不再采用“背景手势层 + seek bar 向外注册 blocker”的模式，而改为：
 
-- iOS
-- Android
-
-`web` 只允许降级，不在本规范中定义正式交互承诺。
-
-## 3. 手势层不是 Overlay
-
-当前 fullscreen 必须区分三件事：
-
-1. `overlay` 是视觉与信息分层
-2. `gesture surface` 是输入识别层
-3. `HUD state ownership` 与 `HUD render attachment` 不是一回事
-
-因此本页固定采用以下层级：
-
-1. `PlayableVideoSurface`
-2. `ActiveVideoGestureSurface`
-3. `RowOwnedContentOverlay`
+1. `RowPlaybackMediaLayer`
+2. `RowPlaybackInteractionLayer`
+3. `RowOwnedVideoOverlay`
 4. `RowPlaybackHudOverlay`
 5. `RowSurfaceStatusOverlay`
 6. `Page-attached overlays`
 
 其中：
 
-- `ActiveVideoGestureSurface` 不属于任何 overlay
-- 它是 `FullscreenVideoRow` 内部的 `row-local interaction surface`
-- 它位于视频画面之上、所有 row overlay 之下
+- `RowPlaybackInteractionLayer` 是 row 内唯一正式交互 owner
+- 它不属于 HUD，也不属于 content overlay
+- 它只负责当前 row 的命中区划分、手势识别与 seek bar control lane 交互
 
-这样做的理由是：
+## 3. 命中区划分
 
-- 手势 ownership 仍然属于当前 row，而不是 pager 壳层
-- row 内的内容、HUD、surface status 都继续跟视频一起移动
-- pager 只保留 page shell overlays，不再直接承载播放器表面 HUD
+`RowPlaybackInteractionLayer` 内部固定拆成两个互斥命中区：
 
-## 4. 手势挂载策略
+1. `BackgroundGestureRegion`
+2. `SeekBarControlLane`
 
-### 4.1 运行时原则
+### 3.1 `BackgroundGestureRegion`
 
-当前实现固定遵循：
+负责 fullscreen 视频背景区的手势：
 
-- 每个 `FullscreenVideoRow` 都有手势槽位
-- 但只有 `active row` 真正渲染 `GestureDetector`
-- 非 active row 不挂真实 detector，而不是“挂了再 disabled”
+- `single tap`
+- `double tap`
+- `long press`
 
-这意味着 fullscreen 不是“全局只有一个 pager-level gesture shell”，也不是“所有已挂载 row 都常驻一整套手势”。
+这个区域覆盖视频背景，但**不覆盖底部 seek bar lane**。
 
-### 4.2 为什么不做 pager-level global gesture shell
+### 3.2 `SeekBarControlLane`
 
-不采用 pager 顶层全局手势层，原因是：
+负责底部 seek bar 的交互：
 
-- 会破坏 row-local ownership
-- 会把本属于 `FullscreenVideoRow` 的交互上提到 pager
-- 会让右侧 action rail 的命中协调更脆弱
-- 后续字幕、词义解释等 active-only HUD 更容易被错误塞回顶层壳
+- rail + thumb 的 `tap-to-seek`
+- drag preview
+- release commit
 
-### 4.3 与右侧 rail 的关系
+这个区域只覆盖 seek bar control strip 本身。
 
-手势 surface 必须保证：
+时间文本继续只读：
 
-- 右侧 action rail 始终有更高命中优先级
-- metadata 文本区继续 `pointerEvents="none"`
-- 文本区之下的触摸应自然落到 gesture surface
+- 左侧 `displayCurrentTime`
+- 右侧 `displayTotalDuration`
 
-因此：
+左右时间文本不参与 seek，不属于背景区，也不向外传播手势协调信息。
 
-- rail 按钮不会进入视频手势
-- 文本本身不接事件
-- 视频背景区域负责单击 / 双击 / 长按
+## 4. 为什么必须放弃 bridge 协调
 
-## 5. 手势语义
+当前 bridge-driven 方案的问题，不是实现细节“还不够优雅”，而是命中区本身发生了重叠。
+
+一旦 seek bar 与背景点击共享一块屏幕区域，就会自然产生以下需求：
+
+- seek bar 必须向外暴露 rail 手势
+- row 必须暂存这些手势
+- 背景层必须等待这些手势失败
+
+这会带来三个长期问题：
+
+1. 交互边界跨组件扩散
+2. 结构上引入纯桥接状态
+3. 背景单击可靠性被 seek bar 协调链拖累
+
+因此目标结构固定采用：
+
+- **几何命中区分离**
+- **单一 interaction owner**
+
+而不是继续优化 bridge。
+
+## 5. 背景手势语义
 
 ### 5.1 Single Tap
 
-`single tap` 只在没有 active hold lock 时参与识别。
+`single tap` 只存在于 `BackgroundGestureRegion`。
 
-它保持当前产品语义不变：
+它的职责保持不变：
 
-- 点击任意视频背景
+- 点击视频背景
 - 切换暂停 / 恢复
 
-它只修改 `basePausedByUser`，真实播放态由派生状态决定，而不是直接在 UI 里命令式切换播放器。
+seek bar lane 不属于背景区，因此在该 lane 上：
+
+- 不触发 `single tap`
+- 不触发暂停切换
 
 ### 5.2 Double Tap
 
-`double tap` 只在没有 active hold lock 时参与识别。
+`double tap` 只存在于 `BackgroundGestureRegion`。
 
-分区规则：
+分区规则保持不变：
 
 - 左半区：`seek -5s`
 - 右半区：`seek +5s`
 
-双击只 seek，不改变基态：
+双击只做相对 seek，不改变当前播放/暂停基态。
 
-- 如果原本在播放，seek 后继续播放
-- 如果原本已暂停，seek 后仍保持暂停
+seek bar lane 上不触发 `double tap`。
 
 ### 5.3 Long Press
 
-`long press` 的分区是三等分：
+`long press` 只存在于 `BackgroundGestureRegion`。
+
+分区规则保持不变：
 
 - 左区：临时 `2x`
 - 中区：占位接口
 - 右区：临时 `2x`
 
-左右长按是唯一允许“临时打破暂停、进入 `2x` 播放”的手势。
+seek bar lane 上不触发 `long press`，因此不会在底部 control lane 内误进临时 `2x`。
 
-当左右长按激活时：
+## 6. Seek Bar 手势语义
 
-- 写入 `transientHoldState`
-- `effectiveShouldPlay = true`
-- `effectivePlaybackRate = 2`
-- `isGestureLocked = true`
+### 6.1 Tap-to-seek
 
-语义固定如下：
+`tap-to-seek` 只作用于 `SeekBarControlLane` 内的 rail + thumb 区域。
 
-- 如果开始长按时原本在播放：按住期间 `2x`，松手恢复 `1x` 并继续播放
-- 如果开始长按时原本已暂停：按住期间临时开始 `2x` 播放，松手先回到 `1x`，再恢复暂停
-- 左右长按激活后，`2x` HUD 必须在整个 hold 生命周期内持续显示，直到松手、active row 切换或页面销毁时才清掉
+行为固定为：
 
-### 5.4 Center Hold
+- 直接根据 rail-local 坐标计算 `targetSeconds`
+- 立即做一次绝对 seek
+- 不进入 scrubbing
+- 不显示额外 seek HUD
+- 不改变当前播放/暂停基态
 
-中间长按当前只保留接口。
+### 6.2 Drag-to-seek
 
-它的行为是：
+drag 只作用于 `SeekBarControlLane`。
 
-- 占用当前手势流
-- 不改播放状态
-- 不改播放速度
-- 不显示 HUD
-- 松手后直接退出
+行为固定为：
 
-因此 `center hold` 不是“空白区回退成 tap”，而是一个已被占用但暂时无业务效果的手势模式。
+- 拖动过程中只更新本地 preview
+- 不实时调 player
+- 松手后只做一次绝对 seek
 
-### 5.5 Gesture Lock
+这意味着 drag 期间：
 
-只要存在 `transientHoldState`，当前会话就进入 `gesture lock`。
+- 视频继续播放
+- seek bar UI优先显示 draft
+- 真实 `timeUpdate` 不覆盖当前 preview
 
-被锁期间：
+### 6.3 底部 lane 不是背景区的一部分
 
-- `single tap` 不触发
-- `double tap` 不触发
+这是全文最关键的约束：
 
-这保证了：
+- 底部 seek bar lane 不属于视频背景区
+- 它是 row-local control lane
 
-- `2x` 期间不会误触发暂停
-- 同一段长按不会再叠出 seek
+因此在 seek bar lane 内：
 
-## 6. 手势识别参数
+- 不触发 pause/resume
+- 不触发背景双击 `±5s`
+- 不触发背景长按 `2x`
 
-当前参数固定为：
+## 7. 状态归属
 
-- `single tap`
-  - 使用 `react-native-gesture-handler` 的 `Pressable` 语义
-  - 通过 `requireExternalGestureToFail(doubleTap, longPress)` 等待更高优先级手势先判定
-- `double tap`
-  - `numberOfTaps = 2`
-  - `maxDuration = 220ms`
-  - `maxDelay = 250ms`
-- `long press`
-  - `minDuration = 320ms`
-  - `maxDistance = 20`
+### 7.1 Pager / session hook
 
-组合优先级固定为：
-
-1. `long press`
-2. `double tap`
-3. `single tap`
-
-实现上当前采用两层配合：
-
-- `double tap + long press` 由 active-row `GestureDetector` 处理，并以 `Gesture.Exclusive(...)` 建立优先级
-- `single tap` 由同一块 surface 内的 `Pressable` 处理，但必须等待 `double tap / long press` 失败后才触发
-
-这样做的原因是：
-
-- 旧版 fullscreen 的单击本来就是全屏 `Pressable`，这条 press 语义在滚动容器里更稳定
-- `single tap` 继续交给 `Pressable`，可以避免把“普通点击”的可靠性绑死在 `Tap gesture` 的识别细节上
-- `requireExternalGestureToFail(...)` 又能保证单击不会抢跑到双击和长按前面
-
-## 7. 状态模型
-
-### 7.1 Widget 持有的会话状态
-
-`widgets/fullscreen-video-pager` 持有以下播放会话状态：
+继续持有低频播放会话态：
 
 - `activeIndex`
+- `activeItemId`
 - `basePausedByUser`
 - `transientHoldState`
-- `activeSurfaceState`
-- `rowPlaybackHudStateByVideoId`
+- active controller
+- active surface gating state
+- row HUD lifecycle state
 
-其中：
+这层不持有 seek bar draft state。
 
-- `basePausedByUser` 是正常基态
-- `transientHoldState` 是长按期间的临时覆盖态
-- `activeSurfaceState` 只反映当前 active row 的播放器表面状态：`loading | ready | error`
-- `rowPlaybackHudStateByVideoId` 是 `videoId -> HUD state` 的稀疏 store；pager 统一维护其生命周期，但只由对应 row 渲染
+### 7.2 RowPlaybackMediaLayer
 
-### 7.2 Feature 层纯规则
+继续持有真实播放器快照：
 
-`features/video-playback` 负责：
+- `progressSnapshot`
+- `surfacePresentation`
+- row-local `seekController`
 
-- 双击左右区解析
-- 长按左右中三区解析
-- `basePausedByUser` 的 toggle
-- active row 变化后的基态 reset
-- active row 变化后的 hold clear
-- `effectiveShouldPlay`
-- `effectivePlaybackRate`
-- `isGestureLocked`
+### 7.3 RowPlaybackInteractionLayer
 
-这里不持有 React state，不渲染 UI，也不直接操作 `expo-video` player。
+持有交互中间态：
 
-### 7.3 派生关系
+- 背景区手势
+- seek bar lane 手势
+- `isScrubbing`
+- `draftRatio`
+- `draftSeconds`
 
-当前派生关系固定为：
+这层是交互 owner，但不是播放器状态 owner。
 
-- `effectiveShouldPlay`
-  - 无 hold：`!basePausedByUser`
-  - 左右 hold：强制 `true`
-  - 中间 hold：跟随基态
-- `effectivePlaybackRate`
-  - 左右 hold：`2`
-  - 其它情况：`1`
-- `isGestureLocked`
-  - `transientHoldState !== null`
+## 8. 目标结构中废弃的旧接口/术语
 
-## 8. 播放器执行边界
+以下术语在目标结构中不再成立：
 
-### 8.1 播放器实例位置
+- `ActiveVideoGestureSurface`
+- `SeekBarGestureBlockers`
+- `railGestureBlockers`
+- `externalGestureBlockers`
+- `onRailGesturesChange(...)`
 
-`VideoPlayer` 继续由 `PlayableVideoSurface` 本地持有。
+这些接口对应的设计前提是“seek bar 与背景手势重叠，需要跨组件桥接协调”。
+目标结构通过命中区分离消除这个前提，因此它们不再属于正式设计的一部分。
 
-不做以下重构：
+## 9. 成功标准
 
-- 不把 player 上提到 pager
-- 不改成单播放器壳
-- 不让 page 层直接持有播放器实例
+手势设计只有同时满足以下条件，才算结构正确：
 
-### 8.2 持久 intent 与一次性命令
-
-播放器执行面分两类：
-
-1. 持久 intent
-   - `shouldPlay`
-   - `playbackRate`
-2. 一次性命令
-   - `registerActiveController(controller | null)`
-
-持久 intent 通过 props 进入 `PlayableVideoSurface`，由该组件自行同步到 `expo-video`。
-
-当前 active controller 固定只暴露最小接口：
-
-- `seekBy(seconds): boolean`
-- `surfaceState: 'loading' | 'ready' | 'error'`
-
-其中：
-
-- 返回 `true` 表示本次 seek 已提交
-- 返回 `false` 表示当前 player 还未 ready 或不可 seek
-- `surfaceState` 只服务 widget 自己做 hit-area 和 controller 生命周期管理，不回流到 `features/video-playback`
-
-当 seek 返回 `false` 时：
-
-- 不显示 seek HUD
-- 不改变播放/暂停基态
-
-controller 的注册与清理必须使用同步生命周期，避免 active row 切换后双击短时间误命中旧 row。
-
-## 9. HUD 模型
-
-当前 HUD 模型固定为：
-
-1. pager 持有 `videoId -> rowPlaybackHudState`
-2. row 自己渲染 `RowPlaybackHudOverlay`
-
-其中每个 row 的 HUD state 至少包含：
-
-- `pauseIndicator`
-  - 进入暂停态时显示
-  - 约 `3s` 后自动消失
-- `transientFeedback`
-  - `seek`
-    - 左右分置的 glass icon HUD
-    - 短暂显示后自动消失
-  - `rate`
-    - 左右 hold 期间持续显示
-    - 只有 `hold end`、row unmount 或显式 session cleanup 时才清掉
-
-`RowPlaybackHudOverlay` 只负责渲染当前 row 的 pause / seek / rate HUD。
-
-它不负责：
-
-- 解析手势
-- 推导业务规则
-- 管理计时器
-
-这些都由 pager 会话层与 model helper 决定。
-
-## 10. Active Row 切换规则
-
-当 active row 改变时，必须同步执行：
-
-1. `basePausedByUser` 重置为 `false`
-2. `transientHoldState` 清空
-3. `effectivePlaybackRate` 回到 `1x`
-4. 当前 active controller 清空
-5. 旧 active row 的 `rate` HUD 立即清掉
-
-但不会全局清空其它 row 的 pause / seek HUD；它们仍按各自的 timer 或 row unmount 自然清理。
-
-这样可以保证：
-
-- 新 row 始终按 autoplay 基线进入
-- 不会把上一条视频的 hold / rate HUD 残留带到下一条
-- 旧 row 的 pause / seek HUD 仍能跟随所属 row 一起滑出，而不是瞬移到新 row
-- 新 row 的背景双击不会短时间误命中上一条 video 的 controller
-
-## 10.1 Error Surface 命中规则
-
-当当前 active row 的 `surfaceState === 'error'` 时：
-
-- `ActiveVideoGestureSurface` 必须完全撤掉
-- 错误态里的 `Retry` 直接接管点击
-- 右侧 rail 仍按原层级存在
-
-`loading` 与 `ready` 状态下，背景手势继续可用。
-
-## 11. 当前实现验收点
-
-只要 fullscreen 手势实现满足以下事实，就视为符合本规范：
-
-- 只有 active row 挂真实 detector
-- 单击保持当前的暂停 / 恢复语义
-- 双击左右只 seek，不改变基态
-- 暂停状态下左右长按会临时 `2x` 播放，松手恢复暂停
-- 长按期间 single tap / double tap 都不会触发
-- 手势反馈只出现在 row-attached playback HUD overlay
-- 页面层不持有手势或播放会话状态；这些状态集中在 `widgets/fullscreen-video-pager` 的 session hook
+1. row 内只有一个正式 interaction owner
+2. 背景区与 seek bar lane 命中不重叠
+3. seek bar 不再向背景层注册 gesture blockers
+4. 背景 pause / double tap / long press 不再依赖外部 rail blocker 协调
+5. seek bar lane 内只负责 seek，不触发背景手势
+6. pager 会话状态仍然不承载高频 scrubbing draft
+7. fullscreen row 切换后，seek bar 交互资格仍然只绑定 active row

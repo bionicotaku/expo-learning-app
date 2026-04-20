@@ -1,22 +1,17 @@
 import type { FeedItem, FeedResponse } from '../model/types';
+import {
+  mockClipCount,
+  resolveMockClipAssetBySequenceNumber,
+  type MockClipAsset,
+} from '@/entities/video/model/mock-clip-catalog';
 
 type FetchMockFeedOptions = {
   delayMs?: number;
 };
 
-type ClipAsset = {
-  clipNumber: number;
-  coverImageUrl: string;
-  videoUrl: string;
-};
-
-type SeededClipAsset = ClipAsset & {
+type SeededClipAsset = MockClipAsset & {
   videoId: string;
 };
-
-const clipLabel =
-  'The Office (US) (2005) - S01E03 - Health Care (1080p BluRay x265 Silence)';
-const encodedClipLabel = encodeURIComponent(clipLabel).replace(/%2F/g, '/');
 
 const tagPool = [
   'PHRASAL VERB',
@@ -51,17 +46,7 @@ const descriptionLeadPool = [
   'A good study clip for reading tone through pauses and delivery.',
 ] as const;
 
-const clipAssets: readonly ClipAsset[] = Array.from({ length: 8 }, (_, index) => {
-  const clipNumber = index + 1;
-
-  return {
-    clipNumber,
-    coverImageUrl: `https://storage.googleapis.com/videos2077/test-video/cover/${encodedClipLabel}-clip${clipNumber}.webp`,
-    videoUrl: `https://storage.googleapis.com/videos2077/test-video/hls/${clipLabel}-clip${clipNumber}_hls/playlist.m3u8`,
-  };
-});
-
-const mockBatchSize = clipAssets.length;
+const mockBatchSize = mockClipCount;
 
 let nextMockFeedSequenceStart = 0;
 
@@ -124,8 +109,8 @@ function createVideoId(itemNumber: number) {
   return `the-office-health-care-video-${itemNumber}`;
 }
 
-function resolveClipAsset(itemNumber: number): ClipAsset {
-  return clipAssets[(itemNumber - 1) % clipAssets.length]!;
+function resolveClipAsset(itemNumber: number): MockClipAsset {
+  return resolveMockClipAssetBySequenceNumber(itemNumber);
 }
 
 function createMockFeedItem(itemNumber: number): FeedItem {
