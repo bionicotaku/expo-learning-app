@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  areFullscreenVideoItemRenderPropsEqual,
+  areFullscreenVideoRowRenderPropsEqual,
   arePlayableVideoSurfacePropsEqual,
 } from './render-props';
 
 describe('fullscreen video render props', () => {
   it('keeps the row stable when only unrelated parent state changes', () => {
     expect(
-      areFullscreenVideoItemRenderPropsEqual(
+      areFullscreenVideoRowRenderPropsEqual(
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: true,
           playbackRate: 1,
           shouldEnableBackgroundGestures: true,
@@ -21,6 +24,9 @@ describe('fullscreen video render props', () => {
         },
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: true,
           playbackRate: 1,
           shouldEnableBackgroundGestures: true,
@@ -35,9 +41,12 @@ describe('fullscreen video render props', () => {
 
   it('re-renders the row when active state changes', () => {
     expect(
-      areFullscreenVideoItemRenderPropsEqual(
+      areFullscreenVideoRowRenderPropsEqual(
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: true,
           playbackRate: 1,
           shouldEnableBackgroundGestures: true,
@@ -48,6 +57,9 @@ describe('fullscreen video render props', () => {
         },
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: false,
           playbackRate: 1,
           shouldEnableBackgroundGestures: false,
@@ -62,9 +74,12 @@ describe('fullscreen video render props', () => {
 
   it('re-renders the row when background gesture availability changes for the active item', () => {
     expect(
-      areFullscreenVideoItemRenderPropsEqual(
+      areFullscreenVideoRowRenderPropsEqual(
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: true,
           playbackRate: 1,
           shouldEnableBackgroundGestures: true,
@@ -75,9 +90,111 @@ describe('fullscreen video render props', () => {
         },
         {
           height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
           isActive: true,
           playbackRate: 1,
           shouldEnableBackgroundGestures: false,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the row when pause indicator visibility changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        },
+        {
+          height: 852,
+          hudPauseIndicatorVisible: true,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the row when transient feedback kind changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: null,
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        },
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: 'rate',
+          hudTransientSeekDeltaSeconds: null,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the row when seek delta changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: 'seek',
+          hudTransientSeekDeltaSeconds: -5,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        },
+        {
+          height: 852,
+          hudPauseIndicatorVisible: false,
+          hudTransientFeedbackKind: 'seek',
+          hudTransientSeekDeltaSeconds: 5,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',

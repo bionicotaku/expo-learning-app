@@ -15,35 +15,15 @@ describe('fullscreen video pager source', () => {
     expect(source).not.toContain('GestureDetector');
   });
 
-  it('clears the active player controller and surface state before switching rows', () => {
+  it('delegates playback session state to a dedicated hook and mounts rows instead of pager-level HUD overlays', () => {
     const source = readFileSync(
       new URL('./fullscreen-video-pager.tsx', import.meta.url).pathname,
       'utf8'
     );
 
-    expect(source).toContain('activePlayerControllerRef.current = null');
-    expect(source).toContain('setActiveSurfaceState(null)');
-  });
-
-  it('splits paused state indication from transient seek and rate feedback', () => {
-    const source = readFileSync(
-      new URL('./fullscreen-video-pager.tsx', import.meta.url).pathname,
-      'utf8'
-    );
-
-    expect(source).toContain('PausedPlaybackIndicatorOverlay');
-    expect(source).not.toContain('createPlaybackToggleFeedback');
-  });
-
-  it('auto-dismisses the pause indicator after a short visibility window', () => {
-    const source = readFileSync(
-      new URL('./fullscreen-video-pager.tsx', import.meta.url).pathname,
-      'utf8'
-    );
-
-    expect(source).toContain('pauseIndicatorVisibilityDurationMs = 3000');
-    expect(source).toContain('pauseIndicatorTimeoutRef');
-    expect(source).toContain('setIsPauseIndicatorVisible(true)');
-    expect(source).toContain('setIsPauseIndicatorVisible(false)');
+    expect(source).toContain('useFullscreenPlaybackSession');
+    expect(source).toContain('FullscreenVideoRow');
+    expect(source).not.toContain('PausedPlaybackIndicatorOverlay');
+    expect(source).not.toContain('PlaybackFeedbackOverlay');
   });
 });

@@ -14,9 +14,9 @@
 
 本文档是页面设计逻辑说明，不单独定义整套风格系统。视觉系统与组件抽象总规范见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)。
 
-`Fullscreen Video` 的 overlay 分层设计与手势设计已单独收口到：
+`Fullscreen Video` 的 overlay 架构与手势设计已单独收口到：
 
-- [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)
+- [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
 - [Fullscreen Video Gesture设计规范](./Fullscreen%20Video%20Gesture设计规范.md)
 
 ## 2. 页面关系总览
@@ -167,28 +167,28 @@
 
 ### 4.2 页面结构
 
-当前落地结构可拆为六层：
+当前目标结构可拆为六层：
 
 1. `Full-bleed video background`
    - 视频内容占据全部画面
 2. `Active video gesture surface`
    - 只存在于当前 active row
    - 承担 single tap / double tap / long press 识别
-3. `Top chrome overlay`
-   - 固定的当前序号 counter
-4. `Row-owned content overlay`
+3. `Row-attached content overlay`
    - 跟视频 row 一起滑动的右侧 action rail
    - 跟视频 row 一起滑动的标题、说明和底部可读性 scrim
-5. `Active ephemeral overlay`
-   - 当前 active video 的播/停、seek、临时 `2x` HUD
-   - 其中 `2x` HUD 在左右长按期间持续显示，不按短 toast 自动消失
-   - 未来继续承接字幕、手势反馈、临时提示
-6. `Pager shell loading pill`
+4. `Row-attached playback HUD overlay`
+   - 当前 video row 的 pause / seek / 临时 `2x` HUD
+   - HUD 生命周期由 pager 会话控制，但视觉上跟随所属 row
+5. `Row-attached surface status overlay`
+   - 当前 row 的 loading / error / retry
+6. `Page shell overlays`
+   - 固定的当前序号 counter
    - 首屏读取时的底部 loading 提示
 
-这一结构说明该页面是“播放优先，内容型 overlay 贴附视频、页面 chrome 独立固定”的模式，而不是图文详情页，也不是把所有交互都堆在 pager 顶层的一层壳上。
+这一结构说明该页面是“播放优先，row 绑定播放器表面与内容，page shell 只保留壳层 UI”的模式，而不是图文详情页，也不是把所有交互都堆在 pager 顶层的一层壳上。
 
-详细分层规则见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
+详细分层规则见 [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)。
 
 ### 4.3 视频页的交互职责
 

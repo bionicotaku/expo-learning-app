@@ -1,11 +1,11 @@
 # Graph Report - .  (2026-04-20)
 
 ## Corpus Check
-- 185 files · ~42,882 words
+- 187 files · ~46,011 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 443 nodes · 359 edges · 157 communities detected
+- 452 nodes · 372 edges · 160 communities detected
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 52 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
@@ -167,18 +167,21 @@
 - [[_COMMUNITY_Community 154|Community 154]]
 - [[_COMMUNITY_Community 155|Community 155]]
 - [[_COMMUNITY_Community 156|Community 156]]
+- [[_COMMUNITY_Community 157|Community 157]]
+- [[_COMMUNITY_Community 158|Community 158]]
+- [[_COMMUNITY_Community 159|Community 159]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useEditorialPaperTheme()` - 18 edges
 2. `TanStack React Query` - 12 edges
 3. `createMockFeedItem()` - 9 edges
-4. `hashString()` - 7 edges
-5. `Fullscreen Video Page` - 7 edges
-6. `Target Source Layer Structure` - 6 edges
-7. `Expo Router` - 6 edges
-8. `Global Top Toast System` - 6 edges
-9. `AdaptiveGlass()` - 5 edges
-10. `Shared Layer Boundary` - 5 edges
+4. `updateHudState()` - 7 edges
+5. `hashString()` - 7 edges
+6. `Fullscreen Video Page` - 7 edges
+7. `Target Source Layer Structure` - 6 edges
+8. `Expo Router` - 6 edges
+9. `Global Top Toast System` - 6 edges
+10. `AdaptiveGlass()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `shouldMountPlayer()` --implements--> `Continuous Video Feed`  [INFERRED]
@@ -205,12 +208,12 @@ Cohesion: 0.06
 Nodes (19): AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton(), AuthSocialRow(), useEditorialPaperTheme(), EditorialTitle(), IconPill() (+11 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
-Nodes (21): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, AuthFooter(), Route-Only App Layer, Expo Router (+13 more)
+Cohesion: 0.08
+Nodes (23): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model (+15 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.07
-Nodes (0): 
+Nodes (0):
 
 ### Community 3 - "Community 3"
 Cohesion: 0.18
@@ -226,7 +229,7 @@ Nodes (14): Dedicated Toast Architecture Rationale, Toast Host, Toast Service, T
 
 ### Community 6 - "Community 6"
 Cohesion: 0.17
-Nodes (0): 
+Nodes (0):
 
 ### Community 7 - "Community 7"
 Cohesion: 0.18
@@ -234,867 +237,881 @@ Nodes (11): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authe
 
 ### Community 8 - "Community 8"
 Cohesion: 0.2
-Nodes (10): Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model, Overlay Split Rationale, Row-bound Overlay, Interactive Write, Network and Telemetry Layer, Pending Operation Key (+2 more)
+Nodes (6): AuthFooter(), Route-Only App Layer, Expo Router, useFeedSource(), VideoDetailPage(), Expo Router
 
 ### Community 9 - "Community 9"
+Cohesion: 0.33
+Nodes (7): clearFullscreenRowTransientFeedback(), clearFullscreenRowTransientFeedbackByKind(), hideFullscreenRowPauseIndicator(), pruneIfEmpty(), setFullscreenRowTransientFeedback(), showFullscreenRowPauseIndicator(), updateHudState()
+
+### Community 10 - "Community 10"
 Cohesion: 0.25
 Nodes (2): isGestureLocked(), resolveEffectivePlaybackState()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
 Cohesion: 0.29
 Nodes (5): resolveDialogModalLayout(), resolveSheetModalLayout(), resolveTopmostModalId(), ModalHost(), ModalItem()
 
-### Community 11 - "Community 11"
+### Community 12 - "Community 12"
 Cohesion: 0.29
 Nodes (8): One-Way Dependency Direction, Legacy Template Directories, Layer Boundaries Clarify Ownership, Target Source Layer Structure, Content-Driven Learning App, Follow Expo Defaults Rationale, Lightweight FSD, Mobile-First Expo Stack
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.33
 Nodes (4): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), resolveEditorialPaperGlassSupport()
 
-### Community 13 - "Community 13"
+### Community 14 - "Community 14"
+Cohesion: 0.4
+Nodes (2): createSetFavoriteMutationOptions(), useSetFavoriteMutation()
+
+### Community 15 - "Community 15"
 Cohesion: 0.6
 Nodes (5): buildApiUrl(), isAbortError(), normalizePath(), parseJsonBody(), requestJson()
 
-### Community 14 - "Community 14"
+### Community 16 - "Community 16"
 Cohesion: 0.6
 Nodes (5): createFeedMediaFeatureCardProps(), formatDuration(), formatViewCount(), resolveFallbackTone(), resolveStableIndex()
 
-### Community 15 - "Community 15"
+### Community 17 - "Community 17"
 Cohesion: 0.5
 Nodes (3): AuthCardTitle(), resolveStructuredAuthTitleFontFamily(), shouldUseEditorialDisplayFont()
 
-### Community 16 - "Community 16"
-Cohesion: 0.4
-Nodes (0): 
-
-### Community 17 - "Community 17"
-Cohesion: 0.5
-Nodes (2): createToastRecord(), resolveToastDuration()
-
 ### Community 18 - "Community 18"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 19 - "Community 19"
 Cohesion: 0.5
-Nodes (2): fetchFavoriteIds(), toSortedArray()
+Nodes (2): createToastRecord(), resolveToastDuration()
 
 ### Community 20 - "Community 20"
-Cohesion: 0.5
-Nodes (0): 
+Cohesion: 0.4
+Nodes (0):
 
 ### Community 21 - "Community 21"
 Cohesion: 0.5
-Nodes (1): createTestIdFactory()
+Nodes (2): fetchFavoriteIds(), toSortedArray()
 
 ### Community 22 - "Community 22"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 23 - "Community 23"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.5
+Nodes (1): createTestIdFactory()
 
 ### Community 24 - "Community 24"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 25 - "Community 25"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 26 - "Community 26"
 Cohesion: 0.67
-Nodes (1): ApiError
+Nodes (0):
 
 ### Community 27 - "Community 27"
-Cohesion: 1.0
-Nodes (2): clampInitialIndex(), resolveInitialFullscreenPagerPosition()
+Cohesion: 0.67
+Nodes (1): ApiError
 
 ### Community 28 - "Community 28"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 29 - "Community 29"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 1.0
+Nodes (2): clampInitialIndex(), resolveInitialFullscreenPagerPosition()
 
 ### Community 30 - "Community 30"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (0):
 
 ### Community 31 - "Community 31"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (0):
 
 ### Community 32 - "Community 32"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 33 - "Community 33"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 34 - "Community 34"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 35 - "Community 35"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 36 - "Community 36"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 37 - "Community 37"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 38 - "Community 38"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 39 - "Community 39"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 40 - "Community 40"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 41 - "Community 41"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 42 - "Community 42"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 43 - "Community 43"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 44 - "Community 44"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 45 - "Community 45"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 46 - "Community 46"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 47 - "Community 47"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 48 - "Community 48"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 49 - "Community 49"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 50 - "Community 50"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 51 - "Community 51"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 52 - "Community 52"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 53 - "Community 53"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 54 - "Community 54"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 55 - "Community 55"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 56 - "Community 56"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 57 - "Community 57"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 58 - "Community 58"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 59 - "Community 59"
 Cohesion: 1.0
-Nodes (2): Auth Coupling Stays Inside Auth Layer, Supabase Auth
+Nodes (0):
 
 ### Community 60 - "Community 60"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 61 - "Community 61"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): Auth Coupling Stays Inside Auth Layer, Supabase Auth
 
 ### Community 62 - "Community 62"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 63 - "Community 63"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 64 - "Community 64"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 65 - "Community 65"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 68 - "Community 68"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 69 - "Community 69"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 72 - "Community 72"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 73 - "Community 73"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 74 - "Community 74"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 75 - "Community 75"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 76 - "Community 76"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 77 - "Community 77"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 78 - "Community 78"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 79 - "Community 79"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 80 - "Community 80"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 81 - "Community 81"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 82 - "Community 82"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 83 - "Community 83"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 84 - "Community 84"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 85 - "Community 85"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 86 - "Community 86"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 87 - "Community 87"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 88 - "Community 88"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 89 - "Community 89"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 90 - "Community 90"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 92 - "Community 92"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 93 - "Community 93"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 94 - "Community 94"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 95 - "Community 95"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 96 - "Community 96"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 97 - "Community 97"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 98 - "Community 98"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 99 - "Community 99"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 100 - "Community 100"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 101 - "Community 101"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 102 - "Community 102"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 103 - "Community 103"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 104 - "Community 104"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 105 - "Community 105"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 106 - "Community 106"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 107 - "Community 107"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 108 - "Community 108"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 109 - "Community 109"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 110 - "Community 110"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 111 - "Community 111"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 112 - "Community 112"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 113 - "Community 113"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 114 - "Community 114"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 115 - "Community 115"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 116 - "Community 116"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 117 - "Community 117"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 118 - "Community 118"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 119 - "Community 119"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 120 - "Community 120"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 121 - "Community 121"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 122 - "Community 122"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 123 - "Community 123"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 124 - "Community 124"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 125 - "Community 125"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 126 - "Community 126"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 127 - "Community 127"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 128 - "Community 128"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 129 - "Community 129"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 130 - "Community 130"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 131 - "Community 131"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 132 - "Community 132"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 133 - "Community 133"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 134 - "Community 134"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 135 - "Community 135"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 136 - "Community 136"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 137 - "Community 137"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 138 - "Community 138"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 139 - "Community 139"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 140 - "Community 140"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 141 - "Community 141"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 142 - "Community 142"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 143 - "Community 143"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 144 - "Community 144"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 145 - "Community 145"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 146 - "Community 146"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 147 - "Community 147"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 148 - "Community 148"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 149 - "Community 149"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 150 - "Community 150"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 151 - "Community 151"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 152 - "Community 152"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 153 - "Community 153"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 154 - "Community 154"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 155 - "Community 155"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 156 - "Community 156"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
+
+### Community 157 - "Community 157"
+Cohesion: 1.0
+Nodes (0):
+
+### Community 158 - "Community 158"
+Cohesion: 1.0
+Nodes (0):
+
+### Community 159 - "Community 159"
+Cohesion: 1.0
+Nodes (0):
 
 ## Knowledge Gaps
 - **18 isolated node(s):** `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow`, `Layer Boundaries Clarify Ownership`, `Supabase Auth` (+13 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 30`** (2 nodes): `readRelative()`, `structure.test.ts`
+- **Thin community `Community 32`** (2 nodes): `readRelative()`, `structure.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (2 nodes): `moveDirectories()`, `reset-project.js`
+- **Thin community `Community 33`** (2 nodes): `moveDirectories()`, `reset-project.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (2 nodes): `IndexRoute()`, `index.tsx`
+- **Thin community `Community 34`** (2 nodes): `IndexRoute()`, `index.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (2 nodes): `AuthRoute()`, `auth.tsx`
+- **Thin community `Community 35`** (2 nodes): `AuthRoute()`, `auth.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (2 nodes): `[videoId].tsx`, `VideoRoute()`
+- **Thin community `Community 36`** (2 nodes): `[videoId].tsx`, `VideoRoute()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (2 nodes): `FeedRoute()`, `feed.tsx`
+- **Thin community `Community 37`** (2 nodes): `FeedRoute()`, `feed.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (2 nodes): `MeRoute()`, `me.tsx`
+- **Thin community `Community 38`** (2 nodes): `MeRoute()`, `me.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (2 nodes): `TabLayout()`, `_layout.tsx`
+- **Thin community `Community 39`** (2 nodes): `TabLayout()`, `_layout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (2 nodes): `SaveRoute()`, `save.tsx`
+- **Thin community `Community 40`** (2 nodes): `SaveRoute()`, `save.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (2 nodes): `resolveAuthPrimaryAction()`, `navigation.ts`
+- **Thin community `Community 41`** (2 nodes): `resolveAuthPrimaryAction()`, `navigation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (2 nodes): `resolveAuthLoginModeLabel()`, `auth-copy.ts`
+- **Thin community `Community 42`** (2 nodes): `resolveAuthLoginModeLabel()`, `auth-copy.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (2 nodes): `ModalBackdrop()`, `ModalBackdrop.tsx`
+- **Thin community `Community 43`** (2 nodes): `ModalBackdrop()`, `ModalBackdrop.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (2 nodes): `shouldDismissSheetGesture()`, `modal-gesture.ts`
+- **Thin community `Community 44`** (2 nodes): `shouldDismissSheetGesture()`, `modal-gesture.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (2 nodes): `createLaunchScreenDesign()`, `launch-screen-design.ts`
+- **Thin community `Community 45`** (2 nodes): `createLaunchScreenDesign()`, `launch-screen-design.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (2 nodes): `getEditorialPaperFontSources()`, `fonts.ts`
+- **Thin community `Community 46`** (2 nodes): `getEditorialPaperFontSources()`, `fonts.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (2 nodes): `use-modal-controller.ts`, `useModalController()`
+- **Thin community `Community 47`** (2 nodes): `use-modal-controller.ts`, `useModalController()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (2 nodes): `resolveAuthPageShellLayout()`, `layout.ts`
+- **Thin community `Community 48`** (2 nodes): `resolveAuthPageShellLayout()`, `layout.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (2 nodes): `buildFeedRestoreScrollParams()`, `restore-scroll.ts`
+- **Thin community `Community 49`** (2 nodes): `buildFeedRestoreScrollParams()`, `restore-scroll.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (2 nodes): `scheduleFeedRestore()`, `restore-scheduler.ts`
+- **Thin community `Community 50`** (2 nodes): `scheduleFeedRestore()`, `restore-scheduler.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (2 nodes): `getFeedListLoadingState()`, `loading-state.ts`
+- **Thin community `Community 51`** (2 nodes): `getFeedListLoadingState()`, `loading-state.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (2 nodes): `createFeedItem()`, `media-feature-card-props.test.ts`
+- **Thin community `Community 52`** (2 nodes): `createFeedItem()`, `media-feature-card-props.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (2 nodes): `ActiveVideoGestureSurfaceComponent()`, `active-video-gesture-surface.tsx`
+- **Thin community `Community 53`** (2 nodes): `ActiveVideoGestureSurfaceComponent()`, `active-video-gesture-surface.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (2 nodes): `RowOwnedVideoOverlay()`, `row-owned-video-overlay.tsx`
+- **Thin community `Community 54`** (2 nodes): `RowOwnedVideoOverlay()`, `row-owned-video-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (2 nodes): `formatFullscreenVideoCounterLabel()`, `overlay-data.ts`
+- **Thin community `Community 55`** (2 nodes): `formatFullscreenVideoCounterLabel()`, `overlay-data.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (2 nodes): `resolveActiveVideoChange()`, `active-video-change.ts`
+- **Thin community `Community 56`** (2 nodes): `resolveActiveVideoChange()`, `active-video-change.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (2 nodes): `resolveActivePlayerSurfaceState()`, `active-player-controller.ts`
+- **Thin community `Community 57`** (2 nodes): `resolveActivePlayerSurfaceState()`, `active-player-controller.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (2 nodes): `getFullscreenVideoLoadingState()`, `loading-state.ts`
+- **Thin community `Community 58`** (2 nodes): `getFullscreenVideoLoadingState()`, `loading-state.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (2 nodes): `shouldShowPausedPlaybackIndicator()`, `paused-playback-indicator.ts`
+- **Thin community `Community 59`** (2 nodes): `use-fullscreen-playback-session.ts`, `useFullscreenPlaybackSession()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (2 nodes): `resolveToneColor()`, `media-feature-card.tsx`
+- **Thin community `Community 60`** (2 nodes): `resolveToneColor()`, `media-feature-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
+- **Thin community `Community 61`** (2 nodes): `Auth Coupling Stays Inside Auth Layer`, `Supabase Auth`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (1 nodes): `root-layout.source.test.ts`
+- **Thin community `Community 62`** (1 nodes): `root-layout.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (1 nodes): `index.ts`
+- **Thin community `Community 63`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (1 nodes): `auth-code-row.tsx`
+- **Thin community `Community 64`** (1 nodes): `auth-code-row.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (1 nodes): `structured-auth-card.tsx`
+- **Thin community `Community 65`** (1 nodes): `structured-auth-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (1 nodes): `login-entry-card.tsx`
+- **Thin community `Community 66`** (1 nodes): `login-entry-card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (1 nodes): `title-font.test.ts`
+- **Thin community `Community 67`** (1 nodes): `title-font.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (1 nodes): `navigation.test.ts`
+- **Thin community `Community 68`** (1 nodes): `navigation.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (1 nodes): `auth-copy.test.ts`
+- **Thin community `Community 69`** (1 nodes): `auth-copy.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (1 nodes): `auth-ui-state.test.ts`
+- **Thin community `Community 70`** (1 nodes): `auth-ui-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `index.ts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (1 nodes): `index.ts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (1 nodes): `feed-session.test.ts`
+- **Thin community `Community 71`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 72`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (1 nodes): `playback-session.test.ts`
+- **Thin community `Community 73`** (1 nodes): `feed-session.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 74`** (1 nodes): `player-window.test.ts`
+- **Thin community `Community 74`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (1 nodes): `index.ts`
+- **Thin community `Community 75`** (1 nodes): `playback-session.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 76`** (1 nodes): `ToastCard.tsx`
+- **Thin community `Community 76`** (1 nodes): `player-window.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (1 nodes): `toast-design.test.ts`
+- **Thin community `Community 77`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (1 nodes): `ToastHost.tsx`
+- **Thin community `Community 78`** (1 nodes): `ToastCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (1 nodes): `index.ts`
+- **Thin community `Community 79`** (1 nodes): `toast-design.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `modal-layout.test.ts`
+- **Thin community `Community 80`** (1 nodes): `ToastHost.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `modal-design.ts`
+- **Thin community `Community 81`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `modal-gesture.test.ts`
+- **Thin community `Community 82`** (1 nodes): `modal-layout.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (1 nodes): `ModalFrame.tsx`
+- **Thin community `Community 83`** (1 nodes): `modal-design.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (1 nodes): `index.ts`
+- **Thin community `Community 84`** (1 nodes): `modal-gesture.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (1 nodes): `launch-screen.tsx`
+- **Thin community `Community 85`** (1 nodes): `ModalFrame.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 86`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (1 nodes): `launch-screen-design.test.ts`
+- **Thin community `Community 87`** (1 nodes): `launch-screen.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (1 nodes): `adaptive-glass-appearance.test.ts`
+- **Thin community `Community 88`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (1 nodes): `types.ts`
+- **Thin community `Community 89`** (1 nodes): `launch-screen-design.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (1 nodes): `glass-support.test.ts`
+- **Thin community `Community 90`** (1 nodes): `adaptive-glass-appearance.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (1 nodes): `index.ts`
+- **Thin community `Community 91`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (1 nodes): `segmented-filter-bar-design.test.ts`
+- **Thin community `Community 92`** (1 nodes): `glass-support.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (1 nodes): `foundation.test.ts`
+- **Thin community `Community 93`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (1 nodes): `glass.ts`
+- **Thin community `Community 94`** (1 nodes): `segmented-filter-bar-design.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (1 nodes): `radius.ts`
+- **Thin community `Community 95`** (1 nodes): `foundation.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (1 nodes): `types.ts`
+- **Thin community `Community 96`** (1 nodes): `glass.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (1 nodes): `elevation.ts`
+- **Thin community `Community 97`** (1 nodes): `radius.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (1 nodes): `index.ts`
+- **Thin community `Community 98`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (1 nodes): `typography.ts`
+- **Thin community `Community 99`** (1 nodes): `elevation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (1 nodes): `spacing.ts`
+- **Thin community `Community 100`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (1 nodes): `types.ts`
+- **Thin community `Community 101`** (1 nodes): `typography.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 102`** (1 nodes): `constants.ts`
+- **Thin community `Community 102`** (1 nodes): `spacing.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 103`** (1 nodes): `index.ts`
+- **Thin community `Community 103`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 104`** (1 nodes): `service.ts`
+- **Thin community `Community 104`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 105`** (1 nodes): `types.ts`
+- **Thin community `Community 105`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 106`** (1 nodes): `index.ts`
+- **Thin community `Community 106`** (1 nodes): `service.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 107`** (1 nodes): `service.ts`
+- **Thin community `Community 107`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 108`** (1 nodes): `launch-bootstrap.test.ts`
+- **Thin community `Community 108`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 109`** (1 nodes): `request.test.ts`
+- **Thin community `Community 109`** (1 nodes): `service.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 110`** (1 nodes): `index.ts`
+- **Thin community `Community 110`** (1 nodes): `launch-bootstrap.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 111`** (1 nodes): `index.ts`
+- **Thin community `Community 111`** (1 nodes): `request.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 112`** (1 nodes): `types.ts`
+- **Thin community `Community 112`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 113`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 114`** (1 nodes): `auth-page-shell.tsx`
+- **Thin community `Community 114`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 115`** (1 nodes): `layout.test.ts`
+- **Thin community `Community 115`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 116`** (1 nodes): `index.ts`
+- **Thin community `Community 116`** (1 nodes): `auth-page-shell.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 117`** (1 nodes): `video-detail-page.source.test.ts`
+- **Thin community `Community 117`** (1 nodes): `layout.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 118`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 119`** (1 nodes): `restore-scroll.test.ts`
+- **Thin community `Community 119`** (1 nodes): `video-detail-page.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 120`** (1 nodes): `feed-page.source.test.ts`
+- **Thin community `Community 120`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 121`** (1 nodes): `restore-scheduler.test.ts`
+- **Thin community `Community 121`** (1 nodes): `restore-scroll.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 122`** (1 nodes): `loading-state.test.ts`
+- **Thin community `Community 122`** (1 nodes): `feed-page.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 123`** (1 nodes): `index.ts`
+- **Thin community `Community 123`** (1 nodes): `restore-scheduler.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 124`** (1 nodes): `index.ts`
+- **Thin community `Community 124`** (1 nodes): `loading-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 125`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 126`** (1 nodes): `top-chrome-overlay.tsx`
+- **Thin community `Community 126`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 127`** (1 nodes): `playback-feedback-overlay.tsx`
+- **Thin community `Community 127`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 128`** (1 nodes): `fullscreen-video-item.source.test.ts`
+- **Thin community `Community 128`** (1 nodes): `top-chrome-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 129`** (1 nodes): `paused-playback-indicator-overlay.tsx`
+- **Thin community `Community 129`** (1 nodes): `row-playback-hud-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 130`** (1 nodes): `active-video-gesture-surface.source.test.ts`
+- **Thin community `Community 130`** (1 nodes): `row-hud-anchors.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 131`** (1 nodes): `video-overlay-action-button.tsx`
+- **Thin community `Community 131`** (1 nodes): `active-video-gesture-surface.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 132`** (1 nodes): `paused-playback-indicator-overlay.source.test.ts`
+- **Thin community `Community 132`** (1 nodes): `video-overlay-action-button.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 133`** (1 nodes): `fullscreen-video-pager.source.test.ts`
+- **Thin community `Community 133`** (1 nodes): `fullscreen-video-row.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 134`** (1 nodes): `fullscreen-video-item.tsx`
+- **Thin community `Community 134`** (1 nodes): `fullscreen-video-pager.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 135`** (1 nodes): `video-overlay-action-rail.tsx`
+- **Thin community `Community 135`** (1 nodes): `fullscreen-video-row.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 136`** (1 nodes): `top-chrome-overlay.source.test.ts`
+- **Thin community `Community 136`** (1 nodes): `row-surface-status-overlay.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 137`** (1 nodes): `fullscreen-video-pager.tsx`
+- **Thin community `Community 137`** (1 nodes): `video-overlay-action-rail.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 138`** (1 nodes): `playable-video-surface.source.test.ts`
+- **Thin community `Community 138`** (1 nodes): `top-chrome-overlay.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 139`** (1 nodes): `playback-feedback-overlay.source.test.ts`
+- **Thin community `Community 139`** (1 nodes): `row-surface-status-overlay.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 140`** (1 nodes): `initial-positioning.test.ts`
+- **Thin community `Community 140`** (1 nodes): `fullscreen-video-pager.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 141`** (1 nodes): `active-player-controller.test.ts`
+- **Thin community `Community 141`** (1 nodes): `playable-video-surface.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 142`** (1 nodes): `playback-feedback.source.test.ts`
+- **Thin community `Community 142`** (1 nodes): `row-playback-hud-overlay.source.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 143`** (1 nodes): `paused-playback-indicator.test.ts`
+- **Thin community `Community 143`** (1 nodes): `initial-positioning.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 144`** (1 nodes): `overlay-data.test.ts`
+- **Thin community `Community 144`** (1 nodes): `active-player-controller.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 145`** (1 nodes): `active-video-change.test.ts`
+- **Thin community `Community 145`** (1 nodes): `row-playback-hud-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 146`** (1 nodes): `render-props.test.ts`
+- **Thin community `Community 146`** (1 nodes): `row-surface-presentation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 147`** (1 nodes): `playback-feedback.test.ts`
+- **Thin community `Community 147`** (1 nodes): `row-hud-layout.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 148`** (1 nodes): `loading-state.test.ts`
+- **Thin community `Community 148`** (1 nodes): `overlay-data.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 149`** (1 nodes): `index.ts`
+- **Thin community `Community 149`** (1 nodes): `active-video-change.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 150`** (1 nodes): `index.ts`
+- **Thin community `Community 150`** (1 nodes): `render-props.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 151`** (1 nodes): `types.ts`
+- **Thin community `Community 151`** (1 nodes): `loading-state.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 152`** (1 nodes): `mock-favorite-repository.test.ts`
+- **Thin community `Community 152`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 153`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 154`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 155`** (1 nodes): `feed-repository.test.ts`
+- **Thin community `Community 155`** (1 nodes): `mock-favorite-repository.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 156`** (1 nodes): `mock-feed-repository.test.ts`
+- **Thin community `Community 156`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 157`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 158`** (1 nodes): `feed-repository.test.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 159`** (1 nodes): `mock-feed-repository.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useEditorialPaperTheme()` connect `Community 0` to `Community 1`, `Community 10`, `Community 12`, `Community 15`?**
-  _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **Why does `TanStack React Query` connect `Community 1` to `Community 3`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `Expo Router` connect `Community 1` to `Community 5`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
+- **Why does `useEditorialPaperTheme()` connect `Community 0` to `Community 8`, `Community 17`, `Community 11`, `Community 13`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `TanStack React Query` connect `Community 1` to `Community 8`, `Community 3`, `Community 14`?**
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+- **Why does `Expo Router` connect `Community 8` to `Community 1`, `Community 5`?**
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
 - **Are the 17 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `AuthSocialRow()` and `AuthField()`) actually correct?**
   _`useEditorialPaperTheme()` has 17 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow` to the rest of the system?**
@@ -1102,4 +1119,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._

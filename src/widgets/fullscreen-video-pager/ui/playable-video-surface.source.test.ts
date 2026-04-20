@@ -12,13 +12,15 @@ describe('playable video surface source', () => {
     expect(source).toContain('useLayoutEffect');
     expect(source).toContain('registerActiveController');
     expect(source).toContain('surfaceState:');
+    expect(source).toContain(
+      'previousProps.registerActiveController === nextProps.registerActiveController'
+    );
   });
 
-  it('renders loading as a centered glass spinner without copy or fullscreen scrim', () => {
-    expect(source).toContain('ActivityIndicator');
-    expect(source).toContain('AdaptiveGlass');
-    expect(source).not.toContain('Loading video...');
-    expect(source).not.toContain("backgroundColor: 'rgba(0,0,0,0.68)'");
-    expect(source).not.toContain('{video.title}');
+  it('stops rendering loading and error presenters itself and emits surface presentation upstream', () => {
+    expect(source).toContain('onSurfacePresentationChange');
+    expect(source).not.toContain('ActivityIndicator');
+    expect(source).not.toContain('AdaptiveGlass');
+    expect(source).not.toContain('Video unavailable');
   });
 });

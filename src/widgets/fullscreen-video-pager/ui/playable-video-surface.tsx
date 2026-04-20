@@ -1,10 +1,9 @@
 import { useEvent } from 'expo';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
-import { AdaptiveGlass } from '@/shared/ui/editorial-paper';
 import {
   resolveActivePlayerSurfaceState,
   type FullscreenActivePlayerController,
@@ -13,8 +12,12 @@ import {
   arePlayableVideoSurfacePropsEqual,
   type PlayableVideoSurfaceRenderProps,
 } from '../model/render-props';
+import type { FullscreenRowSurfacePresentation } from '../model/row-surface-presentation';
 
 type PlayableVideoSurfaceProps = {
+  onSurfacePresentationChange?:
+    | ((presentation: FullscreenRowSurfacePresentation | null) => void)
+    | undefined;
   playbackRate: number;
   registerActiveController?:
     | ((controller: FullscreenActivePlayerController | null) => void)
@@ -23,11 +26,8 @@ type PlayableVideoSurfaceProps = {
   video: FeedItem;
 };
 
-const loadingSpinnerTint = 'rgba(251,247,238,0.96)';
-const loadingGlassShadow =
-  '6px 9px 18px rgba(17,13,10,0.16), inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(17,13,10,0.08)';
-
 function PlayableVideoSurfaceComponent({
+  onSurfacePresentationChange,
   playbackRate,
   registerActiveController,
   video,
@@ -87,96 +87,50 @@ function PlayableVideoSurfaceComponent({
     };
   }, [activeController, registerActiveController]);
 
-  const handleRetry = async () => {
+  const handleRetry = useCallback(async () => {
     await player.replaceAsync(video.videoUrl);
 
     if (shouldPlay) {
       player.play();
     }
-  };
+  }, [player, shouldPlay, video.videoUrl]);
+
+  const retry = useCallback(() => {
+    void handleRetry();
+  }, [handleRetry]);
+
+  const surfacePresentation = useMemo<FullscreenRowSurfacePresentation>(
+    () => ({
+      errorMessage:
+        surfaceState === 'error'
+          ? (error?.message ?? 'The player could not load this video.')
+          : null,
+      retry: surfaceState === 'error' ? retry : null,
+      surfaceState,
+    }),
+    [error?.message, retry, surfaceState]
+  );
+
+  useLayoutEffect(() => {
+    if (!onSurfacePresentationChange) {
+      return;
+    }
+
+    onSurfacePresentationChange(surfacePresentation);
+    return () => {
+      onSurfacePresentationChange(null);
+    };
+  }, [onSurfacePresentationChange, surfacePresentation]);
 
   return (
-    <>
+    <View style={{ width: '100%', height: '100%' }}>
       <VideoView
         player={player}
         nativeControls={false}
         contentFit="cover"
         style={{ width: '100%', height: '100%' }}
       />
-
-      {status !== 'readyToPlay' && status !== 'error' ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <AdaptiveGlass
-            appearance="clear"
-            radius={28}
-            style={{
-              width: 56,
-              height: 56,
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: loadingGlassShadow,
-            }}
-            variant="pill"
-          >
-            <ActivityIndicator color={loadingSpinnerTint} size="small" />
-          </AdaptiveGlass>
-        </View>
-      ) : null}
-
-      {status === 'error' ? (
-        <View
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.78)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 32,
-            gap: 12,
-          }}
-        >
-          <Text
-            selectable
-            style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '700', textAlign: 'center' }}
-          >
-            Video unavailable
-          </Text>
-          <Text
-            selectable
-            style={{
-              color: 'rgba(255,255,255,0.74)',
-              fontSize: 14,
-              textAlign: 'center',
-            }}
-          >
-            {error?.message ?? 'The player could not load this video.'}
-          </Text>
-          <Pressable
-            onPress={() => {
-              void handleRetry();
-            }}
-            style={({ pressed }) => ({
-              paddingHorizontal: 18,
-              paddingVertical: 12,
-              borderRadius: 999,
-              backgroundColor: pressed ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.18)',
-            })}
-          >
-            <Text selectable style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
-              Retry
-            </Text>
-          </Pressable>
-        </View>
-      ) : null}
-    </>
+    </View>
   );
 }
 
@@ -197,7 +151,9 @@ function arePlayableVideoSurfaceComponentPropsEqual(
 
   return (
     arePlayableVideoSurfacePropsEqual(previousRenderProps, nextRenderProps) &&
-    previousProps.video.videoUrl === nextProps.video.videoUrl
+    previousProps.video.videoUrl === nextProps.video.videoUrl &&
+    previousProps.onSurfacePresentationChange === nextProps.onSurfacePresentationChange &&
+    previousProps.registerActiveController === nextProps.registerActiveController
   );
 }
 

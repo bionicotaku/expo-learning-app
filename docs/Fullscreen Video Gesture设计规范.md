@@ -14,7 +14,7 @@
 
 相关文档：
 
-- overlay 分层见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)
+- overlay 架构见 [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
 - 页面关系见 [Feed与Fullscreen Video页面设计逻辑](./Feed与Fullscreen%20Video页面设计逻辑.md)
 
 ## 2. 平台范围
@@ -28,31 +28,32 @@
 
 ## 3. 手势层不是 Overlay
 
-当前 fullscreen 必须区分两件事：
+当前 fullscreen 必须区分三件事：
 
 1. `overlay` 是视觉与信息分层
 2. `gesture surface` 是输入识别层
+3. `HUD state ownership` 与 `HUD render attachment` 不是一回事
 
 因此本页固定采用以下层级：
 
 1. `PlayableVideoSurface`
 2. `ActiveVideoGestureSurface`
-3. `Row-owned content overlay`
-4. `Top chrome overlay`
-5. `Active ephemeral overlay`
-6. `Pager shell loading pill`
+3. `RowOwnedContentOverlay`
+4. `RowPlaybackHudOverlay`
+5. `RowSurfaceStatusOverlay`
+6. `Page-attached overlays`
 
 其中：
 
-- `ActiveVideoGestureSurface` 不属于三层 overlay 模型
-- 它是 `FullscreenVideoItem` 内部的 `row-local interaction surface`
-- 它位于视频画面之上、row-owned overlay 之下
+- `ActiveVideoGestureSurface` 不属于任何 overlay
+- 它是 `FullscreenVideoRow` 内部的 `row-local interaction surface`
+- 它位于视频画面之上、所有 row overlay 之下
 
 这样做的理由是：
 
 - 手势 ownership 仍然属于当前 row，而不是 pager 壳层
-- row-owned 内容层继续跟视频一起移动
-- 顶层 chrome 和瞬时 HUD 不需要反向知道手势识别细节
+- row 内的内容、HUD、surface status 都继续跟视频一起移动
+- pager 只保留 page shell overlays，不再直接承载播放器表面 HUD
 
 ## 4. 手势挂载策略
 
@@ -60,7 +61,7 @@
 
 当前实现固定遵循：
 
-- 每个 `FullscreenVideoItem` 都有手势槽位
+- 每个 `FullscreenVideoRow` 都有手势槽位
 - 但只有 `active row` 真正渲染 `GestureDetector`
 - 非 active row 不挂真实 detector，而不是“挂了再 disabled”
 
@@ -71,7 +72,7 @@
 不采用 pager 顶层全局手势层，原因是：
 
 - 会破坏 row-local ownership
-- 会把本属于 `FullscreenVideoItem` 的交互上提到 pager
+- 会把本属于 `FullscreenVideoRow` 的交互上提到 pager
 - 会让右侧 action rail 的命中协调更脆弱
 - 后续字幕、词义解释等 active-only HUD 更容易被错误塞回顶层壳
 
@@ -209,14 +210,14 @@
 - `basePausedByUser`
 - `transientHoldState`
 - `activeSurfaceState`
-- `playbackFeedback`
+- `rowPlaybackHudStateByVideoId`
 
 其中：
 
 - `basePausedByUser` 是正常基态
 - `transientHoldState` 是长按期间的临时覆盖态
 - `activeSurfaceState` 只反映当前 active row 的播放器表面状态：`loading | ready | error`
-- `playbackFeedback` 是 HUD 用的短期会话反馈；其中播/停与 seek 会自动消失，`2x` 会跟随 hold 生命周期持续显示
+- `rowPlaybackHudStateByVideoId` 是 `videoId -> HUD state` 的稀疏 store；pager 统一维护其生命周期，但只由对应 row 渲染
 
 ### 7.2 Feature 层纯规则
 
@@ -291,26 +292,25 @@ controller 的注册与清理必须使用同步生命周期，避免 active row 
 
 ## 9. HUD 模型
 
-当前 HUD 模型拆成两类：
+当前 HUD 模型固定为：
 
-1. `playbackFeedback` 判别联合
-   - `{ kind: 'seek'; deltaSeconds: -5 | 5 }`
-   - `{ kind: 'rate'; label: '2x' }`
-2. 独立的 pause indicator 可见性
-   - 由当前 active row 的 `effectiveShouldPlay` 直接派生
-   - 不进入 `playbackFeedback` union
+1. pager 持有 `videoId -> rowPlaybackHudState`
+2. row 自己渲染 `RowPlaybackHudOverlay`
 
-显示策略固定为：
+其中每个 row 的 HUD state 至少包含：
 
-- `seek`：短暂显示后自动消失；左右分置为方向型 glass icon HUD
-- `rate`：左右 hold 期间持续显示；只有 `hold end`、active row 切换或页面卸载才清掉
-- `pause indicator`：进入暂停态时显示，并在约 `3s` 后自动消失；恢复播放、active row 切换或 surface 进入 `error` 时立即消失
+- `pauseIndicator`
+  - 进入暂停态时显示
+  - 约 `3s` 后自动消失
+- `transientFeedback`
+  - `seek`
+    - 左右分置的 glass icon HUD
+    - 短暂显示后自动消失
+  - `rate`
+    - 左右 hold 期间持续显示
+    - 只有 `hold end`、row unmount 或显式 session cleanup 时才清掉
 
-`PlaybackFeedbackOverlay` 只负责渲染 `seek / rate` HUD。
-
-`PausedPlaybackIndicatorOverlay` 只负责渲染中心 pause indicator。
-
-当前 pause indicator 不进入 `playbackFeedback` union，而是由 pager 在 pause 生命周期开始时单独拉起一个约 `3s` 的可见窗口。
+`RowPlaybackHudOverlay` 只负责渲染当前 row 的 pause / seek / rate HUD。
 
 它不负责：
 
@@ -327,12 +327,16 @@ controller 的注册与清理必须使用同步生命周期，避免 active row 
 1. `basePausedByUser` 重置为 `false`
 2. `transientHoldState` 清空
 3. `effectivePlaybackRate` 回到 `1x`
-4. 当前 HUD 清空
+4. 当前 active controller 清空
+5. 旧 active row 的 `rate` HUD 立即清掉
+
+但不会全局清空其它 row 的 pause / seek HUD；它们仍按各自的 timer 或 row unmount 自然清理。
 
 这样可以保证：
 
 - 新 row 始终按 autoplay 基线进入
-- 不会把上一条视频的 hold / pause / HUD 残留带到下一条
+- 不会把上一条视频的 hold / rate HUD 残留带到下一条
+- 旧 row 的 pause / seek HUD 仍能跟随所属 row 一起滑出，而不是瞬移到新 row
 - 新 row 的背景双击不会短时间误命中上一条 video 的 controller
 
 ## 10.1 Error Surface 命中规则
@@ -354,5 +358,5 @@ controller 的注册与清理必须使用同步生命周期，避免 active row 
 - 双击左右只 seek，不改变基态
 - 暂停状态下左右长按会临时 `2x` 播放，松手恢复暂停
 - 长按期间 single tap / double tap 都不会触发
-- 手势反馈只出现在 active ephemeral overlay
-- page 层不持有手势或播放会话状态
+- 手势反馈只出现在 row-attached playback HUD overlay
+- 页面层不持有手势或播放会话状态；这些状态集中在 `widgets/fullscreen-video-pager` 的 session hook

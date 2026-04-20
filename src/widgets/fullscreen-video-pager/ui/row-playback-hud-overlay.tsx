@@ -1,29 +1,34 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { SymbolView } from 'expo-symbols';
 import { memo } from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 import { AdaptiveGlass } from '@/shared/ui/editorial-paper';
 
-import { type FullscreenPlaybackFeedback } from '../model/playback-feedback';
+import { rowHudFadeOutDurationMs } from '../model/row-hud-layout';
+import type { FullscreenRowPlaybackHudState } from '../model/row-playback-hud-state';
+import { RowHudAnchors } from './row-hud-anchors';
 
-type PlaybackFeedbackOverlayProps = {
-  playbackFeedback: FullscreenPlaybackFeedback | null;
+type RowPlaybackHudOverlayProps = {
+  hudState: FullscreenRowPlaybackHudState;
+  showCenteredPause: boolean;
 };
 
 const iconTint = 'rgba(251,247,238,0.96)';
+const pauseGlassShadow =
+  '8px 12px 22px rgba(17,13,10,0.18), inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(17,13,10,0.1)';
 const seekGlassShadow =
   '6px 9px 18px rgba(17,13,10,0.16), inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(17,13,10,0.08)';
 const rateGlassShadow =
   '7px 10px 18px rgba(17,13,10,0.16), inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(17,13,10,0.08)';
 const hudFadeIn = FadeIn.duration(180);
-const hudFadeOut = FadeOut.duration(140);
+const hudFadeOut = FadeOut.duration(rowHudFadeOutDurationMs);
 
 type FullscreenHudSymbolProps = {
   fallbackGlyph?: string;
   fallbackIconName?: keyof typeof MaterialIcons.glyphMap;
-  iosSymbol: 'backward.fill' | 'forward.fill' | 'speedometer';
+  iosSymbol: 'backward.fill' | 'forward.fill' | 'play.fill' | 'speedometer';
   size: number;
 };
 
@@ -45,6 +50,7 @@ function FullscreenHudSymbol({
               fontSize: size,
               lineHeight: size,
               fontWeight: '800',
+              letterSpacing: -1,
               textShadowColor: 'rgba(17,13,10,0.22)',
               textShadowOffset: { width: 1, height: 1 },
               textShadowRadius: 2,
@@ -63,33 +69,52 @@ function FullscreenHudSymbol({
   );
 }
 
-function PlaybackFeedbackOverlayComponent({
-  playbackFeedback,
-}: PlaybackFeedbackOverlayProps) {
-  if (!playbackFeedback) {
+function RowPlaybackHudOverlayComponent({
+  hudState,
+  showCenteredPause,
+}: RowPlaybackHudOverlayProps) {
+  const transientFeedback = hudState.transientFeedback;
+
+  if (!showCenteredPause && !transientFeedback) {
     return null;
   }
 
   return (
-    <View
-      pointerEvents="none"
-      style={{
-        position: 'absolute',
-        inset: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      {playbackFeedback.kind === 'seek' ? (
+    <RowHudAnchors
+      center={
+        showCenteredPause ? (
         <Animated.View
-          key={`seek-${playbackFeedback.deltaSeconds}`}
+          key="pause"
           entering={hudFadeIn}
           exiting={hudFadeOut}
-          style={{
-            transform: [
-              { translateX: playbackFeedback.deltaSeconds < 0 ? -122 : 122 },
-            ],
-          }}
+        >
+          <AdaptiveGlass
+            appearance="clear"
+            radius={34}
+            style={{
+              width: 68,
+              height: 68,
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: pauseGlassShadow,
+            }}
+            variant="pill"
+          >
+            <FullscreenHudSymbol
+              fallbackGlyph="▶"
+              iosSymbol="play.fill"
+              size={30}
+            />
+          </AdaptiveGlass>
+        </Animated.View>
+        ) : null
+      }
+      leftCenter={
+        transientFeedback?.kind === 'seek' && transientFeedback.deltaSeconds < 0 ? (
+        <Animated.View
+          key="seek-left"
+          entering={hudFadeIn}
+          exiting={hudFadeOut}
         >
           <AdaptiveGlass
             appearance="clear"
@@ -104,26 +129,48 @@ function PlaybackFeedbackOverlayComponent({
             variant="pill"
           >
             <FullscreenHudSymbol
-              fallbackIconName={
-                playbackFeedback.deltaSeconds < 0 ? 'fast-rewind' : 'fast-forward'
-              }
-              iosSymbol={
-                playbackFeedback.deltaSeconds < 0 ? 'backward.fill' : 'forward.fill'
-              }
+              fallbackIconName="fast-rewind"
+              iosSymbol="backward.fill"
               size={24}
             />
           </AdaptiveGlass>
         </Animated.View>
-      ) : (
+        ) : null
+      }
+      rightCenter={
+        transientFeedback?.kind === 'seek' && transientFeedback.deltaSeconds > 0 ? (
+          <Animated.View
+            key="seek-right"
+            entering={hudFadeIn}
+            exiting={hudFadeOut}
+          >
+            <AdaptiveGlass
+              appearance="clear"
+              radius={29}
+              style={{
+                width: 58,
+                height: 58,
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: seekGlassShadow,
+              }}
+              variant="pill"
+            >
+              <FullscreenHudSymbol
+                fallbackIconName="fast-forward"
+                iosSymbol="forward.fill"
+                size={24}
+              />
+            </AdaptiveGlass>
+          </Animated.View>
+        ) : null
+      }
+      top={
+        transientFeedback?.kind === 'rate' ? (
         <Animated.View
           key="rate"
           entering={hudFadeIn}
           exiting={hudFadeOut}
-          style={{
-            position: 'absolute',
-            top: '15%',
-            alignSelf: 'center',
-          }}
         >
           <AdaptiveGlass
             appearance="clear"
@@ -155,13 +202,14 @@ function PlaybackFeedbackOverlayComponent({
                 textShadowRadius: 2,
               }}
             >
-              2x
+              {transientFeedback.label}
             </Text>
           </AdaptiveGlass>
         </Animated.View>
-      )}
-    </View>
+        ) : null
+      }
+    />
   );
 }
 
-export const PlaybackFeedbackOverlay = memo(PlaybackFeedbackOverlayComponent);
+export const RowPlaybackHudOverlay = memo(RowPlaybackHudOverlayComponent);

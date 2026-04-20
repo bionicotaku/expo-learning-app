@@ -20,7 +20,7 @@
 - v1 不做 dark mode / light mode 双视觉切换
 - v1 不做 progress toast、sticky toast、action toast、loading toast
 - 不引入第三方 toast 宿主库
-- 不把当前 `Fullscreen Video` 页面中的局部 `PlaybackFeedbackOverlay` 纳入这套系统
+- 不把当前 `Fullscreen Video` 页面中的局部 `RowPlaybackHudOverlay` 纳入这套系统
 
 ## 2. 设计定位与边界
 
@@ -68,11 +68,11 @@
 
 #### 不等于 `Fullscreen Video` 局部 HUD
 
-当前 `Fullscreen Video` 中已有的 `PlaybackFeedbackOverlay` 属于局部瞬时反馈层，而不是全局 toast。
+当前 `Fullscreen Video` 中已有的播放反馈 HUD 属于局部 row-attached 播放反馈层，而不是全局 toast。
 
-根据 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)，它更适合归入：
+根据 [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)，它更适合归入：
 
-- `Active ephemeral overlay`
+- `RowPlaybackHudOverlay`
 
 因此必须明确区分两者：
 
@@ -81,7 +81,7 @@
   - 跨页面
   - 固定在应用最前景
   - 不依赖某个 active video
-- `PlaybackFeedbackOverlay`
+- `RowPlaybackHudOverlay`
   - 页面内
   - 只对当前 active video 有意义
   - 与播放态、手势、字幕同层
@@ -587,7 +587,7 @@ toast 卡片本体允许交互，宿主容器不拦截其它页面事件。
 5. 支持自动关闭、手动 dismiss、向上滑 dismiss
 6. `clear()` 触发统一退出流程
 7. 不引入任何第三方 toast 宿主库
-8. Fullscreen 局部 `PlaybackFeedbackOverlay` 不走全局 toast 系统
+8. Fullscreen 局部 `RowPlaybackHudOverlay` 不走全局 toast 系统
 
 ### 8.3 推荐测试场景
 
