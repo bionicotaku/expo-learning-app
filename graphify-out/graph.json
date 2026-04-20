@@ -2763,12 +2763,21 @@
       "norm_label": "video-overlay-action-button.tsx"
     },
     {
+      "label": "fullscreen-video-pager.source.test.ts",
+      "file_type": "code",
+      "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-pager.source.test.ts",
+      "source_location": "L1",
+      "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_pager_source_test_ts",
+      "community": 126,
+      "norm_label": "fullscreen-video-pager.source.test.ts"
+    },
+    {
       "label": "fullscreen-video-item.tsx",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-item.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_item_tsx",
-      "community": 126,
+      "community": 127,
       "norm_label": "fullscreen-video-item.tsx"
     },
     {
@@ -2777,7 +2786,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/video-overlay-action-rail.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_video_overlay_action_rail_tsx",
-      "community": 127,
+      "community": 128,
       "norm_label": "video-overlay-action-rail.tsx"
     },
     {
@@ -2786,7 +2795,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/top-chrome-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_top_chrome_overlay_source_test_ts",
-      "community": 128,
+      "community": 129,
       "norm_label": "top-chrome-overlay.source.test.ts"
     },
     {
@@ -2795,7 +2804,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-pager.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_pager_tsx",
-      "community": 129,
+      "community": 130,
       "norm_label": "fullscreen-video-pager.tsx"
     },
     {
@@ -2840,7 +2849,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/initial-positioning.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_initial_positioning_test_ts",
-      "community": 130,
+      "community": 131,
       "norm_label": "initial-positioning.test.ts"
     },
     {
@@ -2957,7 +2966,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/overlay-data.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_overlay_data_test_ts",
-      "community": 131,
+      "community": 132,
       "norm_label": "overlay-data.test.ts"
     },
     {
@@ -2966,7 +2975,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-video-change.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_active_video_change_test_ts",
-      "community": 132,
+      "community": 133,
       "norm_label": "active-video-change.test.ts"
     },
     {
@@ -2975,7 +2984,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_render_props_test_ts",
-      "community": 133,
+      "community": 134,
       "norm_label": "render-props.test.ts"
     },
     {
@@ -2984,7 +2993,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/playback-feedback.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_playback_feedback_test_ts",
-      "community": 134,
+      "community": 135,
       "norm_label": "playback-feedback.test.ts"
     },
     {
@@ -2993,7 +3002,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/loading-state.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_loading_state_test_ts",
-      "community": 135,
+      "community": 136,
       "norm_label": "loading-state.test.ts"
     },
     {
@@ -3002,7 +3011,7 @@
       "source_file": "src/widgets/media-feature-card/index.ts",
       "source_location": "L1",
       "id": "src_widgets_media_feature_card_index_ts",
-      "community": 136,
+      "community": 137,
       "norm_label": "index.ts"
     },
     {
@@ -3029,7 +3038,7 @@
       "source_file": "src/entities/favorite/index.ts",
       "source_location": "L1",
       "id": "src_entities_favorite_index_ts",
-      "community": 137,
+      "community": 138,
       "norm_label": "index.ts"
     },
     {
@@ -3038,7 +3047,7 @@
       "source_file": "src/entities/favorite/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_favorite_model_types_ts",
-      "community": 138,
+      "community": 139,
       "norm_label": "types.ts"
     },
     {
@@ -3047,7 +3056,7 @@
       "source_file": "src/entities/favorite/api/mock-favorite-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_favorite_api_mock_favorite_repository_test_ts",
-      "community": 139,
+      "community": 140,
       "norm_label": "mock-favorite-repository.test.ts"
     },
     {
@@ -3128,7 +3137,7 @@
       "source_file": "src/entities/feed/index.ts",
       "source_location": "L1",
       "id": "src_entities_feed_index_ts",
-      "community": 140,
+      "community": 141,
       "norm_label": "index.ts"
     },
     {
@@ -3137,7 +3146,7 @@
       "source_file": "src/entities/feed/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_feed_model_types_ts",
-      "community": 141,
+      "community": 142,
       "norm_label": "types.ts"
     },
     {
@@ -3164,7 +3173,7 @@
       "source_file": "src/entities/feed/api/feed-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_feed_api_feed_repository_test_ts",
-      "community": 142,
+      "community": 143,
       "norm_label": "feed-repository.test.ts"
     },
     {
@@ -3308,7 +3317,7 @@
       "source_file": "src/entities/feed/api/mock-feed-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_feed_api_mock_feed_repository_test_ts",
-      "community": 143,
+      "community": 144,
       "norm_label": "mock-feed-repository.test.ts"
     },
     {

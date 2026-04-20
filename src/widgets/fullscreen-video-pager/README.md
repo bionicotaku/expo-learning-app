@@ -6,7 +6,7 @@
 
 - 纵向分页滚动
 - 首次进入时只显示底部小 loading 动画，不渲染整页 loading 项
-- 只为当前/前后 1 个视频挂载 player
+- 只为当前视频与前后 2 个视频挂载 player
 - 在 widget 内部维护单一 `activeIndex` 状态，并从它派生当前 active item
 - 在 widget 内部维护当前播放会话的 `pausedByUser`
 - 在 widget 内部维护短暂的 `playbackFeedbackLabel`

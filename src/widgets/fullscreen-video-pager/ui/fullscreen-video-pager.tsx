@@ -248,15 +248,15 @@ export function FullscreenVideoPager({
           offset: height * index,
           index,
         })}
-        initialNumToRender={3}
+        initialNumToRender={5}
         initialScrollIndex={initialPosition.initialScrollIndex}
-        maxToRenderPerBatch={4}
+        maxToRenderPerBatch={6}
         pagingEnabled
         onScrollToIndexFailed={handleScrollToIndexFailed}
         removeClippedSubviews
         showsVerticalScrollIndicator={false}
         viewabilityConfig={viewabilityConfigRef.current}
-        windowSize={5}
+        windowSize={7}
         onViewableItemsChanged={handleViewableItemsChanged}
       />
 
