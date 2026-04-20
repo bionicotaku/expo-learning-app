@@ -1,21 +1,11 @@
-import type { FeedPageResult } from '../model/types';
+import type { FeedResponse } from '../model/types';
 
-import { fetchMockFeedPage } from './mock-feed-repository';
+import { fetchMockFeed } from './mock-feed-repository';
 
-export type FetchFeedPageParams = {
-  offset: number;
-  limit: number;
-  delayMs?: number;
-};
+const mockFeedDelayMs = 2000;
 
-export async function fetchFeedPage({
-  offset,
-  limit,
-  delayMs = 0,
-}: FetchFeedPageParams): Promise<FeedPageResult> {
-  return fetchMockFeedPage({
-    offset,
-    limit,
-    delayMs,
+export async function fetchFeed(): Promise<FeedResponse> {
+  return fetchMockFeed({
+    delayMs: mockFeedDelayMs,
   });
 }

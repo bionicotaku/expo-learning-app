@@ -1,17 +1,34 @@
-export type FeedListLoadingState = {
-  showFooterLoader: boolean;
-};
+export type FeedListLoadingState =
+  | { kind: 'initial-loading' }
+  | { kind: 'error' }
+  | { kind: 'empty' }
+  | { kind: 'success'; showFooterLoader: boolean };
 
 export function getFeedListLoadingState({
-  itemCount,
   isPending,
-  isFetchingNextPage,
+  hasItems,
+  hasError,
+  isExtending,
 }: {
-  itemCount: number;
   isPending: boolean;
-  isFetchingNextPage: boolean;
+  hasItems: boolean;
+  hasError: boolean;
+  isExtending: boolean;
 }): FeedListLoadingState {
-  return {
-    showFooterLoader: (isPending && itemCount === 0) || (isFetchingNextPage && itemCount > 0),
-  };
+  if (hasItems) {
+    return {
+      kind: 'success',
+      showFooterLoader: isExtending,
+    };
+  }
+
+  if (isPending) {
+    return { kind: 'initial-loading' };
+  }
+
+  if (hasError) {
+    return { kind: 'error' };
+  }
+
+  return { kind: 'empty' };
 }

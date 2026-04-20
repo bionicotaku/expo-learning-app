@@ -16,6 +16,7 @@ import {
   EditorialPaperThemeProvider,
   editorialPaperLightTokens,
 } from '@/shared/theme/editorial-paper';
+import { ModalHost } from '@/shared/ui/modal';
 import { LaunchScreen } from '@/shared/ui/startup';
 import { ToastHost } from '@/shared/ui/toast';
 
@@ -134,6 +135,7 @@ export default function RootLayout() {
               />
             </Stack>
             {Platform.OS !== 'web' ? <ToastHost /> : null}
+            <ModalHost />
           </QueryClientProvider>
         </Animated.View>
 

@@ -11,4 +11,15 @@ describe('root layout source', () => {
     expect(source).toContain('name="video/[videoId]"');
     expect(source).toContain('dangerouslySingular={() => FULLSCREEN_VIDEO_ROUTE_SINGULAR_ID}');
   });
+
+  it('mounts the modal host above the toast host in the root layout tree', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/app/_layout.tsx'), 'utf8');
+
+    expect(source).toContain("import { ModalHost } from '@/shared/ui/modal';");
+    expect(source).toContain('<ToastHost />');
+    expect(source).toContain('<ModalHost />');
+    expect(source.indexOf('<ModalHost />')).toBeGreaterThan(
+      source.indexOf('<ToastHost />')
+    );
+  });
 });

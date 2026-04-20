@@ -1,20 +1,29 @@
+import { Image } from 'expo-image';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { EditorialTitle, RaisedSurface } from '@/shared/ui/editorial-paper';
 
-export type MediaFeatureCardTone = 'peach' | 'butter' | 'sage' | 'lavender' | 'sky' | 'rose';
+export type MediaFeatureCardFallbackTone =
+  | 'peach'
+  | 'butter'
+  | 'sage'
+  | 'lavender'
+  | 'sky'
+  | 'rose';
 
 export type MediaFeatureCardProps = {
   title: string;
   statsLabel: string;
   tagLabel: string;
-  tone: MediaFeatureCardTone;
+  coverImageUrl?: string | null;
+  fallbackTone: MediaFeatureCardFallbackTone;
   onPress?: () => void;
   accessibilityLabel?: string;
 };
 
-const toneColors: Record<MediaFeatureCardTone, string> = {
+const toneColors: Record<MediaFeatureCardFallbackTone, string> = {
   peach: '#EEDBCF',
   butter: '#E6D9BE',
   sage: '#D7E0C2',
@@ -23,7 +32,7 @@ const toneColors: Record<MediaFeatureCardTone, string> = {
   rose: '#EACBCF',
 };
 
-function resolveToneColor(tone: MediaFeatureCardTone) {
+function resolveToneColor(tone: MediaFeatureCardFallbackTone) {
   return toneColors[tone];
 }
 
@@ -31,11 +40,22 @@ export function MediaFeatureCard({
   title,
   statsLabel,
   tagLabel,
-  tone,
+  coverImageUrl,
+  fallbackTone,
   onPress,
   accessibilityLabel,
 }: MediaFeatureCardProps) {
   const { tokens } = useEditorialPaperTheme();
+  const [didCoverFail, setDidCoverFail] = useState(false);
+  const normalizedCoverImageUrl = useMemo(() => {
+    const trimmed = coverImageUrl?.trim();
+    return trimmed ? trimmed : null;
+  }, [coverImageUrl]);
+  const shouldShowFallback = !normalizedCoverImageUrl || didCoverFail;
+
+  useEffect(() => {
+    setDidCoverFail(false);
+  }, [normalizedCoverImageUrl]);
 
   return (
     <Pressable
@@ -59,10 +79,34 @@ export function MediaFeatureCard({
             borderRadius: tokens.radius.cardMd,
             borderCurve: 'continuous',
             overflow: 'hidden',
-            backgroundColor: resolveToneColor(tone),
+            backgroundColor: resolveToneColor(fallbackTone),
             position: 'relative',
           }}
         >
+          {shouldShowFallback ? null : (
+            <>
+              <Image
+                contentFit="cover"
+                onError={() => {
+                  setDidCoverFail(true);
+                }}
+                source={{ uri: normalizedCoverImageUrl }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                }}
+              />
+              <View
+                pointerEvents="none"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'rgba(17, 13, 10, 0.08)',
+                }}
+              />
+            </>
+          )}
+
           <View
             style={{
               position: 'absolute',

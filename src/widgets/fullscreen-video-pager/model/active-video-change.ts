@@ -1,14 +1,14 @@
-type ViewableItemWithId = {
-  id: string;
+type ViewableItemWithVideoId = {
+  videoId: string;
 };
 
-type ViewableItemToken<T extends ViewableItemWithId> = {
+type ViewableItemToken<T extends ViewableItemWithVideoId> = {
   index?: number | null;
   isViewable?: boolean;
   item?: T | null;
 };
 
-type ResolveActiveVideoChangeArgs<T extends ViewableItemWithId> = {
+type ResolveActiveVideoChangeArgs<T extends ViewableItemWithVideoId> = {
   currentActiveIndex: number | null;
   currentActiveItemId: string | null;
   viewableItems: readonly ViewableItemToken<T>[];
@@ -19,7 +19,7 @@ type ActiveVideoChange = {
   itemId: string;
 };
 
-export function resolveActiveVideoChange<T extends ViewableItemWithId>({
+export function resolveActiveVideoChange<T extends ViewableItemWithVideoId>({
   currentActiveIndex,
   currentActiveItemId,
   viewableItems,
@@ -38,13 +38,13 @@ export function resolveActiveVideoChange<T extends ViewableItemWithId>({
 
   if (
     currentItem.index === currentActiveIndex &&
-    currentItem.item.id === currentActiveItemId
+    currentItem.item.videoId === currentActiveItemId
   ) {
     return null;
   }
 
   return {
     index: currentItem.index,
-    itemId: currentItem.item.id,
+    itemId: currentItem.item.videoId,
   };
 }

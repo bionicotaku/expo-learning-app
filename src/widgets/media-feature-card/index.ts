@@ -1,5 +1,5 @@
 export {
   MediaFeatureCard,
+  type MediaFeatureCardFallbackTone,
   type MediaFeatureCardProps,
-  type MediaFeatureCardTone,
 } from './ui/media-feature-card';

@@ -7,25 +7,21 @@ describe('fullscreen video loading state', () => {
     expect(
       getFullscreenVideoLoadingState({
         itemCount: 0,
-        isFetchingNextPage: false,
         isInitialLoading: true,
       })
     ).toEqual({
       showInitialBottomLoader: true,
-      showPaginationBottomLoader: false,
     });
   });
 
-  it('shows only the pagination bottom loader when fetching beyond the loaded videos', () => {
+  it('hides the bottom loader once the first snapshot has loaded', () => {
     expect(
       getFullscreenVideoLoadingState({
-        itemCount: 10,
-        isFetchingNextPage: true,
+        itemCount: 8,
         isInitialLoading: false,
       })
     ).toEqual({
       showInitialBottomLoader: false,
-      showPaginationBottomLoader: true,
     });
   });
 });

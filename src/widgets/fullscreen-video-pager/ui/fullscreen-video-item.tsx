@@ -65,9 +65,9 @@ function FullscreenVideoItemComponent({
 
       <RowOwnedVideoOverlay
         bottomInset={bottomInset}
+        description={video.description}
         onActionPress={onActionPress}
         title={video.title}
-        subtitle={video.subtitle}
       />
     </View>
   );
@@ -78,7 +78,7 @@ function areFullscreenVideoItemComponentPropsEqual(
   nextProps: FullscreenVideoItemProps
 ): boolean {
   const previousRenderProps: FullscreenVideoItemRenderProps = {
-    videoId: previousProps.video.id,
+    videoId: previousProps.video.videoId,
     width: previousProps.width,
     height: previousProps.height,
     isActive: previousProps.isActive,
@@ -86,7 +86,7 @@ function areFullscreenVideoItemComponentPropsEqual(
     shouldPlay: previousProps.shouldPlay,
   };
   const nextRenderProps: FullscreenVideoItemRenderProps = {
-    videoId: nextProps.video.id,
+    videoId: nextProps.video.videoId,
     width: nextProps.width,
     height: nextProps.height,
     isActive: nextProps.isActive,
@@ -97,9 +97,9 @@ function areFullscreenVideoItemComponentPropsEqual(
   return (
     areFullscreenVideoItemRenderPropsEqual(previousRenderProps, nextRenderProps) &&
     previousProps.bottomInset === nextProps.bottomInset &&
-    previousProps.video.uri === nextProps.video.uri &&
+    previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
-    previousProps.video.subtitle === nextProps.video.subtitle
+    previousProps.video.description === nextProps.video.description
   );
 }
 

@@ -140,12 +140,12 @@
 
 ### 7.1 Feed / Video 基础实体
 
-属于 `FeedItem` 或 `video asset` 的基础内容：
+属于 `FeedItem` 的基础内容：
 
-- `id`
-- `uri`
+- `videoId`
+- `videoUrl`
 - `title`
-- `subtitle`
+- `description`
 
 ### 7.2 当前播放会话状态
 

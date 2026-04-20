@@ -8,6 +8,9 @@
   - root 启动阶段的状态机与时间常量
 - `react-query/`
   - QueryClient 初始化与应用级数据缓存基础设施
+- `modal/`
+  - 全局 modal 基座的命令层和状态层
+  - 只维护 stack、phase 和 dismiss 语义
 - `toast/`
   - 全局 `Top Toast` 的命令层和状态层
   - 不包含 React 视图

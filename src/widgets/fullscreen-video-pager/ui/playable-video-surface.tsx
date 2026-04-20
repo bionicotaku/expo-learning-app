@@ -18,7 +18,7 @@ function PlayableVideoSurfaceComponent({
   video,
   shouldPlay,
 }: PlayableVideoSurfaceProps) {
-  const player = useVideoPlayer(video.uri, (instance) => {
+  const player = useVideoPlayer(video.videoUrl, (instance) => {
     instance.loop = true;
     instance.muted = false;
   });
@@ -40,7 +40,7 @@ function PlayableVideoSurfaceComponent({
   }, [player, shouldPlay, status]);
 
   const handleRetry = async () => {
-    await player.replaceAsync(video.uri);
+    await player.replaceAsync(video.videoUrl);
 
     if (shouldPlay) {
       player.play();
@@ -131,17 +131,17 @@ function arePlayableVideoSurfaceComponentPropsEqual(
   nextProps: PlayableVideoSurfaceProps
 ): boolean {
   const previousRenderProps: PlayableVideoSurfaceRenderProps = {
-    videoId: previousProps.video.id,
+    videoId: previousProps.video.videoId,
     shouldPlay: previousProps.shouldPlay,
   };
   const nextRenderProps: PlayableVideoSurfaceRenderProps = {
-    videoId: nextProps.video.id,
+    videoId: nextProps.video.videoId,
     shouldPlay: nextProps.shouldPlay,
   };
 
   return (
     arePlayableVideoSurfacePropsEqual(previousRenderProps, nextRenderProps) &&
-    previousProps.video.uri === nextProps.video.uri
+    previousProps.video.videoUrl === nextProps.video.videoUrl
   );
 }
 

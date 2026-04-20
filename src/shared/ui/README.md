@@ -14,6 +14,10 @@
   - `ToastHost`
   - 应用级全局 top toast 视图实现
   - 独立于 `Editorial Paper`，不作为页面原语使用
+- `modal/`
+  - `ModalHost`
+  - 应用级全局 modal overlay 视图实现
+  - 当前只在 native 端挂载
 - `startup/`
   - `LaunchScreen`
   - 应用启动阶段的正式 JS 过渡屏
@@ -31,5 +35,6 @@
 
 - `toast/` 是全局 overlay UI，不是页面 primitive
 - `toast/` 不并入 `editorial-paper/`
+- `modal/` 与 `toast/` 同级，也不并入 `editorial-paper/`
 - Fullscreen Video 内部的局部 HUD 也不进入 `toast/`
 - `startup/` 是 app 级启动视觉，不是页面模板

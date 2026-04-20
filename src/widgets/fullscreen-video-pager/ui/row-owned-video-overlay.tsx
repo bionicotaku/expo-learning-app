@@ -5,16 +5,16 @@ import { VideoOverlayActionRail } from './video-overlay-action-rail';
 
 type RowOwnedVideoOverlayProps = {
   bottomInset: number;
+  description: string;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   title: string;
-  subtitle: string;
 };
 
 export function RowOwnedVideoOverlay({
   bottomInset,
+  description,
   onActionPress,
   title,
-  subtitle,
 }: RowOwnedVideoOverlayProps) {
   return (
     <View
@@ -81,7 +81,7 @@ export function RowOwnedVideoOverlay({
               maxWidth: 248,
             }}
           >
-            {subtitle}
+            {description}
           </Text>
         </View>
       </View>

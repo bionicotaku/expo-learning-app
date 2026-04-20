@@ -7,22 +7,19 @@ import {
 } from '@/features/feed-session';
 import {
   findFeedItemIndex,
-  flattenFeedPages,
-  shouldPrefetchNextPage,
-  useFeedInfiniteQuery,
-} from '@/features/feed-pagination';
+  useFeedSource,
+} from '@/features/feed-source';
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
+
+const trailingRequestThreshold = 3;
 
 export function VideoDetailPage() {
   const { videoId } = useLocalSearchParams<{ videoId?: string | string[] }>();
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isPending,
-  } = useFeedInfiniteQuery();
-  const items = useMemo(() => flattenFeedPages(data), [data]);
+    isInitialLoading,
+    items,
+    requestMore,
+  } = useFeedSource();
   const normalizedVideoId =
     typeof videoId === 'string' ? videoId : Array.isArray(videoId) ? videoId[0] : null;
   const targetIndex = useMemo(
@@ -30,6 +27,7 @@ export function VideoDetailPage() {
     [items, normalizedVideoId]
   );
   const latestActiveItemIdRef = useRef<string | null>(null);
+  const lastRequestedTailVideoIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -37,33 +35,32 @@ export function VideoDetailPage() {
     };
   }, []);
 
-  const handleActiveItemChange = useCallback(
-    (itemId: string, index: number) => {
-      latestActiveItemIdRef.current = itemId;
+  const handleActiveItemChange = useCallback((itemId: string, index: number) => {
+    latestActiveItemIdRef.current = itemId;
 
-      if (
-        !shouldPrefetchNextPage({
-          activeIndex: index,
-          loadedCount: items.length,
-          isFetchingNextPage,
-          hasNextPage: hasNextPage ?? false,
-        })
-      ) {
-        return;
-      }
+    const tailVideoId = items[items.length - 1]?.videoId ?? null;
+    if (!tailVideoId) {
+      return;
+    }
 
-      void fetchNextPage();
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage, items.length]
-  );
+    if (index < Math.max(0, items.length - trailingRequestThreshold)) {
+      return;
+    }
+
+    if (tailVideoId === lastRequestedTailVideoIdRef.current) {
+      return;
+    }
+
+    lastRequestedTailVideoIdRef.current = tailVideoId;
+    void requestMore();
+  }, [items, requestMore]);
 
   return (
     <>
       <StatusBar style="light" />
       <FullscreenVideoPager
         initialIndex={targetIndex >= 0 ? targetIndex : 0}
-        isFetchingNextPage={isFetchingNextPage}
-        isInitialLoading={isPending && items.length === 0}
+        isInitialLoading={isInitialLoading}
         items={items}
         onActiveItemChange={handleActiveItemChange}
       />

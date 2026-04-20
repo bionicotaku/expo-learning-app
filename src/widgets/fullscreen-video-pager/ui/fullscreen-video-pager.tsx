@@ -28,7 +28,6 @@ const playbackFeedbackDurationMs = 700;
 
 export type FullscreenVideoPagerProps = {
   initialIndex: number;
-  isFetchingNextPage: boolean;
   isInitialLoading: boolean;
   items: FeedItem[];
   onActiveItemChange: (itemId: string, index: number) => void;
@@ -36,7 +35,6 @@ export type FullscreenVideoPagerProps = {
 
 export function FullscreenVideoPager({
   initialIndex,
-  isFetchingNextPage,
   isInitialLoading,
   items,
   onActiveItemChange,
@@ -60,7 +58,6 @@ export function FullscreenVideoPager({
   const [playbackFeedbackLabel, setPlaybackFeedbackLabel] = useState<string | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
-    isFetchingNextPage,
     isInitialLoading,
   });
   const initialPosition = useMemo(
@@ -74,7 +71,7 @@ export function FullscreenVideoPager({
     [initialIndex, items.length]
   );
   const activeItem = activeIndex === null ? null : (items[activeIndex] ?? null);
-  const activeItemId = activeItem?.id ?? null;
+  const activeItemId = activeItem?.videoId ?? null;
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
@@ -146,7 +143,7 @@ export function FullscreenVideoPager({
       return;
     }
 
-    commitActiveVideo(nextItem.id, initialPosition.targetIndex);
+    commitActiveVideo(nextItem.videoId, initialPosition.targetIndex);
   }, [commitActiveVideo, initialPosition.targetIndex, items]);
 
   const handleTogglePlayback = useCallback(() => {
@@ -214,7 +211,7 @@ export function FullscreenVideoPager({
         <FullscreenVideoItem
           bottomInset={insets.bottom}
           height={height}
-          isActive={item.id === activeItemId}
+          isActive={item.videoId === activeItemId}
           onTogglePlayback={handleTogglePlayback}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
           shouldPlay={shouldPlay}
@@ -239,7 +236,7 @@ export function FullscreenVideoPager({
       <FlatList
         ref={listRef}
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.videoId}
         renderItem={renderItem}
         // Fullscreen paging relies on exact viewport-sized items. Automatic
         // content insets shift the initial offset and break first-entry snap.
@@ -263,17 +260,14 @@ export function FullscreenVideoPager({
         onViewableItemsChanged={handleViewableItemsChanged}
       />
 
-      {loadingState.showInitialBottomLoader || loadingState.showPaginationBottomLoader ? (
+      {loadingState.showInitialBottomLoader ? (
         <View
           pointerEvents="none"
           style={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom:
-              activeItem && loadingState.showPaginationBottomLoader
-                ? insets.bottom + 118
-                : insets.bottom + 42,
+            bottom: insets.bottom + 42,
             alignItems: 'center',
           }}
         >
@@ -290,7 +284,7 @@ export function FullscreenVideoPager({
           >
             <ActivityIndicator color="#FFFFFF" size="small" />
             <Text selectable style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
-              {loadingState.showInitialBottomLoader ? 'Loading video feed...' : 'Loading next page...'}
+              Loading video feed...
             </Text>
           </View>
         </View>

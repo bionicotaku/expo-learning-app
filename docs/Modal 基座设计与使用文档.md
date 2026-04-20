@@ -151,7 +151,7 @@ Modal 基座必须拆成两层：
 - `expo-glass-effect`
 - `react-native-safe-area-context`
 - `react-native-gesture-handler`
-- React Native `Animated`
+- `react-native-reanimated`
 
 也就是说：
 
@@ -309,6 +309,7 @@ V1 要提供以下能力：
 - 支持栈式展示多个 modal
 - 只允许顶层 modal 响应 backdrop 和 gesture
 - 关闭顶层后展示下一层
+- 当前只在 native 端挂载 host，web 不启用
 
 #### 呈现类型
 
@@ -355,6 +356,7 @@ V1 要提供以下能力：
 - 不做全局字符串业务注册表
 - 不做复杂 stacked card 联动动画
 - 不做 sheet 拖拽时的内容 stretch / rubber band 特效
+- 不做 Expo Web fallback
 
 ---
 
@@ -440,7 +442,8 @@ type ModalDescriptor = {
   dismissOnBackdropPress?: boolean;
   render: (context: {
     dismiss: () => void;
-    dismissAll: () => void;
+    dismissTop: () => void;
+    clear: () => void;
     isTopMost: boolean;
   }) => React.ReactNode;
 };
@@ -746,10 +749,10 @@ src/features/subtitle-explanation/
 
 #### `shared/ui/modal`
 
-- host 只渲染当前 stack
-- 非顶层 modal 不接收交互
-- dialog / sheet 使用正确布局
-- exit 动画结束后执行 remove
+- host 的挂载接线和 topmost 派生逻辑
+- sheet 关闭阈值和回弹判定
+- dialog / sheet 的纯布局计算
+- `_layout.tsx` 已挂载 `ModalHost`
 
 #### 手势
 
@@ -764,6 +767,7 @@ src/features/subtitle-explanation/
 - Promise 返回链路测试
 - detent 切换测试
 - 多层 stack 联动过渡视觉测试
+- RN 组件渲染 harness
 
 ---
 
@@ -806,4 +810,3 @@ src/features/subtitle-explanation/
 - 保留未来业务交互扩展空间
 - 不继承旧项目的架构问题
 - 与当前仓库的 FSD、Toast 分层、Editorial Paper 主题保持一致
-

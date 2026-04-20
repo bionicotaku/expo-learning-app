@@ -1,16 +1,16 @@
 export type FeedItem = {
-  id: string;
-  kind: 'feed-item';
-  assetId: string;
-  uri: string;
+  videoId: string;
   title: string;
-  subtitle: string;
-  page: number;
-  indexInFeed: number;
+  description: string;
+  videoUrl: string;
+  coverImageUrl?: string | null;
+  durationSeconds: number;
+  viewCount: number;
+  tags: string[];
+  isLiked: boolean;
+  isFavorited: boolean;
 };
 
-export type FeedPageResult = {
+export type FeedResponse = {
   items: FeedItem[];
-  nextOffset: number;
-  hasMore: boolean;
 };

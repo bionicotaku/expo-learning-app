@@ -1,16 +1,10 @@
 import type { FeedItem } from '@/entities/feed';
-import type { MediaFeatureCardProps, MediaFeatureCardTone } from '@/widgets/media-feature-card';
+import type {
+  MediaFeatureCardFallbackTone,
+  MediaFeatureCardProps,
+} from '@/widgets/media-feature-card';
 
-const cardTags = [
-  'PHRASAL VERB',
-  'LISTENING CUE',
-  'ACCENT NOTE',
-  'COMMON PATTERN',
-  'CASUAL EXPRESSION',
-  'USEFUL LINE',
-] as const;
-
-const cardTones: readonly MediaFeatureCardTone[] = [
+const fallbackTones: readonly MediaFeatureCardFallbackTone[] = [
   'peach',
   'butter',
   'sage',
@@ -19,30 +13,50 @@ const cardTones: readonly MediaFeatureCardTone[] = [
   'rose',
 ] as const;
 
-function buildCardDuration(index: number) {
-  const minutes = 1 + (index % 3);
-  const seconds = 12 + ((index * 7) % 42);
+function resolveStableIndex(videoId: string) {
+  const trailingNumber = videoId.match(/(\d+)$/)?.[1];
+
+  if (trailingNumber) {
+    return Number.parseInt(trailingNumber, 10) - 1;
+  }
+
+  let hash = 0;
+
+  for (let index = 0; index < videoId.length; index += 1) {
+    hash = (hash * 31 + videoId.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
+}
+
+function formatDuration(durationSeconds: number) {
+  const totalSeconds = Math.max(0, Math.floor(durationSeconds));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-function buildCardViews(index: number) {
-  return `${(7.8 + ((index * 4.9) % 18)).toFixed(1)}k`;
+function formatViewCount(viewCount: number) {
+  if (viewCount < 1000) {
+    return String(viewCount);
+  }
+
+  return `${(Math.round(viewCount / 100) / 10).toFixed(1)}k`;
 }
 
-function buildCardTag(index: number) {
-  return cardTags[index % cardTags.length];
-}
-
-function buildCardTone(index: number) {
-  return cardTones[index % cardTones.length];
+function resolveFallbackTone(videoId: string): MediaFeatureCardFallbackTone {
+  const stableIndex = resolveStableIndex(videoId);
+  return fallbackTones[((stableIndex % fallbackTones.length) + fallbackTones.length) % fallbackTones.length];
 }
 
 export function createFeedMediaFeatureCardProps(item: FeedItem): MediaFeatureCardProps {
   return {
     title: item.title,
-    statsLabel: `${buildCardViews(item.indexInFeed)} · ${buildCardDuration(item.indexInFeed)}`,
-    tagLabel: buildCardTag(item.indexInFeed),
-    tone: buildCardTone(item.indexInFeed),
+    statsLabel: `${formatViewCount(item.viewCount)} · ${formatDuration(item.durationSeconds)}`,
+    tagLabel: item.tags[0] ?? 'ENGLISH STUDY',
+    coverImageUrl: item.coverImageUrl ?? null,
+    fallbackTone: resolveFallbackTone(item.videoId),
     accessibilityLabel: `Open video: ${item.title}`,
   };
 }

@@ -7,10 +7,11 @@
 - 从 route param 读取 `videoId`
 - 依赖根 `Stack` 上 `video/[videoId]` 的 `dangerouslySingular` 配置，确保 fullscreen video 只复用一个栈实例
 - 复用共享 feed source 找到进入位置
-- 初次进入时也通过 pager 列表自身的 loading item 等待第一页，不额外渲染全屏 loading 页
+- 初次进入时通过 pager 自身的 loading item 等待共享 source 返回
 - 通过 `onActiveItemChange(itemId, index)` 接收 pager 当前 active video 的变化
-- 根据 pager 上报的 active index 触发下一页预取
+- 当 active video 进入当前已加载序列的最后 3 条时请求下一批
 - 在离开页面时把最后一次上报的 `activeItemId` 写入 `pendingRestoreVideoId`
+- route `videoId` 找不到匹配项时回退到第一个视频
 
 边界约束：
 

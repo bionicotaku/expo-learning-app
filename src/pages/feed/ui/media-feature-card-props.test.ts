@@ -5,14 +5,16 @@ import { createFeedMediaFeatureCardProps } from './media-feature-card-props';
 
 function createFeedItem(overrides: Partial<FeedItem> = {}): FeedItem {
   return {
-    id: 'feed-1',
-    kind: 'feed-item',
-    assetId: 'asset-1',
-    uri: 'https://example.com/video.mp4',
+    videoId: 'the-office-health-care-clip-1',
     title: 'A useful phrase that still sounds natural in daily conversation.',
-    subtitle: 'subtitle',
-    page: 1,
-    indexInFeed: 0,
+    description: 'subtitle',
+    videoUrl: 'https://example.com/video.m3u8',
+    coverImageUrl: 'https://example.com/cover.webp',
+    durationSeconds: 72,
+    viewCount: 7800,
+    tags: ['PHRASAL VERB', 'LISTENING CUE'],
+    isLiked: false,
+    isFavorited: true,
     ...overrides,
   };
 }
@@ -22,18 +24,30 @@ describe('createFeedMediaFeatureCardProps', () => {
     expect(createFeedMediaFeatureCardProps(createFeedItem())).toEqual({
       accessibilityLabel:
         'Open video: A useful phrase that still sounds natural in daily conversation.',
+      coverImageUrl: 'https://example.com/cover.webp',
+      fallbackTone: 'peach',
       statsLabel: '7.8k · 1:12',
       tagLabel: 'PHRASAL VERB',
       title: 'A useful phrase that still sounds natural in daily conversation.',
-      tone: 'peach',
     });
   });
 
-  it('cycles the visual tone and tag based on the feed index', () => {
-    expect(createFeedMediaFeatureCardProps(createFeedItem({ indexInFeed: 4 }))).toMatchObject({
-      statsLabel: '9.4k · 2:40',
-      tagLabel: 'CASUAL EXPRESSION',
-      tone: 'sky',
+  it('falls back to a stable tone and default tag when the feed item has no cover or tags', () => {
+    expect(
+      createFeedMediaFeatureCardProps(
+        createFeedItem({
+          videoId: 'the-office-health-care-clip-4',
+          coverImageUrl: null,
+          tags: [],
+          viewCount: 12450,
+          durationSeconds: 160,
+        })
+      )
+    ).toMatchObject({
+      coverImageUrl: null,
+      fallbackTone: 'lavender',
+      statsLabel: '12.5k · 2:40',
+      tagLabel: 'ENGLISH STUDY',
     });
   });
 });
