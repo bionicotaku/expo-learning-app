@@ -16,7 +16,12 @@
 - 可点击字幕 overlay 的交互与布局
 - transcript 与播放器时间同步策略
 
-这些内容后续再分别补文档；本轮先把 API 与 mock 真值收稳。
+这些内容后续由独立文档补充；本轮先把 API 与 mock 真值收稳。
+
+相关文档：
+
+- Fullscreen 场景下的 source/read/cache 设计见 [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
+- 视频真值与 runtime 分层见 [Video 真值与 Runtime 设计规范](./Video%20真值与%20Runtime%20设计规范.md)
 
 ## 2. 适用范围与优先级
 
@@ -24,6 +29,7 @@
 
 - `src/entities/transcript`
 - `src/shared/api`
+- `features/transcript-source` 的 entity 边界依赖
 - 当前 transcript mock 资源组织方式
 - 未来真实后端与当前 mock repository 的 transcript 契约对齐
 

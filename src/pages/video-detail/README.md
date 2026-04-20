@@ -2,6 +2,12 @@
 
 `pages/video-detail` 是 Fullscreen Video 页的页面装配层。
 
+相关设计文档：
+
+- [Fullscreen Transcript Source设计规范](../../../docs/Fullscreen%20Transcript%20Source设计规范.md)
+- [Fullscreen Video Overlay架构设计规范](../../../docs/Fullscreen%20Video%20Overlay架构设计规范.md)
+- [Video 真值与 Runtime 设计规范](../../../docs/Video%20真值与%20Runtime%20设计规范.md)
+
 当前职责：
 
 - 从 route param 读取 `videoId`
@@ -10,6 +16,7 @@
 - 给 fullscreen 传 canonical `VideoListItem[]`
 - 初次进入时通过 pager 自身的 loading item 等待共享 source 返回
 - 通过 `onActiveItemChange(itemId, index)` 接收 pager 当前 active video 的变化
+- 负责把当前 active `videoId` / `index` 喂给 transcript source；row 与 pager 不直接承担 transcript 读取
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
 - 在离开页面时把最后一次上报的 `activeItemId` 写入 `pendingRestoreVideoId`
 - route `videoId` 找不到匹配项时回退到第一个视频
@@ -20,6 +27,7 @@
 - page 不维护 `basePausedByUser`、`transientHoldState`、HUD 或任何 row 级交互状态
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
+- page 不直接实现 transcript query cache；这层属于 `features/transcript-source`
 - page 不直接定义 runtime store 结构
 - page 不持有跨页面长期状态
 - page 不定义 `dangerouslySingular`；route 单实例约束属于 `app/_layout.tsx`

@@ -26,6 +26,8 @@
 相关文档：
 
 - [Feed API设计](./Feed%20API设计.md)
+- [Transcript API设计](./Transcript%20API设计.md)
+- [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
 - [Feed与Fullscreen Video页面设计逻辑](./Feed%E4%B8%8EFullscreen%20Video%E9%A1%B5%E9%9D%A2%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91.md)
 - [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.md)
 - [项目规范](./项目规范.md)
@@ -49,6 +51,7 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 8. 当前状态层固定采用：
    - `React Query` 管 source/server state cache
    - `Zustand` 管 client/runtime state store
+9. transcript 属于按 `videoId` 键控的 interactive-read 子资源，应走 React Query cache，而不是 `video-runtime`。
 
 一句话收口：
 
@@ -114,6 +117,10 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 - `isFavorited`
 - 未来的 `lastWatchPosition`
 - 未来的 `isMuted`
+
+当前明确不属于 runtime override 的典型远程读资源包括：
+
+- transcript
 
 ### 3.5 `Effective video state`
 

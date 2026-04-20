@@ -10,8 +10,11 @@ describe('video detail page source', () => {
     );
 
     expect(source).toContain('requestMore');
+    expect(source).toContain('useFullscreenTranscriptSource');
     expect(source).toContain('items={canonicalItems}');
     expect(source).not.toContain('useVideoRuntimeStore');
+    expect(source).not.toContain('activeTranscript={');
+    expect(source).not.toContain('activeTranscriptStatus={');
     expect(source).not.toContain('handleActionPress');
     expect(source).not.toContain('onActionPress=');
     expect(source).not.toContain('fetchNextPage');

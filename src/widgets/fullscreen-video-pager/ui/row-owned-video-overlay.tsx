@@ -4,6 +4,9 @@ import { Text, View } from 'react-native';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import { VideoOverlayActionRail } from './video-overlay-action-rail';
 
+const contentBottomOffset = 42;
+const contentTextGap = 4;
+
 type RowOwnedVideoOverlayProps = {
   bottomInset: number;
   description: string;
@@ -53,14 +56,15 @@ function RowOwnedVideoOverlayComponent({
             position: 'absolute',
             left: 22,
             right: 92,
-            bottom: bottomInset + 58,
+            bottom: bottomInset + contentBottomOffset,
+            gap: contentTextGap,
           }}
         >
           <Text
             selectable
             style={{
               fontSize: 15,
-              lineHeight: 22,
+              lineHeight: 18,
               letterSpacing: -0.08,
               fontWeight: '700',
               color: 'rgba(251,247,238,0.97)',
@@ -68,7 +72,6 @@ function RowOwnedVideoOverlayComponent({
               textShadowOffset: { width: 1, height: 1 },
               textShadowRadius: 3,
               maxWidth: 260,
-              marginBottom: 12,
             }}
             numberOfLines={2}
           >
@@ -78,7 +81,7 @@ function RowOwnedVideoOverlayComponent({
             selectable
             style={{
               fontSize: 13.5,
-              lineHeight: 21,
+              lineHeight: 16,
               color: 'rgba(251,247,238,0.9)',
               textShadowColor: 'rgba(17,13,10,0.24)',
               textShadowOffset: { width: 1, height: 1 },
