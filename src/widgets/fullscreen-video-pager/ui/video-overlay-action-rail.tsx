@@ -52,13 +52,7 @@ function VideoOverlayActionRailComponent({
           }
           key={item.id}
           item={item}
-          onPress={
-            onActionPress
-              ? () => {
-                  onActionPress(item);
-                }
-              : undefined
-          }
+          onPress={onActionPress}
         />
       ))}
     </View>

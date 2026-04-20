@@ -6,6 +6,7 @@ import {
   type VideoListItem,
 } from '@/entities/video';
 import { useVideoRuntimeStore } from '@/features/video-runtime';
+import { batchSourceHandoff } from './batch-source-handoff';
 
 export const FEED_QUERY_KEY = ['feed', 'main'] as const;
 
@@ -39,10 +40,8 @@ function mapFeedItemsToVideoListItems(items: FeedItem[]) {
   return items.map(mapFeedItemToVideoListItem);
 }
 
-function acceptFetchedSourceTruth(items: FeedItem[]) {
-  useVideoRuntimeStore
-    .getState()
-    .acceptSourceTruth(items.map((item) => item.videoId));
+function getSourceVideoIds(items: FeedItem[]) {
+  return items.map((item) => item.videoId);
 }
 
 function createFeedSourceSnapshot(items: FeedItem[]): FeedSourceSnapshot {
@@ -84,13 +83,16 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
 
     try {
       const response = await repository.fetchFeed();
+      const videoIds = getSourceVideoIds(response.items);
 
-      setFeedSourceSnapshot(queryClient, (snapshot) => ({
-        items: mergeFeedSourceItems(snapshot.items, response.items),
-        isExtending: false,
-        isRefreshing: false,
-      }));
-      acceptFetchedSourceTruth(response.items);
+      batchSourceHandoff(() => {
+        setFeedSourceSnapshot(queryClient, (snapshot) => ({
+          items: mergeFeedSourceItems(snapshot.items, response.items),
+          isExtending: false,
+          isRefreshing: false,
+        }));
+        useVideoRuntimeStore.getState().acceptFetchedIds('feed', videoIds);
+      });
     } catch (error) {
       setFeedSourceSnapshot(queryClient, (snapshot) => ({
         ...snapshot,
@@ -132,8 +134,12 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
           try {
             const response = await repository.fetchFeed();
             const snapshot = createFeedSourceSnapshot(response.items);
-            queryClient.setQueryData<FeedSourceSnapshot>(FEED_QUERY_KEY, snapshot);
-            acceptFetchedSourceTruth(response.items);
+            const videoIds = getSourceVideoIds(response.items);
+
+            batchSourceHandoff(() => {
+              queryClient.setQueryData<FeedSourceSnapshot>(FEED_QUERY_KEY, snapshot);
+              useVideoRuntimeStore.getState().replaceSourceSnapshot('feed', videoIds);
+            });
           } catch (error) {
             setFeedSourceSnapshot(queryClient, (snapshot) => ({
               ...snapshot,
@@ -161,7 +167,9 @@ const feedSourceController = createFeedSourceController({ fetchFeed });
 
 export async function fetchInitialFeedSourceSnapshot() {
   const response = await fetchFeed();
-  acceptFetchedSourceTruth(response.items);
+  useVideoRuntimeStore
+    .getState()
+    .replaceSourceSnapshot('feed', getSourceVideoIds(response.items));
   return createFeedSourceSnapshot(response.items);
 }
 

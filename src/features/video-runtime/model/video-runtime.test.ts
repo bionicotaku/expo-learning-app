@@ -153,7 +153,58 @@ describe('video runtime store', () => {
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({});
   });
 
-  it('drops runtime overrides for fetched video ids when source truth is accepted again', () => {
+  it('accepts fetched ids into source membership and drops overrides for those ids', () => {
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
+      {
+        isLiked: true,
+      },
+      {
+        isLiked: false,
+        isFavorited: false,
+      }
+    );
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-3',
+      {
+        isFavorited: true,
+      },
+      {
+        isLiked: false,
+        isFavorited: false,
+      }
+    );
+
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('feed', ['the-office-health-care-video-1', 'the-office-health-care-video-2']);
+
+    expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-3': {
+        isFavorited: true,
+      },
+    });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-1': true,
+        'the-office-health-care-video-2': true,
+      },
+      history: {},
+    });
+  });
+
+  it('replaces a source snapshot, prunes feed-only orphan overrides, and keeps ids still owned by another source', () => {
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('feed', [
+        'the-office-health-care-video-1',
+        'the-office-health-care-video-2',
+        'the-office-health-care-video-3',
+      ]);
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('history', ['the-office-health-care-video-2']);
+
     useVideoRuntimeStore.getState().setFlags(
       'the-office-health-care-video-1',
       {
@@ -174,14 +225,61 @@ describe('video runtime store', () => {
         isFavorited: false,
       }
     );
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-4',
+      {
+        isLiked: true,
+      },
+      {
+        isLiked: false,
+        isFavorited: false,
+      }
+    );
 
     useVideoRuntimeStore
       .getState()
-      .acceptSourceTruth(['the-office-health-care-video-1']);
+      .replaceSourceSnapshot('feed', ['the-office-health-care-video-3']);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
       'the-office-health-care-video-2': {
         isFavorited: true,
+      },
+      'the-office-health-care-video-4': {
+        isLiked: true,
+      },
+    });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-3': true,
+      },
+      history: {
+        'the-office-health-care-video-2': true,
+      },
+    });
+  });
+
+  it('clearAll removes both runtime overrides and source membership', () => {
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('feed', ['the-office-health-care-video-1']);
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
+      {
+        isLiked: true,
+      },
+      {
+        isLiked: false,
+        isFavorited: false,
+      }
+    );
+
+    useVideoRuntimeStore.getState().clearAll();
+
+    expect(useVideoRuntimeStore.getState()).toMatchObject({
+      overridesByVideoId: {},
+      sourceVideoIds: {
+        feed: {},
+        history: {},
       },
     });
   });

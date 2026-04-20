@@ -12,7 +12,7 @@
   - `requestMore / refresh` controller
   - append 去重和单飞控制
   - `FeedItem[] -> VideoListItem[]` 映射出口
-  - 成功 fetch 后让返回 batch 的 `videoId` 重新以 source truth 为准
+  - 成功 fetch 后通过 `video-runtime` 执行 source-aware handoff
 
 边界约束：
 
@@ -36,5 +36,6 @@
 当前与 `video-runtime` 的边界固定为：
 
 - 本地点击 `like / favorite` 时，runtime override 可以先覆盖当前 canonical 值
-- 但只要 `feed` 成功返回新的 batch，这批返回里的 `videoId` 就立即重新以 source truth 为准
-- 也就是说，`feed-source` 不拥有 runtime store，但它负责在 fetch 成功边界上让对应 runtime override 失效
+- `feed` full refresh / initial fetch 成功后，调用 `replaceSourceSnapshot('feed', videoIds)`
+- `feed` append / requestMore 成功后，调用 `acceptFetchedIds('feed', videoIds)`
+- 也就是说，`feed-source` 不拥有 runtime store，但它负责在 fetch 成功边界上把 feed 的 source truth 重新接管回来

@@ -71,6 +71,13 @@ describe('feed source helpers', () => {
         isFavorited: true,
       },
     });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-1': true,
+        'the-office-health-care-video-2': true,
+      },
+      history: {},
+    });
 
     fetchFeedSpy.mockRestore();
   });
@@ -190,7 +197,7 @@ describe('feed source helpers', () => {
     });
   });
 
-  it('lets fetched source truth override local runtime overrides for the returned video ids', async () => {
+  it('lets append union returned ids into feed membership and replace local runtime overrides for those ids', async () => {
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
         fetchFeed: () => Promise<{ items: FeedItem[] }>;
@@ -199,9 +206,14 @@ describe('feed source helpers', () => {
         refresh: (queryClient: QueryClient) => Promise<void>;
       };
     }).createFeedSourceController({
-      fetchFeed: vi.fn().mockResolvedValue({
-        items: [createFeedItem(0), createFeedItem(1)],
-      }),
+      fetchFeed: vi
+        .fn()
+        .mockResolvedValueOnce({
+          items: [createFeedItem(0), createFeedItem(1)],
+        })
+        .mockResolvedValueOnce({
+          items: [createFeedItem(0)],
+        }),
     });
 
     useVideoRuntimeStore.getState().setFlags(
@@ -222,9 +234,24 @@ describe('feed source helpers', () => {
         isFavorited: true,
       },
     });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-1': true,
+        'the-office-health-care-video-2': true,
+      },
+      history: {},
+    });
 
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('history', ['the-office-health-care-video-2']);
     useVideoRuntimeStore.getState().setFlags(
       'the-office-health-care-video-2',
+      { isLiked: true },
+      { isLiked: false, isFavorited: false }
+    );
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
@@ -232,9 +259,55 @@ describe('feed source helpers', () => {
     await controller.refresh(queryClient);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-2': {
+        isLiked: true,
+      },
       'the-office-health-care-video-3': {
         isFavorited: true,
       },
+    });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-1': true,
+      },
+      history: {
+        'the-office-health-care-video-2': true,
+      },
+    });
+  });
+
+  it('does not mutate runtime override or membership when a feed request fails', async () => {
+    const controller = (feedSource as typeof feedSource & {
+      createFeedSourceController: (repository: {
+        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+      }) => {
+        requestMore: (queryClient: QueryClient) => Promise<void>;
+      };
+    }).createFeedSourceController({
+      fetchFeed: vi.fn().mockRejectedValue(new Error('network failed')),
+    });
+
+    useVideoRuntimeStore
+      .getState()
+      .acceptFetchedIds('feed', ['the-office-health-care-video-1']);
+    useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-1',
+      { isLiked: true },
+      { isLiked: false, isFavorited: false }
+    );
+
+    await expect(controller.requestMore(queryClient)).rejects.toThrow('network failed');
+
+    expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-1': {
+        isLiked: true,
+      },
+    });
+    expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
+      feed: {
+        'the-office-health-care-video-1': true,
+      },
+      history: {},
     });
   });
 });

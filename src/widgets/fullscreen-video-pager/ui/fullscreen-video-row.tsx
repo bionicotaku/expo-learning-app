@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import type { VideoListItem } from '@/entities/video';
@@ -125,7 +125,7 @@ function FullscreenVideoRowComponent({
     }, rowHudFadeOutDurationMs);
   }, [pauseCenterReserved, showCenteredPause]);
 
-  const handleActionPress = (item: FullscreenVideoOverlayActionItem) => {
+  const handleActionPress = useCallback((item: FullscreenVideoOverlayActionItem) => {
     if (item.id === 'like') {
       toggleLiked();
       return;
@@ -137,7 +137,7 @@ function FullscreenVideoRowComponent({
     }
 
     onActionPress?.(video.videoId, item);
-  };
+  }, [onActionPress, toggleFavorited, toggleLiked, video.videoId]);
 
   return (
     <View

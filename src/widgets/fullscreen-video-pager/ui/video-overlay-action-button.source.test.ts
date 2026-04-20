@@ -12,6 +12,8 @@ describe('video overlay action button source', () => {
     expect(source).toContain('isActive');
     expect(source).toContain('activeTintColor');
     expect(source).toContain('const resolvedTintColor');
+    expect(source).toContain('const handlePress = useCallback(');
+    expect(source).toContain('onPress?.(item);');
     expect(source).toContain('AdaptiveGlass');
   });
 });

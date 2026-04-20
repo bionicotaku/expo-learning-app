@@ -1,5 +1,5 @@
 import { SymbolView } from 'expo-symbols';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { AdaptiveGlass } from '@/shared/ui/editorial-paper';
@@ -9,7 +9,7 @@ type VideoOverlayActionButtonProps = {
   activeTintColor?: string;
   isActive?: boolean;
   item: FullscreenVideoOverlayActionItem;
-  onPress?: () => void;
+  onPress?: (item: FullscreenVideoOverlayActionItem) => void;
   size?: number;
 };
 
@@ -23,15 +23,16 @@ function VideoOverlayActionButtonComponent({
   size = 54,
 }: VideoOverlayActionButtonProps) {
   const resolvedTintColor = isActive ? (activeTintColor ?? iconTint) : iconTint;
+  const handlePress = useCallback(() => {
+    onPress?.(item);
+  }, [item, onPress]);
 
   return (
     <Pressable
       accessibilityLabel={item.accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={{ disabled: onPress === undefined }}
-      onPress={() => {
-        onPress?.();
-      }}
+      onPress={handlePress}
       style={({ pressed }) => ({
         opacity: pressed && onPress ? 0.92 : 1,
         transform: [{ scale: pressed && onPress ? 0.97 : 1 }],

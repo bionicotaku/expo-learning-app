@@ -23,6 +23,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('resolveRowHudCenterOwner');
     expect(source).toContain('shouldReserveCenterForPause');
     expect(source).toContain('useVideoRuntimeState');
+    expect(source).toContain('const handleActionPress = useCallback(');
     expect(source).toContain("if (item.id === 'like')");
     expect(source).toContain("if (item.id === 'favorite')");
     expect(source).toContain('onActionPress?.(video.videoId, item);');

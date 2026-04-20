@@ -15,5 +15,8 @@ describe('video overlay action rail source', () => {
     expect(source).toContain("item.id === 'favorite'");
     expect(source).toContain('isActive={');
     expect(source).toContain('activeTintColor={');
+    expect(source).toContain('onPress={onActionPress}');
+    expect(source).not.toContain('() => {');
+    expect(source).not.toContain('onActionPress(item);');
   });
 });

@@ -23,6 +23,8 @@ export type {
   UseVideoRuntimeStateResult,
 } from './model/use-video-runtime-state';
 export type {
+  VideoRuntimeSource,
+  VideoSourceMembership,
   VideoRuntimeOverride,
   VideoRuntimeState,
 } from './model/video-runtime-store';
