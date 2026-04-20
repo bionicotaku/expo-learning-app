@@ -1,12 +1,17 @@
 import { memo } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
+import type {
+  FullscreenHoldZone,
+  FullscreenTapZone,
+} from '@/features/video-playback';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import {
   areFullscreenVideoItemRenderPropsEqual,
   type FullscreenVideoItemRenderProps,
 } from '../model/render-props';
+import { ActiveVideoGestureSurface } from './active-video-gesture-surface';
 import { PlayableVideoSurface } from './playable-video-surface';
 import { RowOwnedVideoOverlay } from './row-owned-video-overlay';
 
@@ -15,7 +20,12 @@ type FullscreenVideoItemProps = {
   height: number;
   isActive: boolean;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
-  onTogglePlayback: () => void;
+  onDoubleTap: (zone: FullscreenTapZone) => void;
+  onHoldEnd: () => void;
+  onHoldStart: (zone: FullscreenHoldZone) => void;
+  onSingleTap: () => void;
+  playbackRate: number;
+  registerActiveSeekBy?: ((seekBy: ((seconds: number) => boolean) | null) => void) | undefined;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
   video: FeedItem;
@@ -29,7 +39,12 @@ function FullscreenVideoItemComponent({
   bottomInset,
   isActive,
   onActionPress,
-  onTogglePlayback,
+  onDoubleTap,
+  onHoldEnd,
+  onHoldStart,
+  onSingleTap,
+  playbackRate,
+  registerActiveSeekBy,
   shouldUsePlayer,
   shouldPlay,
 }: FullscreenVideoItemProps) {
@@ -42,7 +57,12 @@ function FullscreenVideoItemComponent({
       }}
     >
       {shouldUsePlayer ? (
-        <PlayableVideoSurface video={video} shouldPlay={shouldPlay} />
+        <PlayableVideoSurface
+          playbackRate={playbackRate}
+          registerSeekBy={registerActiveSeekBy}
+          shouldPlay={shouldPlay}
+          video={video}
+        />
       ) : (
         <View
           style={{
@@ -52,16 +72,15 @@ function FullscreenVideoItemComponent({
         />
       )}
 
-      <Pressable
-        accessibilityLabel={shouldPlay ? 'Pause video' : 'Play video'}
-        accessibilityRole="button"
-        disabled={!isActive}
-        onPress={onTogglePlayback}
-        style={{
-          position: 'absolute',
-          inset: 0,
-        }}
-      />
+      {isActive ? (
+        <ActiveVideoGestureSurface
+          onDoubleTap={onDoubleTap}
+          onHoldEnd={onHoldEnd}
+          onHoldStart={onHoldStart}
+          onSingleTap={onSingleTap}
+          width={width}
+        />
+      ) : null}
 
       <RowOwnedVideoOverlay
         bottomInset={bottomInset}
@@ -82,6 +101,7 @@ function areFullscreenVideoItemComponentPropsEqual(
     width: previousProps.width,
     height: previousProps.height,
     isActive: previousProps.isActive,
+    playbackRate: previousProps.playbackRate,
     shouldUsePlayer: previousProps.shouldUsePlayer,
     shouldPlay: previousProps.shouldPlay,
   };
@@ -90,6 +110,7 @@ function areFullscreenVideoItemComponentPropsEqual(
     width: nextProps.width,
     height: nextProps.height,
     isActive: nextProps.isActive,
+    playbackRate: nextProps.playbackRate,
     shouldUsePlayer: nextProps.shouldUsePlayer,
     shouldPlay: nextProps.shouldPlay,
   };

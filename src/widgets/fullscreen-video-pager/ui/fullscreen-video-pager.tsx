@@ -11,15 +11,27 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FeedItem } from '@/entities/feed';
 import {
-  resolvePausedByUserAfterActiveChange,
+  createTransientHoldState,
+  isGestureLocked,
+  resolveBasePausedByUserAfterActiveChange,
+  resolveEffectivePlaybackState,
+  resolveTransientHoldStateAfterActiveChange,
   shouldMountPlayer,
-  shouldPlayVideo,
-  togglePlaybackPausedByUser,
+  toggleBasePlaybackPausedByUser,
+  type FullscreenHoldZone,
+  type FullscreenTapZone,
+  type FullscreenTransientHoldState,
 } from '@/features/video-playback';
 import { resolveActiveVideoChange } from '../model/active-video-change';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
-import { getPlaybackFeedbackLabel } from '../model/playback-feedback';
+import {
+  createPlaybackToggleFeedback,
+  createRateFeedback,
+  createSeekFeedback,
+  shouldAutoDismissPlaybackFeedback,
+  type FullscreenPlaybackFeedback,
+} from '../model/playback-feedback';
 import { FullscreenVideoItem } from './fullscreen-video-item';
 import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
 import { TopChromeOverlay } from './top-chrome-overlay';
@@ -45,7 +57,9 @@ export function FullscreenVideoPager({
   const playbackFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const pausedByUserRef = useRef(false);
+  const activePlayerSeekByRef = useRef<((seconds: number) => boolean) | null>(null);
+  const basePausedByUserRef = useRef(false);
+  const transientHoldStateRef = useRef<FullscreenTransientHoldState | null>(null);
   const activeSnapshotRef = useRef<{
     index: number | null;
     itemId: string | null;
@@ -54,8 +68,11 @@ export function FullscreenVideoPager({
     itemId: null,
   });
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [pausedByUser, setPausedByUser] = useState(false);
-  const [playbackFeedbackLabel, setPlaybackFeedbackLabel] = useState<string | null>(null);
+  const [basePausedByUser, setBasePausedByUser] = useState(false);
+  const [transientHoldState, setTransientHoldState] =
+    useState<FullscreenTransientHoldState | null>(null);
+  const [playbackFeedback, setPlaybackFeedback] =
+    useState<FullscreenPlaybackFeedback | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
     isInitialLoading,
@@ -76,6 +93,32 @@ export function FullscreenVideoPager({
     itemVisiblePercentThreshold: 80,
   });
 
+  const clearPlaybackFeedback = useCallback(() => {
+    if (playbackFeedbackTimeoutRef.current) {
+      clearTimeout(playbackFeedbackTimeoutRef.current);
+      playbackFeedbackTimeoutRef.current = null;
+    }
+
+    setPlaybackFeedback(null);
+  }, []);
+
+  const showPlaybackFeedback = useCallback((nextFeedback: FullscreenPlaybackFeedback) => {
+    if (playbackFeedbackTimeoutRef.current) {
+      clearTimeout(playbackFeedbackTimeoutRef.current);
+      playbackFeedbackTimeoutRef.current = null;
+    }
+
+    setPlaybackFeedback(nextFeedback);
+    if (!shouldAutoDismissPlaybackFeedback(nextFeedback)) {
+      return;
+    }
+
+    playbackFeedbackTimeoutRef.current = setTimeout(() => {
+      setPlaybackFeedback(null);
+      playbackFeedbackTimeoutRef.current = null;
+    }, playbackFeedbackDurationMs);
+  }, []);
+
   const commitActiveVideo = useCallback(
     (itemId: string, index: number) => {
       const currentSnapshot = activeSnapshotRef.current;
@@ -83,19 +126,22 @@ export function FullscreenVideoPager({
         return;
       }
 
-      const nextPausedByUser = resolvePausedByUserAfterActiveChange({
+      const nextBasePausedByUser = resolveBasePausedByUserAfterActiveChange({
         currentActiveIndex: currentSnapshot.index,
         nextActiveIndex: index,
-        pausedByUser: pausedByUserRef.current,
+        basePausedByUser: basePausedByUserRef.current,
+      });
+      const nextTransientHoldState = resolveTransientHoldStateAfterActiveChange({
+        currentActiveIndex: currentSnapshot.index,
+        nextActiveIndex: index,
+        transientHoldState: transientHoldStateRef.current,
       });
 
-      pausedByUserRef.current = nextPausedByUser;
-      setPausedByUser(nextPausedByUser);
-      if (playbackFeedbackTimeoutRef.current) {
-        clearTimeout(playbackFeedbackTimeoutRef.current);
-        playbackFeedbackTimeoutRef.current = null;
-      }
-      setPlaybackFeedbackLabel(null);
+      basePausedByUserRef.current = nextBasePausedByUser;
+      transientHoldStateRef.current = nextTransientHoldState;
+      setBasePausedByUser(nextBasePausedByUser);
+      setTransientHoldState(nextTransientHoldState);
+      clearPlaybackFeedback();
 
       activeSnapshotRef.current = {
         index,
@@ -104,7 +150,7 @@ export function FullscreenVideoPager({
       setActiveIndex(index);
       onActiveItemChange(itemId, index);
     },
-    [onActiveItemChange]
+    [clearPlaybackFeedback, onActiveItemChange]
   );
 
   useEffect(() => {
@@ -146,21 +192,58 @@ export function FullscreenVideoPager({
     commitActiveVideo(nextItem.videoId, initialPosition.targetIndex);
   }, [commitActiveVideo, initialPosition.targetIndex, items]);
 
-  const handleTogglePlayback = useCallback(() => {
-    const nextPausedByUser = togglePlaybackPausedByUser(pausedByUserRef.current);
+  const handleRegisterActiveSeekBy = useCallback((seekBy: ((seconds: number) => boolean) | null) => {
+    activePlayerSeekByRef.current = seekBy;
+  }, []);
 
-    pausedByUserRef.current = nextPausedByUser;
-    setPausedByUser(nextPausedByUser);
-    setPlaybackFeedbackLabel(getPlaybackFeedbackLabel(nextPausedByUser));
-
-    if (playbackFeedbackTimeoutRef.current) {
-      clearTimeout(playbackFeedbackTimeoutRef.current);
+  const handleSingleTap = useCallback(() => {
+    if (isGestureLocked(transientHoldStateRef.current)) {
+      return;
     }
 
-    playbackFeedbackTimeoutRef.current = setTimeout(() => {
-      setPlaybackFeedbackLabel(null);
-    }, playbackFeedbackDurationMs);
-  }, []);
+    const nextBasePausedByUser = toggleBasePlaybackPausedByUser(
+      basePausedByUserRef.current
+    );
+    basePausedByUserRef.current = nextBasePausedByUser;
+    setBasePausedByUser(nextBasePausedByUser);
+    showPlaybackFeedback(createPlaybackToggleFeedback(nextBasePausedByUser));
+  }, [showPlaybackFeedback]);
+
+  const handleDoubleTap = useCallback((zone: FullscreenTapZone) => {
+    if (isGestureLocked(transientHoldStateRef.current)) {
+      return;
+    }
+
+    const deltaSeconds = zone === 'left' ? -5 : 5;
+    if (!activePlayerSeekByRef.current?.(deltaSeconds)) {
+      return;
+    }
+
+    showPlaybackFeedback(createSeekFeedback(deltaSeconds));
+  }, [showPlaybackFeedback]);
+
+  const handleHoldStart = useCallback((zone: FullscreenHoldZone) => {
+    const nextTransientHoldState = createTransientHoldState({
+      basePausedByUser: basePausedByUserRef.current,
+      zone,
+    });
+
+    transientHoldStateRef.current = nextTransientHoldState;
+    setTransientHoldState(nextTransientHoldState);
+    if (zone === 'left' || zone === 'right') {
+      showPlaybackFeedback(createRateFeedback());
+    }
+  }, [showPlaybackFeedback]);
+
+  const handleHoldEnd = useCallback(() => {
+    if (!transientHoldStateRef.current) {
+      return;
+    }
+
+    transientHoldStateRef.current = null;
+    setTransientHoldState(null);
+    clearPlaybackFeedback();
+  }, [clearPlaybackFeedback]);
 
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
@@ -191,20 +274,22 @@ export function FullscreenVideoPager({
   const renderState = useMemo(
     () => ({
       activeIndex,
+      basePausedByUser,
       bottomInset: insets.bottom,
       height,
-      pausedByUser,
+      transientHoldState,
       width,
     }),
-    [activeIndex, height, insets.bottom, pausedByUser, width]
+    [activeIndex, basePausedByUser, height, insets.bottom, transientHoldState, width]
   );
 
   const renderItem = useCallback(
     ({ item, index }: { item: FeedItem; index: number }) => {
-      const shouldPlay = shouldPlayVideo({
+      const effectivePlaybackState = resolveEffectivePlaybackState({
         activeIndex,
+        basePausedByUser,
         itemIndex: index,
-        pausedByUser,
+        transientHoldState,
       });
 
       return (
@@ -212,9 +297,16 @@ export function FullscreenVideoPager({
           bottomInset={insets.bottom}
           height={height}
           isActive={item.videoId === activeItemId}
-          onTogglePlayback={handleTogglePlayback}
+          onDoubleTap={handleDoubleTap}
+          onHoldEnd={handleHoldEnd}
+          onHoldStart={handleHoldStart}
+          onSingleTap={handleSingleTap}
+          playbackRate={effectivePlaybackState.playbackRate}
+          registerActiveSeekBy={
+            item.videoId === activeItemId ? handleRegisterActiveSeekBy : undefined
+          }
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
-          shouldPlay={shouldPlay}
+          shouldPlay={effectivePlaybackState.shouldPlay}
           video={item}
           width={width}
         />
@@ -223,10 +315,15 @@ export function FullscreenVideoPager({
     [
       activeIndex,
       activeItemId,
-      handleTogglePlayback,
+      basePausedByUser,
+      handleDoubleTap,
+      handleHoldEnd,
+      handleHoldStart,
+      handleRegisterActiveSeekBy,
+      handleSingleTap,
       height,
       insets.bottom,
-      pausedByUser,
+      transientHoldState,
       width,
     ]
   );
@@ -295,7 +392,7 @@ export function FullscreenVideoPager({
         topInset={insets.top}
         totalItems={items.length}
       />
-      <PlaybackFeedbackOverlay playbackFeedbackLabel={playbackFeedbackLabel} />
+      <PlaybackFeedbackOverlay playbackFeedback={playbackFeedback} />
     </View>
   );
 }

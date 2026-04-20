@@ -12,5 +12,6 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('initialNumToRender={5}');
     expect(source).toContain('maxToRenderPerBatch={6}');
     expect(source).toContain('windowSize={7}');
+    expect(source).not.toContain('GestureDetector');
   });
 });

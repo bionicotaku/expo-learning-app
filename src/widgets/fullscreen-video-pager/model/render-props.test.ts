@@ -12,6 +12,7 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: true,
+          playbackRate: 1,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -20,6 +21,7 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: true,
+          playbackRate: 1,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -35,6 +37,7 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: true,
+          playbackRate: 1,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -43,6 +46,7 @@ describe('fullscreen video render props', () => {
         {
           height: 852,
           isActive: false,
+          playbackRate: 1,
           shouldUsePlayer: true,
           shouldPlay: false,
           videoId: 'feed-4',
@@ -56,10 +60,12 @@ describe('fullscreen video render props', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
+          playbackRate: 1,
           shouldPlay: true,
           videoId: 'feed-4',
         },
         {
+          playbackRate: 1,
           shouldPlay: true,
           videoId: 'feed-4',
         }
@@ -71,11 +77,30 @@ describe('fullscreen video render props', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
+          playbackRate: 1,
           shouldPlay: true,
           videoId: 'feed-4',
         },
         {
+          playbackRate: 1,
           shouldPlay: false,
+          videoId: 'feed-4',
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the player surface when playback rate changes during a temporary hold', () => {
+    expect(
+      arePlayableVideoSurfacePropsEqual(
+        {
+          playbackRate: 1,
+          shouldPlay: true,
+          videoId: 'feed-4',
+        },
+        {
+          playbackRate: 2,
+          shouldPlay: true,
           videoId: 'feed-4',
         }
       )

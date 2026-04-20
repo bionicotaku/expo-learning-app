@@ -1,16 +1,23 @@
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 
+import {
+  formatPlaybackFeedbackLabel,
+  type FullscreenPlaybackFeedback,
+} from '../model/playback-feedback';
+
 type PlaybackFeedbackOverlayProps = {
-  playbackFeedbackLabel: string | null;
+  playbackFeedback: FullscreenPlaybackFeedback | null;
 };
 
 function PlaybackFeedbackOverlayComponent({
-  playbackFeedbackLabel,
+  playbackFeedback,
 }: PlaybackFeedbackOverlayProps) {
-  if (!playbackFeedbackLabel) {
+  if (!playbackFeedback) {
     return null;
   }
+
+  const playbackFeedbackLabel = formatPlaybackFeedbackLabel(playbackFeedback);
 
   return (
     <View

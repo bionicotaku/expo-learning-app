@@ -14,7 +14,10 @@
 
 本文档是页面设计逻辑说明，不单独定义整套风格系统。视觉系统与组件抽象总规范见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)。
 
-`Fullscreen Video` 的 overlay 分层设计已单独收口到 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
+`Fullscreen Video` 的 overlay 分层设计与手势设计已单独收口到：
+
+- [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)
+- [Fullscreen Video Gesture设计规范](./Fullscreen%20Video%20Gesture设计规范.md)
 
 ## 2. 页面关系总览
 
@@ -164,19 +167,23 @@
 
 ### 4.2 页面结构
 
-当前落地结构可拆为五层：
+当前落地结构可拆为六层：
 
 1. `Full-bleed video background`
    - 视频内容占据全部画面
-2. `Top chrome overlay`
+2. `Active video gesture surface`
+   - 只存在于当前 active row
+   - 承担 single tap / double tap / long press 识别
+3. `Top chrome overlay`
    - 固定的当前序号 counter
-3. `Row-owned content overlay`
+4. `Row-owned content overlay`
    - 跟视频 row 一起滑动的右侧 action rail
    - 跟视频 row 一起滑动的标题、说明和底部可读性 scrim
-4. `Active ephemeral overlay`
-   - 当前 active video 的播/停 HUD
+5. `Active ephemeral overlay`
+   - 当前 active video 的播/停、seek、临时 `2x` HUD
+   - 其中 `2x` HUD 在左右长按期间持续显示，不按短 toast 自动消失
    - 未来继续承接字幕、手势反馈、临时提示
-5. `Pager shell loading pill`
+6. `Pager shell loading pill`
    - 首屏读取时的底部 loading 提示
 
 这一结构说明该页面是“播放优先，内容型 overlay 贴附视频、页面 chrome 独立固定”的模式，而不是图文详情页，也不是把所有交互都堆在 pager 顶层的一层壳上。
@@ -191,12 +198,15 @@
 - 上下滑动切换视频
 - 支持系统右滑返回手势
 - 通过点击 active row 的视频背景切换播/停
+- 通过双击 active row 左右半区执行 `-5s / +5s`
+- 通过长按 active row 左右区进入临时 `2x`
 - 在不打断沉浸感的前提下保留右侧动作位
 
 当前实现下还应明确两点：
 
 - 右侧 action rail 这轮只完成结构落位，不接真实收藏/分享/标注写操作
 - 静音切换本轮移除，不保留旧入口
+- center hold 只保留接口，不产生当前业务效果
 
 视频页消费的是和列表页同一份共享 feed source。
 

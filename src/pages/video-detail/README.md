@@ -16,7 +16,7 @@
 边界约束：
 
 - page 不维护 `activeIndex / activeItemId` 本地状态；这部分属于 pager 内部播放会话
-- page 不维护 `pausedByUser`、播/停 HUD 或任何 row 级交互状态
+- page 不维护 `basePausedByUser`、`transientHoldState`、HUD 或任何 row 级交互状态
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
 - page 不持有跨页面长期状态

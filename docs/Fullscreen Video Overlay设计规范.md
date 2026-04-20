@@ -12,6 +12,7 @@
 相关文档：
 
 - 页面关系与共享数据逻辑见 [Feed与Fullscreen Video页面设计逻辑](./Feed与Fullscreen%20Video页面设计逻辑.md)
+- 手势设计见 [Fullscreen Video Gesture设计规范](./Fullscreen%20Video%20Gesture设计规范.md)
 - 全局视觉系统见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)
 
 ## 2. 当前稳定前提
@@ -21,9 +22,9 @@
 - 页面本质是纵向分页的沉浸式视频浏览器
 - 每次真正处于消费焦点的只有一个 active video
 - Feed 列表页与视频页共享同一份 feed source
-- pager 只为当前/前后 1 个视频挂载 player
+- pager 只为当前/前后 2 个视频挂载 player
 - 当前视频默认有声自动播放
-- 背景主点击手势是播/停，不再承担静音切换
+- 背景主手势由 row-local gesture surface 接管，不再承担静音切换
 
 因此 overlay 设计必须同时满足两件事：
 
@@ -39,6 +40,12 @@
 3. `Active ephemeral overlay`
 
 这三层不是视觉稿名词，而是当前实现边界。
+
+需要特别说明的是：
+
+- `ActiveVideoGestureSurface` 不属于这三层 overlay 中的任何一层
+- 它是 `FullscreenVideoItem` 内部的输入识别层
+- 它位于视频画面之上、row-owned overlay 之下
 
 ## 4. Layer 1: Row-owned content overlay
 
@@ -132,7 +139,7 @@
 
 ### 6.4 设计理由
 
-这类状态更新频率高、持续时间短，不能反向拖动 row 内容层或顶部 chrome 一起重渲。
+这类状态更新频率高、持续时间短或只跟随当前 hold 生命周期，不能反向拖动 row 内容层或顶部 chrome 一起重渲。
 
 ## 7. 状态归属建议
 
@@ -152,8 +159,9 @@
 只属于当前 fullscreen 播放会话：
 
 - `activeIndex`
-- `pausedByUser`
-- 当前 HUD 文案
+- `basePausedByUser`
+- `transientHoldState`
+- 当前 HUD feedback
 
 这类状态由 `widgets/fullscreen-video-pager` 持有，不回写到 page 或 feed source。
 
@@ -162,9 +170,10 @@
 属于纯规则层而非 UI state：
 
 - player window 策略
-- 背景点按后的播/停切换规则
-- active row 变化后的暂停重置规则
-- `activeIndex + pausedByUser -> shouldPlay`
+- 手势分区解析
+- 单击后的播/停切换规则
+- active row 变化后的暂停与 hold reset 规则
+- `activeIndex + basePausedByUser + transientHoldState -> shouldPlay / playbackRate`
 
 这类逻辑归 `features/video-playback`。
 
@@ -187,7 +196,7 @@
 负责：
 
 - 视频画面
-- 背景点击层
+- row-local gesture surface
 - row-owned content overlay
 - row 内最小 loading / error 覆盖层
 
@@ -201,8 +210,10 @@
 
 负责：
 
-- 当前 active video 的播/停 HUD
+- 当前 active video 的播/停、seek、临时 `2x` HUD
 - 未来的字幕/手势/临时反馈
+
+其中当前 `2x` HUD 不走统一短 toast 定时器，而是跟随左右长按生命周期持续显示。
 
 ## 9. 性能约束
 
@@ -212,22 +223,27 @@
 2. top chrome overlay 只承载固定页面 chrome
 3. active ephemeral overlay 的高频更新不得牵连前两层
 4. player 是否挂载由 `shouldMountPlayer()` 决定
-5. player 是否播放由 `shouldPlayVideo()` 决定
-6. active row 变化后，`pausedByUser` 必须重置为 `false`
+5. player 是否播放、是否临时 `2x` 由 effective playback state 决定
+6. active row 变化后，`basePausedByUser` 必须重置为 `false`
+7. active row 变化后，`transientHoldState` 必须清空
 
 ## 10. 当前实现真相
 
 当前落地实现已经收口为：
 
+- `row-local gesture surface`
+  - 只挂在 active row
+  - 承担 single tap / double tap / long press 识别
 - `row-owned content overlay`
   - 标题、说明、scrim、右侧 rail
 - `top chrome overlay`
   - counter
 - `active ephemeral overlay`
-  - 播/停 HUD
+  - 播/停、seek、临时 `2x` HUD
 
 不再保留的旧口径包括：
 
 - 页面级 `isMuted`
 - “点击任意位置切换静音”
 - “右侧 rail 由 pager 顶层统一渲染”
+- “所有 mounted row 都常驻完整手势 detector”

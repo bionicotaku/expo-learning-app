@@ -1,6 +1,6 @@
 import { useEvent } from 'expo';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { memo, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
@@ -10,11 +10,15 @@ import {
 } from '../model/render-props';
 
 type PlayableVideoSurfaceProps = {
+  playbackRate: number;
+  registerSeekBy?: ((seekBy: ((seconds: number) => boolean) | null) => void) | undefined;
   shouldPlay: boolean;
   video: FeedItem;
 };
 
 function PlayableVideoSurfaceComponent({
+  playbackRate,
+  registerSeekBy,
   video,
   shouldPlay,
 }: PlayableVideoSurfaceProps) {
@@ -29,6 +33,10 @@ function PlayableVideoSurfaceComponent({
   });
 
   useEffect(() => {
+    player.playbackRate = playbackRate;
+  }, [playbackRate, player]);
+
+  useEffect(() => {
     if (!shouldPlay) {
       player.pause();
       return;
@@ -38,6 +46,26 @@ function PlayableVideoSurfaceComponent({
       player.play();
     }
   }, [player, shouldPlay, status]);
+
+  const seekBy = useCallback((seconds: number): boolean => {
+    if (status !== 'readyToPlay') {
+      return false;
+    }
+
+    player.seekBy(seconds);
+    return true;
+  }, [player, status]);
+
+  useEffect(() => {
+    if (!registerSeekBy) {
+      return;
+    }
+
+    registerSeekBy(seekBy);
+    return () => {
+      registerSeekBy(null);
+    };
+  }, [registerSeekBy, seekBy]);
 
   const handleRetry = async () => {
     await player.replaceAsync(video.videoUrl);
@@ -131,10 +159,12 @@ function arePlayableVideoSurfaceComponentPropsEqual(
   nextProps: PlayableVideoSurfaceProps
 ): boolean {
   const previousRenderProps: PlayableVideoSurfaceRenderProps = {
+    playbackRate: previousProps.playbackRate,
     videoId: previousProps.video.videoId,
     shouldPlay: previousProps.shouldPlay,
   };
   const nextRenderProps: PlayableVideoSurfaceRenderProps = {
+    playbackRate: nextProps.playbackRate,
     videoId: nextProps.video.videoId,
     shouldPlay: nextProps.shouldPlay,
   };
