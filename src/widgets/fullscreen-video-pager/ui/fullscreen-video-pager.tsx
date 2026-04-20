@@ -32,6 +32,10 @@ import {
   shouldAutoDismissPlaybackFeedback,
   type FullscreenPlaybackFeedback,
 } from '../model/playback-feedback';
+import type {
+  FullscreenActivePlayerController,
+  FullscreenActivePlayerSurfaceState,
+} from '../model/active-player-controller';
 import { FullscreenVideoItem } from './fullscreen-video-item';
 import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
 import { TopChromeOverlay } from './top-chrome-overlay';
@@ -57,7 +61,7 @@ export function FullscreenVideoPager({
   const playbackFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const activePlayerSeekByRef = useRef<((seconds: number) => boolean) | null>(null);
+  const activePlayerControllerRef = useRef<FullscreenActivePlayerController | null>(null);
   const basePausedByUserRef = useRef(false);
   const transientHoldStateRef = useRef<FullscreenTransientHoldState | null>(null);
   const activeSnapshotRef = useRef<{
@@ -71,6 +75,8 @@ export function FullscreenVideoPager({
   const [basePausedByUser, setBasePausedByUser] = useState(false);
   const [transientHoldState, setTransientHoldState] =
     useState<FullscreenTransientHoldState | null>(null);
+  const [activeSurfaceState, setActiveSurfaceState] =
+    useState<FullscreenActivePlayerSurfaceState | null>(null);
   const [playbackFeedback, setPlaybackFeedback] =
     useState<FullscreenPlaybackFeedback | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
@@ -137,6 +143,8 @@ export function FullscreenVideoPager({
         transientHoldState: transientHoldStateRef.current,
       });
 
+      activePlayerControllerRef.current = null;
+      setActiveSurfaceState(null);
       basePausedByUserRef.current = nextBasePausedByUser;
       transientHoldStateRef.current = nextTransientHoldState;
       setBasePausedByUser(nextBasePausedByUser);
@@ -192,9 +200,13 @@ export function FullscreenVideoPager({
     commitActiveVideo(nextItem.videoId, initialPosition.targetIndex);
   }, [commitActiveVideo, initialPosition.targetIndex, items]);
 
-  const handleRegisterActiveSeekBy = useCallback((seekBy: ((seconds: number) => boolean) | null) => {
-    activePlayerSeekByRef.current = seekBy;
-  }, []);
+  const handleRegisterActiveController = useCallback(
+    (controller: FullscreenActivePlayerController | null) => {
+      activePlayerControllerRef.current = controller;
+      setActiveSurfaceState(controller?.surfaceState ?? null);
+    },
+    []
+  );
 
   const handleSingleTap = useCallback(() => {
     if (isGestureLocked(transientHoldStateRef.current)) {
@@ -215,7 +227,7 @@ export function FullscreenVideoPager({
     }
 
     const deltaSeconds = zone === 'left' ? -5 : 5;
-    if (!activePlayerSeekByRef.current?.(deltaSeconds)) {
+    if (!activePlayerControllerRef.current?.seekBy(deltaSeconds)) {
       return;
     }
 
@@ -274,13 +286,22 @@ export function FullscreenVideoPager({
   const renderState = useMemo(
     () => ({
       activeIndex,
+      activeSurfaceState,
       basePausedByUser,
       bottomInset: insets.bottom,
       height,
       transientHoldState,
       width,
     }),
-    [activeIndex, basePausedByUser, height, insets.bottom, transientHoldState, width]
+    [
+      activeIndex,
+      activeSurfaceState,
+      basePausedByUser,
+      height,
+      insets.bottom,
+      transientHoldState,
+      width,
+    ]
   );
 
   const renderItem = useCallback(
@@ -291,20 +312,28 @@ export function FullscreenVideoPager({
         itemIndex: index,
         transientHoldState,
       });
+      const isCurrentActiveItem = item.videoId === activeItemId;
+      const accessibilityLabel = effectivePlaybackState.shouldPlay
+        ? 'Pause video'
+        : 'Play video';
+      const shouldEnableBackgroundGestures =
+        isCurrentActiveItem && activeSurfaceState !== 'error';
 
       return (
         <FullscreenVideoItem
+          accessibilityLabel={accessibilityLabel}
           bottomInset={insets.bottom}
           height={height}
-          isActive={item.videoId === activeItemId}
+          isActive={isCurrentActiveItem}
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleHoldStart}
           onSingleTap={handleSingleTap}
           playbackRate={effectivePlaybackState.playbackRate}
-          registerActiveSeekBy={
-            item.videoId === activeItemId ? handleRegisterActiveSeekBy : undefined
+          registerActiveController={
+            isCurrentActiveItem ? handleRegisterActiveController : undefined
           }
+          shouldEnableBackgroundGestures={shouldEnableBackgroundGestures}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
           shouldPlay={effectivePlaybackState.shouldPlay}
           video={item}
@@ -315,11 +344,12 @@ export function FullscreenVideoPager({
     [
       activeIndex,
       activeItemId,
+      activeSurfaceState,
       basePausedByUser,
       handleDoubleTap,
       handleHoldEnd,
       handleHoldStart,
-      handleRegisterActiveSeekBy,
+      handleRegisterActiveController,
       handleSingleTap,
       height,
       insets.bottom,

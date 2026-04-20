@@ -208,12 +208,14 @@
 - `activeIndex`
 - `basePausedByUser`
 - `transientHoldState`
+- `activeSurfaceState`
 - `playbackFeedback`
 
 其中：
 
 - `basePausedByUser` 是正常基态
 - `transientHoldState` 是长按期间的临时覆盖态
+- `activeSurfaceState` 只反映当前 active row 的播放器表面状态：`loading | ready | error`
 - `playbackFeedback` 是 HUD 用的短期会话反馈；其中播/停与 seek 会自动消失，`2x` 会跟随 hold 生命周期持续显示
 
 ### 7.2 Feature 层纯规则
@@ -265,23 +267,27 @@
    - `shouldPlay`
    - `playbackRate`
 2. 一次性命令
-   - `seekBy(seconds): boolean`
+   - `registerActiveController(controller | null)`
 
 持久 intent 通过 props 进入 `PlayableVideoSurface`，由该组件自行同步到 `expo-video`。
 
-一次性命令只保留最小接口：
+当前 active controller 固定只暴露最小接口：
 
 - `seekBy(seconds): boolean`
+- `surfaceState: 'loading' | 'ready' | 'error'`
 
 其中：
 
 - 返回 `true` 表示本次 seek 已提交
 - 返回 `false` 表示当前 player 还未 ready 或不可 seek
+- `surfaceState` 只服务 widget 自己做 hit-area 和 controller 生命周期管理，不回流到 `features/video-playback`
 
 当 seek 返回 `false` 时：
 
 - 不显示 seek HUD
 - 不改变播放/暂停基态
+
+controller 的注册与清理必须使用同步生命周期，避免 active row 切换后双击短时间误命中旧 row。
 
 ## 9. HUD 模型
 
@@ -320,6 +326,17 @@
 
 - 新 row 始终按 autoplay 基线进入
 - 不会把上一条视频的 hold / pause / HUD 残留带到下一条
+- 新 row 的背景双击不会短时间误命中上一条 video 的 controller
+
+## 10.1 Error Surface 命中规则
+
+当当前 active row 的 `surfaceState === 'error'` 时：
+
+- `ActiveVideoGestureSurface` 必须完全撤掉
+- 错误态里的 `Retry` 直接接管点击
+- 右侧 rail 仍按原层级存在
+
+`loading` 与 `ready` 状态下，背景手势继续可用。
 
 ## 11. 当前实现验收点
 

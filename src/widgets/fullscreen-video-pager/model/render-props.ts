@@ -2,6 +2,7 @@ export type FullscreenVideoItemRenderProps = {
   height: number;
   isActive: boolean;
   playbackRate: number;
+  shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
   videoId: string;
@@ -18,6 +19,8 @@ export function areFullscreenVideoItemRenderPropsEqual(
     previousProps.height === nextProps.height &&
     previousProps.isActive === nextProps.isActive &&
     previousProps.playbackRate === nextProps.playbackRate &&
+    previousProps.shouldEnableBackgroundGestures ===
+      nextProps.shouldEnableBackgroundGestures &&
     previousProps.shouldUsePlayer === nextProps.shouldUsePlayer &&
     previousProps.shouldPlay === nextProps.shouldPlay
   );

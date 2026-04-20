@@ -22,4 +22,8 @@ describe('ActiveVideoGestureSurface source', () => {
     expect(source).toContain('Pressable');
     expect(source).toContain('requireExternalGestureToFail');
   });
+
+  it('forwards a dynamic accessibility label to the fullscreen playback button', () => {
+    expect(source).toContain('accessibilityLabel={accessibilityLabel}');
+  });
 });

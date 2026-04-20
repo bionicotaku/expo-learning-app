@@ -13,6 +13,7 @@ describe('fullscreen video render props', () => {
           height: 852,
           isActive: true,
           playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -22,6 +23,7 @@ describe('fullscreen video render props', () => {
           height: 852,
           isActive: true,
           playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -38,6 +40,7 @@ describe('fullscreen video render props', () => {
           height: 852,
           isActive: true,
           playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
           shouldUsePlayer: true,
           shouldPlay: true,
           videoId: 'feed-4',
@@ -47,8 +50,36 @@ describe('fullscreen video render props', () => {
           height: 852,
           isActive: false,
           playbackRate: 1,
+          shouldEnableBackgroundGestures: false,
           shouldUsePlayer: true,
           shouldPlay: false,
+          videoId: 'feed-4',
+          width: 393,
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the row when background gesture availability changes for the active item', () => {
+    expect(
+      areFullscreenVideoItemRenderPropsEqual(
+        {
+          height: 852,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: true,
+          shouldUsePlayer: true,
+          shouldPlay: true,
+          videoId: 'feed-4',
+          width: 393,
+        },
+        {
+          height: 852,
+          isActive: true,
+          playbackRate: 1,
+          shouldEnableBackgroundGestures: false,
+          shouldUsePlayer: true,
+          shouldPlay: true,
           videoId: 'feed-4',
           width: 393,
         }

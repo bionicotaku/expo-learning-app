@@ -161,6 +161,7 @@
 - `activeIndex`
 - `basePausedByUser`
 - `transientHoldState`
+- `activeSurfaceState`
 - 当前 HUD feedback
 
 这类状态由 `widgets/fullscreen-video-pager` 持有，不回写到 page 或 feed source。
@@ -199,6 +200,8 @@
 - row-local gesture surface
 - row-owned content overlay
 - row 内最小 loading / error 覆盖层
+
+其中 error 覆盖层需要拥有自己的点击恢复路径，因此当前 active row 进入 `error` 时，背景 gesture surface 必须撤掉，不能继续盖在 `Retry` 上面。
 
 ### 8.2 `TopChromeOverlay`
 

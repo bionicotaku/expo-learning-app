@@ -10,7 +10,7 @@ describe('fullscreen video item source', () => {
     );
 
     expect(source).toContain('ActiveVideoGestureSurface');
-    expect(source).toContain('isActive ? (');
+    expect(source).toContain('shouldEnableBackgroundGestures ? (');
     expect(source).not.toContain('disabled={!isActive}');
   });
 });

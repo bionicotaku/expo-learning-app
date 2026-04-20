@@ -1,9 +1,13 @@
 import { useEvent } from 'expo';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import type { FeedItem } from '@/entities/feed';
+import {
+  resolveActivePlayerSurfaceState,
+  type FullscreenActivePlayerController,
+} from '../model/active-player-controller';
 import {
   arePlayableVideoSurfacePropsEqual,
   type PlayableVideoSurfaceRenderProps,
@@ -11,14 +15,16 @@ import {
 
 type PlayableVideoSurfaceProps = {
   playbackRate: number;
-  registerSeekBy?: ((seekBy: ((seconds: number) => boolean) | null) => void) | undefined;
+  registerActiveController?:
+    | ((controller: FullscreenActivePlayerController | null) => void)
+    | undefined;
   shouldPlay: boolean;
   video: FeedItem;
 };
 
 function PlayableVideoSurfaceComponent({
   playbackRate,
-  registerSeekBy,
+  registerActiveController,
   video,
   shouldPlay,
 }: PlayableVideoSurfaceProps) {
@@ -31,6 +37,7 @@ function PlayableVideoSurfaceComponent({
     status: player.status,
     error: undefined,
   });
+  const surfaceState = resolveActivePlayerSurfaceState(status);
 
   useEffect(() => {
     player.playbackRate = playbackRate;
@@ -56,16 +63,24 @@ function PlayableVideoSurfaceComponent({
     return true;
   }, [player, status]);
 
-  useEffect(() => {
-    if (!registerSeekBy) {
+  const activeController = useMemo<FullscreenActivePlayerController>(
+    () => ({
+      seekBy,
+      surfaceState: surfaceState,
+    }),
+    [seekBy, surfaceState]
+  );
+
+  useLayoutEffect(() => {
+    if (!registerActiveController) {
       return;
     }
 
-    registerSeekBy(seekBy);
+    registerActiveController(activeController);
     return () => {
-      registerSeekBy(null);
+      registerActiveController(null);
     };
-  }, [registerSeekBy, seekBy]);
+  }, [activeController, registerActiveController]);
 
   const handleRetry = async () => {
     await player.replaceAsync(video.videoUrl);

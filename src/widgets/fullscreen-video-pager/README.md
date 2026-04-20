@@ -10,9 +10,11 @@
 - 在 widget 内部维护单一 `activeIndex` 状态，并从它派生当前 active item
 - 在 widget 内部维护当前播放会话的 `basePausedByUser`
 - 在 widget 内部维护当前临时长按态 `transientHoldState`
+- 在 widget 内部维护当前 active row 的 `activeSurfaceState`
 - 在 widget 内部维护 HUD feedback；播/停与 seek 会自动消失，`2x` 会在左右长按期间持续显示
 - 只为当前 active row 挂载真实 `ActiveVideoGestureSurface`
 - active row 的背景单击使用 `Pressable` 语义，并等待 double tap / long press 失败后才切换播/停
+- active row 的背景手势只在 `loading / ready` 时可用；`error` 时撤掉背景手势层，让 `Retry` 直接接管点击
 - 采用三层 overlay 结构：
   - `row-owned content overlay`：每个 row 自己的标题、描述、底部可读性 scrim 和右侧 clear glass action rail
   - `top chrome overlay`：右上 counter
@@ -26,6 +28,7 @@
 - 长按 active row 左右区进入临时 `2x`
 - 左右长按期间持续显示 `2x` HUD，松手后立即清掉
 - 右侧 rail 这轮只完成结构落位，不接真实业务动作
+- active row 的最小 player controller 不再只是 `seekBy`，而是 `{ seekBy, surfaceState }`
 
 边界约束：
 
@@ -35,4 +38,4 @@
 - widget 不持有跨页面恢复定位状态
 - widget 不持有跨页面长期音频偏好；这轮不提供静音切换
 - widget 不使用自动 safe-area content inset；否则会破坏 `initialScrollIndex` 的首屏整页吸附
-- widget 不直接持有 `VideoPlayer` 实例；一次性 seek 命令通过 active row 的最小 controller 暴露
+- widget 不直接持有 `VideoPlayer` 实例；播放器只通过 active row 的最小 controller 暴露 `{ seekBy, surfaceState }`

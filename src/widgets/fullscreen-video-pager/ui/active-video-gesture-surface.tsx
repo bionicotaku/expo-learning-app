@@ -15,6 +15,7 @@ const longPressMinDurationMs = 320;
 const gestureMaxDistance = 20;
 
 type ActiveVideoGestureSurfaceProps = {
+  accessibilityLabel: string;
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
@@ -23,6 +24,7 @@ type ActiveVideoGestureSurfaceProps = {
 };
 
 function ActiveVideoGestureSurfaceComponent({
+  accessibilityLabel,
   onDoubleTap,
   onHoldEnd,
   onHoldStart,
@@ -70,6 +72,7 @@ function ActiveVideoGestureSurfaceComponent({
   return (
     <GestureDetector gesture={gesture.exclusiveGesture}>
       <Pressable
+        accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
         onPress={onSingleTap}
         requireExternalGestureToFail={[gesture.longPress, gesture.doubleTap]}

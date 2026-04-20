@@ -11,11 +11,13 @@ import {
   areFullscreenVideoItemRenderPropsEqual,
   type FullscreenVideoItemRenderProps,
 } from '../model/render-props';
+import type { FullscreenActivePlayerController } from '../model/active-player-controller';
 import { ActiveVideoGestureSurface } from './active-video-gesture-surface';
 import { PlayableVideoSurface } from './playable-video-surface';
 import { RowOwnedVideoOverlay } from './row-owned-video-overlay';
 
 type FullscreenVideoItemProps = {
+  accessibilityLabel: string;
   bottomInset: number;
   height: number;
   isActive: boolean;
@@ -25,7 +27,10 @@ type FullscreenVideoItemProps = {
   onHoldStart: (zone: FullscreenHoldZone) => void;
   onSingleTap: () => void;
   playbackRate: number;
-  registerActiveSeekBy?: ((seekBy: ((seconds: number) => boolean) | null) => void) | undefined;
+  registerActiveController?:
+    | ((controller: FullscreenActivePlayerController | null) => void)
+    | undefined;
+  shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
   video: FeedItem;
@@ -33,18 +38,19 @@ type FullscreenVideoItemProps = {
 };
 
 function FullscreenVideoItemComponent({
+  accessibilityLabel,
   video,
   width,
   height,
   bottomInset,
-  isActive,
   onActionPress,
   onDoubleTap,
   onHoldEnd,
   onHoldStart,
   onSingleTap,
   playbackRate,
-  registerActiveSeekBy,
+  registerActiveController,
+  shouldEnableBackgroundGestures,
   shouldUsePlayer,
   shouldPlay,
 }: FullscreenVideoItemProps) {
@@ -59,7 +65,7 @@ function FullscreenVideoItemComponent({
       {shouldUsePlayer ? (
         <PlayableVideoSurface
           playbackRate={playbackRate}
-          registerSeekBy={registerActiveSeekBy}
+          registerActiveController={registerActiveController}
           shouldPlay={shouldPlay}
           video={video}
         />
@@ -72,8 +78,9 @@ function FullscreenVideoItemComponent({
         />
       )}
 
-      {isActive ? (
+      {shouldEnableBackgroundGestures ? (
         <ActiveVideoGestureSurface
+          accessibilityLabel={accessibilityLabel}
           onDoubleTap={onDoubleTap}
           onHoldEnd={onHoldEnd}
           onHoldStart={onHoldStart}
@@ -102,6 +109,7 @@ function areFullscreenVideoItemComponentPropsEqual(
     height: previousProps.height,
     isActive: previousProps.isActive,
     playbackRate: previousProps.playbackRate,
+    shouldEnableBackgroundGestures: previousProps.shouldEnableBackgroundGestures,
     shouldUsePlayer: previousProps.shouldUsePlayer,
     shouldPlay: previousProps.shouldPlay,
   };
@@ -111,6 +119,7 @@ function areFullscreenVideoItemComponentPropsEqual(
     height: nextProps.height,
     isActive: nextProps.isActive,
     playbackRate: nextProps.playbackRate,
+    shouldEnableBackgroundGestures: nextProps.shouldEnableBackgroundGestures,
     shouldUsePlayer: nextProps.shouldUsePlayer,
     shouldPlay: nextProps.shouldPlay,
   };
