@@ -68,47 +68,44 @@ vi.mock('react-native-reanimated', async () => {
 });
 
 type DescriptionStateHarnessProps = {
+  activeVisitToken: number | null;
   description: string;
-  isActive: boolean;
   maxTextWidth?: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onRenderSnapshot?: (snapshot: {
     isExpanded: boolean;
     mode: string;
     placement: string;
-    stateOwnerKey: string;
+    activeVisitToken: number | null;
   }) => void;
-  stateOwnerKey: string;
 };
 
 function DescriptionStateHarness({
+  activeVisitToken,
   description,
-  isActive,
   maxTextWidth = 279,
   measurementCache,
   onRenderSnapshot,
-  stateOwnerKey,
 }: DescriptionStateHarnessProps) {
   const state = useExpandableOverlayDescriptionState({
+    activeVisitToken,
     description,
-    isActive,
     maxTextWidth,
     measurementCache,
-    stateOwnerKey,
   });
   onRenderSnapshot?.({
-    isExpanded: state.isExpanded,
-    mode: state.mode,
-    placement: state.layoutContract.actionPlacement,
-    stateOwnerKey,
+    isExpanded: state.viewModel.isExpanded,
+    mode: state.viewModel.mode,
+    placement: state.viewModel.layoutContract.actionPlacement,
+    activeVisitToken,
   });
 
   return (
     <View>
-      <Text testID="mode">{state.mode}</Text>
-      <Text testID="expandable">{String(state.isExpandable)}</Text>
-      <Text testID="expanded">{String(state.isExpanded)}</Text>
-      <Text testID="placement">{state.layoutContract.actionPlacement}</Text>
+      <Text testID="mode">{state.viewModel.mode}</Text>
+      <Text testID="expandable">{String(state.viewModel.isExpandable)}</Text>
+      <Text testID="expanded">{String(state.viewModel.isExpanded)}</Text>
+      <Text testID="placement">{state.viewModel.layoutContract.actionPlacement}</Text>
       <Pressable testID="expand" onPress={state.handleExpandPress} />
       <Pressable testID="collapse" onPress={state.handleCollapsePress} />
       <Text testID="measure" onTextLayout={state.handleDescriptionTextLayout}>
@@ -135,7 +132,7 @@ describe('expandable overlay description runtime', () => {
       isExpanded: boolean;
       mode: string;
       placement: string;
-      stateOwnerKey: string;
+      activeVisitToken: number | null;
     }[] = [];
     let renderer: TestRenderer.ReactTestRenderer;
 
@@ -152,13 +149,12 @@ describe('expandable overlay description runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <DescriptionStateHarness
+          activeVisitToken={1}
           description="description a"
-          isActive
           measurementCache={measurementCache}
           onRenderSnapshot={(snapshot) => {
             renderSnapshots.push(snapshot);
           }}
-          stateOwnerKey="video-a"
         />
       );
     });
@@ -185,13 +181,12 @@ describe('expandable overlay description runtime', () => {
     act(() => {
       renderer!.update(
         <DescriptionStateHarness
+          activeVisitToken={2}
           description="description b"
-          isActive
           measurementCache={measurementCache}
           onRenderSnapshot={(snapshot) => {
             renderSnapshots.push(snapshot);
           }}
-          stateOwnerKey="video-b"
         />
       );
     });
@@ -202,7 +197,7 @@ describe('expandable overlay description runtime', () => {
       isExpanded: false,
       mode: 'collapsed',
       placement: 'inline',
-      stateOwnerKey: 'video-b',
+      activeVisitToken: 2,
     });
     expect(readTestValue(renderer!, 'expanded')).toBe('false');
     expect(readTestValue(renderer!, 'mode')).toBe('collapsed');
@@ -218,10 +213,9 @@ describe('expandable overlay description runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <DescriptionStateHarness
+          activeVisitToken={1}
           description={description}
-          isActive
           measurementCache={measurementCache}
-          stateOwnerKey="video-a"
         />
       );
     });
@@ -257,10 +251,9 @@ describe('expandable overlay description runtime', () => {
     act(() => {
       renderer!.update(
         <DescriptionStateHarness
+          activeVisitToken={null}
           description={description}
-          isActive={false}
           measurementCache={measurementCache}
-          stateOwnerKey="video-a"
         />
       );
     });
@@ -276,16 +269,76 @@ describe('expandable overlay description runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <DescriptionStateHarness
+          activeVisitToken={2}
           description={description}
-          isActive
           measurementCache={measurementCache}
-          stateOwnerKey="video-a"
         />
       );
     });
 
     expect(readTestValue(renderer!, 'mode')).toBe('collapsed');
     expect(readTestValue(renderer!, 'expandable')).toBe('true');
+    expect(readTestValue(renderer!, 'expanded')).toBe('false');
+    expect(readTestValue(renderer!, 'placement')).toBe('inline');
+  });
+
+  it('does not revive expanded state when the same mounted row gets a new active visit token', () => {
+    const measurementCache = createExpandableOverlayDescriptionMeasurementCache();
+    const description =
+      'Compact example of how people soften, dodge, or redirect a tense moment.';
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <DescriptionStateHarness
+          activeVisitToken={1}
+          description={description}
+          measurementCache={measurementCache}
+        />
+      );
+    });
+
+    act(() => {
+      renderer!.root.findByProps({ testID: 'measure' }).props.onTextLayout({
+        nativeEvent: {
+          lines: [{ text: 'line 1' }, { text: 'line 2' }, { text: 'line 3' }],
+        },
+      });
+    });
+
+    act(() => {
+      renderer!.root.findByProps({ testID: 'expand' }).props.onPress({
+        stopPropagation: vi.fn(),
+      });
+    });
+
+    expect(readTestValue(renderer!, 'mode')).toBe('expanded');
+    expect(readTestValue(renderer!, 'placement')).toBe('footer');
+
+    act(() => {
+      renderer!.update(
+        <DescriptionStateHarness
+          activeVisitToken={null}
+          description={description}
+          measurementCache={measurementCache}
+        />
+      );
+    });
+
+    expect(readTestValue(renderer!, 'mode')).toBe('collapsed');
+    expect(readTestValue(renderer!, 'expanded')).toBe('false');
+
+    act(() => {
+      renderer!.update(
+        <DescriptionStateHarness
+          activeVisitToken={2}
+          description={description}
+          measurementCache={measurementCache}
+        />
+      );
+    });
+
+    expect(readTestValue(renderer!, 'mode')).toBe('collapsed');
     expect(readTestValue(renderer!, 'expanded')).toBe('false');
     expect(readTestValue(renderer!, 'placement')).toBe('inline');
   });

@@ -27,20 +27,21 @@ export type ExpandableOverlayDescriptionLayoutContract = {
   contentBottomLift: number;
 };
 
-export type ExpandableOverlayDescriptionUiState = {
-  expandedContentKey: string | null;
+export type ExpandableOverlayDescriptionViewModel = {
+  collapsedViewportHeight: number;
+  currentExpansionKey: string | null;
+  descriptionContainerHeight: number;
+  isExpandable: boolean;
+  isExpanded: boolean;
+  isMeasurementReady: boolean;
+  layoutContract: ExpandableOverlayDescriptionLayoutContract;
+  mode: 'measuring' | 'static' | 'collapsed' | 'expanded';
 };
 
-type ExpandableOverlayDescriptionUiEvent =
-  | { type: 'collapse-pressed' }
-  | { type: 'content-invalidated' }
-  | { contentKey: string; type: 'expand-pressed' };
-
-type ExpandableOverlayDescriptionRenderMode =
-  | 'measuring'
-  | 'static'
-  | 'collapsed'
-  | 'expanded';
+type ExpandableOverlayDescriptionMeasurementTypography = Pick<
+  FullscreenVideoOverlayTypography,
+  'descriptionFontSize' | 'descriptionLineHeight'
+>;
 
 const collapsedLineCount = 2;
 const defaultMeasurementCacheLimit = 120;
@@ -56,24 +57,9 @@ export const fullscreenVideoOverlayTypography: Readonly<FullscreenVideoOverlayTy
 };
 
 export function createExpandableOverlayDescriptionMeasurementTypographyKey(
-  typography: FullscreenVideoOverlayTypography
+  typography: ExpandableOverlayDescriptionMeasurementTypography
 ) {
-  return [
-    `title:${typography.titleFontSize}/${typography.titleLineHeight}`,
-    `description:${typography.descriptionFontSize}/${typography.descriptionLineHeight}`,
-    `action:${typography.actionFontSize}/${typography.actionLineHeight}`,
-    `lane:${typography.actionLaneHeight}`,
-  ].join('|');
-}
-
-export function createExpandableOverlayDescriptionContentKey({
-  measurementKey,
-  stateOwnerKey,
-}: {
-  measurementKey: string;
-  stateOwnerKey: string;
-}) {
-  return `${stateOwnerKey}:${measurementKey}`;
+  return `description:${typography.descriptionFontSize}/${typography.descriptionLineHeight}`;
 }
 
 export function createExpandableOverlayDescriptionMeasurementKey({
@@ -99,20 +85,11 @@ export function createExpandableOverlayDescriptionMeasurementCache(
   };
 }
 
-export function readExpandableOverlayDescriptionMeasurementCache(
+export function peekExpandableOverlayDescriptionMeasurementCache(
   cache: ExpandableOverlayDescriptionMeasurementCache,
   measurementKey: string
 ) {
-  const lines = cache.entries.get(measurementKey);
-
-  if (!lines) {
-    return undefined;
-  }
-
-  cache.entries.delete(measurementKey);
-  cache.entries.set(measurementKey, lines);
-
-  return lines;
+  return cache.entries.get(measurementKey);
 }
 
 export function writeExpandableOverlayDescriptionMeasurementCache({
@@ -145,60 +122,6 @@ export function normalizeExpandableOverlayDescriptionMeasuredLineText(text: stri
   return text.replace(/\s+$/u, '');
 }
 
-export function resolveExpandableOverlayDescriptionMeasurementSnapshot({
-  currentMeasurementKey,
-  measurement,
-}: {
-  currentMeasurementKey: string;
-  measurement: ExpandableOverlayDescriptionMeasurement;
-}) {
-  if (measurement.key !== currentMeasurementKey) {
-    return {
-      isMeasurementReady: false,
-      lines: [] as readonly ExpandableOverlayDescriptionMeasuredLine[],
-    };
-  }
-
-  return {
-    isMeasurementReady: true,
-    lines: measurement.lines,
-  };
-}
-
-export function resolveExpandableOverlayDescriptionRenderMode({
-  isExpanded,
-  isMeasurementReady,
-  lineCount,
-}: {
-  isExpanded: boolean;
-  isMeasurementReady: boolean;
-  lineCount: number;
-}): ExpandableOverlayDescriptionRenderMode {
-  if (!isMeasurementReady) {
-    return 'measuring';
-  }
-
-  if (lineCount <= collapsedLineCount) {
-    return 'static';
-  }
-
-  return isExpanded ? 'expanded' : 'collapsed';
-}
-
-export function resolveExpandableOverlayDescriptionExpandedState({
-  contentKey,
-  expandedContentKey,
-  isActive,
-  isExpandable,
-}: {
-  contentKey: string;
-  expandedContentKey: string | null;
-  isActive: boolean;
-  isExpandable: boolean;
-}) {
-  return isActive && isExpandable && expandedContentKey === contentKey;
-}
-
 export function getExpandableOverlayDescriptionState(
   lines: readonly ExpandableOverlayDescriptionMeasuredLine[]
 ) {
@@ -208,73 +131,99 @@ export function getExpandableOverlayDescriptionState(
   };
 }
 
-export function resolveExpandableOverlayDescriptionLayoutContract({
+export function resolveExpandableOverlayDescriptionViewModel({
   actionGap,
   actionLaneHeight,
-  isExpandable,
-  isExpanded,
+  activeVisitToken,
+  expandedExpansionKey,
+  isMeasurementReady,
+  lineCount,
+  measurementKey,
 }: {
   actionGap: number;
   actionLaneHeight: number;
-  isExpandable: boolean;
-  isExpanded: boolean;
-}): ExpandableOverlayDescriptionLayoutContract {
-  if (!isExpandable) {
+  activeVisitToken: number | null;
+  expandedExpansionKey: string | null;
+  isMeasurementReady: boolean;
+  lineCount: number;
+  measurementKey: string;
+}): ExpandableOverlayDescriptionViewModel {
+  const currentExpansionKey =
+    activeVisitToken === null ? null : `${activeVisitToken}:${measurementKey}`;
+  const isExpandable = isMeasurementReady && lineCount > collapsedLineCount;
+  const isExpanded =
+    currentExpansionKey !== null &&
+    isExpandable &&
+    expandedExpansionKey === currentExpansionKey;
+  const visibleLineCount = Math.min(Math.max(0, lineCount), collapsedLineCount);
+  const collapsedViewportHeight =
+    collapsedLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight;
+  const collapsedHeight =
+    visibleLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight;
+  const expandedHeight =
+    lineCount <= collapsedLineCount
+      ? collapsedHeight
+      : lineCount * fullscreenVideoOverlayTypography.descriptionLineHeight;
+
+  if (!isMeasurementReady) {
     return {
-      actionPlacement: 'hidden',
-      contentBottomLift: 0,
+      collapsedViewportHeight,
+      currentExpansionKey,
+      descriptionContainerHeight: collapsedHeight,
+      isExpandable: false,
+      isExpanded: false,
+      isMeasurementReady,
+      layoutContract: {
+        actionPlacement: 'hidden',
+        contentBottomLift: 0,
+      },
+      mode: 'measuring',
+    };
+  }
+
+  if (lineCount <= collapsedLineCount) {
+    return {
+      collapsedViewportHeight,
+      currentExpansionKey,
+      descriptionContainerHeight: collapsedHeight,
+      isExpandable: false,
+      isExpanded: false,
+      isMeasurementReady,
+      layoutContract: {
+        actionPlacement: 'hidden',
+        contentBottomLift: 0,
+      },
+      mode: 'static',
     };
   }
 
   if (!isExpanded) {
     return {
-      actionPlacement: 'inline',
-      contentBottomLift: 0,
+      collapsedViewportHeight,
+      currentExpansionKey,
+      descriptionContainerHeight: collapsedHeight,
+      isExpandable,
+      isExpanded,
+      isMeasurementReady,
+      layoutContract: {
+        actionPlacement: 'inline',
+        contentBottomLift: 0,
+      },
+      mode: 'collapsed',
     };
   }
 
   return {
-    actionPlacement: 'footer',
-    contentBottomLift: actionLaneHeight + actionGap,
+    collapsedViewportHeight,
+    currentExpansionKey,
+    descriptionContainerHeight: expandedHeight,
+    isExpandable,
+    isExpanded,
+    isMeasurementReady,
+    layoutContract: {
+      actionPlacement: 'footer',
+      contentBottomLift: actionLaneHeight + actionGap,
+    },
+    mode: 'expanded',
   };
-}
-
-export function reduceExpandableOverlayDescriptionUiState(
-  state: ExpandableOverlayDescriptionUiState,
-  event: ExpandableOverlayDescriptionUiEvent
-): ExpandableOverlayDescriptionUiState {
-  switch (event.type) {
-    case 'expand-pressed':
-      return { expandedContentKey: event.contentKey };
-    case 'collapse-pressed':
-    case 'content-invalidated':
-      return { expandedContentKey: null };
-    default:
-      return state;
-  }
-}
-
-export function resolveExpandableOverlayDescriptionHeights(lineCount: number) {
-  const visibleLineCount = Math.min(Math.max(0, lineCount), collapsedLineCount);
-  const collapsedHeight =
-    visibleLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight;
-
-  if (lineCount <= collapsedLineCount) {
-    return {
-      collapsedHeight,
-      expandedHeight: collapsedHeight,
-    };
-  }
-
-  return {
-    collapsedHeight,
-    expandedHeight:
-      lineCount * fullscreenVideoOverlayTypography.descriptionLineHeight,
-  };
-}
-
-export function resolveExpandableOverlayDescriptionCollapsedViewportHeight() {
-  return (
-    collapsedLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight
-  );
 }

@@ -16,10 +16,9 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('ExpandableOverlayDescriptionAction');
     expect(source).toContain('useExpandableOverlayDescriptionState');
     expect(source).toContain('measurementCache');
-    expect(source).toContain('videoId');
+    expect(source).toContain('activeVisitToken');
     expect(source).toContain('layoutContract.contentBottomLift');
     expect(source).toContain('allowFontScaling={false}');
-    expect(source).toContain('isActive');
     expect(source).toContain('isLiked');
     expect(source).toContain('isFavorited');
     expect(source).toContain('LinearTransition.springify()');
@@ -30,6 +29,7 @@ describe('row owned video overlay source', () => {
     expect(source).not.toContain("collapseLabel = '收起'");
     expect(source).not.toContain('setIsExpanded');
     expect(source).not.toContain('setMeasurement');
+    expect(source).not.toContain('stateOwnerKey');
     expect(source).not.toContain('descriptionState.isExpanded && descriptionState.isExpandable');
   });
 });

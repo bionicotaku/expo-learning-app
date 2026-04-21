@@ -1,4 +1,5 @@
 export type FullscreenVideoRowRenderProps = {
+  activeVisitToken: number | null;
   height: number;
   hudPauseIndicatorVisible: boolean;
   hudTransientFeedbackKind: 'seek' | 'rate' | null;
@@ -18,6 +19,7 @@ export function areFullscreenVideoRowRenderPropsEqual(
 ): boolean {
   return (
     previousProps.videoId === nextProps.videoId &&
+    previousProps.activeVisitToken === nextProps.activeVisitToken &&
     previousProps.width === nextProps.width &&
     previousProps.height === nextProps.height &&
     previousProps.hudPauseIndicatorVisible === nextProps.hudPauseIndicatorVisible &&

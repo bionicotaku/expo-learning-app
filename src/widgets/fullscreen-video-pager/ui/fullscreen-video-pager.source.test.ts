@@ -36,6 +36,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain(
       'registerActiveController={\n            isCurrentActiveItem ? registerActiveController : undefined'
     );
+    expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');
     expect(source).not.toContain('progressSnapshot');

@@ -27,37 +27,34 @@ const contentLayoutTransition = LinearTransition.springify()
   .overshootClamping(1);
 
 type RowOwnedVideoOverlayProps = {
+  activeVisitToken: number | null;
   bottomInset: number;
   description: string;
-  isActive: boolean;
   isFavorited: boolean;
   isLiked: boolean;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   title: string;
-  videoId: string;
 };
 
 function RowOwnedVideoOverlayComponent({
+  activeVisitToken,
   bottomInset,
   description,
-  isActive,
   isFavorited,
   isLiked,
   measurementCache,
   onActionPress,
   title,
-  videoId,
 }: RowOwnedVideoOverlayProps) {
   const descriptionState = useExpandableOverlayDescriptionState({
+    activeVisitToken,
     description,
-    isActive,
     maxTextWidth: descriptionTextWidth,
     measurementCache,
-    stateOwnerKey: videoId,
   });
   const contentColumnBottomOffset =
-    contentBottomOffset + descriptionState.layoutContract.contentBottomLift;
+    contentBottomOffset + descriptionState.viewModel.layoutContract.contentBottomLift;
 
   return (
     <View

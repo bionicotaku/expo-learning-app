@@ -30,6 +30,7 @@ import { RowSurfaceStatusOverlay } from './row-surface-status-overlay';
 
 type FullscreenVideoRowProps = {
   accessibilityLabel: string;
+  activeVisitToken: number | null;
   bottomInset: number;
   height: number;
   hudState: FullscreenRowPlaybackHudState;
@@ -54,6 +55,7 @@ type FullscreenVideoRowProps = {
 
 function FullscreenVideoRowComponent({
   accessibilityLabel,
+  activeVisitToken,
   video,
   width,
   height,
@@ -177,15 +179,14 @@ function FullscreenVideoRowComponent({
       ) : null}
 
       <RowOwnedVideoOverlay
+        activeVisitToken={activeVisitToken}
         bottomInset={bottomInset}
         description={video.description}
-        isActive={isActive}
         isFavorited={isFavorited}
         isLiked={isLiked}
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
         title={video.title}
-        videoId={video.videoId}
       />
       <RowPlaybackHudOverlay
         hudState={hudState}
@@ -205,6 +206,7 @@ function areFullscreenVideoRowComponentPropsEqual(
 ): boolean {
   const previousRenderProps: FullscreenVideoRowRenderProps = {
     videoId: previousProps.video.videoId,
+    activeVisitToken: previousProps.activeVisitToken,
     width: previousProps.width,
     height: previousProps.height,
     hudPauseIndicatorVisible: previousProps.hudState.pauseIndicatorVisible,
@@ -221,6 +223,7 @@ function areFullscreenVideoRowComponentPropsEqual(
   };
   const nextRenderProps: FullscreenVideoRowRenderProps = {
     videoId: nextProps.video.videoId,
+    activeVisitToken: nextProps.activeVisitToken,
     width: nextProps.width,
     height: nextProps.height,
     hudPauseIndicatorVisible: nextProps.hudState.pauseIndicatorVisible,

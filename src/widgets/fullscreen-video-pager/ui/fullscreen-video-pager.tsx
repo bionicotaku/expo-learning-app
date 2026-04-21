@@ -156,6 +156,7 @@ export function FullscreenVideoPager({
       return (
         <FullscreenVideoRow
           accessibilityLabel={rowRenderState.accessibilityLabel}
+          activeVisitToken={rowRenderState.activeVisitToken}
           bottomInset={insets.bottom}
           height={height}
           hudState={rowRenderState.hudState}

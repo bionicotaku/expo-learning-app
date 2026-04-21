@@ -1,20 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  createExpandableOverlayDescriptionContentKey,
   createExpandableOverlayDescriptionMeasurementCache,
   createExpandableOverlayDescriptionMeasurementKey,
   createExpandableOverlayDescriptionMeasurementTypographyKey,
   fullscreenVideoOverlayTypography,
   getExpandableOverlayDescriptionState,
   normalizeExpandableOverlayDescriptionMeasuredLineText,
-  readExpandableOverlayDescriptionMeasurementCache,
-  reduceExpandableOverlayDescriptionUiState,
-  resolveExpandableOverlayDescriptionExpandedState,
-  resolveExpandableOverlayDescriptionLayoutContract,
-  resolveExpandableOverlayDescriptionMeasurementSnapshot,
-  resolveExpandableOverlayDescriptionRenderMode,
-  resolveExpandableOverlayDescriptionHeights,
+  peekExpandableOverlayDescriptionMeasurementCache,
+  resolveExpandableOverlayDescriptionViewModel,
   writeExpandableOverlayDescriptionMeasurementCache,
 } from './expandable-overlay-description';
 
@@ -54,96 +48,75 @@ describe('expandable overlay description model', () => {
 
   it('uses a dedicated measuring phase before the description can render collapsed or expanded content', () => {
     expect(
-      resolveExpandableOverlayDescriptionRenderMode({
-        isExpanded: false,
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: null,
+        expandedExpansionKey: null,
         isMeasurementReady: false,
         lineCount: 0,
-      })
+        measurementKey: 'key-a',
+      }).mode
     ).toBe('measuring');
 
     expect(
-      resolveExpandableOverlayDescriptionRenderMode({
-        isExpanded: false,
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: 1,
+        expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 3,
-      })
+        measurementKey: 'key-a',
+      }).mode
     ).toBe('collapsed');
 
     expect(
-      resolveExpandableOverlayDescriptionRenderMode({
-        isExpanded: true,
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: 1,
+        expandedExpansionKey: '1:key-a',
         isMeasurementReady: true,
         lineCount: 3,
-      })
+        measurementKey: 'key-a',
+      }).mode
     ).toBe('expanded');
 
     expect(
-      resolveExpandableOverlayDescriptionRenderMode({
-        isExpanded: false,
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: 1,
+        expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 2,
-      })
+        measurementKey: 'key-a',
+      }).mode
     ).toBe('static');
   });
 
-  it('treats stale measurements as not ready for the current description key', () => {
-    const currentKey = createExpandableOverlayDescriptionMeasurementKey({
-      description: 'current description',
-      maxTextWidth: 248,
-      typographyKey: createExpandableOverlayDescriptionMeasurementTypographyKey(
-        fullscreenVideoOverlayTypography
-      ),
-    });
-
-    expect(
-      resolveExpandableOverlayDescriptionMeasurementSnapshot({
-        currentMeasurementKey: currentKey,
-        measurement: {
-          key: 'stale-key',
-          lines: [{ text: 'line 1' }, { text: 'line 2' }],
-        },
-      })
-    ).toEqual({
-      isMeasurementReady: false,
-      lines: [],
-    });
-
-    expect(
-      resolveExpandableOverlayDescriptionMeasurementSnapshot({
-        currentMeasurementKey: currentKey,
-        measurement: {
-          key: currentKey,
-          lines: [{ text: 'line 1' }, { text: 'line 2' }, { text: 'line 3' }],
-        },
-      })
-    ).toEqual({
-      isMeasurementReady: true,
-      lines: [{ text: 'line 1' }, { text: 'line 2' }, { text: 'line 3' }],
-    });
-  });
-
-  it('uses a fixed two-line collapsed viewport and taller expanded viewport', () => {
-    expect(resolveExpandableOverlayDescriptionHeights(5)).toEqual({
-      collapsedHeight: 32,
-      expandedHeight: 80,
-    });
-  });
-
-  it('keeps collapsed and expanded heights equal when the text is not expandable', () => {
-    expect(resolveExpandableOverlayDescriptionHeights(2)).toEqual({
-      collapsedHeight: 32,
-      expandedHeight: 32,
-    });
-  });
-
-  it('uses the fixed overlay typography contract inside the measurement key', () => {
+  it('uses only description measurement typography inside the measurement key', () => {
     const defaultTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
       fullscreenVideoOverlayTypography
     );
-    const updatedTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey({
+    const updatedVisualTypography = {
       ...fullscreenVideoOverlayTypography,
-      descriptionLineHeight: 18,
-    });
+      titleFontSize: 99,
+      titleLineHeight: 99,
+      actionFontSize: 77,
+      actionLineHeight: 77,
+      actionLaneHeight: 44,
+    };
+    const updatedTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
+      updatedVisualTypography
+    );
+    const updatedDescriptionTypographyKey =
+      createExpandableOverlayDescriptionMeasurementTypographyKey({
+        ...fullscreenVideoOverlayTypography,
+        descriptionFontSize: 18,
+        descriptionLineHeight: 18,
+      });
 
     expect(
       createExpandableOverlayDescriptionMeasurementKey({
@@ -169,12 +142,14 @@ describe('expandable overlay description model', () => {
       createExpandableOverlayDescriptionMeasurementKey({
         description: 'same text',
         maxTextWidth: 248,
-        typographyKey: updatedTypographyKey,
+        typographyKey: updatedDescriptionTypographyKey,
       })
     );
+
+    expect(updatedTypographyKey).toBe(defaultTypographyKey);
   });
 
-  it('touches cached measurements on read so the oldest untouched entry is evicted first', () => {
+  it('keeps measurement cache reads pure and only evicts by insertion order on write', () => {
     const cache = createExpandableOverlayDescriptionMeasurementCache(2);
 
     writeExpandableOverlayDescriptionMeasurementCache({
@@ -187,25 +162,28 @@ describe('expandable overlay description model', () => {
       lines: [{ text: 'second' }],
       measurementKey: 'key-2',
     });
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toEqual([
+
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toEqual([
       { text: 'first' },
     ]);
+    expect([...cache.entries.keys()]).toEqual(['key-1', 'key-2']);
+
     writeExpandableOverlayDescriptionMeasurementCache({
       cache,
       lines: [{ text: 'third' }],
       measurementKey: 'key-3',
     });
 
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toEqual([
-      { text: 'first' },
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toBeUndefined();
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-2')).toEqual([
+      { text: 'second' },
     ]);
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-2')).toBeUndefined();
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-3')).toEqual([
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-3')).toEqual([
       { text: 'third' },
     ]);
   });
 
-  it('keeps collapsed and expanded layout derived from the current content identity', () => {
+  it('derives expansion from the active visit token instead of reviving stale content identity', () => {
     const measurementKey = createExpandableOverlayDescriptionMeasurementKey({
       description: 'same text',
       maxTextWidth: 248,
@@ -213,108 +191,81 @@ describe('expandable overlay description model', () => {
         fullscreenVideoOverlayTypography
       ),
     });
-    const expandedContentKey = createExpandableOverlayDescriptionContentKey({
-      measurementKey,
-      stateOwnerKey: 'video-a',
-    });
+    const expandedExpansionKey = `1:${measurementKey}`;
 
     expect(
-      resolveExpandableOverlayDescriptionExpandedState({
-        contentKey: expandedContentKey,
-        expandedContentKey,
-        isActive: true,
-        isExpandable: true,
-      })
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: 1,
+        expandedExpansionKey,
+        isMeasurementReady: true,
+        lineCount: 3,
+        measurementKey,
+      }).isExpanded
     ).toBe(true);
-    expect(
-      resolveExpandableOverlayDescriptionExpandedState({
-        contentKey: createExpandableOverlayDescriptionContentKey({
-          measurementKey,
-          stateOwnerKey: 'video-b',
-        }),
-        expandedContentKey,
-        isActive: true,
-        isExpandable: true,
-      })
-    ).toBe(false);
-    expect(
-      resolveExpandableOverlayDescriptionExpandedState({
-        contentKey: expandedContentKey,
-        expandedContentKey,
-        isActive: false,
-        isExpandable: true,
-      })
-    ).toBe(false);
-    expect(
-      resolveExpandableOverlayDescriptionExpandedState({
-        contentKey: expandedContentKey,
-        expandedContentKey,
-        isActive: true,
-        isExpandable: false,
-      })
-    ).toBe(false);
-  });
 
-  it('stores the content key on expand press and clears it on collapse-like events', () => {
-    const expandedState = reduceExpandableOverlayDescriptionUiState(
-      { expandedContentKey: null },
-      { type: 'expand-pressed', contentKey: 'video-a:key-1' }
-    );
-
-    expect(expandedState).toEqual({ expandedContentKey: 'video-a:key-1' });
     expect(
-      reduceExpandableOverlayDescriptionUiState(expandedState, {
-        type: 'collapse-pressed',
+      resolveExpandableOverlayDescriptionViewModel({
+        actionGap: 4,
+        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+        activeVisitToken: 2,
+        expandedExpansionKey,
+        isMeasurementReady: true,
+        lineCount: 3,
+        measurementKey,
       })
-    ).toEqual({ expandedContentKey: null });
-    expect(
-      reduceExpandableOverlayDescriptionUiState(expandedState, {
-        type: 'content-invalidated',
-      })
-    ).toEqual({ expandedContentKey: null });
-  });
-
-  it('uses the fixed visual-size overlay typography for description heights', () => {
-    expect(resolveExpandableOverlayDescriptionHeights(5)).toEqual({
-      collapsedHeight:
-        fullscreenVideoOverlayTypography.descriptionLineHeight * 2,
-      expandedHeight:
-        fullscreenVideoOverlayTypography.descriptionLineHeight * 5,
+    ).toMatchObject({
+      isExpanded: false,
+      layoutContract: {
+        actionPlacement: 'inline',
+        contentBottomLift: 0,
+      },
+      mode: 'collapsed',
     });
   });
 
   it('returns a complete layout contract so parents do not assemble conditional offsets themselves', () => {
     expect(
-      resolveExpandableOverlayDescriptionLayoutContract({
+      resolveExpandableOverlayDescriptionViewModel({
         actionGap: 4,
         actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
-        isExpandable: false,
-        isExpanded: false,
-      })
+        activeVisitToken: null,
+        expandedExpansionKey: null,
+        isMeasurementReady: true,
+        lineCount: 2,
+        measurementKey: 'key-a',
+      }).layoutContract
     ).toEqual({
       actionPlacement: 'hidden',
       contentBottomLift: 0,
     });
 
     expect(
-      resolveExpandableOverlayDescriptionLayoutContract({
+      resolveExpandableOverlayDescriptionViewModel({
         actionGap: 4,
         actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
-        isExpandable: true,
-        isExpanded: false,
-      })
+        activeVisitToken: 1,
+        expandedExpansionKey: null,
+        isMeasurementReady: true,
+        lineCount: 3,
+        measurementKey: 'key-a',
+      }).layoutContract
     ).toEqual({
       actionPlacement: 'inline',
       contentBottomLift: 0,
     });
 
     expect(
-      resolveExpandableOverlayDescriptionLayoutContract({
+      resolveExpandableOverlayDescriptionViewModel({
         actionGap: 4,
         actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
-        isExpandable: true,
-        isExpanded: true,
-      })
+        activeVisitToken: 1,
+        expandedExpansionKey: '1:key-a',
+        isMeasurementReady: true,
+        lineCount: 3,
+        measurementKey: 'key-a',
+      }).layoutContract
     ).toEqual({
       actionPlacement: 'footer',
       contentBottomLift:
@@ -322,7 +273,7 @@ describe('expandable overlay description model', () => {
     });
   });
 
-  it('keeps the newest untouched entries when the cache overflows', () => {
+  it('keeps the newest inserted entries when the cache overflows', () => {
     const cache = createExpandableOverlayDescriptionMeasurementCache(2);
 
     writeExpandableOverlayDescriptionMeasurementCache({
@@ -341,11 +292,11 @@ describe('expandable overlay description model', () => {
       measurementKey: 'key-3',
     });
 
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toBeUndefined();
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-2')).toEqual([
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-1')).toBeUndefined();
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-2')).toEqual([
       { text: 'second' },
     ]);
-    expect(readExpandableOverlayDescriptionMeasurementCache(cache, 'key-3')).toEqual([
+    expect(peekExpandableOverlayDescriptionMeasurementCache(cache, 'key-3')).toEqual([
       { text: 'third' },
     ]);
   });

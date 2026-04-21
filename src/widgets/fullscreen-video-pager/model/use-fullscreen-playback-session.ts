@@ -39,6 +39,7 @@ type FullscreenPlaybackSessionArgs = {
 };
 
 type FullscreenRowRenderState = {
+  activeVisitToken: number | null;
   accessibilityLabel: string;
   effectivePlaybackState: ReturnType<typeof resolveEffectivePlaybackState>;
   hudState: FullscreenRowPlaybackHudState;
@@ -56,6 +57,7 @@ export function useFullscreenPlaybackSession({
   const transientFeedbackTimeoutsRef = useRef(
     new Map<string, ReturnType<typeof setTimeout>>()
   );
+  const activeVisitTokenRef = useRef(0);
   const activeSnapshotRef = useRef<{
     index: number | null;
     itemId: string | null;
@@ -65,6 +67,7 @@ export function useFullscreenPlaybackSession({
   });
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeVisitToken, setActiveVisitToken] = useState<number | null>(null);
   const [basePausedByUser, setBasePausedByUser] = useState(false);
   const [transientHoldState, setTransientHoldState] =
     useState<FullscreenTransientHoldState | null>(null);
@@ -230,7 +233,9 @@ export function useFullscreenPlaybackSession({
         index,
         itemId,
       };
+      activeVisitTokenRef.current += 1;
       setActiveIndex(index);
+      setActiveVisitToken(activeVisitTokenRef.current);
       onActiveVideoChange(itemId, index);
     },
     [clearTransientFeedbackByKindForVideo, onActiveVideoChange]
@@ -336,6 +341,7 @@ export function useFullscreenPlaybackSession({
       const isCurrentActiveItem = videoId === activeItemId;
 
       return {
+        activeVisitToken: isCurrentActiveItem ? activeVisitToken : null,
         accessibilityLabel: effectivePlaybackState.shouldPlay
           ? 'Pause video'
           : 'Play video',
@@ -351,6 +357,7 @@ export function useFullscreenPlaybackSession({
     [
       activeIndex,
       activeItemId,
+      activeVisitToken,
       activeSurfaceState,
       basePausedByUser,
       rowPlaybackHudStateByVideoId,

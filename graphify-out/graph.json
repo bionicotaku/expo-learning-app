@@ -329,7 +329,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L1",
       "id": "style_reference_visual_reference_base_jsx",
-      "community": 8,
+      "community": 7,
       "norm_label": "visual-reference-base.jsx"
     },
     {
@@ -338,7 +338,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L30",
       "id": "visual_reference_base_designcanvas",
-      "community": 8,
+      "community": 7,
       "norm_label": "designcanvas()"
     },
     {
@@ -347,7 +347,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L182",
       "id": "visual_reference_base_dcsection",
-      "community": 8,
+      "community": 7,
       "norm_label": "dcsection()"
     },
     {
@@ -356,7 +356,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L210",
       "id": "visual_reference_base_dcartboard",
-      "community": 8,
+      "community": 7,
       "norm_label": "dcartboard()"
     },
     {
@@ -365,7 +365,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L238",
       "id": "visual_reference_base_dcpostit",
-      "community": 8,
+      "community": 7,
       "norm_label": "dcpostit()"
     },
     {
@@ -374,7 +374,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L258",
       "id": "visual_reference_base_iosstatusbar",
-      "community": 8,
+      "community": 7,
       "norm_label": "iosstatusbar()"
     },
     {
@@ -383,7 +383,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L294",
       "id": "visual_reference_base_iosglasspill",
-      "community": 8,
+      "community": 7,
       "norm_label": "iosglasspill()"
     },
     {
@@ -392,7 +392,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L325",
       "id": "visual_reference_base_iosnavbar",
-      "community": 8,
+      "community": 7,
       "norm_label": "iosnavbar()"
     },
     {
@@ -401,7 +401,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L367",
       "id": "visual_reference_base_ioslistrow",
-      "community": 8,
+      "community": 7,
       "norm_label": "ioslistrow()"
     },
     {
@@ -410,7 +410,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L402",
       "id": "visual_reference_base_ioslist",
-      "community": 8,
+      "community": 7,
       "norm_label": "ioslist()"
     },
     {
@@ -419,7 +419,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L422",
       "id": "visual_reference_base_iosdevice",
-      "community": 8,
+      "community": 7,
       "norm_label": "iosdevice()"
     },
     {
@@ -428,7 +428,7 @@
       "source_file": "style-reference/visual-reference-base.jsx",
       "source_location": "L460",
       "id": "visual_reference_base_ioskeyboard",
-      "community": 8,
+      "community": 7,
       "norm_label": "ioskeyboard()"
     },
     {
@@ -455,7 +455,7 @@
       "source_file": "src/root-layout.source.test.ts",
       "source_location": "L1",
       "id": "src_root_layout_source_test_ts",
-      "community": 73,
+      "community": 75,
       "norm_label": "root-layout.source.test.ts"
     },
     {
@@ -599,7 +599,7 @@
       "source_file": "src/features/auth/index.ts",
       "source_location": "L1",
       "id": "src_features_auth_index_ts",
-      "community": 74,
+      "community": 76,
       "norm_label": "index.ts"
     },
     {
@@ -671,7 +671,7 @@
       "source_file": "src/features/auth/ui/auth-code-row.tsx",
       "source_location": "L1",
       "id": "src_features_auth_ui_auth_code_row_tsx",
-      "community": 75,
+      "community": 77,
       "norm_label": "auth-code-row.tsx"
     },
     {
@@ -716,7 +716,7 @@
       "source_file": "src/features/auth/ui/structured-auth-card.tsx",
       "source_location": "L1",
       "id": "src_features_auth_ui_structured_auth_card_tsx",
-      "community": 76,
+      "community": 78,
       "norm_label": "structured-auth-card.tsx"
     },
     {
@@ -761,7 +761,7 @@
       "source_file": "src/features/auth/ui/login-entry-card.tsx",
       "source_location": "L1",
       "id": "src_features_auth_ui_login_entry_card_tsx",
-      "community": 77,
+      "community": 79,
       "norm_label": "login-entry-card.tsx"
     },
     {
@@ -770,7 +770,7 @@
       "source_file": "src/features/auth/ui/title-font.test.ts",
       "source_location": "L1",
       "id": "src_features_auth_ui_title_font_test_ts",
-      "community": 78,
+      "community": 80,
       "norm_label": "title-font.test.ts"
     },
     {
@@ -779,7 +779,7 @@
       "source_file": "src/features/auth/model/navigation.test.ts",
       "source_location": "L1",
       "id": "src_features_auth_model_navigation_test_ts",
-      "community": 79,
+      "community": 81,
       "norm_label": "navigation.test.ts"
     },
     {
@@ -851,7 +851,7 @@
       "source_file": "src/features/auth/model/auth-copy.test.ts",
       "source_location": "L1",
       "id": "src_features_auth_model_auth_copy_test_ts",
-      "community": 80,
+      "community": 82,
       "norm_label": "auth-copy.test.ts"
     },
     {
@@ -860,7 +860,7 @@
       "source_file": "src/features/auth/model/auth-ui-state.test.ts",
       "source_location": "L1",
       "id": "src_features_auth_model_auth_ui_state_test_ts",
-      "community": 81,
+      "community": 83,
       "norm_label": "auth-ui-state.test.ts"
     },
     {
@@ -869,7 +869,7 @@
       "source_file": "src/features/video-runtime/index.ts",
       "source_location": "L1",
       "id": "src_features_video_runtime_index_ts",
-      "community": 82,
+      "community": 84,
       "norm_label": "index.ts"
     },
     {
@@ -950,7 +950,7 @@
       "source_file": "src/features/video-runtime/model/video-runtime.test.ts",
       "source_location": "L1",
       "id": "src_features_video_runtime_model_video_runtime_test_ts",
-      "community": 83,
+      "community": 85,
       "norm_label": "video-runtime.test.ts"
     },
     {
@@ -995,7 +995,7 @@
       "source_file": "src/features/feed-session/index.ts",
       "source_location": "L1",
       "id": "src_features_feed_session_index_ts",
-      "community": 84,
+      "community": 86,
       "norm_label": "index.ts"
     },
     {
@@ -1049,7 +1049,7 @@
       "source_file": "src/features/feed-session/model/feed-session.test.ts",
       "source_location": "L1",
       "id": "src_features_feed_session_model_feed_session_test_ts",
-      "community": 85,
+      "community": 87,
       "norm_label": "feed-session.test.ts"
     },
     {
@@ -1058,7 +1058,7 @@
       "source_file": "src/features/video-playback/index.ts",
       "source_location": "L1",
       "id": "src_features_video_playback_index_ts",
-      "community": 86,
+      "community": 88,
       "norm_label": "index.ts"
     },
     {
@@ -1067,7 +1067,7 @@
       "source_file": "src/features/video-playback/model/playback-session.test.ts",
       "source_location": "L1",
       "id": "src_features_video_playback_model_playback_session_test_ts",
-      "community": 87,
+      "community": 89,
       "norm_label": "playback-session.test.ts"
     },
     {
@@ -1076,7 +1076,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L1",
       "id": "src_features_video_playback_model_playback_session_ts",
-      "community": 11,
+      "community": 10,
       "norm_label": "playback-session.ts"
     },
     {
@@ -1085,7 +1085,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L29",
       "id": "playback_session_resolvefullscreentapzone",
-      "community": 11,
+      "community": 10,
       "norm_label": "resolvefullscreentapzone()"
     },
     {
@@ -1094,7 +1094,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L40",
       "id": "playback_session_resolvefullscreenholdzone",
-      "community": 11,
+      "community": 10,
       "norm_label": "resolvefullscreenholdzone()"
     },
     {
@@ -1103,7 +1103,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L60",
       "id": "playback_session_togglebaseplaybackpausedbyuser",
-      "community": 11,
+      "community": 10,
       "norm_label": "togglebaseplaybackpausedbyuser()"
     },
     {
@@ -1112,7 +1112,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L66",
       "id": "playback_session_createtransientholdstate",
-      "community": 11,
+      "community": 10,
       "norm_label": "createtransientholdstate()"
     },
     {
@@ -1121,7 +1121,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L79",
       "id": "playback_session_isgesturelocked",
-      "community": 11,
+      "community": 10,
       "norm_label": "isgesturelocked()"
     },
     {
@@ -1130,7 +1130,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L85",
       "id": "playback_session_resolvebasepausedbyuserafteractivechange",
-      "community": 11,
+      "community": 10,
       "norm_label": "resolvebasepausedbyuserafteractivechange()"
     },
     {
@@ -1139,7 +1139,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L97",
       "id": "playback_session_resolvetransientholdstateafteractivechange",
-      "community": 11,
+      "community": 10,
       "norm_label": "resolvetransientholdstateafteractivechange()"
     },
     {
@@ -1148,7 +1148,7 @@
       "source_file": "src/features/video-playback/model/playback-session.ts",
       "source_location": "L109",
       "id": "playback_session_resolveeffectiveplaybackstate",
-      "community": 11,
+      "community": 10,
       "norm_label": "resolveeffectiveplaybackstate()"
     },
     {
@@ -1157,7 +1157,7 @@
       "source_file": "src/features/video-playback/model/player-window.test.ts",
       "source_location": "L1",
       "id": "src_features_video_playback_model_player_window_test_ts",
-      "community": 88,
+      "community": 90,
       "norm_label": "player-window.test.ts"
     },
     {
@@ -1166,7 +1166,7 @@
       "source_file": "src/features/video-playback/model/player-window.ts",
       "source_location": "L1",
       "id": "src_features_video_playback_model_player_window_ts",
-      "community": 9,
+      "community": 8,
       "norm_label": "player-window.ts"
     },
     {
@@ -1175,7 +1175,7 @@
       "source_file": "src/features/video-playback/model/player-window.ts",
       "source_location": "L1",
       "id": "player_window_shouldmountplayer",
-      "community": 9,
+      "community": 8,
       "norm_label": "shouldmountplayer()"
     },
     {
@@ -1184,7 +1184,7 @@
       "source_file": "src/features/transcript-source/index.ts",
       "source_location": "L1",
       "id": "src_features_transcript_source_index_ts",
-      "community": 89,
+      "community": 91,
       "norm_label": "index.ts"
     },
     {
@@ -1193,7 +1193,7 @@
       "source_file": "src/features/transcript-source/model/transcript-query.test.ts",
       "source_location": "L1",
       "id": "src_features_transcript_source_model_transcript_query_test_ts",
-      "community": 90,
+      "community": 92,
       "norm_label": "transcript-query.test.ts"
     },
     {
@@ -1202,7 +1202,7 @@
       "source_file": "src/features/transcript-source/model/transcript-prefetch.test.ts",
       "source_location": "L1",
       "id": "src_features_transcript_source_model_transcript_prefetch_test_ts",
-      "community": 91,
+      "community": 93,
       "norm_label": "transcript-prefetch.test.ts"
     },
     {
@@ -1256,7 +1256,7 @@
       "source_file": "src/features/transcript-source/model/use-fullscreen-transcript-source.source.test.ts",
       "source_location": "L1",
       "id": "src_features_transcript_source_model_use_fullscreen_transcript_source_source_test_ts",
-      "community": 92,
+      "community": 94,
       "norm_label": "use-fullscreen-transcript-source.source.test.ts"
     },
     {
@@ -1283,7 +1283,7 @@
       "source_file": "src/features/feed-source/index.ts",
       "source_location": "L1",
       "id": "src_features_feed_source_index_ts",
-      "community": 93,
+      "community": 95,
       "norm_label": "index.ts"
     },
     {
@@ -1508,7 +1508,7 @@
       "source_file": "src/shared/ui/toast/ToastCard.tsx",
       "source_location": "L1",
       "id": "src_shared_ui_toast_toastcard_tsx",
-      "community": 94,
+      "community": 96,
       "norm_label": "toastcard.tsx"
     },
     {
@@ -1517,7 +1517,7 @@
       "source_file": "src/shared/ui/toast/toast-design.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_toast_toast_design_test_ts",
-      "community": 95,
+      "community": 97,
       "norm_label": "toast-design.test.ts"
     },
     {
@@ -1526,7 +1526,7 @@
       "source_file": "src/shared/ui/toast/ToastHost.tsx",
       "source_location": "L1",
       "id": "src_shared_ui_toast_toasthost_tsx",
-      "community": 96,
+      "community": 98,
       "norm_label": "toasthost.tsx"
     },
     {
@@ -1535,7 +1535,7 @@
       "source_file": "src/shared/ui/toast/index.ts",
       "source_location": "L1",
       "id": "src_shared_ui_toast_index_ts",
-      "community": 97,
+      "community": 99,
       "norm_label": "index.ts"
     },
     {
@@ -1598,7 +1598,7 @@
       "source_file": "src/shared/ui/modal/modal-layout.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_modal_modal_layout_test_ts",
-      "community": 98,
+      "community": 100,
       "norm_label": "modal-layout.test.ts"
     },
     {
@@ -1607,7 +1607,7 @@
       "source_file": "src/shared/ui/modal/modal-design.ts",
       "source_location": "L1",
       "id": "src_shared_ui_modal_modal_design_ts",
-      "community": 99,
+      "community": 101,
       "norm_label": "modal-design.ts"
     },
     {
@@ -1634,7 +1634,7 @@
       "source_file": "src/shared/ui/modal/modal-gesture.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_modal_modal_gesture_test_ts",
-      "community": 100,
+      "community": 102,
       "norm_label": "modal-gesture.test.ts"
     },
     {
@@ -1643,7 +1643,7 @@
       "source_file": "src/shared/ui/modal/ModalFrame.tsx",
       "source_location": "L1",
       "id": "src_shared_ui_modal_modalframe_tsx",
-      "community": 101,
+      "community": 103,
       "norm_label": "modalframe.tsx"
     },
     {
@@ -1670,7 +1670,7 @@
       "source_file": "src/shared/ui/modal/index.ts",
       "source_location": "L1",
       "id": "src_shared_ui_modal_index_ts",
-      "community": 102,
+      "community": 104,
       "norm_label": "index.ts"
     },
     {
@@ -1697,7 +1697,7 @@
       "source_file": "src/shared/ui/startup/launch-screen.tsx",
       "source_location": "L1",
       "id": "src_shared_ui_startup_launch_screen_tsx",
-      "community": 103,
+      "community": 105,
       "norm_label": "launch-screen.tsx"
     },
     {
@@ -1706,7 +1706,7 @@
       "source_file": "src/shared/ui/startup/index.ts",
       "source_location": "L1",
       "id": "src_shared_ui_startup_index_ts",
-      "community": 104,
+      "community": 106,
       "norm_label": "index.ts"
     },
     {
@@ -1715,7 +1715,7 @@
       "source_file": "src/shared/ui/startup/launch-screen-design.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_startup_launch_screen_design_test_ts",
-      "community": 105,
+      "community": 107,
       "norm_label": "launch-screen-design.test.ts"
     },
     {
@@ -1787,7 +1787,7 @@
       "source_file": "src/shared/ui/editorial-paper/adaptive-glass-appearance.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_editorial_paper_adaptive_glass_appearance_test_ts",
-      "community": 106,
+      "community": 108,
       "norm_label": "adaptive-glass-appearance.test.ts"
     },
     {
@@ -1931,7 +1931,7 @@
       "source_file": "src/shared/ui/editorial-paper/types.ts",
       "source_location": "L1",
       "id": "src_shared_ui_editorial_paper_types_ts",
-      "community": 107,
+      "community": 109,
       "norm_label": "types.ts"
     },
     {
@@ -1940,7 +1940,7 @@
       "source_file": "src/shared/ui/editorial-paper/glass-support.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_editorial_paper_glass_support_test_ts",
-      "community": 108,
+      "community": 110,
       "norm_label": "glass-support.test.ts"
     },
     {
@@ -2048,7 +2048,7 @@
       "source_file": "src/shared/ui/editorial-paper/index.ts",
       "source_location": "L1",
       "id": "src_shared_ui_editorial_paper_index_ts",
-      "community": 109,
+      "community": 111,
       "norm_label": "index.ts"
     },
     {
@@ -2075,7 +2075,7 @@
       "source_file": "src/shared/ui/editorial-paper/segmented-filter-bar-design.test.ts",
       "source_location": "L1",
       "id": "src_shared_ui_editorial_paper_segmented_filter_bar_design_test_ts",
-      "community": 110,
+      "community": 112,
       "norm_label": "segmented-filter-bar-design.test.ts"
     },
     {
@@ -2084,7 +2084,7 @@
       "source_file": "src/shared/theme/editorial-paper/foundation.test.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_foundation_test_ts",
-      "community": 111,
+      "community": 113,
       "norm_label": "foundation.test.ts"
     },
     {
@@ -2111,7 +2111,7 @@
       "source_file": "src/shared/theme/editorial-paper/glass.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_glass_ts",
-      "community": 112,
+      "community": 114,
       "norm_label": "glass.ts"
     },
     {
@@ -2120,7 +2120,7 @@
       "source_file": "src/shared/theme/editorial-paper/radius.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_radius_ts",
-      "community": 113,
+      "community": 115,
       "norm_label": "radius.ts"
     },
     {
@@ -2129,7 +2129,7 @@
       "source_file": "src/shared/theme/editorial-paper/types.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_types_ts",
-      "community": 114,
+      "community": 116,
       "norm_label": "types.ts"
     },
     {
@@ -2138,7 +2138,7 @@
       "source_file": "src/shared/theme/editorial-paper/elevation.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_elevation_ts",
-      "community": 115,
+      "community": 117,
       "norm_label": "elevation.ts"
     },
     {
@@ -2183,7 +2183,7 @@
       "source_file": "src/shared/theme/editorial-paper/index.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_index_ts",
-      "community": 116,
+      "community": 118,
       "norm_label": "index.ts"
     },
     {
@@ -2192,7 +2192,7 @@
       "source_file": "src/shared/theme/editorial-paper/typography.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_typography_ts",
-      "community": 117,
+      "community": 119,
       "norm_label": "typography.ts"
     },
     {
@@ -2201,7 +2201,7 @@
       "source_file": "src/shared/theme/editorial-paper/spacing.ts",
       "source_location": "L1",
       "id": "src_shared_theme_editorial_paper_spacing_ts",
-      "community": 118,
+      "community": 120,
       "norm_label": "spacing.ts"
     },
     {
@@ -2246,7 +2246,7 @@
       "source_file": "src/shared/lib/toast/types.ts",
       "source_location": "L1",
       "id": "src_shared_lib_toast_types_ts",
-      "community": 119,
+      "community": 121,
       "norm_label": "types.ts"
     },
     {
@@ -2255,7 +2255,7 @@
       "source_file": "src/shared/lib/toast/constants.ts",
       "source_location": "L1",
       "id": "src_shared_lib_toast_constants_ts",
-      "community": 120,
+      "community": 122,
       "norm_label": "constants.ts"
     },
     {
@@ -2264,7 +2264,7 @@
       "source_file": "src/shared/lib/toast/index.ts",
       "source_location": "L1",
       "id": "src_shared_lib_toast_index_ts",
-      "community": 121,
+      "community": 123,
       "norm_label": "index.ts"
     },
     {
@@ -2273,7 +2273,7 @@
       "source_file": "src/shared/lib/toast/service.ts",
       "source_location": "L1",
       "id": "src_shared_lib_toast_service_ts",
-      "community": 122,
+      "community": 124,
       "norm_label": "service.ts"
     },
     {
@@ -2363,7 +2363,7 @@
       "source_file": "src/shared/lib/modal/types.ts",
       "source_location": "L1",
       "id": "src_shared_lib_modal_types_ts",
-      "community": 123,
+      "community": 125,
       "norm_label": "types.ts"
     },
     {
@@ -2372,7 +2372,7 @@
       "source_file": "src/shared/lib/modal/index.ts",
       "source_location": "L1",
       "id": "src_shared_lib_modal_index_ts",
-      "community": 124,
+      "community": 126,
       "norm_label": "index.ts"
     },
     {
@@ -2381,7 +2381,7 @@
       "source_file": "src/shared/lib/modal/service.ts",
       "source_location": "L1",
       "id": "src_shared_lib_modal_service_ts",
-      "community": 125,
+      "community": 127,
       "norm_label": "service.ts"
     },
     {
@@ -2462,7 +2462,7 @@
       "source_file": "src/shared/lib/startup/launch-bootstrap.test.ts",
       "source_location": "L1",
       "id": "src_shared_lib_startup_launch_bootstrap_test_ts",
-      "community": 126,
+      "community": 128,
       "norm_label": "launch-bootstrap.test.ts"
     },
     {
@@ -2498,7 +2498,7 @@
       "source_file": "src/shared/api/request.test.ts",
       "source_location": "L1",
       "id": "src_shared_api_request_test_ts",
-      "community": 127,
+      "community": 129,
       "norm_label": "request.test.ts"
     },
     {
@@ -2561,7 +2561,7 @@
       "source_file": "src/shared/api/index.ts",
       "source_location": "L1",
       "id": "src_shared_api_index_ts",
-      "community": 128,
+      "community": 130,
       "norm_label": "index.ts"
     },
     {
@@ -2570,7 +2570,7 @@
       "source_file": "src/shared/telemetry/index.ts",
       "source_location": "L1",
       "id": "src_shared_telemetry_index_ts",
-      "community": 129,
+      "community": 131,
       "norm_label": "index.ts"
     },
     {
@@ -2579,7 +2579,7 @@
       "source_file": "src/shared/telemetry/model/types.ts",
       "source_location": "L1",
       "id": "src_shared_telemetry_model_types_ts",
-      "community": 130,
+      "community": 132,
       "norm_label": "types.ts"
     },
     {
@@ -2588,7 +2588,7 @@
       "source_file": "src/pages/auth/index.ts",
       "source_location": "L1",
       "id": "src_pages_auth_index_ts",
-      "community": 131,
+      "community": 133,
       "norm_label": "index.ts"
     },
     {
@@ -2615,7 +2615,7 @@
       "source_file": "src/pages/auth/ui/auth-page-shell.tsx",
       "source_location": "L1",
       "id": "src_pages_auth_ui_auth_page_shell_tsx",
-      "community": 132,
+      "community": 134,
       "norm_label": "auth-page-shell.tsx"
     },
     {
@@ -2642,7 +2642,7 @@
       "source_file": "src/pages/auth/ui/layout.test.ts",
       "source_location": "L1",
       "id": "src_pages_auth_ui_layout_test_ts",
-      "community": 133,
+      "community": 135,
       "norm_label": "layout.test.ts"
     },
     {
@@ -2651,7 +2651,7 @@
       "source_file": "src/pages/video-detail/index.ts",
       "source_location": "L1",
       "id": "src_pages_video_detail_index_ts",
-      "community": 134,
+      "community": 136,
       "norm_label": "index.ts"
     },
     {
@@ -2678,7 +2678,7 @@
       "source_file": "src/pages/video-detail/ui/fullscreen-video-session.source.test.ts",
       "source_location": "L1",
       "id": "src_pages_video_detail_ui_fullscreen_video_session_source_test_ts",
-      "community": 135,
+      "community": 137,
       "norm_label": "fullscreen-video-session.source.test.ts"
     },
     {
@@ -2700,13 +2700,49 @@
       "norm_label": "videodetailpage()"
     },
     {
+      "label": "video-detail-page.runtime.test.tsx",
+      "file_type": "code",
+      "source_file": "src/pages/video-detail/ui/video-detail-page.runtime.test.tsx",
+      "source_location": "L1",
+      "id": "src_pages_video_detail_ui_video_detail_page_runtime_test_tsx",
+      "community": 57,
+      "norm_label": "video-detail-page.runtime.test.tsx"
+    },
+    {
+      "label": "FullscreenVideoSession()",
+      "file_type": "code",
+      "source_file": "src/pages/video-detail/ui/video-detail-page.runtime.test.tsx",
+      "source_location": "L87",
+      "id": "video_detail_page_runtime_test_fullscreenvideosession",
+      "community": 57,
+      "norm_label": "fullscreenvideosession()"
+    },
+    {
       "label": "video-detail-page.source.test.ts",
       "file_type": "code",
       "source_file": "src/pages/video-detail/ui/video-detail-page.source.test.ts",
       "source_location": "L1",
       "id": "src_pages_video_detail_ui_video_detail_page_source_test_ts",
-      "community": 136,
+      "community": 138,
       "norm_label": "video-detail-page.source.test.ts"
+    },
+    {
+      "label": "fullscreen-video-session.runtime.test.tsx",
+      "file_type": "code",
+      "source_file": "src/pages/video-detail/ui/fullscreen-video-session.runtime.test.tsx",
+      "source_location": "L1",
+      "id": "src_pages_video_detail_ui_fullscreen_video_session_runtime_test_tsx",
+      "community": 58,
+      "norm_label": "fullscreen-video-session.runtime.test.tsx"
+    },
+    {
+      "label": "FullscreenVideoPager()",
+      "file_type": "code",
+      "source_file": "src/pages/video-detail/ui/fullscreen-video-session.runtime.test.tsx",
+      "source_location": "L69",
+      "id": "fullscreen_video_session_runtime_test_fullscreenvideopager",
+      "community": 58,
+      "norm_label": "fullscreenvideopager()"
     },
     {
       "label": "resolve-video-detail-route-target.test.ts",
@@ -2714,7 +2750,7 @@
       "source_file": "src/pages/video-detail/model/resolve-video-detail-route-target.test.ts",
       "source_location": "L1",
       "id": "src_pages_video_detail_model_resolve_video_detail_route_target_test_ts",
-      "community": 137,
+      "community": 139,
       "norm_label": "resolve-video-detail-route-target.test.ts"
     },
     {
@@ -2723,7 +2759,7 @@
       "source_file": "src/pages/video-detail/model/resolve-video-detail-route-target.ts",
       "source_location": "L1",
       "id": "src_pages_video_detail_model_resolve_video_detail_route_target_ts",
-      "community": 23,
+      "community": 24,
       "norm_label": "resolve-video-detail-route-target.ts"
     },
     {
@@ -2732,7 +2768,7 @@
       "source_file": "src/pages/video-detail/model/resolve-video-detail-route-target.ts",
       "source_location": "L17",
       "id": "resolve_video_detail_route_target_resolvevideodetailroutetarget",
-      "community": 23,
+      "community": 24,
       "norm_label": "resolvevideodetailroutetarget()"
     },
     {
@@ -2741,7 +2777,7 @@
       "source_file": "src/pages/feed/index.ts",
       "source_location": "L1",
       "id": "src_pages_feed_index_ts",
-      "community": 138,
+      "community": 140,
       "norm_label": "index.ts"
     },
     {
@@ -2750,7 +2786,7 @@
       "source_file": "src/pages/feed/ui/restore-scroll.test.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_restore_scroll_test_ts",
-      "community": 139,
+      "community": 141,
       "norm_label": "restore-scroll.test.ts"
     },
     {
@@ -2759,7 +2795,7 @@
       "source_file": "src/pages/feed/ui/feed-page.source.test.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_feed_page_source_test_ts",
-      "community": 140,
+      "community": 142,
       "norm_label": "feed-page.source.test.ts"
     },
     {
@@ -2768,7 +2804,7 @@
       "source_file": "src/pages/feed/ui/restore-scheduler.test.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_restore_scheduler_test_ts",
-      "community": 141,
+      "community": 143,
       "norm_label": "restore-scheduler.test.ts"
     },
     {
@@ -2777,7 +2813,7 @@
       "source_file": "src/pages/feed/ui/restore-scroll.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_restore_scroll_ts",
-      "community": 57,
+      "community": 59,
       "norm_label": "restore-scroll.ts"
     },
     {
@@ -2786,7 +2822,7 @@
       "source_file": "src/pages/feed/ui/restore-scroll.ts",
       "source_location": "L7",
       "id": "restore_scroll_buildfeedrestorescrollparams",
-      "community": 57,
+      "community": 59,
       "norm_label": "buildfeedrestorescrollparams()"
     },
     {
@@ -2804,7 +2840,7 @@
       "source_file": "src/pages/feed/ui/restore-scheduler.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_restore_scheduler_ts",
-      "community": 58,
+      "community": 60,
       "norm_label": "restore-scheduler.ts"
     },
     {
@@ -2813,7 +2849,7 @@
       "source_file": "src/pages/feed/ui/restore-scheduler.ts",
       "source_location": "L14",
       "id": "restore_scheduler_schedulefeedrestore",
-      "community": 58,
+      "community": 60,
       "norm_label": "schedulefeedrestore()"
     },
     {
@@ -2876,7 +2912,7 @@
       "source_file": "src/pages/feed/ui/loading-state.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_loading_state_ts",
-      "community": 59,
+      "community": 61,
       "norm_label": "loading-state.ts"
     },
     {
@@ -2885,7 +2921,7 @@
       "source_file": "src/pages/feed/ui/loading-state.ts",
       "source_location": "L7",
       "id": "loading_state_getfeedlistloadingstate",
-      "community": 59,
+      "community": 61,
       "norm_label": "getfeedlistloadingstate()"
     },
     {
@@ -2894,7 +2930,7 @@
       "source_file": "src/pages/feed/ui/media-feature-card-props.test.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_media_feature_card_props_test_ts",
-      "community": 60,
+      "community": 62,
       "norm_label": "media-feature-card-props.test.ts"
     },
     {
@@ -2903,7 +2939,7 @@
       "source_file": "src/pages/feed/ui/media-feature-card-props.test.ts",
       "source_location": "L6",
       "id": "media_feature_card_props_test_createvideolistitem",
-      "community": 60,
+      "community": 62,
       "norm_label": "createvideolistitem()"
     },
     {
@@ -2912,7 +2948,7 @@
       "source_file": "src/pages/feed/ui/loading-state.test.ts",
       "source_location": "L1",
       "id": "src_pages_feed_ui_loading_state_test_ts",
-      "community": 142,
+      "community": 144,
       "norm_label": "loading-state.test.ts"
     },
     {
@@ -2921,7 +2957,7 @@
       "source_file": "src/pages/me/index.ts",
       "source_location": "L1",
       "id": "src_pages_me_index_ts",
-      "community": 143,
+      "community": 145,
       "norm_label": "index.ts"
     },
     {
@@ -2948,7 +2984,7 @@
       "source_file": "src/pages/save/index.ts",
       "source_location": "L1",
       "id": "src_pages_save_index_ts",
-      "community": 144,
+      "community": 146,
       "norm_label": "index.ts"
     },
     {
@@ -2975,7 +3011,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/index.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_index_ts",
-      "community": 145,
+      "community": 147,
       "norm_label": "index.ts"
     },
     {
@@ -2984,7 +3020,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/top-chrome-overlay.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_top_chrome_overlay_tsx",
-      "community": 146,
+      "community": 148,
       "norm_label": "top-chrome-overlay.tsx"
     },
     {
@@ -2993,7 +3029,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-seek-bar-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_seek_bar_overlay_source_test_ts",
-      "community": 147,
+      "community": 149,
       "norm_label": "row-playback-seek-bar-overlay.source.test.ts"
     },
     {
@@ -3002,7 +3038,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-interaction-layer.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_interaction_layer_source_test_ts",
-      "community": 148,
+      "community": 150,
       "norm_label": "row-playback-interaction-layer.source.test.ts"
     },
     {
@@ -3036,7 +3072,7 @@
       "label": "DescriptionStateHarness()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.runtime.test.tsx",
-      "source_location": "L84",
+      "source_location": "L83",
       "id": "expandable_overlay_description_runtime_test_descriptionstateharness",
       "community": 13,
       "norm_label": "descriptionstateharness()"
@@ -3045,7 +3081,7 @@
       "label": "readTestValue()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.runtime.test.tsx",
-      "source_location": "L121",
+      "source_location": "L118",
       "id": "expandable_overlay_description_runtime_test_readtestvalue",
       "community": 13,
       "norm_label": "readtestvalue()"
@@ -3065,7 +3101,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-media-layer.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_media_layer_source_test_ts",
-      "community": 149,
+      "community": 151,
       "norm_label": "row-playback-media-layer.source.test.ts"
     },
     {
@@ -3074,7 +3110,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-hud-overlay.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_hud_overlay_tsx",
-      "community": 150,
+      "community": 152,
       "norm_label": "row-playback-hud-overlay.tsx"
     },
     {
@@ -3090,7 +3126,7 @@
       "label": "areMeasuredLinesEqual()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.tsx",
-      "source_location": "L72",
+      "source_location": "L62",
       "id": "expandable_overlay_description_aremeasuredlinesequal",
       "community": 13,
       "norm_label": "aremeasuredlinesequal()"
@@ -3099,7 +3135,7 @@
       "label": "useExpandableOverlayDescriptionState()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.tsx",
-      "source_location": "L102",
+      "source_location": "L86",
       "id": "expandable_overlay_description_useexpandableoverlaydescriptionstate",
       "community": 13,
       "norm_label": "useexpandableoverlaydescriptionstate()"
@@ -3110,7 +3146,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/video-overlay-action-rail.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_video_overlay_action_rail_source_test_ts",
-      "community": 151,
+      "community": 153,
       "norm_label": "video-overlay-action-rail.source.test.ts"
     },
     {
@@ -3119,7 +3155,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-owned-video-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_owned_video_overlay_source_test_ts",
-      "community": 152,
+      "community": 154,
       "norm_label": "row-owned-video-overlay.source.test.ts"
     },
     {
@@ -3128,7 +3164,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-hud-anchors.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_hud_anchors_tsx",
-      "community": 153,
+      "community": 155,
       "norm_label": "row-hud-anchors.tsx"
     },
     {
@@ -3137,7 +3173,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/video-overlay-action-button.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_video_overlay_action_button_tsx",
-      "community": 154,
+      "community": 156,
       "norm_label": "video-overlay-action-button.tsx"
     },
     {
@@ -3146,7 +3182,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-row.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_row_source_test_ts",
-      "community": 155,
+      "community": 157,
       "norm_label": "fullscreen-video-row.source.test.ts"
     },
     {
@@ -3155,7 +3191,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_expandable_overlay_description_source_test_ts",
-      "community": 156,
+      "community": 158,
       "norm_label": "expandable-overlay-description.source.test.ts"
     },
     {
@@ -3164,7 +3200,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-pager.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_pager_source_test_ts",
-      "community": 157,
+      "community": 159,
       "norm_label": "fullscreen-video-pager.source.test.ts"
     },
     {
@@ -3173,7 +3209,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-row.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_row_tsx",
-      "community": 158,
+      "community": 160,
       "norm_label": "fullscreen-video-row.tsx"
     },
     {
@@ -3182,7 +3218,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-surface-status-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_surface_status_overlay_source_test_ts",
-      "community": 159,
+      "community": 161,
       "norm_label": "row-surface-status-overlay.source.test.ts"
     },
     {
@@ -3191,7 +3227,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/video-overlay-action-rail.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_video_overlay_action_rail_tsx",
-      "community": 160,
+      "community": 162,
       "norm_label": "video-overlay-action-rail.tsx"
     },
     {
@@ -3200,7 +3236,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-seek-bar-overlay.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_seek_bar_overlay_tsx",
-      "community": 61,
+      "community": 63,
       "norm_label": "row-playback-seek-bar-overlay.tsx"
     },
     {
@@ -3209,7 +3245,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-seek-bar-overlay.tsx",
       "source_location": "L26",
       "id": "row_playback_seek_bar_overlay_formatseekbartime",
-      "community": 61,
+      "community": 63,
       "norm_label": "formatseekbartime()"
     },
     {
@@ -3218,7 +3254,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/top-chrome-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_top_chrome_overlay_source_test_ts",
-      "community": 161,
+      "community": 163,
       "norm_label": "top-chrome-overlay.source.test.ts"
     },
     {
@@ -3227,7 +3263,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-media-layer.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_media_layer_tsx",
-      "community": 162,
+      "community": 164,
       "norm_label": "row-playback-media-layer.tsx"
     },
     {
@@ -3236,7 +3272,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-surface-status-overlay.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_surface_status_overlay_tsx",
-      "community": 163,
+      "community": 165,
       "norm_label": "row-surface-status-overlay.tsx"
     },
     {
@@ -3245,7 +3281,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/fullscreen-video-pager.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_fullscreen_video_pager_tsx",
-      "community": 164,
+      "community": 166,
       "norm_label": "fullscreen-video-pager.tsx"
     },
     {
@@ -3254,7 +3290,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-interaction-layer.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_interaction_layer_tsx",
-      "community": 62,
+      "community": 64,
       "norm_label": "row-playback-interaction-layer.tsx"
     },
     {
@@ -3263,7 +3299,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-interaction-layer.tsx",
       "source_location": "L66",
       "id": "row_playback_interaction_layer_backgroundgestureregion",
-      "community": 62,
+      "community": 64,
       "norm_label": "backgroundgestureregion()"
     },
     {
@@ -3272,7 +3308,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/playable-video-surface.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_playable_video_surface_source_test_ts",
-      "community": 165,
+      "community": 167,
       "norm_label": "playable-video-surface.source.test.ts"
     },
     {
@@ -3281,7 +3317,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-playback-hud-overlay.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_playback_hud_overlay_source_test_ts",
-      "community": 166,
+      "community": 168,
       "norm_label": "row-playback-hud-overlay.source.test.ts"
     },
     {
@@ -3290,7 +3326,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/video-overlay-action-button.source.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_video_overlay_action_button_source_test_ts",
-      "community": 167,
+      "community": 169,
       "norm_label": "video-overlay-action-button.source.test.ts"
     },
     {
@@ -3299,7 +3335,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/ui/row-owned-video-overlay.tsx",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_ui_row_owned_video_overlay_tsx",
-      "community": 168,
+      "community": 170,
       "norm_label": "row-owned-video-overlay.tsx"
     },
     {
@@ -3335,7 +3371,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-seek-bar-store.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_playback_seek_bar_store_ts",
-      "community": 63,
+      "community": 65,
       "norm_label": "row-playback-seek-bar-store.ts"
     },
     {
@@ -3344,7 +3380,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-seek-bar-store.ts",
       "source_location": "L21",
       "id": "row_playback_seek_bar_store_createrowplaybackseekbarstore",
-      "community": 63,
+      "community": 65,
       "norm_label": "createrowplaybackseekbarstore()"
     },
     {
@@ -3353,7 +3389,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/overlay-data.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_overlay_data_ts",
-      "community": 64,
+      "community": 66,
       "norm_label": "overlay-data.ts"
     },
     {
@@ -3362,7 +3398,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/overlay-data.ts",
       "source_location": "L39",
       "id": "overlay_data_formatfullscreenvideocounterlabel",
-      "community": 64,
+      "community": 66,
       "norm_label": "formatfullscreenvideocounterlabel()"
     },
     {
@@ -3371,7 +3407,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_test_ts",
-      "community": 169,
+      "community": 171,
       "norm_label": "expandable-overlay-description.test.ts"
     },
     {
@@ -3380,7 +3416,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/initial-positioning.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_initial_positioning_test_ts",
-      "community": 170,
+      "community": 172,
       "norm_label": "initial-positioning.test.ts"
     },
     {
@@ -3416,7 +3452,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-video-change.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_active_video_change_ts",
-      "community": 65,
+      "community": 67,
       "norm_label": "active-video-change.ts"
     },
     {
@@ -3425,7 +3461,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-video-change.ts",
       "source_location": "L22",
       "id": "active_video_change_resolveactivevideochange",
-      "community": 65,
+      "community": 67,
       "norm_label": "resolveactivevideochange()"
     },
     {
@@ -3434,7 +3470,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-player-controller.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_active_player_controller_ts",
-      "community": 66,
+      "community": 68,
       "norm_label": "active-player-controller.ts"
     },
     {
@@ -3443,7 +3479,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-player-controller.ts",
       "source_location": "L8",
       "id": "active_player_controller_resolveactiveplayersurfacestate",
-      "community": 66,
+      "community": 68,
       "norm_label": "resolveactiveplayersurfacestate()"
     },
     {
@@ -3452,7 +3488,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_playback_hud_state_ts",
-      "community": 10,
+      "community": 9,
       "norm_label": "row-playback-hud-state.ts"
     },
     {
@@ -3461,7 +3497,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L26",
       "id": "row_playback_hud_state_pruneifempty",
-      "community": 10,
+      "community": 9,
       "norm_label": "pruneifempty()"
     },
     {
@@ -3470,7 +3506,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L44",
       "id": "row_playback_hud_state_updatehudstate",
-      "community": 10,
+      "community": 9,
       "norm_label": "updatehudstate()"
     },
     {
@@ -3479,7 +3515,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L57",
       "id": "row_playback_hud_state_getfullscreenrowplaybackhudstate",
-      "community": 10,
+      "community": 9,
       "norm_label": "getfullscreenrowplaybackhudstate()"
     },
     {
@@ -3488,7 +3524,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L64",
       "id": "row_playback_hud_state_showfullscreenrowpauseindicator",
-      "community": 10,
+      "community": 9,
       "norm_label": "showfullscreenrowpauseindicator()"
     },
     {
@@ -3497,7 +3533,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L74",
       "id": "row_playback_hud_state_hidefullscreenrowpauseindicator",
-      "community": 10,
+      "community": 9,
       "norm_label": "hidefullscreenrowpauseindicator()"
     },
     {
@@ -3506,7 +3542,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L84",
       "id": "row_playback_hud_state_setfullscreenrowtransientfeedback",
-      "community": 10,
+      "community": 9,
       "norm_label": "setfullscreenrowtransientfeedback()"
     },
     {
@@ -3515,7 +3551,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L95",
       "id": "row_playback_hud_state_clearfullscreenrowtransientfeedback",
-      "community": 10,
+      "community": 9,
       "norm_label": "clearfullscreenrowtransientfeedback()"
     },
     {
@@ -3524,7 +3560,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L105",
       "id": "row_playback_hud_state_clearfullscreenrowtransientfeedbackbykind",
-      "community": 10,
+      "community": 9,
       "norm_label": "clearfullscreenrowtransientfeedbackbykind()"
     },
     {
@@ -3533,7 +3569,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.ts",
       "source_location": "L119",
       "id": "row_playback_hud_state_clearfullscreenrowplaybackhudstate",
-      "community": 10,
+      "community": 9,
       "norm_label": "clearfullscreenrowplaybackhudstate()"
     },
     {
@@ -3542,7 +3578,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-player-controller.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_active_player_controller_test_ts",
-      "community": 171,
+      "community": 173,
       "norm_label": "active-player-controller.test.ts"
     },
     {
@@ -3578,7 +3614,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/seek-bar-target.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_seek_bar_target_test_ts",
-      "community": 172,
+      "community": 174,
       "norm_label": "seek-bar-target.test.ts"
     },
     {
@@ -3587,7 +3623,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-hud-state.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_playback_hud_state_test_ts",
-      "community": 173,
+      "community": 175,
       "norm_label": "row-playback-hud-state.test.ts"
     },
     {
@@ -3596,7 +3632,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-surface-presentation.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_surface_presentation_ts",
-      "community": 174,
+      "community": 176,
       "norm_label": "row-surface-presentation.ts"
     },
     {
@@ -3612,7 +3648,7 @@
       "label": "areFullscreenVideoRowRenderPropsEqual()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.ts",
-      "source_location": "L15",
+      "source_location": "L16",
       "id": "render_props_arefullscreenvideorowrenderpropsequal",
       "community": 32,
       "norm_label": "arefullscreenvideorowrenderpropsequal()"
@@ -3621,7 +3657,7 @@
       "label": "arePlayableVideoSurfacePropsEqual()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.ts",
-      "source_location": "L42",
+      "source_location": "L44",
       "id": "render_props_areplayablevideosurfacepropsequal",
       "community": 32,
       "norm_label": "areplayablevideosurfacepropsequal()"
@@ -3632,7 +3668,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/seek-bar-layout.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_seek_bar_layout_test_ts",
-      "community": 175,
+      "community": 177,
       "norm_label": "seek-bar-layout.test.ts"
     },
     {
@@ -3641,143 +3677,80 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "expandable-overlay-description.ts"
     },
     {
       "label": "createExpandableOverlayDescriptionMeasurementTypographyKey()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L58",
+      "source_location": "L59",
       "id": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementtypographykey",
-      "community": 3,
+      "community": 11,
       "norm_label": "createexpandableoverlaydescriptionmeasurementtypographykey()"
-    },
-    {
-      "label": "createExpandableOverlayDescriptionContentKey()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L69",
-      "id": "expandable_overlay_description_createexpandableoverlaydescriptioncontentkey",
-      "community": 3,
-      "norm_label": "createexpandableoverlaydescriptioncontentkey()"
     },
     {
       "label": "createExpandableOverlayDescriptionMeasurementKey()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L79",
+      "source_location": "L65",
       "id": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementkey",
-      "community": 3,
+      "community": 11,
       "norm_label": "createexpandableoverlaydescriptionmeasurementkey()"
     },
     {
       "label": "createExpandableOverlayDescriptionMeasurementCache()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L93",
+      "source_location": "L79",
       "id": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementcache",
-      "community": 3,
+      "community": 11,
       "norm_label": "createexpandableoverlaydescriptionmeasurementcache()"
     },
     {
-      "label": "readExpandableOverlayDescriptionMeasurementCache()",
+      "label": "peekExpandableOverlayDescriptionMeasurementCache()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L102",
-      "id": "expandable_overlay_description_readexpandableoverlaydescriptionmeasurementcache",
-      "community": 3,
-      "norm_label": "readexpandableoverlaydescriptionmeasurementcache()"
+      "source_location": "L88",
+      "id": "expandable_overlay_description_peekexpandableoverlaydescriptionmeasurementcache",
+      "community": 11,
+      "norm_label": "peekexpandableoverlaydescriptionmeasurementcache()"
     },
     {
       "label": "writeExpandableOverlayDescriptionMeasurementCache()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L118",
+      "source_location": "L95",
       "id": "expandable_overlay_description_writeexpandableoverlaydescriptionmeasurementcache",
-      "community": 3,
+      "community": 11,
       "norm_label": "writeexpandableoverlaydescriptionmeasurementcache()"
     },
     {
       "label": "normalizeExpandableOverlayDescriptionMeasuredLineText()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L144",
+      "source_location": "L121",
       "id": "expandable_overlay_description_normalizeexpandableoverlaydescriptionmeasuredlinetext",
-      "community": 3,
+      "community": 11,
       "norm_label": "normalizeexpandableoverlaydescriptionmeasuredlinetext()"
-    },
-    {
-      "label": "resolveExpandableOverlayDescriptionMeasurementSnapshot()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L148",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionmeasurementsnapshot",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptionmeasurementsnapshot()"
-    },
-    {
-      "label": "resolveExpandableOverlayDescriptionRenderMode()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L168",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionrendermode",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptionrendermode()"
-    },
-    {
-      "label": "resolveExpandableOverlayDescriptionExpandedState()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L188",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionexpandedstate",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptionexpandedstate()"
     },
     {
       "label": "getExpandableOverlayDescriptionState()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L202",
+      "source_location": "L125",
       "id": "expandable_overlay_description_getexpandableoverlaydescriptionstate",
-      "community": 3,
+      "community": 11,
       "norm_label": "getexpandableoverlaydescriptionstate()"
     },
     {
-      "label": "resolveExpandableOverlayDescriptionLayoutContract()",
+      "label": "resolveExpandableOverlayDescriptionViewModel()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L211",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionlayoutcontract",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptionlayoutcontract()"
-    },
-    {
-      "label": "reduceExpandableOverlayDescriptionUiState()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L242",
-      "id": "expandable_overlay_description_reduceexpandableoverlaydescriptionuistate",
-      "community": 3,
-      "norm_label": "reduceexpandableoverlaydescriptionuistate()"
-    },
-    {
-      "label": "resolveExpandableOverlayDescriptionHeights()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L257",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionheights",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptionheights()"
-    },
-    {
-      "label": "resolveExpandableOverlayDescriptionCollapsedViewportHeight()",
-      "file_type": "code",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L276",
-      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptioncollapsedviewportheight",
-      "community": 3,
-      "norm_label": "resolveexpandableoverlaydescriptioncollapsedviewportheight()"
+      "source_location": "L134",
+      "id": "expandable_overlay_description_resolveexpandableoverlaydescriptionviewmodel",
+      "community": 11,
+      "norm_label": "resolveexpandableoverlaydescriptionviewmodel()"
     },
     {
       "label": "loading-state.ts",
@@ -3785,7 +3758,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/loading-state.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_loading_state_ts",
-      "community": 67,
+      "community": 69,
       "norm_label": "loading-state.ts"
     },
     {
@@ -3794,7 +3767,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/loading-state.ts",
       "source_location": "L5",
       "id": "loading_state_getfullscreenvideoloadingstate",
-      "community": 67,
+      "community": 69,
       "norm_label": "getfullscreenvideoloadingstate()"
     },
     {
@@ -3803,16 +3776,16 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/use-fullscreen-playback-session.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_use_fullscreen_playback_session_ts",
-      "community": 68,
+      "community": 70,
       "norm_label": "use-fullscreen-playback-session.ts"
     },
     {
       "label": "useFullscreenPlaybackSession()",
       "file_type": "code",
       "source_file": "src/widgets/fullscreen-video-pager/model/use-fullscreen-playback-session.ts",
-      "source_location": "L48",
+      "source_location": "L49",
       "id": "use_fullscreen_playback_session_usefullscreenplaybacksession",
-      "community": 68,
+      "community": 70,
       "norm_label": "usefullscreenplaybacksession()"
     },
     {
@@ -3821,7 +3794,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-hud-layout.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_hud_layout_test_ts",
-      "community": 176,
+      "community": 178,
       "norm_label": "row-hud-layout.test.ts"
     },
     {
@@ -3830,7 +3803,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-playback-seek-bar-store.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_playback_seek_bar_store_test_ts",
-      "community": 177,
+      "community": 179,
       "norm_label": "row-playback-seek-bar-store.test.ts"
     },
     {
@@ -3839,7 +3812,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-progress-snapshot.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_row_progress_snapshot_ts",
-      "community": 24,
+      "community": 23,
       "norm_label": "row-progress-snapshot.ts"
     },
     {
@@ -3848,7 +3821,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-progress-snapshot.ts",
       "source_location": "L9",
       "id": "row_progress_snapshot_clampratio",
-      "community": 24,
+      "community": 23,
       "norm_label": "clampratio()"
     },
     {
@@ -3857,7 +3830,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-progress-snapshot.ts",
       "source_location": "L17",
       "id": "row_progress_snapshot_normalizeseconds",
-      "community": 24,
+      "community": 23,
       "norm_label": "normalizeseconds()"
     },
     {
@@ -3866,7 +3839,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/row-progress-snapshot.ts",
       "source_location": "L25",
       "id": "row_progress_snapshot_createfullscreenrowprogresssnapshot",
-      "community": 24,
+      "community": 23,
       "norm_label": "createfullscreenrowprogresssnapshot()"
     },
     {
@@ -3875,7 +3848,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/overlay-data.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_overlay_data_test_ts",
-      "community": 178,
+      "community": 180,
       "norm_label": "overlay-data.test.ts"
     },
     {
@@ -3884,7 +3857,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/active-video-change.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_active_video_change_test_ts",
-      "community": 179,
+      "community": 181,
       "norm_label": "active-video-change.test.ts"
     },
     {
@@ -3893,7 +3866,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_render_props_test_ts",
-      "community": 180,
+      "community": 182,
       "norm_label": "render-props.test.ts"
     },
     {
@@ -3929,7 +3902,7 @@
       "source_file": "src/widgets/fullscreen-video-pager/model/loading-state.test.ts",
       "source_location": "L1",
       "id": "src_widgets_fullscreen_video_pager_model_loading_state_test_ts",
-      "community": 181,
+      "community": 183,
       "norm_label": "loading-state.test.ts"
     },
     {
@@ -3938,7 +3911,7 @@
       "source_file": "src/widgets/media-feature-card/index.ts",
       "source_location": "L1",
       "id": "src_widgets_media_feature_card_index_ts",
-      "community": 182,
+      "community": 184,
       "norm_label": "index.ts"
     },
     {
@@ -3947,7 +3920,7 @@
       "source_file": "src/widgets/media-feature-card/ui/media-feature-card.tsx",
       "source_location": "L1",
       "id": "src_widgets_media_feature_card_ui_media_feature_card_tsx",
-      "community": 69,
+      "community": 71,
       "norm_label": "media-feature-card.tsx"
     },
     {
@@ -3956,7 +3929,7 @@
       "source_file": "src/widgets/media-feature-card/ui/media-feature-card.tsx",
       "source_location": "L35",
       "id": "media_feature_card_resolvetonecolor",
-      "community": 69,
+      "community": 71,
       "norm_label": "resolvetonecolor()"
     },
     {
@@ -3965,7 +3938,7 @@
       "source_file": "src/entities/video/index.ts",
       "source_location": "L1",
       "id": "src_entities_video_index_ts",
-      "community": 183,
+      "community": 185,
       "norm_label": "index.ts"
     },
     {
@@ -3974,7 +3947,7 @@
       "source_file": "src/entities/video/model/video-list-item.test.ts",
       "source_location": "L1",
       "id": "src_entities_video_model_video_list_item_test_ts",
-      "community": 70,
+      "community": 72,
       "norm_label": "video-list-item.test.ts"
     },
     {
@@ -3983,7 +3956,7 @@
       "source_file": "src/entities/video/model/video-list-item.test.ts",
       "source_location": "L10",
       "id": "video_list_item_test_createfeeditem",
-      "community": 70,
+      "community": 72,
       "norm_label": "createfeeditem()"
     },
     {
@@ -3992,7 +3965,7 @@
       "source_file": "src/entities/video/model/map-feed-item-to-video-list-item.ts",
       "source_location": "L1",
       "id": "src_entities_video_model_map_feed_item_to_video_list_item_ts",
-      "community": 71,
+      "community": 73,
       "norm_label": "map-feed-item-to-video-list-item.ts"
     },
     {
@@ -4001,7 +3974,7 @@
       "source_file": "src/entities/video/model/map-feed-item-to-video-list-item.ts",
       "source_location": "L5",
       "id": "map_feed_item_to_video_list_item_mapfeeditemtovideolistitem",
-      "community": 71,
+      "community": 73,
       "norm_label": "mapfeeditemtovideolistitem()"
     },
     {
@@ -4046,7 +4019,7 @@
       "source_file": "src/entities/video/model/mock-clip-catalog.test.ts",
       "source_location": "L1",
       "id": "src_entities_video_model_mock_clip_catalog_test_ts",
-      "community": 184,
+      "community": 186,
       "norm_label": "mock-clip-catalog.test.ts"
     },
     {
@@ -4055,7 +4028,7 @@
       "source_file": "src/entities/video/model/find-video-list-item-index.ts",
       "source_location": "L1",
       "id": "src_entities_video_model_find_video_list_item_index_ts",
-      "community": 23,
+      "community": 24,
       "norm_label": "find-video-list-item-index.ts"
     },
     {
@@ -4064,7 +4037,7 @@
       "source_file": "src/entities/video/model/find-video-list-item-index.ts",
       "source_location": "L3",
       "id": "find_video_list_item_index_findvideolistitemindex",
-      "community": 23,
+      "community": 24,
       "norm_label": "findvideolistitemindex()"
     },
     {
@@ -4073,7 +4046,7 @@
       "source_file": "src/entities/video/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_video_model_types_ts",
-      "community": 185,
+      "community": 187,
       "norm_label": "types.ts"
     },
     {
@@ -4082,7 +4055,7 @@
       "source_file": "src/entities/transcript/index.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_index_ts",
-      "community": 186,
+      "community": 188,
       "norm_label": "index.ts"
     },
     {
@@ -4091,7 +4064,7 @@
       "source_file": "src/entities/transcript/model/dto.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_model_dto_ts",
-      "community": 187,
+      "community": 189,
       "norm_label": "dto.ts"
     },
     {
@@ -4145,7 +4118,7 @@
       "source_file": "src/entities/transcript/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_model_types_ts",
-      "community": 188,
+      "community": 190,
       "norm_label": "types.ts"
     },
     {
@@ -4154,7 +4127,7 @@
       "source_file": "src/entities/transcript/model/mappers.test.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_model_mappers_test_ts",
-      "community": 189,
+      "community": 191,
       "norm_label": "mappers.test.ts"
     },
     {
@@ -4163,7 +4136,7 @@
       "source_file": "src/entities/transcript/api/transcript-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_api_transcript_repository_test_ts",
-      "community": 190,
+      "community": 192,
       "norm_label": "transcript-repository.test.ts"
     },
     {
@@ -4190,7 +4163,7 @@
       "source_file": "src/entities/transcript/api/mock-transcript-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_transcript_api_mock_transcript_repository_test_ts",
-      "community": 191,
+      "community": 193,
       "norm_label": "mock-transcript-repository.test.ts"
     },
     {
@@ -4235,7 +4208,7 @@
       "source_file": "src/entities/favorite/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_favorite_model_types_ts",
-      "community": 192,
+      "community": 194,
       "norm_label": "types.ts"
     },
     {
@@ -4244,7 +4217,7 @@
       "source_file": "src/entities/feed/index.ts",
       "source_location": "L1",
       "id": "src_entities_feed_index_ts",
-      "community": 193,
+      "community": 195,
       "norm_label": "index.ts"
     },
     {
@@ -4253,7 +4226,7 @@
       "source_file": "src/entities/feed/model/types.ts",
       "source_location": "L1",
       "id": "src_entities_feed_model_types_ts",
-      "community": 194,
+      "community": 196,
       "norm_label": "types.ts"
     },
     {
@@ -4280,7 +4253,7 @@
       "source_file": "src/entities/feed/api/feed-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_feed_api_feed_repository_test_ts",
-      "community": 195,
+      "community": 197,
       "norm_label": "feed-repository.test.ts"
     },
     {
@@ -4424,7 +4397,7 @@
       "source_file": "src/entities/feed/api/mock-feed-repository.test.ts",
       "source_location": "L1",
       "id": "src_entities_feed_api_mock_feed_repository_test_ts",
-      "community": 196,
+      "community": 198,
       "norm_label": "mock-feed-repository.test.ts"
     },
     {
@@ -4488,7 +4461,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "mock data behaves like real async flow",
       "id": "doc_norm_mock_real_flow"
     },
@@ -4540,7 +4513,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 74,
       "norm_label": "supabase auth",
       "id": "doc_tech_supabase_auth"
     },
@@ -4553,7 +4526,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "react query feed pagination",
       "id": "doc_tech_react_query"
     },
@@ -4566,7 +4539,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "expo-video playback",
       "id": "doc_tech_expo_video"
     },
@@ -4605,7 +4578,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 74,
       "norm_label": "auth coupling stays inside auth layer",
       "id": "doc_tech_sdk_coupling_rationale"
     },
@@ -4631,7 +4604,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "mvp closed loop",
       "id": "doc_product_mvp_closed_loop"
     },
@@ -4644,7 +4617,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "continuous video feed",
       "id": "doc_product_video_feed"
     },
@@ -4657,7 +4630,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "learning retention space",
       "id": "doc_product_learning_workspace"
     },
@@ -4670,7 +4643,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "real account system",
       "id": "doc_product_real_auth"
     },
@@ -4683,7 +4656,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "mock business data with real async flow",
       "id": "doc_product_mock_async_data"
     },
@@ -4696,7 +4669,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "feed-first entry rationale",
       "id": "doc_product_feed_first_rationale"
     },
@@ -4709,7 +4682,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 8,
       "norm_label": "persistent assets need authentication",
       "id": "doc_product_auth_asset_rationale"
     },
@@ -4722,7 +4695,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "project specification",
       "id": "\u9879\u76ee\u89c4\u8303_project_specification"
     },
@@ -4735,7 +4708,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "lightweight fsd structure",
       "id": "\u9879\u76ee\u89c4\u8303_lightweight_fsd"
     },
@@ -4748,7 +4721,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "dependency direction rules",
       "id": "\u9879\u76ee\u89c4\u8303_dependency_direction"
     },
@@ -4761,7 +4734,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "shared layer boundary",
       "id": "\u9879\u76ee\u89c4\u8303_shared_layer"
     },
@@ -4774,7 +4747,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "app route layer boundary",
       "id": "\u9879\u76ee\u89c4\u8303_app_layer"
     },
@@ -4865,7 +4838,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "network and telemetry layer",
       "id": "\u7f51\u7edc\u5c42\u4e0e\u4e8b\u4ef6\u4e0a\u62a5\u89c4\u8303_network_layer"
     },
@@ -4891,7 +4864,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "interactive write",
       "id": "\u7f51\u7edc\u5c42\u4e0e\u4e8b\u4ef6\u4e0a\u62a5\u89c4\u8303_interactive_write"
     },
@@ -4904,7 +4877,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "telemetry channel",
       "id": "\u7f51\u7edc\u5c42\u4e0e\u4e8b\u4ef6\u4e0a\u62a5\u89c4\u8303_telemetry"
     },
@@ -4930,7 +4903,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "pending operation key",
       "id": "\u7f51\u7edc\u5c42\u4e0e\u4e8b\u4ef6\u4e0a\u62a5\u89c4\u8303_pending_operation_key"
     },
@@ -4943,7 +4916,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "telemetry persistence rationale",
       "id": "\u7f51\u7edc\u5c42\u4e0e\u4e8b\u4ef6\u4e0a\u62a5\u89c4\u8303_telemetry_persistence_rationale"
     },
@@ -4956,7 +4929,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "editorial paper ui system",
       "id": "\u7f16\u8f91\u7eb8\u611fUI\u8bbe\u8ba1\u89c4\u8303_editorial_paper"
     },
@@ -4969,7 +4942,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "light theme only",
       "id": "\u7f16\u8f91\u7eb8\u611fUI\u8bbe\u8ba1\u89c4\u8303_light_theme"
     },
@@ -4982,7 +4955,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "shared theme and ui boundary",
       "id": "\u7f16\u8f91\u7eb8\u611fUI\u8bbe\u8ba1\u89c4\u8303_shared_theme_ui_boundary"
     },
@@ -5008,7 +4981,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "light only editorial rationale",
       "id": "\u7f16\u8f91\u7eb8\u611fUI\u8bbe\u8ba1\u89c4\u8303_light_only_rationale"
     },
@@ -5086,7 +5059,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "fullscreen video overlay model",
       "id": "Fullscreen Video Overlay\u8bbe\u8ba1\u89c4\u8303_overlay_model"
     },
@@ -5099,7 +5072,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "row-bound overlay",
       "id": "Fullscreen Video Overlay\u8bbe\u8ba1\u89c4\u8303_row_bound_overlay"
     },
@@ -5112,7 +5085,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "active-only stable overlay",
       "id": "Fullscreen Video Overlay\u8bbe\u8ba1\u89c4\u8303_active_stable_overlay"
     },
@@ -5125,7 +5098,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "active-only ephemeral overlay",
       "id": "Fullscreen Video Overlay\u8bbe\u8ba1\u89c4\u8303_active_ephemeral_overlay"
     },
@@ -5138,7 +5111,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 1,
+      "community": 3,
       "norm_label": "overlay split rationale",
       "id": "Fullscreen Video Overlay\u8bbe\u8ba1\u89c4\u8303_overlay_split_rationale"
     },
@@ -5151,7 +5124,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "global top toast system",
       "id": "\u5168\u5c40Top Toast\u8bbe\u8ba1\u4e0e\u5b9e\u73b0\u89c4\u8303_top_toast"
     },
@@ -5164,7 +5137,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "toast host",
       "id": "\u5168\u5c40Top Toast\u8bbe\u8ba1\u4e0e\u5b9e\u73b0\u89c4\u8303_toast_host"
     },
@@ -5177,7 +5150,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "toast store",
       "id": "\u5168\u5c40Top Toast\u8bbe\u8ba1\u4e0e\u5b9e\u73b0\u89c4\u8303_toast_store"
     },
@@ -5190,7 +5163,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "toast service",
       "id": "\u5168\u5c40Top Toast\u8bbe\u8ba1\u4e0e\u5b9e\u73b0\u89c4\u8303_toast_service"
     },
@@ -5203,7 +5176,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "dedicated toast architecture rationale",
       "id": "\u5168\u5c40Top Toast\u8bbe\u8ba1\u4e0e\u5b9e\u73b0\u89c4\u8303_toast_architecture_rationale"
     }
@@ -7912,6 +7885,30 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/pages/video-detail/ui/video-detail-page.runtime.test.tsx",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "src_pages_video_detail_ui_video_detail_page_runtime_test_tsx",
+      "_tgt": "video_detail_page_runtime_test_fullscreenvideosession",
+      "source": "src_pages_video_detail_ui_video_detail_page_runtime_test_tsx",
+      "target": "video_detail_page_runtime_test_fullscreenvideosession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/video-detail/ui/fullscreen-video-session.runtime.test.tsx",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "src_pages_video_detail_ui_fullscreen_video_session_runtime_test_tsx",
+      "_tgt": "fullscreen_video_session_runtime_test_fullscreenvideopager",
+      "source": "src_pages_video_detail_ui_fullscreen_video_session_runtime_test_tsx",
+      "target": "fullscreen_video_session_runtime_test_fullscreenvideopager",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/video-detail/model/resolve-video-detail-route-target.ts",
       "source_location": "L17",
       "weight": 1.0,
@@ -8153,7 +8150,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.runtime.test.tsx",
-      "source_location": "L84",
+      "source_location": "L83",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_ui_expandable_overlay_description_runtime_test_tsx",
       "_tgt": "expandable_overlay_description_runtime_test_descriptionstateharness",
@@ -8165,7 +8162,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.runtime.test.tsx",
-      "source_location": "L121",
+      "source_location": "L118",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_ui_expandable_overlay_description_runtime_test_tsx",
       "_tgt": "expandable_overlay_description_runtime_test_readtestvalue",
@@ -8201,7 +8198,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.tsx",
-      "source_location": "L72",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_ui_expandable_overlay_description_tsx",
       "_tgt": "expandable_overlay_description_aremeasuredlinesequal",
@@ -8213,7 +8210,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/ui/expandable-overlay-description.tsx",
-      "source_location": "L102",
+      "source_location": "L86",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_ui_expandable_overlay_description_tsx",
       "_tgt": "expandable_overlay_description_useexpandableoverlaydescriptionstate",
@@ -8561,7 +8558,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.ts",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_render_props_ts",
       "_tgt": "render_props_arefullscreenvideorowrenderpropsequal",
@@ -8573,7 +8570,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/render-props.ts",
-      "source_location": "L42",
+      "source_location": "L44",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_render_props_ts",
       "_tgt": "render_props_areplayablevideosurfacepropsequal",
@@ -8585,7 +8582,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L58",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementtypographykey",
@@ -8597,19 +8594,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L69",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_createexpandableoverlaydescriptioncontentkey",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_createexpandableoverlaydescriptioncontentkey",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L79",
+      "source_location": "L65",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementkey",
@@ -8621,7 +8606,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L93",
+      "source_location": "L79",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_createexpandableoverlaydescriptionmeasurementcache",
@@ -8633,19 +8618,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L102",
+      "source_location": "L88",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_readexpandableoverlaydescriptionmeasurementcache",
+      "_tgt": "expandable_overlay_description_peekexpandableoverlaydescriptionmeasurementcache",
       "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_readexpandableoverlaydescriptionmeasurementcache",
+      "target": "expandable_overlay_description_peekexpandableoverlaydescriptionmeasurementcache",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L118",
+      "source_location": "L95",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_writeexpandableoverlaydescriptionmeasurementcache",
@@ -8657,7 +8642,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L144",
+      "source_location": "L121",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_normalizeexpandableoverlaydescriptionmeasuredlinetext",
@@ -8669,43 +8654,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L148",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionmeasurementsnapshot",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionmeasurementsnapshot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L168",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionrendermode",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionrendermode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L188",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionexpandedstate",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionexpandedstate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L202",
+      "source_location": "L125",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
       "_tgt": "expandable_overlay_description_getexpandableoverlaydescriptionstate",
@@ -8717,48 +8666,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L211",
+      "source_location": "L134",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionlayoutcontract",
+      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionviewmodel",
       "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionlayoutcontract",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L242",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_reduceexpandableoverlaydescriptionuistate",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_reduceexpandableoverlaydescriptionuistate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L257",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptionheights",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionheights",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/widgets/fullscreen-video-pager/model/expandable-overlay-description.ts",
-      "source_location": "L276",
-      "weight": 1.0,
-      "_src": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "_tgt": "expandable_overlay_description_resolveexpandableoverlaydescriptioncollapsedviewportheight",
-      "source": "src_widgets_fullscreen_video_pager_model_expandable_overlay_description_ts",
-      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptioncollapsedviewportheight",
+      "target": "expandable_overlay_description_resolveexpandableoverlaydescriptionviewmodel",
       "confidence_score": 1.0
     },
     {
@@ -8777,7 +8690,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/widgets/fullscreen-video-pager/model/use-fullscreen-playback-session.ts",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "_src": "src_widgets_fullscreen_video_pager_model_use_fullscreen_playback_session_ts",
       "_tgt": "use_fullscreen_playback_session_usefullscreenplaybacksession",

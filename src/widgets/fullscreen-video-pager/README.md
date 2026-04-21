@@ -72,6 +72,7 @@ FullscreenVideoPager
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
+  - cache 是有上限的 session-scoped 插入序缓存；读取只做纯命中，不在 render 路径里改共享顺序
   - page-attached overlays 渲染
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
@@ -88,10 +89,10 @@ FullscreenVideoPager
 - `ui/expandable-overlay-description.tsx`
   - row-local description 状态模块 + presenter
   - 默认最多 2 行；折叠态直接使用 native tail ellipsis，让 `...` 跟在 description 文本后面
-  - 持有 description 的 measurement 与 `expandedContentKey`；当前 `isExpanded` 由 `stateOwnerKey + measurementKey + isActive + isExpandable` 同步派生，不再靠 effect 事后修正 correctness
+  - 持有 description 的 measurement 与 `expandedExpansionKey`；当前 `isExpanded` 由 `activeVisitToken + measurementKey` 同步派生，active visit 一变更就首帧失效，不再靠 effect 事后清理
   - 同一模块同时导出 description state hook、完整 layout contract、文本 presenter 和固定 `展开 / 收起` action presenter，不再通过父子 callback 桥同步按钮显隐
   - 先做 hidden text measurement，再进入稳定的 `measuring | static | collapsed | expanded` 渲染阶段
-  - measurement key 固定绑定 overlay typography contract、宽度和 description 文本；measurement cache 有上限，读命中会刷新最近使用顺序，并由 pager 提供生命周期
+  - measurement key 只绑定 description measurement typography、宽度和 description 文本；title / action / lane 样式调整不再误伤 description measurement cache
   - `展开 / 收起` action presenter 挂在父层 absolute sibling，避开内容列的 layout animation；折叠态与第二行同 baseline，展开态作为独立最后一行；标签只在固定槽位里做 opacity crossfade，不再通过 enter/exit 重新挂载
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
@@ -150,6 +151,7 @@ FullscreenVideoPager
 
 - `activeIndex`
 - `activeItemId`
+- `activeVisitToken`
 - `basePausedByUser`
 - `transientHoldState`
 - `activeSurfaceState`
@@ -158,6 +160,7 @@ FullscreenVideoPager
 
 其中：
 
+- `activeVisitToken` 是当前 active row 的访问轮次；只要真实 active video 发生切换就递增，用来让 row-local description 展开态首帧同步失效
 - `basePausedByUser` 是正常播/停基态
 - `transientHoldState` 是左右/中间长按期间的临时覆盖态
 - `activeSurfaceState` 只反映当前 active row 的 `loading | ready | error`

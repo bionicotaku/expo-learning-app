@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import {
   Pressable,
   Text,
@@ -9,31 +9,21 @@ import {
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
-  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
 import {
-  createExpandableOverlayDescriptionContentKey,
   createExpandableOverlayDescriptionMeasurementKey,
   createExpandableOverlayDescriptionMeasurementTypographyKey,
   fullscreenVideoOverlayTypography,
-  getExpandableOverlayDescriptionState,
   normalizeExpandableOverlayDescriptionMeasuredLineText,
-  readExpandableOverlayDescriptionMeasurementCache,
-  reduceExpandableOverlayDescriptionUiState,
-  resolveExpandableOverlayDescriptionExpandedState,
-  resolveExpandableOverlayDescriptionLayoutContract,
-  resolveExpandableOverlayDescriptionCollapsedViewportHeight,
-  resolveExpandableOverlayDescriptionHeights,
-  resolveExpandableOverlayDescriptionMeasurementSnapshot,
-  resolveExpandableOverlayDescriptionRenderMode,
+  peekExpandableOverlayDescriptionMeasurementCache,
+  resolveExpandableOverlayDescriptionViewModel,
   writeExpandableOverlayDescriptionMeasurementCache,
-  type ExpandableOverlayDescriptionLayoutContract,
   type ExpandableOverlayDescriptionMeasurementCache,
   type ExpandableOverlayDescriptionMeasurement,
   type ExpandableOverlayDescriptionMeasuredLine,
-  type ExpandableOverlayDescriptionUiState,
+  type ExpandableOverlayDescriptionViewModel,
 } from '../model/expandable-overlay-description';
 
 export const descriptionActionReserveWidth = 34;
@@ -80,31 +70,24 @@ function areMeasuredLinesEqual(
 }
 
 type ExpandableOverlayDescriptionState = {
-  collapsedViewportHeight: number;
-  descriptionContainerHeight: number;
   handleCollapsePress: (event: GestureResponderEvent) => void;
   handleDescriptionTextLayout: (event: NativeSyntheticEvent<TextLayoutEventData>) => void;
   handleExpandPress: (event: GestureResponderEvent) => void;
-  isExpandable: boolean;
-  isExpanded: boolean;
-  layoutContract: ExpandableOverlayDescriptionLayoutContract;
-  mode: ReturnType<typeof resolveExpandableOverlayDescriptionRenderMode>;
+  viewModel: ExpandableOverlayDescriptionViewModel;
 };
 
 type UseExpandableOverlayDescriptionStateArgs = {
+  activeVisitToken: number | null;
   description: string;
-  isActive: boolean;
   maxTextWidth: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
-  stateOwnerKey: string;
 };
 
 export function useExpandableOverlayDescriptionState({
+  activeVisitToken,
   description,
-  isActive,
   maxTextWidth,
   measurementCache,
-  stateOwnerKey,
 }: UseExpandableOverlayDescriptionStateArgs): ExpandableOverlayDescriptionState {
   const measurementKey = useMemo(
     () =>
@@ -115,115 +98,46 @@ export function useExpandableOverlayDescriptionState({
       }),
     [description, maxTextWidth]
   );
-  const contentKey = useMemo(
-    () =>
-      createExpandableOverlayDescriptionContentKey({
-        measurementKey,
-        stateOwnerKey,
-      }),
-    [measurementKey, stateOwnerKey]
-  );
   const [measurement, setMeasurement] = useState<ExpandableOverlayDescriptionMeasurement>({
     key: '',
     lines: [],
   });
-  const [uiState, setUiState] = useState<ExpandableOverlayDescriptionUiState>({
-    expandedContentKey: null,
-  });
+  const [expandedExpansionKey, setExpandedExpansionKey] = useState<string | null>(null);
 
-  const measurementSnapshot = useMemo(() => {
-    const cachedLines = readExpandableOverlayDescriptionMeasurementCache(
-      measurementCache,
-      measurementKey
-    );
-
-    if (cachedLines) {
-      return {
-        isMeasurementReady: true,
-        lines: cachedLines,
-      };
+  const cachedMeasuredLines = useMemo(
+    () =>
+      peekExpandableOverlayDescriptionMeasurementCache(
+        measurementCache,
+        measurementKey
+      ),
+    [measurementCache, measurementKey]
+  );
+  const measuredLines = useMemo(() => {
+    if (cachedMeasuredLines) {
+      return cachedMeasuredLines;
     }
 
-    return resolveExpandableOverlayDescriptionMeasurementSnapshot({
-      currentMeasurementKey: measurementKey,
-      measurement,
-    });
-  }, [measurement, measurementCache, measurementKey]);
-  const measuredLines = measurementSnapshot.lines;
-  const descriptionState = useMemo(
-    () => getExpandableOverlayDescriptionState(measuredLines),
-    [measuredLines]
-  );
-  const { collapsedHeight, expandedHeight } = useMemo(
-    () => resolveExpandableOverlayDescriptionHeights(measuredLines.length),
-    [measuredLines.length]
-  );
-  const collapsedViewportHeight = useMemo(
-    () => resolveExpandableOverlayDescriptionCollapsedViewportHeight(),
-    []
-  );
-  const isExpandable =
-    measurementSnapshot.isMeasurementReady && descriptionState.isExpandable;
-  const isExpanded = useMemo(
+    if (measurement.key === measurementKey) {
+      return measurement.lines;
+    }
+
+    return [] as readonly ExpandableOverlayDescriptionMeasuredLine[];
+  }, [cachedMeasuredLines, measurement, measurementKey]);
+  const isMeasurementReady =
+    cachedMeasuredLines !== undefined || measurement.key === measurementKey;
+  const viewModel = useMemo(
     () =>
-      resolveExpandableOverlayDescriptionExpandedState({
-        contentKey,
-        expandedContentKey: uiState.expandedContentKey,
-        isActive,
-        isExpandable,
-      }),
-    [contentKey, isActive, isExpandable, uiState.expandedContentKey]
-  );
-  const mode = useMemo(
-    () =>
-      resolveExpandableOverlayDescriptionRenderMode({
-        isExpanded,
-        isMeasurementReady: measurementSnapshot.isMeasurementReady,
-        lineCount: measuredLines.length,
-      }),
-    [isExpanded, measuredLines.length, measurementSnapshot.isMeasurementReady]
-  );
-  const layoutContract = useMemo(
-    () =>
-      resolveExpandableOverlayDescriptionLayoutContract({
+      resolveExpandableOverlayDescriptionViewModel({
         actionGap: descriptionActionGap,
         actionLaneHeight: descriptionActionLaneHeight,
-        isExpandable,
-        isExpanded,
+        activeVisitToken,
+        expandedExpansionKey,
+        isMeasurementReady,
+        lineCount: measuredLines.length,
+        measurementKey,
       }),
-    [isExpandable, isExpanded]
+    [activeVisitToken, expandedExpansionKey, isMeasurementReady, measuredLines.length, measurementKey]
   );
-
-  useEffect(() => {
-    if (
-      uiState.expandedContentKey === null ||
-      (uiState.expandedContentKey === contentKey && isActive && isExpandable)
-    ) {
-      return;
-    }
-
-    setUiState((previousState) =>
-      previousState.expandedContentKey === null
-        ? previousState
-        : reduceExpandableOverlayDescriptionUiState(previousState, {
-            type: 'content-invalidated',
-          })
-    );
-  }, [contentKey, isActive, isExpandable, uiState.expandedContentKey]);
-
-  useEffect(() => {
-    if (measurementSnapshot.isMeasurementReady) {
-      return;
-    }
-
-    setUiState((previousState) =>
-      previousState.expandedContentKey === null
-        ? previousState
-        : reduceExpandableOverlayDescriptionUiState(previousState, {
-            type: 'content-invalidated',
-          })
-    );
-  }, [measurementSnapshot.isMeasurementReady]);
 
   const handleDescriptionTextLayout = useCallback(
     (event: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -251,33 +165,23 @@ export function useExpandableOverlayDescriptionState({
 
   const handleExpandPress = useCallback((event: GestureResponderEvent) => {
     event.stopPropagation?.();
-    setUiState((previousState) =>
-      reduceExpandableOverlayDescriptionUiState(previousState, {
-        contentKey,
-        type: 'expand-pressed',
-      })
-    );
-  }, [contentKey]);
+    if (viewModel.currentExpansionKey === null) {
+      return;
+    }
+
+    setExpandedExpansionKey(viewModel.currentExpansionKey);
+  }, [viewModel.currentExpansionKey]);
 
   const handleCollapsePress = useCallback((event: GestureResponderEvent) => {
     event.stopPropagation?.();
-    setUiState((previousState) =>
-      reduceExpandableOverlayDescriptionUiState(previousState, {
-        type: 'collapse-pressed',
-      })
-    );
+    setExpandedExpansionKey(null);
   }, []);
 
   return {
-    collapsedViewportHeight,
-    descriptionContainerHeight: mode === 'expanded' ? expandedHeight : collapsedHeight,
     handleCollapsePress,
     handleDescriptionTextLayout,
     handleExpandPress,
-    isExpandable,
-    isExpanded,
-    layoutContract,
-    mode,
+    viewModel,
   };
 }
 
@@ -293,11 +197,13 @@ function ExpandableOverlayDescriptionComponent({
   state,
 }: ExpandableOverlayDescriptionProps) {
   const {
-    collapsedViewportHeight,
-    descriptionContainerHeight,
     handleDescriptionTextLayout,
-    isExpandable,
-    mode,
+    viewModel: {
+      collapsedViewportHeight,
+      descriptionContainerHeight,
+      isExpandable,
+      mode,
+    },
   } = state;
   const descriptionViewportHeight =
     mode === 'measuring' ? collapsedViewportHeight : descriptionContainerHeight;
@@ -387,8 +293,7 @@ type ExpandableOverlayDescriptionActionProps = {
     ExpandableOverlayDescriptionState,
     | 'handleCollapsePress'
     | 'handleExpandPress'
-    | 'isExpanded'
-    | 'layoutContract'
+    | 'viewModel'
   >;
 };
 
@@ -397,21 +302,22 @@ function ExpandableOverlayDescriptionActionComponent({
   left,
   state,
 }: ExpandableOverlayDescriptionActionProps) {
-  const { handleCollapsePress, handleExpandPress, isExpanded, layoutContract } = state;
-  const expandLabelOpacity = useSharedValue(isExpanded ? 0 : 1);
-
-  useEffect(() => {
-    expandLabelOpacity.value = withTiming(isExpanded ? 0 : 1, {
-      duration: actionLabelFadeDurationMs,
-    });
-  }, [expandLabelOpacity, isExpanded]);
+  const {
+    handleCollapsePress,
+    handleExpandPress,
+    viewModel: { isExpanded, layoutContract },
+  } = state;
 
   const expandLabelAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: expandLabelOpacity.value,
+    opacity: withTiming(isExpanded ? 0 : 1, {
+      duration: actionLabelFadeDurationMs,
+    }),
   }));
 
   const collapseLabelAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: 1 - expandLabelOpacity.value,
+    opacity: withTiming(isExpanded ? 1 : 0, {
+      duration: actionLabelFadeDurationMs,
+    }),
   }));
 
   if (layoutContract.actionPlacement === 'hidden') {
