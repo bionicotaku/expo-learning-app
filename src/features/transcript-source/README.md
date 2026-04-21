@@ -10,6 +10,7 @@
 
 当前职责：
 
+- 当前由 `pages/video-detail/ui/fullscreen-video-session.tsx` 传入 fullscreen session 的 active target
 - `model/transcript-query.ts`
   - transcript query key builder
 - `model/transcript-prefetch.ts`

@@ -67,8 +67,9 @@ FullscreenVideoPager
   - row 与 player surface 的 memo compare contract
 - `ui/fullscreen-video-pager.tsx`
   - FlatList 壳层
-  - 初始定位与 post-load alignment
+  - mount-scoped `entryIndex` 初始定位与 post-load alignment
   - active row 切换装配
+  - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
   - page-attached overlays 渲染

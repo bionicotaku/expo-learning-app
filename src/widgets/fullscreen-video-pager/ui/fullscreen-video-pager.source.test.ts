@@ -25,6 +25,10 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('useFullscreenPlaybackSession');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('FullscreenVideoRow');
+    expect(source).toContain('entryIndex');
+    expect(source).toContain('onActiveVideoChange');
+    expect(source).not.toContain('initialIndex');
+    expect(source).not.toContain('onActiveItemChange');
     expect(source).not.toContain('PausedPlaybackIndicatorOverlay');
     expect(source).not.toContain('PlaybackFeedbackOverlay');
     expect(source).toContain('const renderState = useMemo');

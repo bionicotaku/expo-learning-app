@@ -20,7 +20,7 @@
 
 相关文档：
 
-- Fullscreen 场景下的 source/read/cache 设计见 [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
+- Fullscreen 场景下的 transcript source/read/cache 设计见 [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
 - 视频真值与 runtime 分层见 [Video 真值与 Runtime 设计规范](./Video%20真值与%20Runtime%20设计规范.md)
 
 ## 2. 适用范围与优先级

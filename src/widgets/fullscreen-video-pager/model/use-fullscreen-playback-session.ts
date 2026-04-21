@@ -35,7 +35,7 @@ const pauseIndicatorVisibilityDurationMs = 3000;
 
 type FullscreenPlaybackSessionArgs = {
   items: VideoListItem[];
-  onActiveItemChange: (itemId: string, index: number) => void;
+  onActiveVideoChange: (itemId: string, index: number) => void;
 };
 
 type FullscreenRowRenderState = {
@@ -47,7 +47,7 @@ type FullscreenRowRenderState = {
 
 export function useFullscreenPlaybackSession({
   items,
-  onActiveItemChange,
+  onActiveVideoChange,
 }: FullscreenPlaybackSessionArgs) {
   const activePlayerControllerRef = useRef<FullscreenActivePlayerController | null>(null);
   const basePausedByUserRef = useRef(false);
@@ -231,9 +231,9 @@ export function useFullscreenPlaybackSession({
         itemId,
       };
       setActiveIndex(index);
-      onActiveItemChange(itemId, index);
+      onActiveVideoChange(itemId, index);
     },
-    [clearTransientFeedbackByKindForVideo, onActiveItemChange]
+    [clearTransientFeedbackByKindForVideo, onActiveVideoChange]
   );
 
   const handleSingleTap = useCallback(() => {

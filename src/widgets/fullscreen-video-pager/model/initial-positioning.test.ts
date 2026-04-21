@@ -6,7 +6,7 @@ describe('resolveInitialFullscreenPagerPosition', () => {
   it('uses initialScrollIndex when the pager mounted with items already available', () => {
     expect(
       resolveInitialFullscreenPagerPosition({
-        initialIndex: 3,
+        entryIndex: 3,
         itemCount: 8,
         mountedWithItems: true,
         hasCompletedPostLoadAlignment: false,
@@ -21,7 +21,7 @@ describe('resolveInitialFullscreenPagerPosition', () => {
   it('does not use initialScrollIndex when the pager mounted with an empty list', () => {
     expect(
       resolveInitialFullscreenPagerPosition({
-        initialIndex: 4,
+        entryIndex: 4,
         itemCount: 8,
         mountedWithItems: false,
         hasCompletedPostLoadAlignment: false,
@@ -36,7 +36,7 @@ describe('resolveInitialFullscreenPagerPosition', () => {
   it('does not request post-load alignment after it has already completed once', () => {
     expect(
       resolveInitialFullscreenPagerPosition({
-        initialIndex: 4,
+        entryIndex: 4,
         itemCount: 8,
         mountedWithItems: false,
         hasCompletedPostLoadAlignment: true,
@@ -51,7 +51,7 @@ describe('resolveInitialFullscreenPagerPosition', () => {
   it('clamps out-of-range indices to the available list bounds', () => {
     expect(
       resolveInitialFullscreenPagerPosition({
-        initialIndex: 99,
+        entryIndex: 99,
         itemCount: 5,
         mountedWithItems: true,
         hasCompletedPostLoadAlignment: false,
@@ -66,7 +66,7 @@ describe('resolveInitialFullscreenPagerPosition', () => {
   it('falls back to index zero while the list is still empty', () => {
     expect(
       resolveInitialFullscreenPagerPosition({
-        initialIndex: 7,
+        entryIndex: 7,
         itemCount: 0,
         mountedWithItems: false,
         hasCompletedPostLoadAlignment: false,

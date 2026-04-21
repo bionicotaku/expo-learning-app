@@ -21,10 +21,10 @@ import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
 
 export type FullscreenVideoPagerProps = {
-  initialIndex: number;
+  entryIndex: number;
   isInitialLoading: boolean;
   items: VideoListItem[];
-  onActiveItemChange: (itemId: string, index: number) => void;
+  onActiveVideoChange: (itemId: string, index: number) => void;
   onActionPress?: (
     videoId: string,
     item: FullscreenVideoOverlayActionItem
@@ -32,11 +32,11 @@ export type FullscreenVideoPagerProps = {
 };
 
 export function FullscreenVideoPager({
-  initialIndex,
+  entryIndex,
   isInitialLoading,
   items,
   onActionPress,
-  onActiveItemChange,
+  onActiveVideoChange,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -53,12 +53,12 @@ export function FullscreenVideoPager({
   const initialPosition = useMemo(
     () =>
       resolveInitialFullscreenPagerPosition({
-        initialIndex,
+        entryIndex,
         itemCount: items.length,
         mountedWithItems: mountedWithItemsRef.current,
         hasCompletedPostLoadAlignment: hasCompletedPostLoadAlignmentRef.current,
       }),
-    [initialIndex, items.length]
+    [entryIndex, items.length]
   );
   const {
     activeIndex,
@@ -73,7 +73,7 @@ export function FullscreenVideoPager({
     registerActiveController,
   } = useFullscreenPlaybackSession({
     items,
-    onActiveItemChange,
+    onActiveVideoChange,
   });
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
