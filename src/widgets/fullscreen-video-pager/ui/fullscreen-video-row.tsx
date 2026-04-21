@@ -17,6 +17,7 @@ import {
   areFullscreenVideoRowRenderPropsEqual,
   type FullscreenVideoRowRenderProps,
 } from '../model/render-props';
+import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import type { FullscreenRowPlaybackHudState } from '../model/row-playback-hud-state';
 import { createRowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
 import type { FullscreenRowSurfacePresentation } from '../model/row-surface-presentation';
@@ -33,6 +34,7 @@ type FullscreenVideoRowProps = {
   height: number;
   hudState: FullscreenRowPlaybackHudState;
   isActive: boolean;
+  measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (videoId: string, item: FullscreenVideoOverlayActionItem) => void;
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
@@ -58,6 +60,7 @@ function FullscreenVideoRowComponent({
   bottomInset,
   hudState,
   isActive,
+  measurementCache,
   onActionPress,
   onDoubleTap,
   onHoldEnd,
@@ -176,8 +179,10 @@ function FullscreenVideoRowComponent({
       <RowOwnedVideoOverlay
         bottomInset={bottomInset}
         description={video.description}
+        isActive={isActive}
         isFavorited={isFavorited}
         isLiked={isLiked}
+        measurementCache={measurementCache}
         onActionPress={handleActionPress}
         title={video.title}
       />

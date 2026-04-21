@@ -27,6 +27,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain("if (item.id === 'like')");
     expect(source).toContain("if (item.id === 'favorite')");
     expect(source).toContain('onActionPress?.(video.videoId, item);');
+    expect(source).toContain('isActive={isActive}');
     expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
     expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('showCenteredPause={showCenteredPause}');

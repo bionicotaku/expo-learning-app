@@ -23,6 +23,7 @@ describe('fullscreen video pager source', () => {
     );
 
     expect(source).toContain('useFullscreenPlaybackSession');
+    expect(source).toContain('createExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('FullscreenVideoRow');
     expect(source).not.toContain('PausedPlaybackIndicatorOverlay');
     expect(source).not.toContain('PlaybackFeedbackOverlay');
@@ -31,6 +32,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain(
       'registerActiveController={\n            isCurrentActiveItem ? registerActiveController : undefined'
     );
+    expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');
     expect(source).not.toContain('progressSnapshot');
   });

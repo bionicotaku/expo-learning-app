@@ -1,17 +1,35 @@
 import { memo } from 'react';
 import { Text, View } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
+import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
+import {
+  ExpandableOverlayDescription,
+  ExpandableOverlayDescriptionAction,
+  useExpandableOverlayDescriptionState,
+} from './expandable-overlay-description';
 import { VideoOverlayActionRail } from './video-overlay-action-rail';
 
 const contentBottomOffset = 42;
 const contentTextGap = 4;
+const contentLeftInset = 16;
+const contentRightInset = 64;
+const sharedTextWidth = 279;
+const descriptionTextWidth = sharedTextWidth;
+const contentLayoutTransition = LinearTransition.springify()
+  .mass(0.85)
+  .damping(32)
+  .stiffness(340)
+  .overshootClamping(1);
 
 type RowOwnedVideoOverlayProps = {
   bottomInset: number;
   description: string;
+  isActive: boolean;
   isFavorited: boolean;
   isLiked: boolean;
+  measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   title: string;
 };
@@ -19,11 +37,22 @@ type RowOwnedVideoOverlayProps = {
 function RowOwnedVideoOverlayComponent({
   bottomInset,
   description,
+  isActive,
   isFavorited,
   isLiked,
+  measurementCache,
   onActionPress,
   title,
 }: RowOwnedVideoOverlayProps) {
+  const descriptionState = useExpandableOverlayDescriptionState({
+    description,
+    isActive,
+    maxTextWidth: descriptionTextWidth,
+    measurementCache,
+  });
+  const contentColumnBottomOffset =
+    contentBottomOffset + descriptionState.layoutContract.contentBottomLift;
+
   return (
     <View
       pointerEvents="box-none"
@@ -33,7 +62,7 @@ function RowOwnedVideoOverlayComponent({
       }}
     >
       <View
-        pointerEvents="none"
+        pointerEvents="box-none"
         style={{
           position: 'absolute',
           inset: 0,
@@ -41,6 +70,7 @@ function RowOwnedVideoOverlayComponent({
         }}
       >
         <View
+          pointerEvents="none"
           style={{
             position: 'absolute',
             left: 0,
@@ -51,17 +81,19 @@ function RowOwnedVideoOverlayComponent({
               'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 42%, rgba(0,0,0,0.22) 74%, rgba(0,0,0,0.34) 100%)',
           }}
         />
-        <View
+        <Animated.View
+          layout={contentLayoutTransition}
+          pointerEvents="box-none"
           style={{
             position: 'absolute',
-            left: 22,
-            right: 92,
-            bottom: bottomInset + contentBottomOffset,
+            left: contentLeftInset,
+            right: contentRightInset,
+            bottom: bottomInset + contentColumnBottomOffset,
             gap: contentTextGap,
           }}
         >
           <Text
-            selectable
+            selectable={false}
             style={{
               fontSize: 15,
               lineHeight: 18,
@@ -71,27 +103,24 @@ function RowOwnedVideoOverlayComponent({
               textShadowColor: 'rgba(17,13,10,0.26)',
               textShadowOffset: { width: 1, height: 1 },
               textShadowRadius: 3,
-              maxWidth: 260,
+              maxWidth: sharedTextWidth,
             }}
             numberOfLines={2}
           >
             {title}
           </Text>
-          <Text
-            selectable
-            style={{
-              fontSize: 13.5,
-              lineHeight: 16,
-              color: 'rgba(251,247,238,0.9)',
-              textShadowColor: 'rgba(17,13,10,0.24)',
-              textShadowOffset: { width: 1, height: 1 },
-              textShadowRadius: 3,
-              maxWidth: 248,
-            }}
-          >
-            {description}
-          </Text>
-        </View>
+          <ExpandableOverlayDescription
+            description={description}
+            maxTextWidth={descriptionTextWidth}
+            state={descriptionState}
+          />
+        </Animated.View>
+
+        <ExpandableOverlayDescriptionAction
+          bottom={bottomInset + contentBottomOffset}
+          left={contentLeftInset + descriptionTextWidth}
+          state={descriptionState}
+        />
       </View>
 
       <VideoOverlayActionRail

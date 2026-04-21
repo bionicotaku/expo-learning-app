@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { VideoListItem } from '@/entities/video';
 import { shouldMountPlayer } from '@/features/video-playback';
 import { resolveActiveVideoChange } from '../model/active-video-change';
+import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
@@ -40,6 +41,9 @@ export function FullscreenVideoPager({
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatListType<VideoListItem>>(null);
+  const descriptionMeasurementCacheRef = useRef(
+    createExpandableOverlayDescriptionMeasurementCache()
+  );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
   const loadingState = getFullscreenVideoLoadingState({
@@ -156,6 +160,7 @@ export function FullscreenVideoPager({
           height={height}
           hudState={rowRenderState.hudState}
           isActive={isCurrentActiveItem}
+          measurementCache={descriptionMeasurementCacheRef.current}
           onActionPress={onActionPress}
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
