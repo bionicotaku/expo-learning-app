@@ -31,19 +31,26 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: null,
         descriptionLineHeight,
+        hasValidMeasurement: false,
         expandedExpansionKey: null,
-        isMeasurementReady: false,
+        isDescriptionEmpty: false,
         lineCount: 0,
         measurementKey: 'key-a',
-      }).mode
-    ).toBe('measuring');
+      })
+    ).toEqual({
+      actionPlacement: 'hidden',
+      collapsedViewportHeight: descriptionLineHeight * 2,
+      descriptionContainerHeight: descriptionLineHeight * 2,
+      mode: 'measuring',
+    });
 
     expect(
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: null,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey: 'key-a',
       }).mode
@@ -53,8 +60,9 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: '1:key-a',
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey: 'key-a',
       }).mode
@@ -64,35 +72,58 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: null,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 2,
         measurementKey: 'key-a',
       }).mode
     ).toBe('static');
   });
 
+  it('keeps non-empty descriptions in measuring when there is no valid measurement', () => {
+    expect(
+      resolveExpandableOverlayDescriptionViewState({
+        activeVisitToken: 1,
+        descriptionLineHeight,
+        hasValidMeasurement: false,
+        expandedExpansionKey: null,
+        isDescriptionEmpty: false,
+        lineCount: 0,
+        measurementKey: 'key-a',
+      }).mode
+    ).toBe('measuring');
+  });
+
+  it('treats empty descriptions as static hidden zero-height content', () => {
+    expect(
+      resolveExpandableOverlayDescriptionViewState({
+        activeVisitToken: null,
+        descriptionLineHeight,
+        hasValidMeasurement: true,
+        expandedExpansionKey: null,
+        isDescriptionEmpty: true,
+        lineCount: 0,
+        measurementKey: 'key-a',
+      })
+    ).toEqual({
+      actionPlacement: 'hidden',
+      collapsedViewportHeight: descriptionLineHeight * 2,
+      descriptionContainerHeight: 0,
+      mode: 'static',
+    });
+  });
+
   it('uses only description measurement typography inside the measurement key', () => {
     const defaultTypographyKey =
       createExpandableOverlayDescriptionMeasurementTypographyKey(
         createFullscreenVideoOverlayDescriptionMeasurementTypography(
-          fullscreenVideoOverlayTheme
+          fullscreenVideoOverlayTheme.descriptionText
         )
       );
     const updatedVisualTypography =
       createFullscreenVideoOverlayDescriptionMeasurementTypography({
-        ...fullscreenVideoOverlayTheme,
-        descriptionActionGap: 99,
-        descriptionActionLaneHeight: 44,
-        descriptionActionReserveWidth: 48,
-        descriptionActionText: {
-          fontSize: 77,
-          lineHeight: 77,
-        },
-        titleText: {
-          fontSize: 99,
-          lineHeight: 99,
-        },
+        ...fullscreenVideoOverlayTheme.descriptionText,
       });
     const updatedTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
       updatedVisualTypography
@@ -100,7 +131,7 @@ describe('expandable overlay description model', () => {
     const updatedDescriptionTypographyKey =
       createExpandableOverlayDescriptionMeasurementTypographyKey({
         ...createFullscreenVideoOverlayDescriptionMeasurementTypography(
-          fullscreenVideoOverlayTheme
+          fullscreenVideoOverlayTheme.descriptionText
         ),
         descriptionFontSize: 18,
         descriptionLineHeight: 18,
@@ -177,7 +208,7 @@ describe('expandable overlay description model', () => {
       maxTextWidth: 248,
       typographyKey: createExpandableOverlayDescriptionMeasurementTypographyKey(
         createFullscreenVideoOverlayDescriptionMeasurementTypography(
-          fullscreenVideoOverlayTheme
+          fullscreenVideoOverlayTheme.descriptionText
         )
       ),
     });
@@ -187,25 +218,26 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey,
-      }).isExpanded
-    ).toBe(true);
+      }).mode
+    ).toBe('expanded');
 
     expect(
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 2,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey,
       })
     ).toMatchObject({
       actionPlacement: 'inline',
-      isExpanded: false,
       mode: 'collapsed',
     });
   });
@@ -215,8 +247,9 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: null,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: null,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 2,
         measurementKey: 'key-a',
       })
@@ -226,9 +259,6 @@ describe('expandable overlay description model', () => {
         fullscreenVideoOverlayTheme.descriptionText.lineHeight * 2,
       descriptionContainerHeight:
         fullscreenVideoOverlayTheme.descriptionText.lineHeight * 2,
-      isExpandable: false,
-      isExpanded: false,
-      isMeasurementReady: true,
       mode: 'static',
     });
 
@@ -236,8 +266,9 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: null,
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey: 'key-a',
       }).actionPlacement
@@ -247,8 +278,9 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: '1:key-a',
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey: 'key-a',
       }).actionPlacement
@@ -258,12 +290,25 @@ describe('expandable overlay description model', () => {
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
         descriptionLineHeight,
+        hasValidMeasurement: true,
         expandedExpansionKey: '1:key-a',
-        isMeasurementReady: true,
+        isDescriptionEmpty: false,
         lineCount: 3,
         measurementKey: 'key-a',
       })
     ).not.toHaveProperty('currentExpansionKey');
+
+    expect(
+      resolveExpandableOverlayDescriptionViewState({
+        activeVisitToken: 1,
+        descriptionLineHeight,
+        hasValidMeasurement: true,
+        expandedExpansionKey: '1:key-a',
+        isDescriptionEmpty: false,
+        lineCount: 3,
+        measurementKey: 'key-a',
+      })
+    ).not.toHaveProperty('isExpanded');
   });
 
   it('keeps the newest inserted entries when the cache overflows', () => {

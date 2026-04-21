@@ -22,28 +22,17 @@ import {
   type ExpandableOverlayDescriptionViewState,
 } from '../model/expandable-overlay-description';
 import {
-  createFullscreenVideoOverlayDescriptionMeasurementTypography,
   fullscreenVideoOverlayTheme,
+  fullscreenVideoOverlayDescriptionMeasurementTypography,
 } from '../model/fullscreen-video-overlay-theme';
-
-export const descriptionActionReserveWidth =
-  fullscreenVideoOverlayTheme.descriptionActionReserveWidth;
-export const descriptionActionLaneHeight =
-  fullscreenVideoOverlayTheme.descriptionActionLaneHeight;
-export const descriptionActionGap =
-  fullscreenVideoOverlayTheme.descriptionActionGap;
 
 const expandLabel = '展开';
 const collapseLabel = '收起';
 const actionHitSlop = 8;
 const actionLabelFadeDurationMs = 80;
-const descriptionMeasurementTypography =
-  createFullscreenVideoOverlayDescriptionMeasurementTypography(
-    fullscreenVideoOverlayTheme
-  );
 const descriptionMeasurementTypographyKey =
   createExpandableOverlayDescriptionMeasurementTypographyKey(
-    descriptionMeasurementTypography
+    fullscreenVideoOverlayDescriptionMeasurementTypography
   );
 
 const descriptionTextStyle = {
@@ -79,6 +68,7 @@ export type ExpandableOverlayDescriptionState = {
   handleCollapsePress: (event: GestureResponderEvent) => void;
   handleDescriptionTextLayout: (event: NativeSyntheticEvent<TextLayoutEventData>) => void;
   handleExpandPress: (event: GestureResponderEvent) => void;
+  measurementKey: string;
   viewState: ExpandableOverlayDescriptionViewState;
 };
 
@@ -89,12 +79,23 @@ type UseExpandableOverlayDescriptionStateArgs = {
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
 };
 
+function isValidMeasuredLines({
+  isDescriptionEmpty,
+  lines,
+}: {
+  isDescriptionEmpty: boolean;
+  lines: readonly ExpandableOverlayDescriptionMeasuredLine[];
+}) {
+  return isDescriptionEmpty || lines.length > 0;
+}
+
 export function useExpandableOverlayDescriptionState({
   activeVisitToken,
   description,
   maxTextWidth,
   measurementCache,
 }: UseExpandableOverlayDescriptionStateArgs): ExpandableOverlayDescriptionState {
+  const isDescriptionEmpty = description.trim().length === 0;
   const measurementKey = useMemo(
     () =>
       createExpandableOverlayDescriptionMeasurementKey({
@@ -115,41 +116,60 @@ export function useExpandableOverlayDescriptionState({
   });
   const [expandedExpansionKey, setExpandedExpansionKey] = useState<string | null>(null);
 
-  const cachedMeasuredLines = useMemo(
-    () =>
-      peekExpandableOverlayDescriptionMeasurementCache(
-        measurementCache,
-        measurementKey
-      ),
-    [measurementCache, measurementKey]
-  );
+  const cachedMeasuredLines = useMemo(() => {
+    const nextCachedLines = peekExpandableOverlayDescriptionMeasurementCache(
+      measurementCache,
+      measurementKey
+    );
+
+    if (!nextCachedLines) {
+      return null;
+    }
+
+    return isValidMeasuredLines({
+      isDescriptionEmpty,
+      lines: nextCachedLines,
+    })
+      ? nextCachedLines
+      : null;
+  }, [isDescriptionEmpty, measurementCache, measurementKey]);
+  const localMeasuredLines = useMemo(() => {
+    if (measurement.key !== measurementKey) {
+      return null;
+    }
+
+    return isValidMeasuredLines({
+      isDescriptionEmpty,
+      lines: measurement.lines,
+    })
+      ? measurement.lines
+      : null;
+  }, [isDescriptionEmpty, measurement, measurementKey]);
   const measuredLines = useMemo(() => {
-    if (cachedMeasuredLines) {
-      return cachedMeasuredLines;
+    if (isDescriptionEmpty) {
+      return [] as readonly ExpandableOverlayDescriptionMeasuredLine[];
     }
 
-    if (measurement.key === measurementKey) {
-      return measurement.lines;
-    }
-
-    return [] as readonly ExpandableOverlayDescriptionMeasuredLine[];
-  }, [cachedMeasuredLines, measurement, measurementKey]);
-  const isMeasurementReady =
-    cachedMeasuredLines !== undefined || measurement.key === measurementKey;
+    return cachedMeasuredLines ?? localMeasuredLines ?? [];
+  }, [cachedMeasuredLines, isDescriptionEmpty, localMeasuredLines]);
+  const hasValidMeasurement = isDescriptionEmpty || cachedMeasuredLines !== null || localMeasuredLines !== null;
   const viewState = useMemo(
     () =>
       resolveExpandableOverlayDescriptionViewState({
         activeVisitToken,
-        descriptionLineHeight: descriptionMeasurementTypography.descriptionLineHeight,
+        descriptionLineHeight:
+          fullscreenVideoOverlayDescriptionMeasurementTypography.descriptionLineHeight,
+        hasValidMeasurement,
         expandedExpansionKey,
-        isMeasurementReady,
+        isDescriptionEmpty,
         lineCount: measuredLines.length,
         measurementKey,
       }),
     [
       activeVisitToken,
       expandedExpansionKey,
-      isMeasurementReady,
+      hasValidMeasurement,
+      isDescriptionEmpty,
       measuredLines.length,
       measurementKey,
     ]
@@ -160,6 +180,14 @@ export function useExpandableOverlayDescriptionState({
       const nextLines = event.nativeEvent.lines.map((line) => ({
         text: normalizeExpandableOverlayDescriptionMeasuredLineText(line.text),
       }));
+      const shouldAcceptMeasurement = isValidMeasuredLines({
+        isDescriptionEmpty,
+        lines: nextLines,
+      });
+
+      if (!shouldAcceptMeasurement) {
+        return;
+      }
 
       writeExpandableOverlayDescriptionMeasurementCache({
         cache: measurementCache,
@@ -176,7 +204,7 @@ export function useExpandableOverlayDescriptionState({
             }
       );
     },
-    [measurementCache, measurementKey]
+    [isDescriptionEmpty, measurementCache, measurementKey]
   );
 
   const handleExpandPress = useCallback(
@@ -200,6 +228,7 @@ export function useExpandableOverlayDescriptionState({
     handleCollapsePress,
     handleDescriptionTextLayout,
     handleExpandPress,
+    measurementKey,
     viewState,
   };
 }
@@ -217,15 +246,16 @@ function ExpandableOverlayDescriptionComponent({
 }: ExpandableOverlayDescriptionProps) {
   const {
     handleDescriptionTextLayout,
+    measurementKey,
     viewState: {
       collapsedViewportHeight,
       descriptionContainerHeight,
-      isExpandable,
       mode,
     },
   } = state;
-  const descriptionViewportHeight =
-    mode === 'measuring' ? collapsedViewportHeight : descriptionContainerHeight;
+  const descriptionViewportHeight = descriptionContainerHeight;
+  const canToggle = mode === 'collapsed' || mode === 'expanded';
+  const needsMeasurement = mode === 'measuring';
 
   return (
     <View
@@ -236,37 +266,42 @@ function ExpandableOverlayDescriptionComponent({
         overflow: mode === 'collapsed' || mode === 'expanded' ? 'hidden' : 'visible',
       }}
     >
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: maxTextWidth,
-          opacity: 0,
-        }}
-      >
-        <Text
-          allowFontScaling={false}
-          selectable={false}
-          onTextLayout={handleDescriptionTextLayout}
-          style={descriptionTextStyle}
+      {needsMeasurement ? (
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: maxTextWidth,
+            opacity: 0,
+          }}
         >
-          {description}
-        </Text>
-      </View>
+          <Text
+            key={measurementKey}
+            allowFontScaling={false}
+            selectable={false}
+            onTextLayout={handleDescriptionTextLayout}
+            style={descriptionTextStyle}
+          >
+            {description}
+          </Text>
+        </View>
+      ) : null}
 
       {mode === 'static' ? (
-        <Text
-          allowFontScaling={false}
-          selectable={false}
-          style={[descriptionTextStyle, { width: maxTextWidth }]}
-        >
-          {description}
-        </Text>
+        description.trim().length === 0 ? null : (
+          <Text
+            allowFontScaling={false}
+            selectable={false}
+            style={[descriptionTextStyle, { width: maxTextWidth }]}
+          >
+            {description}
+          </Text>
+        )
       ) : mode === 'measuring' ? (
         <View style={{ width: maxTextWidth, height: collapsedViewportHeight }} />
-      ) : isExpandable ? (
+      ) : canToggle ? (
         mode === 'expanded' ? (
           <View style={{ width: maxTextWidth }}>
             <Text
@@ -322,8 +357,9 @@ function ExpandableOverlayDescriptionActionComponent({
   const {
     handleCollapsePress,
     handleExpandPress,
-    viewState: { actionPlacement, isExpanded },
+    viewState: { actionPlacement, mode },
   } = state;
+  const isExpanded = mode === 'expanded';
 
   const expandLabelAnimatedStyle = useAnimatedStyle(() => ({
     opacity: withTiming(isExpanded ? 0 : 1, {
@@ -348,8 +384,8 @@ function ExpandableOverlayDescriptionActionComponent({
         position: 'absolute',
         left,
         bottom,
-        width: descriptionActionReserveWidth,
-        height: descriptionActionLaneHeight,
+        width: fullscreenVideoOverlayTheme.descriptionActionReserveWidth,
+        height: fullscreenVideoOverlayTheme.descriptionActionLaneHeight,
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
       }}
@@ -361,8 +397,8 @@ function ExpandableOverlayDescriptionActionComponent({
         <View
           style={{
             position: 'relative',
-            width: descriptionActionReserveWidth,
-            height: descriptionActionLaneHeight,
+            width: fullscreenVideoOverlayTheme.descriptionActionReserveWidth,
+            height: fullscreenVideoOverlayTheme.descriptionActionLaneHeight,
           }}
         >
           <Animated.Text

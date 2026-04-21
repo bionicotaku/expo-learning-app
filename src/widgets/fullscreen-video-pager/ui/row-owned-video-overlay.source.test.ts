@@ -19,8 +19,8 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('activeVisitToken');
     expect(source).toContain("../model/fullscreen-video-overlay-theme");
     expect(source).toContain('viewState.actionPlacement');
-    expect(source).toContain('descriptionActionLaneHeight');
-    expect(source).toContain('descriptionActionGap');
+    expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionLaneHeight');
+    expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionGap');
     expect(source).toContain('allowFontScaling={false}');
     expect(source).toContain('isLiked');
     expect(source).toContain('isFavorited');

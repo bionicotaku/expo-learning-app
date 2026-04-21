@@ -1,11 +1,11 @@
 # Graph Report - .  (2026-04-20)
 
 ## Corpus Check
-- 236 files · ~61,119 words
+- 236 files · ~61,629 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 626 nodes · 586 edges · 202 communities detected
+- 628 nodes · 588 edges · 202 communities detected
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 67 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -253,12 +253,12 @@ Cohesion: 0.05
 Nodes (26): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), AuthCardTitle(), AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton() (+18 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.1
-Nodes (30): 账户初始化完成, 认证状态, 为什么必须有初始化阶段, 登录、验证与状态维护设计文档, 认证单一真相来源, Editorial Paper 风格系统, Editorial Paper UI 设计规范, Theme Tokens (+22 more)
+Cohesion: 0.13
+Nodes (31): Feed API 设计, Feed-centred 到 Video Runtime Membership 难点处理复盘, Feed Source Contract, 不暴露分页语义的原因, 无状态 batch feed API, Active Transcript, L1 内存缓存, Transcript 不进入 video-runtime 的原因 (+23 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.14
-Nodes (30): Feed API 设计, Feed-centred 到 Video Runtime Membership 难点处理复盘, Feed Source Contract, 不暴露分页语义的原因, 无状态 batch feed API, Active Transcript, L1 内存缓存, Transcript 不进入 video-runtime 的原因 (+22 more)
+Cohesion: 0.11
+Nodes (29): 账户初始化完成, 认证状态, 为什么必须有初始化阶段, 登录、验证与状态维护设计文档, 认证单一真相来源, Editorial Paper 风格系统, Editorial Paper UI 设计规范, Theme Tokens (+21 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.07
@@ -289,20 +289,20 @@ Cohesion: 0.18
 Nodes (11): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, Mock Business Data With Real Async Flow, MVP Closed Loop, Real Account System, Continuous Video Feed (+3 more)
 
 ### Community 11 - "Community 11"
+Cohesion: 0.2
+Nodes (2): DescriptionStateHarness(), useExpandableOverlayDescriptionState()
+
+### Community 12 - "Community 12"
 Cohesion: 0.33
 Nodes (7): clearFullscreenRowTransientFeedback(), clearFullscreenRowTransientFeedbackByKind(), hideFullscreenRowPauseIndicator(), pruneIfEmpty(), setFullscreenRowTransientFeedback(), showFullscreenRowPauseIndicator(), updateHudState()
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.25
 Nodes (2): isGestureLocked(), resolveEffectivePlaybackState()
 
-### Community 13 - "Community 13"
+### Community 14 - "Community 14"
 Cohesion: 0.29
 Nodes (5): resolveDialogModalLayout(), resolveSheetModalLayout(), resolveTopmostModalId(), ModalHost(), ModalItem()
-
-### Community 14 - "Community 14"
-Cohesion: 0.25
-Nodes (2): DescriptionStateHarness(), useExpandableOverlayDescriptionState()
 
 ### Community 15 - "Community 15"
 Cohesion: 0.25
@@ -345,12 +345,12 @@ Cohesion: 0.5
 Nodes (1): createTestIdFactory()
 
 ### Community 25 - "Community 25"
-Cohesion: 0.5
-Nodes (2): findVideoListItemIndex(), resolveVideoDetailRouteTarget()
-
-### Community 26 - "Community 26"
 Cohesion: 0.83
 Nodes (3): clampRatio(), createFullscreenRowProgressSnapshot(), normalizeSeconds()
+
+### Community 26 - "Community 26"
+Cohesion: 0.5
+Nodes (2): findVideoListItemIndex(), resolveVideoDetailRouteTarget()
 
 ### Community 27 - "Community 27"
 Cohesion: 0.67
@@ -1391,7 +1391,7 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useEditorialPaperTheme()` connect `Community 1` to `Community 0`, `Community 13`?**
+- **Why does `useEditorialPaperTheme()` connect `Community 1` to `Community 0`, `Community 14`?**
   _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **Why does `TanStack React Query` connect `Community 0` to `Community 7`?**
   _High betweenness centrality (0.041) - this node is a cross-community bridge._
@@ -1404,4 +1404,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13 - nodes in this community are weakly interconnected._

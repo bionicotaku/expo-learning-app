@@ -29,7 +29,6 @@ describe('expandable overlay description source', () => {
     expect(source).toContain(
       "overflow: mode === 'collapsed' || mode === 'expanded' ? 'hidden' : 'visible'"
     );
-    expect(source).toContain('descriptionActionReserveWidth');
     expect(source).toContain("expandLabel = '展开'");
     expect(source).toContain("collapseLabel = '收起'");
     expect(source).toContain('useAnimatedStyle');
@@ -38,16 +37,23 @@ describe('expandable overlay description source', () => {
     expect(source).toContain("mode === 'collapsed'");
     expect(source).toContain('viewState');
     expect(source).toContain('actionPlacement');
-    expect(source).toContain('isExpanded');
-    expect(source).toContain('isExpandable');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementKey');
     expect(source).toContain('normalizeExpandableOverlayDescriptionMeasuredLineText');
     expect(source).toContain("position: 'absolute'");
     expect(source).toContain('opacity: 0');
+    expect(source).toContain('mode === \'expanded\'');
+    expect(source).toContain('mode === \'collapsed\' || mode === \'expanded\'');
+    expect(source).toContain('key={measurementKey}');
     expect(source).not.toContain('stateOwnerKey');
     expect(source).not.toContain('isActive');
     expect(source).not.toContain('fullscreenVideoOverlayTypography');
     expect(source).not.toContain('layoutContract');
+    expect(source).not.toContain('export const descriptionActionReserveWidth');
+    expect(source).not.toContain('export const descriptionActionLaneHeight');
+    expect(source).not.toContain('export const descriptionActionGap');
+    expect(source).not.toContain('viewState.isExpanded');
+    expect(source).not.toContain('viewState.isExpandable');
+    expect(source).not.toContain('viewState.isMeasurementReady');
     expect(source).not.toContain('resolveExpandableOverlayDescriptionRenderMode');
     expect(source).not.toContain('resolveExpandableOverlayDescriptionLayoutContract');
     expect(source).not.toContain('reduceExpandableOverlayDescriptionUiState');

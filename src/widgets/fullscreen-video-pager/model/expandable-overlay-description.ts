@@ -22,15 +22,40 @@ export type ExpandableOverlayDescriptionActionPlacement =
   | 'inline'
   | 'footer';
 
-export type ExpandableOverlayDescriptionViewState = {
-  actionPlacement: ExpandableOverlayDescriptionActionPlacement;
+type ExpandableOverlayDescriptionBaseViewState = {
   collapsedViewportHeight: number;
   descriptionContainerHeight: number;
-  isExpandable: boolean;
-  isExpanded: boolean;
-  isMeasurementReady: boolean;
-  mode: 'measuring' | 'static' | 'collapsed' | 'expanded';
 };
+
+type ExpandableOverlayDescriptionMeasuringViewState =
+  ExpandableOverlayDescriptionBaseViewState & {
+    actionPlacement: 'hidden';
+    mode: 'measuring';
+  };
+
+type ExpandableOverlayDescriptionStaticViewState =
+  ExpandableOverlayDescriptionBaseViewState & {
+    actionPlacement: 'hidden';
+    mode: 'static';
+  };
+
+type ExpandableOverlayDescriptionCollapsedViewState =
+  ExpandableOverlayDescriptionBaseViewState & {
+    actionPlacement: 'inline';
+    mode: 'collapsed';
+  };
+
+type ExpandableOverlayDescriptionExpandedViewState =
+  ExpandableOverlayDescriptionBaseViewState & {
+    actionPlacement: 'footer';
+    mode: 'expanded';
+  };
+
+export type ExpandableOverlayDescriptionViewState =
+  | ExpandableOverlayDescriptionMeasuringViewState
+  | ExpandableOverlayDescriptionStaticViewState
+  | ExpandableOverlayDescriptionCollapsedViewState
+  | ExpandableOverlayDescriptionExpandedViewState;
 
 const collapsedLineCount = 2;
 const defaultMeasurementCacheLimit = 120;
@@ -104,53 +129,56 @@ export function normalizeExpandableOverlayDescriptionMeasuredLineText(text: stri
 export function resolveExpandableOverlayDescriptionViewState({
   activeVisitToken,
   descriptionLineHeight,
+  hasValidMeasurement,
   expandedExpansionKey,
-  isMeasurementReady,
+  isDescriptionEmpty,
   lineCount,
   measurementKey,
 }: {
   activeVisitToken: number | null;
   descriptionLineHeight: number;
+  hasValidMeasurement: boolean;
   expandedExpansionKey: string | null;
-  isMeasurementReady: boolean;
+  isDescriptionEmpty: boolean;
   lineCount: number;
   measurementKey: string;
 }): ExpandableOverlayDescriptionViewState {
+  const collapsedViewportHeight = collapsedLineCount * descriptionLineHeight;
+
+  if (isDescriptionEmpty) {
+    return {
+      actionPlacement: 'hidden',
+      collapsedViewportHeight,
+      descriptionContainerHeight: 0,
+      mode: 'static',
+    };
+  }
+
+  if (!hasValidMeasurement) {
+    return {
+      actionPlacement: 'hidden',
+      collapsedViewportHeight,
+      descriptionContainerHeight: collapsedViewportHeight,
+      mode: 'measuring',
+    };
+  }
+
   const currentExpansionKey =
     activeVisitToken === null ? null : `${activeVisitToken}:${measurementKey}`;
-  const isExpandable = isMeasurementReady && lineCount > collapsedLineCount;
   const isExpanded =
-    currentExpansionKey !== null &&
-    isExpandable &&
-    expandedExpansionKey === currentExpansionKey;
+    currentExpansionKey !== null && expandedExpansionKey === currentExpansionKey;
   const visibleLineCount = Math.min(Math.max(0, lineCount), collapsedLineCount);
-  const collapsedViewportHeight = collapsedLineCount * descriptionLineHeight;
   const collapsedHeight = visibleLineCount * descriptionLineHeight;
   const expandedHeight =
     lineCount <= collapsedLineCount
       ? collapsedHeight
       : lineCount * descriptionLineHeight;
 
-  if (!isMeasurementReady) {
-    return {
-      actionPlacement: 'hidden',
-      collapsedViewportHeight,
-      descriptionContainerHeight: collapsedHeight,
-      isExpandable: false,
-      isExpanded: false,
-      isMeasurementReady,
-      mode: 'measuring',
-    };
-  }
-
   if (lineCount <= collapsedLineCount) {
     return {
       actionPlacement: 'hidden',
       collapsedViewportHeight,
       descriptionContainerHeight: collapsedHeight,
-      isExpandable: false,
-      isExpanded: false,
-      isMeasurementReady,
       mode: 'static',
     };
   }
@@ -160,9 +188,6 @@ export function resolveExpandableOverlayDescriptionViewState({
       actionPlacement: 'inline',
       collapsedViewportHeight,
       descriptionContainerHeight: collapsedHeight,
-      isExpandable,
-      isExpanded,
-      isMeasurementReady,
       mode: 'collapsed',
     };
   }
@@ -171,9 +196,6 @@ export function resolveExpandableOverlayDescriptionViewState({
     actionPlacement: 'footer',
     collapsedViewportHeight,
     descriptionContainerHeight: expandedHeight,
-    isExpandable,
-    isExpanded,
-    isMeasurementReady,
     mode: 'expanded',
   };
 }

@@ -35,11 +35,16 @@ export const fullscreenVideoOverlayTheme: Readonly<FullscreenVideoOverlayTheme> 
   },
 };
 
+export const fullscreenVideoOverlayDescriptionMeasurementTypography =
+  createFullscreenVideoOverlayDescriptionMeasurementTypography(
+    fullscreenVideoOverlayTheme.descriptionText
+  );
+
 export function createFullscreenVideoOverlayDescriptionMeasurementTypography(
-  theme: FullscreenVideoOverlayTheme
+  descriptionText: FullscreenVideoOverlayTextMetrics
 ): FullscreenVideoOverlayDescriptionMeasurementTypography {
   return {
-    descriptionFontSize: theme.descriptionText.fontSize,
-    descriptionLineHeight: theme.descriptionText.lineHeight,
+    descriptionFontSize: descriptionText.fontSize,
+    descriptionLineHeight: descriptionText.lineHeight,
   };
 }

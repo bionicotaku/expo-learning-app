@@ -93,11 +93,15 @@ FullscreenVideoPager
 - `ui/expandable-overlay-description.tsx`
   - row-local description 状态模块 + presenter
   - 默认最多 2 行；折叠态直接使用 native tail ellipsis，让 `...` 跟在 description 文本后面
-  - 持有 description 的 measurement 与 row-local 展开态；当前 `isExpanded` 由 `activeVisitToken + measurementKey` 同步派生，active visit 一变更就首帧失效，不再靠 effect 事后清理
+  - 持有 description 的 measurement 与 row-local 展开态；当前展开身份由 `activeVisitToken + measurementKey` 同步派生，active visit 一变更就首帧失效，不再靠 effect 事后清理
   - 同一模块同时导出 description state hook、纯语义 `viewState`、文本 presenter 和固定 `展开 / 收起` action presenter，不再通过父子 callback 桥同步按钮显隐
-  - 先做 hidden text measurement，再进入稳定的 `measuring | static | collapsed | expanded` 渲染阶段
+  - 只在缺少合法 measurement 时挂 hidden text measurement；一旦命中有效 cache 或本地 measurement 就卸载 hidden measurer
+  - 非空 description 的空 measurement 视为无效输入，直接忽略，不得把长文案降级成不可展开
+  - 进入稳定的 `measuring | static | collapsed | expanded` 渲染阶段后，不再让 hidden measurer 常驻参与重复测量
   - measurement key 只绑定 description measurement typography、宽度和 description 文本；title / action / lane 样式调整不再误伤 description measurement cache
-  - `viewState` 只表达 description 自己的语义状态：`mode`、`isExpandable`、`isExpanded`、`actionPlacement` 与文本高度，不再输出父层几何
+  - description measurement typography 由 `model/fullscreen-video-overlay-theme.ts` 单独提供；measurement helper 不再吃整份 overlay theme
+  - 空 description 直接视为 `static + hidden + zero height`，不保留空白占位或展开入口
+  - `viewState` 只表达 description 自己的语义状态：`mode`、`actionPlacement` 与文本高度，不再输出父层几何或并行布尔真相
   - `展开 / 收起` action presenter 挂在父层 absolute sibling，避开内容列的 layout animation；折叠态与第二行同 baseline，展开态作为独立最后一行；标签只在固定槽位里做 opacity crossfade，不再通过 enter/exit 重新挂载
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
