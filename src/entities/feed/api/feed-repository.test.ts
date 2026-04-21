@@ -1,19 +1,47 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchFeedPage } from '@/entities/feed';
+import { fetchFeed } from '@/entities/feed';
+import { resetMockFeedSequence } from './mock-feed-repository';
 
 describe('feed repository facade', () => {
-  it('keeps the public feed page contract stable', async () => {
-    const page = await fetchFeedPage({
-      offset: 10,
-      limit: 10,
+  beforeEach(() => {
+    resetMockFeedSequence();
+  });
+
+  it('keeps the public feed snapshot contract stable', async () => {
+    const response = await fetchFeed();
+
+    expect(response).toMatchObject({
+      items: expect.arrayContaining([
+        expect.objectContaining({
+          videoId: 'the-office-health-care-video-1',
+          title: expect.any(String),
+          description: expect.any(String),
+          videoUrl: expect.stringContaining('playlist.m3u8'),
+          durationSeconds: expect.any(Number),
+          viewCount: expect.any(Number),
+          tags: expect.any(Array),
+          isLiked: expect.any(Boolean),
+          isFavorited: expect.any(Boolean),
+        }),
+      ]),
+    });
+  });
+
+  it('keeps the mock feed facade on a 2 second delay by default', async () => {
+    vi.useFakeTimers();
+
+    let resolved = false;
+    const request = fetchFeed().then(() => {
+      resolved = true;
     });
 
-    expect(page.nextOffset).toBe(20);
-    expect(page.hasMore).toBe(true);
-    expect(page.items[0]).toMatchObject({
-      id: 'feed-11',
-      indexInFeed: 10,
-    });
+    await vi.advanceTimersByTimeAsync(1999);
+    expect(resolved).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(request).resolves.toBeUndefined();
+
+    vi.useRealTimers();
   });
 });

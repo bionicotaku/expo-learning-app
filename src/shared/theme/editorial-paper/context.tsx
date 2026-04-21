@@ -9,17 +9,14 @@ import { editorialPaperLightTokens } from './tokens';
 const defaultThemeContextValue: EditorialPaperThemeContextValue = {
   themeKey: 'light',
   tokens: editorialPaperLightTokens,
-  fontsLoaded: false,
 };
 
 export function createEditorialPaperThemeContextValue(
-  fontsLoaded: boolean,
   tokens: EditorialPaperTokens = editorialPaperLightTokens
 ): EditorialPaperThemeContextValue {
   return {
     themeKey: 'light',
     tokens,
-    fontsLoaded,
   };
 }
 
@@ -28,17 +25,12 @@ export const EditorialPaperThemeContext =
 
 type EditorialPaperThemeProviderProps = {
   children: React.ReactNode;
-  fontsLoaded: boolean;
 };
 
 export function EditorialPaperThemeProvider({
   children,
-  fontsLoaded,
 }: EditorialPaperThemeProviderProps) {
-  const value = React.useMemo(
-    () => createEditorialPaperThemeContextValue(fontsLoaded),
-    [fontsLoaded]
-  );
+  const value = React.useMemo(() => createEditorialPaperThemeContextValue(), []);
 
   return (
     <EditorialPaperThemeContext.Provider value={value}>

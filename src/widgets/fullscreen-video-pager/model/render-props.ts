@@ -1,29 +1,43 @@
-export type FullscreenVideoItemRenderProps = {
+export type FullscreenVideoRowRenderProps = {
+  activeVisitToken: number | null;
   height: number;
+  hudPauseIndicatorVisible: boolean;
+  hudTransientFeedbackKind: 'seek' | 'rate' | null;
+  hudTransientSeekDeltaSeconds: -5 | 5 | null;
   isActive: boolean;
-  isMuted: boolean;
+  playbackRate: number;
+  shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
+  shouldPlay: boolean;
   videoId: string;
   width: number;
 };
 
-export function areFullscreenVideoItemRenderPropsEqual(
-  previousProps: FullscreenVideoItemRenderProps,
-  nextProps: FullscreenVideoItemRenderProps
+export function areFullscreenVideoRowRenderPropsEqual(
+  previousProps: FullscreenVideoRowRenderProps,
+  nextProps: FullscreenVideoRowRenderProps
 ): boolean {
   return (
     previousProps.videoId === nextProps.videoId &&
+    previousProps.activeVisitToken === nextProps.activeVisitToken &&
     previousProps.width === nextProps.width &&
     previousProps.height === nextProps.height &&
+    previousProps.hudPauseIndicatorVisible === nextProps.hudPauseIndicatorVisible &&
+    previousProps.hudTransientFeedbackKind === nextProps.hudTransientFeedbackKind &&
+    previousProps.hudTransientSeekDeltaSeconds ===
+      nextProps.hudTransientSeekDeltaSeconds &&
     previousProps.isActive === nextProps.isActive &&
-    previousProps.isMuted === nextProps.isMuted &&
-    previousProps.shouldUsePlayer === nextProps.shouldUsePlayer
+    previousProps.playbackRate === nextProps.playbackRate &&
+    previousProps.shouldEnableBackgroundGestures ===
+      nextProps.shouldEnableBackgroundGestures &&
+    previousProps.shouldUsePlayer === nextProps.shouldUsePlayer &&
+    previousProps.shouldPlay === nextProps.shouldPlay
   );
 }
 
 export type PlayableVideoSurfaceRenderProps = {
-  isActive: boolean;
-  isMuted: boolean;
+  playbackRate: number;
+  shouldPlay: boolean;
   videoId: string;
 };
 
@@ -33,7 +47,7 @@ export function arePlayableVideoSurfacePropsEqual(
 ): boolean {
   return (
     previousProps.videoId === nextProps.videoId &&
-    previousProps.isActive === nextProps.isActive &&
-    previousProps.isMuted === nextProps.isMuted
+    previousProps.playbackRate === nextProps.playbackRate &&
+    previousProps.shouldPlay === nextProps.shouldPlay
   );
 }

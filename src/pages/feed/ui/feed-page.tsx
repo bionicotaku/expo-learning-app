@@ -1,7 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,169 +11,24 @@ import {
   View,
 } from 'react-native';
 
-import type { FeedItem } from '@/entities/feed';
+import {
+  findVideoListItemIndex,
+  type VideoListItem,
+} from '@/entities/video';
 import {
   clearPendingRestoreVideoId,
   getPendingRestoreVideoId,
 } from '@/features/feed-session';
 import {
-  findFeedItemIndex,
-  flattenFeedPages,
-  refreshFeedSource,
-  useFeedInfiniteQuery,
-} from '@/features/feed-pagination';
+  useFeedSource,
+} from '@/features/feed-source';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
-import {
-  EditorialTitle,
-  MetaLabel,
-  RaisedSurface,
-} from '@/shared/ui/editorial-paper';
+import { EditorialTitle, MetaLabel } from '@/shared/ui/editorial-paper';
+import { MediaFeatureCard } from '@/widgets/media-feature-card';
 import { getFeedListLoadingState } from './loading-state';
+import { createVideoMediaFeatureCardProps } from './media-feature-card-props';
 import { buildFeedRestoreScrollParams } from './restore-scroll';
 import { scheduleFeedRestore } from './restore-scheduler';
-
-const cardTones = [
-  '#EEDBCF',
-  '#E6D9BE',
-  '#D7E0C2',
-  '#D7D0E7',
-  '#D3E5E8',
-  '#EACBCF',
-] as const;
-
-const cardTags = [
-  'PHRASAL VERB',
-  'LISTENING CUE',
-  'ACCENT NOTE',
-  'COMMON PATTERN',
-  'CASUAL EXPRESSION',
-  'USEFUL LINE',
-] as const;
-
-function buildCardDuration(index: number) {
-  const minutes = 1 + (index % 3);
-  const seconds = 12 + ((index * 7) % 42);
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-}
-
-function buildCardTone(index: number) {
-  return cardTones[index % cardTones.length];
-}
-
-function buildCardTag(index: number) {
-  return cardTags[index % cardTags.length];
-}
-
-function FeedCard({
-  item,
-  onPress,
-}: {
-  item: FeedItem;
-  onPress: (item: FeedItem) => void;
-}) {
-  const { tokens } = useEditorialPaperTheme();
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={() => onPress(item)}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.95 : 1,
-      })}
-    >
-      <RaisedSurface
-        style={{
-          padding: tokens.spacing.sm,
-          gap: tokens.spacing.md,
-        }}
-      >
-        <View
-          style={{
-            minHeight: 214,
-            borderRadius: tokens.radius.cardMd,
-            borderCurve: 'continuous',
-            overflow: 'hidden',
-            backgroundColor: buildCardTone(item.indexInFeed),
-            padding: tokens.spacing.md,
-            justifyContent: 'space-between',
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <View
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                borderRadius: tokens.radius.pill,
-                borderCurve: 'continuous',
-                backgroundColor: 'rgba(251,247,238,0.78)',
-                boxShadow: tokens.elevation.soft,
-              }}
-            >
-              <MetaLabel uppercase={false} style={{ color: tokens.color.ink }}>
-                {buildCardTag(item.indexInFeed)}
-              </MetaLabel>
-            </View>
-
-            <View
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                borderRadius: tokens.radius.pill,
-                borderCurve: 'continuous',
-                backgroundColor: 'rgba(28,26,23,0.08)',
-              }}
-            >
-              <MetaLabel uppercase={false} style={{ color: tokens.color.ink }}>
-                {buildCardDuration(item.indexInFeed)}
-              </MetaLabel>
-            </View>
-          </View>
-
-          <View style={{ gap: tokens.spacing.sm }}>
-            <MetaLabel uppercase={false} tone="inkSoft">
-              {`Page ${item.page} · ${(item.indexInFeed % 5) + 1}/5`}
-            </MetaLabel>
-            <Text
-              selectable
-              style={{
-                color: tokens.color.ink,
-                fontSize: 14,
-                lineHeight: 20,
-                fontWeight: '600',
-                maxWidth: '78%',
-              }}
-            >
-              {item.subtitle}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ gap: tokens.spacing.xs }}>
-          <EditorialTitle variant="title" style={{ fontSize: 28, lineHeight: 30 }}>
-            {item.title}
-          </EditorialTitle>
-          <Text
-            selectable
-            style={{
-              color: tokens.color.inkSoft,
-              fontSize: 15,
-              lineHeight: 22,
-              fontWeight: '500',
-            }}
-          >
-            {`Tap to open the fullscreen reel and keep scrolling through the shared feed source.`}
-          </Text>
-        </View>
-      </RaisedSurface>
-    </Pressable>
-  );
-}
 
 function FeedListHeader({ itemCount }: { itemCount: number }) {
   return (
@@ -185,31 +39,106 @@ function FeedListHeader({ itemCount }: { itemCount: number }) {
   );
 }
 
+function FeedStatePanel({
+  title,
+  body,
+  actionLabel,
+  onActionPress,
+}: {
+  title: string;
+  body: string;
+  actionLabel?: string;
+  onActionPress?: () => void;
+}) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 28,
+        gap: 12,
+      }}
+    >
+      <EditorialTitle
+        style={{
+          fontSize: 24,
+          lineHeight: 30,
+          textAlign: 'center',
+        }}
+        variant="title"
+      >
+        {title}
+      </EditorialTitle>
+      <Text
+        style={{
+          fontSize: 14,
+          lineHeight: 22,
+          textAlign: 'center',
+          color: 'rgba(28,26,23,0.72)',
+        }}
+      >
+        {body}
+      </Text>
+      {actionLabel && onActionPress ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onActionPress}
+          style={({ pressed }) => ({
+            marginTop: 4,
+            paddingHorizontal: 18,
+            paddingVertical: 12,
+            borderRadius: 999,
+            backgroundColor: pressed ? 'rgba(28,26,23,0.88)' : 'rgba(28,26,23,0.94)',
+          })}
+        >
+          <Text
+            style={{
+              color: '#FBF7EE',
+              fontSize: 13,
+              fontWeight: '700',
+              letterSpacing: 0.3,
+            }}
+          >
+            {actionLabel}
+          </Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
 export function FeedPage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { tokens } = useEditorialPaperTheme();
-  const listRef = useRef<FlatList<FeedItem>>(null);
+  const listRef = useRef<FlatList<VideoListItem>>(null);
   const restoreTargetVideoIdRef = useRef<string | null>(null);
+  const lastRequestedTailVideoIdRef = useRef<string | null>(null);
   const visibleItemIdsRef = useRef<Set<string>>(new Set());
+  const itemsRef = useRef<VideoListItem[]>([]);
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 50,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [restoreTargetVideoId, setRestoreTargetVideoId] = useState<string | null>(null);
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isPending,
-  } = useFeedInfiniteQuery();
-  const items = useMemo(() => flattenFeedPages(data), [data]);
+    error,
+    isExtending,
+    isInitialLoading,
+    refresh,
+    requestMore,
+    items,
+  } = useFeedSource();
   const loadingState = getFeedListLoadingState({
-    itemCount: items.length,
-    isPending,
-    isFetchingNextPage,
+    isPending: isInitialLoading,
+    hasItems: items.length > 0,
+    hasError: Boolean(error),
+    isExtending,
   });
+
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   useEffect(() => {
     restoreTargetVideoIdRef.current = restoreTargetVideoId;
@@ -235,7 +164,7 @@ export function FeedPage() {
       return;
     }
 
-    const restoreIndex = findFeedItemIndex(items, restoreTargetVideoId);
+    const restoreIndex = findVideoListItemIndex(items, restoreTargetVideoId);
     if (restoreIndex < 0) {
       return;
     }
@@ -252,44 +181,96 @@ export function FeedPage() {
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await refreshFeedSource(queryClient);
+      await refresh();
     } finally {
       setIsRefreshing(false);
     }
-  }, [queryClient]);
+  }, [refresh]);
 
   const handleOpenVideo = useCallback(
-    (item: FeedItem) => {
-      router.push(`/video/${item.id}` as never);
+    (item: VideoListItem) => {
+      router.navigate(`/video/${item.videoId}` as never);
     },
     [router]
   );
 
-  const handleEndReached = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) {
-      return;
-    }
-
-    void fetchNextPage();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
   const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
       visibleItemIdsRef.current = new Set(
         viewableItems
-          .filter((item) => item.isViewable && item.item?.id)
-          .map((item) => item.item.id)
+          .filter((item) => item.isViewable && item.item?.videoId)
+          .map((item) => item.item.videoId)
       );
 
       const nextRestoreTarget = restoreTargetVideoIdRef.current;
-      if (!nextRestoreTarget || !visibleItemIdsRef.current.has(nextRestoreTarget)) {
+      if (nextRestoreTarget && visibleItemIdsRef.current.has(nextRestoreTarget)) {
+        clearPendingRestoreVideoId();
+        setRestoreTargetVideoId(null);
+      }
+
+      const tailVideoId = itemsRef.current[itemsRef.current.length - 1]?.videoId ?? null;
+      if (!tailVideoId || !visibleItemIdsRef.current.has(tailVideoId)) {
         return;
       }
 
-      clearPendingRestoreVideoId();
-      setRestoreTargetVideoId(null);
+      if (tailVideoId === lastRequestedTailVideoIdRef.current) {
+        return;
+      }
+
+      lastRequestedTailVideoIdRef.current = tailVideoId;
+      void requestMore();
     }
   );
+
+  if (loadingState.kind === 'initial-loading') {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: tokens.color.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: tokens.spacing.md,
+        }}
+      >
+        <StatusBar style="dark" />
+        <ActivityIndicator color={tokens.color.accent} />
+        <MetaLabel uppercase={false}>Loading video feed…</MetaLabel>
+      </View>
+    );
+  }
+
+  if (loadingState.kind === 'error') {
+    return (
+      <View style={{ flex: 1, backgroundColor: tokens.color.background }}>
+        <StatusBar style="dark" />
+        <FeedStatePanel
+          actionLabel="Retry"
+          body="The feed snapshot could not be loaded. Try the request again."
+          onActionPress={() => {
+            void refresh();
+          }}
+          title="Feed unavailable"
+        />
+      </View>
+    );
+  }
+
+  if (loadingState.kind === 'empty') {
+    return (
+      <View style={{ flex: 1, backgroundColor: tokens.color.background }}>
+        <StatusBar style="dark" />
+        <FeedStatePanel
+          actionLabel="Refresh"
+          body="The feed is empty right now. Pull to refresh or try again."
+          onActionPress={() => {
+            void refresh();
+          }}
+          title="No clips yet"
+        />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -297,33 +278,35 @@ export function FeedPage() {
       <FlatList
         ref={listRef}
         data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <FeedCard item={item} onPress={handleOpenVideo} />}
+        keyExtractor={(item) => item.videoId}
+        renderItem={({ item }) => (
+          <MediaFeatureCard
+            {...createVideoMediaFeatureCardProps(item)}
+            onPress={() => {
+              handleOpenVideo(item);
+            }}
+          />
+        )}
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{
           paddingHorizontal: tokens.spacing.pageX,
           paddingTop: tokens.spacing.pageTop,
-          paddingBottom: tokens.spacing.pageBottomWithTab,
+          paddingBottom: tokens.spacing.xxl,
           gap: tokens.spacing.lg,
         }}
         style={{ flex: 1, backgroundColor: tokens.color.background }}
         ListHeaderComponent={<FeedListHeader itemCount={items.length} />}
         ListFooterComponent={
-          loadingState.showFooterLoader ? (
+          loadingState.kind === 'success' && loadingState.showFooterLoader ? (
             <View
               style={{
-                paddingTop: tokens.spacing.md,
-                paddingBottom: tokens.spacing.xl,
                 alignItems: 'center',
-                gap: tokens.spacing.sm,
+                paddingTop: tokens.spacing.md,
               }}
             >
               <ActivityIndicator color={tokens.color.accent} />
-              <MetaLabel uppercase={false}>Loading clips…</MetaLabel>
             </View>
-          ) : (
-            <View style={{ height: tokens.spacing.xs }} />
-          )
+          ) : null
         }
         refreshControl={
           <RefreshControl
@@ -334,8 +317,6 @@ export function FeedPage() {
             tintColor={tokens.color.accent}
           />
         }
-        onEndReachedThreshold={0.5}
-        onEndReached={handleEndReached}
         onScrollToIndexFailed={({ index }) => {
           if (!restoreTargetVideoIdRef.current) {
             return;

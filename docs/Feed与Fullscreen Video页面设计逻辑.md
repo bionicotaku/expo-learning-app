@@ -2,489 +2,455 @@
 
 ## 1. 文档目标
 
-本文档专门定义当前产品中 `Feed 列表页` 与 `Fullscreen Video 页` 的页面关系、视觉分工、交互逻辑、共享数据模型与实现边界。
+本文档定义 `Feed 列表页` 与 `Fullscreen Video 页` 的目标页面关系、交互职责与共享数据模型。
 
-这份文档回答以下问题：
+重点回答：
 
-- 首页 Feed 应该长什么样，它解决什么问题
-- Fullscreen Video 页应该长什么样，它解决什么问题
-- 两个页面为什么不是冲突关系，而是同一套内容系统的两种视图
-- 它们如何共享 feed 数据、页面间恢复状态和返回定位
-- 在 Expo + 当前轻量 FSD 结构中，这套逻辑应该落在哪些层
+- Feed 与 Fullscreen 为什么是同一内容系统的两种页面投影
+- Fullscreen 的 page lifetime 与 session lifetime 应如何拆开
+- Fullscreen 页面的 row 内结构应该如何组织
+- 视频背景区与底部 seek bar control lane 的职责如何分离
 
-本文档是页面设计逻辑说明，不单独定义整套风格系统。视觉系统与组件抽象总规范见 [编辑纸感UI设计规范](./编辑纸感UI设计规范.md)。
+相关文档：
 
-`Fullscreen Video` 的 overlay 分层设计已单独收口到 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
+- [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
+- [Fullscreen Video Gesture设计规范](./Fullscreen%20Video%20Gesture设计规范.md)
+- [Fullscreen Video Seek Bar Overlay设计规范](./Fullscreen%20Video%20Seek%20Bar%20Overlay设计规范.md)
+- [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
+- [Video 真值与 Runtime 设计规范](./Video%20%E7%9C%9F%E5%80%BC%E4%B8%8E%20Runtime%20%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.md)
 
 ## 2. 页面关系总览
 
-### 2.1 一句话模型
+`Feed 列表页` 与 `Fullscreen Video 页` 不是两套独立产品，而是同一套 canonical video truth 的两种页面投影。当前实现仍然共享 `feed source`，但两边的长期依赖模型已经不再是 `FeedItem`，而是：
 
-当前产品中的 `Feed 列表页` 与 `Fullscreen Video 页` 不是两套独立产品思路，而是同一份内容源的两种页面投影：
+- source 输出的 canonical `VideoListItem`
+- 再叠加 `video-runtime` 的本地 override
 
-- `Feed 列表页` 是内容发现入口，形态接近 YouTube 首页
-- `Fullscreen Video 页` 是沉浸式消费入口，形态接近 TikTok 视频详情
-
-用户路径固定如下：
-
-1. 用户打开 App 后，首先进入 `Feed 列表页`
-2. 用户浏览卡片流，选择感兴趣的视频
-3. 点击视频卡片后，通过 `Stack push` 进入 `Fullscreen Video 页`
-4. 在 `Fullscreen Video 页` 中继续上下滑动浏览视频
-5. 用户返回后，`Feed 列表页` 自动恢复到最后播放视频对应的卡片位置
-
-### 2.2 为什么需要两种页面
-
-这两个页面各自承担不同目标：
+也就是说，这两个页面当前共享的是：
 
 - `Feed 列表页`
-  - 降低进入成本
-  - 让用户快速判断内容值不值得点开
-  - 承担搜索、筛选、列表分页、回看定位
+  - 负责内容发现、比较与进入
 - `Fullscreen Video 页`
-  - 最大化观看沉浸感
-  - 提供连续滑动消费
-  - 承担播放中的理解、保存、分享、返回等动作
-
-如果只有列表页，沉浸感不足；如果只有全屏视频流，入口成本太高，也不利于回看和定位。
-
-### 2.3 与产品总览的关系
-
-产品总览中“主内容区”承载：
-
-- 内容流入口
-- 视频播放与切换
-- 详情或沉浸式观看入口
-- 基础学习辅助能力
-- 回到列表后的状态保持
-
-`Feed 列表页` 与 `Fullscreen Video 页` 正是这五项能力的页面化拆分：
-
-- 列表页负责“入口”和“回到列表后的状态保持”
-- 视频页负责“播放与切换”和“沉浸式观看”
-- 学习辅助能力沿视频页展开，并在后续扩展时向收藏、沉淀等页面外溢
-
-## 3. Feed 列表页设计逻辑
-
-### 3.1 页面角色
-
-`Feed 列表页` 是 App 首屏，也是内容驱动型学习产品的低门槛入口。
-
-它的设计目标不是“替代播放页”，而是：
-
-- 让用户在不进入沉浸式播放前先筛选内容
-- 提供更轻、更可比较的内容决策环境
-- 保持较强的信息密度，但不做传统文本列表
-
-### 3.2 页面结构
-
-当前最小实现下，列表页结构固定为两段：
-
-1. `Header block`
-   - 日期或轻量 meta 信息
-   - serif 主标题
-   - 一个右上角轻操作位，例如搜索
-2. `Card stream`
-   - 多张视频内容卡片顺序排列
-   - 每张卡片都同时表达主题、调性、时长和点击意图
-
-如果未来重新引入多一级主导航，底部 tab 仍应属于 `app shell`，而不是页面内容本身。
-
-这一结构决定了列表页不是“瀑布流资讯页”，也不是“短视频全屏播放器”。
-
-### 3.3 卡片设计目标
-
-每张卡片都必须同时承载四类信息：
-
-- 内容主题
-- 内容氛围或学习价值
-- 基础消费信息，如时长或热度
-- “点击后进入视频页”的明确暗示
-
-参考稿中的 `MediaFeatureCard` 已经说明了这一逻辑：
-
-- 大尺寸视觉缩略区
-- 左上统计信息贴片
-- 底部 tag/learning cue
-- 右下播放动作
-- 下方 serif 标题
-
-因此 Feed 卡片不是纯海报图，也不是单纯文字摘要，而是“编辑化内容卡片”。
-
-### 3.4 列表页的交互职责
-
-列表页至少承担以下交互：
-
-- 向下滚动浏览卡片流
-- 滚动到底时触发 feed 分页请求
-- 点击任意卡片进入对应视频的 `Fullscreen Video 页`
-- 从视频页返回后恢复到对应卡片位置
-
-列表页不承担的职责：
-
-- 自动播放全屏视频
-- 复杂播放控制
-- 右侧视频动作列
-- 纵向视频 pager 本体
-
-### 3.5 列表页的状态要求
-
-列表页必须具备真实运行态，而不是只有设计稿态。
-
-至少需要：
-
-- `initial loading`
-- `append loading`
-- `error`
-- `empty`
-- `restored anchor`
-
-其中最关键的是两点：
-
-- 滚动到底时要有真实追加行为
-- 从 `Fullscreen Video 页` 返回后，要能恢复到最后播放的视频卡片
-
-## 4. Fullscreen Video 页面设计逻辑
-
-### 4.1 页面角色
-
-`Fullscreen Video 页` 是从列表页点击进入的沉浸式详情视图。
-
-它不是首页，也不是孤立详情页，而是：
-
-- 某一视频卡片的深入消费层
-- 纵向连续浏览视频的容器
-- 播放中学习辅助和行为动作的主要承载页
-
-### 4.2 页面结构
-
-参考稿中的 `CScreenVideoFull` 已经给出稳定结构，页面可拆为五层：
-
-1. `Full-bleed video background`
-   - 视频内容占据全部画面
-2. `Top controls`
-   - 返回按钮
-   - 可后续扩展其他轻动作
-3. `Right action rail`
-   - 收藏、分享、笔记、更多动作等
-4. `Bottom content block`
-   - 标题
-   - 简短说明或学习提示
-5. `Playback progress`
-   - 当前视频进度可视化
-
-这一结构说明该页面是“播放优先，信息叠加”的模式，而不是“图文详情页”。
-
-具体到 overlay 的职责拆分，后续实现应遵循三层模型：
-
-- `Row-bound overlay`
-- `Active-only stable overlay`
-- `Active-only ephemeral overlay`
-
-详细规则见 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)。
-
-### 4.3 视频页的交互职责
-
-视频页必须承担：
-
-- 当前视频自动播放
-- 上下滑动切换视频
-- 到达预取阈值时继续请求 feed 数据
-- 支持系统返回手势与返回按钮
-- 在不打断沉浸感的前提下提供保存/分享等动作
-
-根据当前设计约束，预取策略固定为：
-
-- 当滑动接近当前已加载序列末尾，例如到 `8/10` 附近时，触发下一页加载
-
-这保证视频页和列表页共享统一分页节奏，而不是各自维护自己的列表边界。
-
-### 4.4 视频页与列表页的关系
-
-视频页的第一页不是重新随机决定的，而是：
-
-- 由用户点击的列表项决定进入位置
-- 进入后以该视频所在 index 为初始 active item
-- 后续继续上下滑动浏览同一 feed source 中的相邻视频
-
-也就是说，视频页不是“从列表页跳去一个孤立详情页”，而是“从某张卡片进入同一序列的沉浸式浏览器”。
-
-### 4.5 视频页不承担的职责
-
-视频页不负责：
-
-- 定义底部 tab
-- 维护独立的第二份 feed 列表
-- 接管首页搜索或列表排序
-- 重复实现另一套播放器数据源
-
-## 5. 两个页面的共享数据逻辑
-
-### 5.1 Shared Feed Source
-
-`Feed 列表页` 与 `Fullscreen Video 页` 必须共享同一份全局 feed source。
-
-共享内容至少包括：
-
-- `feed items`
-- `pagination state`
-- `query cache`
-- `id -> index` 映射
-- 当前已加载页数和末尾位置
-
-这意味着：
-
-- 列表页下拉到底加载的内容，视频页也能直接使用
-- 视频页接近尾部触发的分页请求，返回列表页后也能直接看到
-- 两个页面不能各自维护一份独立 list
-
-### 5.2 FeedSourceContract
-
-未来实现层必须存在一个明确契约，至少表达：
-
-- 如何读取当前 feed items
-- 如何追加下一页
-- 如何通过 `videoId` 找到 index
-- 如何在分页后保持 index 映射稳定
-
-这份契约属于内容数据模型，不属于页面模板本身。
-
-### 5.3 FeedSessionContract
-
-除了共享 feed source，还必须有一层轻量 session 状态，用于页面间衔接。
-
-当前最小实现中，这层状态只需要：
-
-- `pendingRestoreVideoId`
-
-作用固定为：
-
-- 在 `Fullscreen Video` 离开时记录最后一次活跃的视频 id
-- 在 `Feed` 重新获得 focus 时恢复滚动锚点
-- 只有目标卡片真正进入可见区后才清空恢复目标
-
-这层状态不属于主题系统，也不属于实体持久化字段，而是页面导航与会话联动所需的短期状态。
-
-## 6. 路由与导航设计逻辑
-
-### 6.1 路由模型
-
-当前运行态的路由关系如下：
-
-- `Feed 列表页`
-  - App 首屏 route
-- `Fullscreen Video 页`
-  - 由列表项点击后进入的 stack detail route
-
-进入方式：
-
-- 点击卡片后 `Stack push`
-- 默认使用从右到左的原生 iOS push 动画
-
-返回方式：
-
-- 左上角返回按钮
-- 从左到右滑动的系统返回手势
-
-### 6.2 为什么视频页不应内嵌主导航壳
-
-当前最小运行态没有底部 tab。
-
-如果未来重新引入 `app shell` 主导航，`Fullscreen Video 页` 仍应保持为 stack detail，不应内嵌 tab。理由有两个：
-
-- 视觉上会破坏沉浸感
-- 导航语义上它不是一级页面，而是内容详情层
-
-因此当前结论固定为：
-
-- `Feed` 与 `Fullscreen Video` 构成当前最小运行态
-- 若未来扩展收藏夹、我的等一级页面，主导航也只属于 `app shell`
-- `Fullscreen Video` 仍保持在 stack detail 体系内
-
-### 6.3 返回恢复规则
-
-从视频页返回列表页时，页面不应该回到顶部，也不应该丢失上下文。
-
-恢复规则固定为：
-
-- 返回后，列表页自动滚动到最后播放视频所在卡片
-- 如果用户从列表页点击第 N 个卡片进入视频页
-- 在视频页滑到第 N+K 个视频后返回
-- 列表页应恢复到 `pendingRestoreVideoId` 对应卡片位置，而不是最初点击的卡片位置
-
-这条规则保证用户的上下文感连续。
-
-## 7. 视觉分工逻辑
-
-### 7.1 列表页的视觉关键词
-
-列表页的关键词是：
-
-- 编辑化
-- 可比较
-- 信息密度适中
-- 内容发现
-
-因此它更强调：
-
-- 卡片之间的对照关系
-- 题目和 tag 的判断价值
-- 缩略图与标题的并置
-
-### 7.2 视频页的视觉关键词
-
-视频页的关键词是：
-
-- 沉浸
-- 连续
-- 低干扰
-- 行为叠加
-
-因此它更强调：
-
-- 视频本体占据视觉中心
-- 动作与信息作为 overlay 轻叠加
-- 底部文本只保留最必要的标题与说明
-
-### 7.3 为什么两页风格可以统一
-
-虽然两页视觉重心不同，但它们仍属于同一套 `Editorial Paper` 风格：
-
-- 列表页通过纸面背景、serif 标题、柔和压印卡片来表达风格
-- 视频页通过暖色 overlay、柔和按钮表面、信息块排版节奏来延续风格
-
-统一的不是布局，而是：
-
-- token
-- 字体系统
-- 表面语言
-- 强调色温
-- 操作层级
-
-## 8. 在 Expo + FSD 中的实现边界
-
-### 8.1 app 层
-
-`app/` 负责：
-
-- route entry
-- stack detail route
-- header / toolbar 配置
-- 页面切换动画和原生导航关系
-
-如未来扩展多一级主导航，再由 `app/` 引入 app shell / tabs。
-
-不负责：
-
-- 页面模板
-- 业务播放逻辑
-- feed 数据选择与派生
-
-### 8.2 pages 层
-
-`pages/feed` 负责：
-
-- 列表页骨架
-- header block
-- 列表 widgets 装配
-- 返回时的恢复策略
-
-`pages/video-detail` 负责：
-
-- Fullscreen Video 页骨架
-- 当前视频的沉浸式布局
-- 与 pager widget 的装配
-
-### 8.3 widgets 层
-
-`widgets` 负责复合视图：
-
-- `MediaFeatureCard`
-- `VideoPager`
-- `VideoOverlay`
-- `ProfileSummaryCard`
-- `CollectionItemCard`
+  - 负责沉浸式播放、连续浏览与播放中交互
+
+当前共享数据链固定为：
+
+```text
+feed source snapshot (FeedItem[])
+-> canonical VideoListItem[]
+-> effectiveVideoItem[]
+-> FeedPage / VideoDetailPage / Fullscreen Video
+```
 
 其中：
 
-- 列表页主要消费 `card/list` 型 widgets
-- 视频页主要消费 `pager/overlay/action` 型 widgets
+- `features/feed-source` 负责前两段
+- `features/video-runtime` 负责 `canonical -> effective` 聚合
+- 页面和 widget 不自己做局部 merge
 
-### 8.4 features 层
+## 3. Feed 列表页职责
 
-`features` 负责：
+列表页继续承担：
 
-- feed 分页能力
-- 收藏/保存动作
-- 播放切换与 active item
-- 返回锚点与会话恢复
+- 浏览卡片流
+- 下拉刷新
+- 尾部续接
+- 点击卡片进入 fullscreen
+- 返回后恢复 anchor
 
-视频页右侧动作列、列表页小型保存动作等都应归入 feature 语义，而不是 shared。
+列表页不承担：
 
-### 8.5 entities 层
+- 背景手势播放控制
+- seek bar
+- fullscreen row HUD
 
-`entities/feed` 与 `entities/video` 负责：
+## 4. Fullscreen Video 页面结构
 
-- feed item 类型
-- video entity 类型
-- id/index 映射辅助
-- 领域级数据读取与映射
+fullscreen 的当前结构固定为：
 
-不负责：
+1. `VideoDetailPage`
+2. `FullscreenVideoSession`
+3. `FullscreenVideoPager`
+4. `RowPlaybackMediaLayer`
+5. `RowPlaybackInteractionLayer`
+6. `RowOwnedVideoOverlay`
+7. `RowPlaybackHudOverlay`
+8. `RowSurfaceStatusOverlay`
+9. `Page shell overlays`
 
-- 页面跳转
-- 返回恢复策略
-- 视觉组件
+其中 page / session / pager 的正式层级固定为：
 
-### 8.6 shared 层
+```text
+VideoDetailPage
+└── FullscreenVideoSession
+    ├── useFullscreenTranscriptSource(...)
+    └── FullscreenVideoPager
+        └── useFullscreenPlaybackSession(...)
+```
 
-`shared` 只负责：
+### 4.1 `VideoDetailPage`
 
-- `Editorial Paper` token
-- `RaisedSurface / InsetSurface / AdaptiveGlass`
-- 通用 icon pill、segmented bar、title 原语
+`VideoDetailPage` 当前职责固定为 page-lifetime 装配：
 
-不负责：
+- 从 route param 读取 `videoId`
+- 消费共享 `feed source`
+- 维护页面退出时需要写回的 page-lifetime `latestRestoreVideoId`
+- route/session 变化时先用 `entryVideoId` 预置 restore target
+- pager committed active 到来后再覆盖 restore target
+- 计算当前 route 对应的 `fullscreenSessionKey`
+- 渲染 `FullscreenVideoSession`
 
-- tab 导航壳
-- 视频动作列
-- 列表卡业务字段结构
-- 页面级 header block
+它不再直接持有：
 
-## 9. 页面级验收标准
+- transcript active state
+- pager active state
+- route change 与 pager retarget 的兼容逻辑
 
-### 9.1 Feed 列表页验收
+这里需要明确区分：
 
-- 首屏是列表 feed，不是全屏视频页
-- 卡片能清楚表达“点进去看视频”
-- 滚动到底有真实分页追加
-- 从视频页返回后，列表恢复到最后播放视频卡片位置
-- 页面仍保持 `Editorial Paper` 的纸面与编辑感，而不是退化成通用资讯列表
+- page 的 restore target
+  - 属于 page-lifetime state
+  - 服务“退出 fullscreen 后 Feed 恢复到哪条视频”
+- session 的 pager active
+  - 属于 session-lifetime state
+  - 服务 transcript source、near-tail requestMore 和当前 session 内的真实 active 语义
 
-### 9.2 Fullscreen Video 页验收
+两者不是同一个 owner，也不要求完全同步更新。
 
-- 进入方式是从列表卡片 stack push
-- 页面支持上下滑动切换视频
-- 预取阈值触发时能继续追加 feed 数据
-- 页面不显示 tab
-- 返回按钮和系统手势都可返回列表页
-- 页面视觉保持沉浸，但动作层和文案层仍延续 `Editorial Paper`
+### 4.2 `FullscreenVideoSession`
 
-### 9.3 系统级验收
+这是 fullscreen 页面结构中的新增核心层。
 
-- Feed 与 Fullscreen Video 共用全局 feed source
-- 两个页面不维护独立的列表数据
-- 返回定位基于 `pendingRestoreVideoId`
-- 导航壳、页面模板、数据模型、视觉原语四层边界清楚
+它承担 session-lifetime 职责：
 
-## 10. 默认实现结论
+- 根据 `routeVideoId + canonicalItems` 解析本次 session 的 entry target
+- 持有 `pagerReportedActive`
+- 派生 transcript source 输入
+- 接收 pager active change
+- 收口 near-tail `requestMore()` 触发
+- 渲染 `FullscreenVideoPager`
 
-当前关于这两个页面，默认结论固定如下：
+它是：
 
-- `Feed 列表页` 是 App 首屏
-- `Fullscreen Video 页` 是 stack detail
-- 两个页面共享同一份 feed source
-- 视频页是列表页的沉浸式投影视图，不是另一套首页
-- 返回列表页时恢复到最后播放视频对应卡片
-- 列表页负责内容发现，视频页负责沉浸消费
-- 两个页面共同构成主内容区的完整闭环
+- route target 与 pager active 的对齐层
+- transcript source 的正式 owner
+
+### 4.3 `FullscreenVideoPager`
+
+pager 继续承担 widget-lifetime 职责：
+
+- 首屏定位
+- row 分页
+- viewability -> active row change
+- row / overlay / playback session 装配
+
+它不再承担：
+
+- route retarget
+- page-level session reset
+- transcript source read/cache
+
+其中：
+
+- `RowPlaybackMediaLayer`
+  - 承载播放器与真实进度快照
+- `RowPlaybackInteractionLayer`
+  - 是 row 内唯一交互 owner
+  - 内部分成：
+    - `BackgroundGestureRegion`
+    - `SeekBarControlLane`
+- `RowOwnedVideoOverlay`
+  - 承载标题、说明、右侧动作列与底部 scrim
+- `RowPlaybackHudOverlay`
+  - 承载 pause / seek / `2x` HUD
+- `RowSurfaceStatusOverlay`
+  - 承载 loading / error / retry
+
+## 5. Fullscreen 的 session 结构
+
+当前 fullscreen 已显式拆开：
+
+1. `page lifetime`
+2. `fullscreen session lifetime`
+3. `pager widget lifetime`
+
+这是因为 `video/[videoId]` 通过 `dangerouslySingular` 复用 page instance。
+
+也就是说：
+
+- route 从 `/video/a` 切到 `/video/b` 时
+- `VideoDetailPage` 不一定重挂
+- 但从业务语义上，这已经是一个新的 fullscreen browsing session
+
+因此当前结构固定要求：
+
+- route target change = new fullscreen session
+
+### 5.1 session key
+
+每次 route target 变化，都必须开启新的 fullscreen session。
+
+推荐的 session key 固定为：
+
+```ts
+fullscreenSessionKey = `route:${normalizedVideoId ?? '__default__'}`
+```
+
+这个 key 属于：
+
+- page -> session 子树的重建边界
+
+不属于：
+
+- pager 内部 active state
+- transcript cache key
+
+### 5.2 为什么必须引入 session 层
+
+如果 page 直接持有：
+
+- pager active
+- transcript active
+
+就会把以下两种生命周期混在一起：
+
+- page instance 生命周期
+- 当前 route target 对应的 fullscreen session 生命周期
+
+一旦 route reuse 发生，局部 state 就会粘住旧 session。
+
+session 层的作用就是：
+
+- 把 page instance reuse 与业务 session reset 显式拆开
+
+### 5.3 为什么不把 pager 改成 route-controlled
+
+最佳结构里，pager 继续保持 mount-scoped widget，不改成 fully controlled retarget 组件。
+
+原因是：
+
+- route retarget 本质上是新 session，不是同一 pager 会话里的普通 active 变化
+- 为了 route retarget 把 pager 改成受控组件，会把 widget API 变脏
+- 正确做法是让 page 用 session key 重建整个 session 子树，而不是强行让 pager 承担 route reset
+
+## 6. 三类 active 概念必须拆开
+
+fullscreen 当前必须显式区分三类概念：
+
+### 6.1 route target
+
+route target 表示：
+
+- 当前 route 想进入哪条 fullscreen 视频
+
+建议统一命名为：
+
+- `routeVideoId`
+- `entryIndex`
+- `entryVideoId`
+
+它来自：
+
+- route param
+- `canonicalItems`
+- route miss -> fallback first item
+
+### 6.2 pager active
+
+pager active 表示：
+
+- pager 已经真正 commit 到哪条视频
+
+建议结构固定为：
+
+```ts
+type FullscreenPagerReportedActive = {
+  itemId: string;
+  index: number;
+};
+```
+
+它只由 pager 上报，不由 route 直接写入。
+
+### 6.3 transcript active
+
+transcript active 不应由 page 单独维护一组“只 seed 一次”的 state。
+
+它应当由 fullscreen session 当前上下文派生：
+
+```ts
+transcriptVideoId = pagerReportedActive?.itemId ?? entryVideoId
+transcriptIndex = pagerReportedActive?.index ?? entryIndex
+```
+
+也就是：
+
+- pager 尚未回调时，用 route entry target
+- pager 回调后，以真正的 pager active 为准
+
+## 7. Fullscreen 页面交互职责
+
+fullscreen 页固定承担：
+
+- 当前视频有声自动播放
+- 上下滑动切换视频
+- 系统右滑返回
+- 视频背景区 `single tap` 切 pause/resume
+- 视频背景区 `double tap` 做 `-5s / +5s`
+- 视频背景区 `long press` 做临时 `2x`
+- 底部 seek bar lane 做：
+  - rail + thumb 的 `tap-to-seek`
+  - drag preview
+  - release commit
+- 右侧 action rail 做：
+  - `like` 本地 toggle
+  - `favorite` 本地 toggle
+  - `share / annotate` 的现有 UI 行为
+
+### 5.1 背景区职责
+
+视频背景区只负责：
+
+- pause / resume
+- `±5s`
+- 临时 `2x`
+
+### 5.2 底部 control lane 职责
+
+底部 seek bar control lane 只负责：
+
+- 当前时间预览
+- rail + thumb 定位
+- 绝对 seek
+
+它不属于背景点击区，因此：
+
+- 不触发 pause
+- 不触发背景双击 `±5s`
+- 不触发背景长按 `2x`
+
+### 5.3 右侧 action rail 的数据语义
+
+fullscreen 右侧 action rail 当前固定消费 `effective video item`：
+
+- `isLiked === true`
+  - heart 显示为红色
+- `isFavorited === true`
+  - star 显示为黄色
+
+当前这两个动作都只修改 `features/video-runtime`：
+
+- 不调 API
+- 不复用旧的 `features/favorite`
+- 不把本地 toggle 混回 `feed-source`
+
+## 8. Shared Feed Source
+
+`Feed 列表页` 与 `Fullscreen Video 页` 当前共享同一份 `feed source`，并且页面长期消费模型已经收口为 canonical/effective video：
+
+- `feed items`
+- source state
+- query cache
+- `id -> index`
+- 当前已加载尾 item 与续接状态
+
+这意味着：
+
+- fullscreen 不是独立播放器数据源
+- feed 返回定位仍以同一份 source 为准
+- fullscreen 不再长期直接依赖 `FeedItem`
+- 未来多个 source 进入 UI 时，应先映射到同一套 `VideoListItem`
+- 页面最终渲染态统一来自 `effectiveVideoItem`
+
+## 9. Fullscreen 数据流
+
+### 9.1 初次进入 fullscreen
+
+当前流程固定为：
+
+1. `VideoDetailPage` 读取 route `videoId`
+2. `useFeedSource()` 返回 `canonicalItems`
+3. page 解析：
+   - `entryIndex`
+   - `entryVideoId`
+   - `fullscreenSessionKey`
+4. page 渲染：
+
+```tsx
+<FullscreenVideoSession
+  key={fullscreenSessionKey}
+  entryIndex={entryIndex}
+  entryVideoId={entryVideoId}
+  items={canonicalItems}
+  isInitialLoading={isInitialLoading}
+  requestMore={requestMore}
+  onLatestActiveVideoIdChange={...}
+/>
+```
+
+5. session 先用 `entryVideoId` 建立 transcript source 输入
+6. pager mount 后再通过 `onActiveVideoChange(...)` 报告真正 active item
+
+### 9.2 fullscreen 内滑动切换
+
+当前流程固定为：
+
+1. pager 内部 viewability 识别出新的 active row
+2. pager 上报 `onActiveVideoChange(itemId, index)`
+3. session 更新 `pagerReportedActive`
+4. transcript source 自动切到新的 `itemId`
+5. session 继续根据该 `index` 判断是否接近尾部，并触发 `requestMore()`
+
+### 9.3 singular route 下切到另一条视频
+
+这是当前最关键的结构要求。
+
+当前流程固定为：
+
+1. route 从 `/video/a` 变到 `/video/b`
+2. `VideoDetailPage` 复用 page instance，但重新计算出新的 `fullscreenSessionKey`
+3. 旧 `FullscreenVideoSession` 整体卸载
+4. 新 `FullscreenVideoSession` 按新的 route target 重建
+5. transcript source 立即使用新的 route target，而不是继续粘旧视频
+6. pager 重新用新的 `entryIndex` 初始化
+
+### 9.4 页面退出
+
+退出 fullscreen 时，page 继续保持当前页面级语义：
+
+- 只写回 `latestActiveItemIdRef`
+- 不写回 transcript state
+- 不清理 transcript query cache
+
+transcript cache 继续交给 React Query 的 `gcTime` 回收。
+
+## 10. 目标结构中的关键设计结论
+
+fullscreen 的当前页面逻辑固定采用：
+
+- row-local media layer
+- row-local single interaction owner
+- row-local content / HUD / surface status overlays
+- page shell 只保留 pager 级 UI
+- page lifetime 与 session lifetime 显式拆开
+- session 绑定 route target，而不是绑定 page instance
+
+不再采用：
+
+- 独立的 `ActiveVideoGestureSurface`
+- seek bar 通过 bridge 与背景层协调
+- 底部 lane 被视为背景区的一部分
+- page 直接持有 transcript active state
+- pager 被改造成 route-controlled retarget widget
+
+## 11. 成功标准
+
+页面逻辑只有同时满足以下条件，才算正确：
+
+1. Feed 与 Fullscreen 继续共享同一份 source
+2. Fullscreen route reuse 时，会开启新的 fullscreen session
+3. `VideoDetailPage` 不再直接持有 transcript active state
+4. Fullscreen row 内只存在一个正式 interaction owner
+5. 视频背景区与 seek bar control lane 的职责完全分离
+6. 底部 control lane 不再属于背景点击区
+7. 页面级、session 级、row 级 UI 边界清晰，不再靠 bridge 协调手势

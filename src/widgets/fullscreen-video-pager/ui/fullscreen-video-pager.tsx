@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { FlatList as FlatListType, ViewToken } from 'react-native';
 import {
   ActivityIndicator,
@@ -9,96 +9,75 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { FeedItem } from '@/entities/feed';
+import type { VideoListItem } from '@/entities/video';
 import { shouldMountPlayer } from '@/features/video-playback';
 import { resolveActiveVideoChange } from '../model/active-video-change';
+import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
-import { ActiveVideoOverlay } from './active-video-overlay';
-import { FullscreenVideoItem } from './fullscreen-video-item';
-import { PlaybackFeedbackOverlay } from './playback-feedback-overlay';
-
-const audioToastDurationMs = 700;
+import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
+import { useFullscreenPlaybackSession } from '../model/use-fullscreen-playback-session';
+import { FullscreenVideoRow } from './fullscreen-video-row';
+import { TopChromeOverlay } from './top-chrome-overlay';
 
 export type FullscreenVideoPagerProps = {
-  initialIndex: number;
-  isFetchingNextPage: boolean;
+  entryIndex: number;
   isInitialLoading: boolean;
-  isMuted: boolean;
-  items: FeedItem[];
-  onActiveItemChange: (itemId: string, index: number) => void;
-  onToggleMuted: () => void;
+  items: VideoListItem[];
+  onActiveVideoChange: (itemId: string, index: number) => void;
+  onActionPress?: (
+    videoId: string,
+    item: FullscreenVideoOverlayActionItem
+  ) => void;
 };
 
 export function FullscreenVideoPager({
-  initialIndex,
-  isFetchingNextPage,
+  entryIndex,
   isInitialLoading,
-  isMuted,
   items,
-  onActiveItemChange,
-  onToggleMuted,
+  onActionPress,
+  onActiveVideoChange,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const listRef = useRef<FlatListType<FeedItem>>(null);
-  const audioToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listRef = useRef<FlatListType<VideoListItem>>(null);
+  const descriptionMeasurementCacheRef = useRef(
+    createExpandableOverlayDescriptionMeasurementCache()
+  );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const activeSnapshotRef = useRef<{
-    index: number | null;
-    itemId: string | null;
-  }>({
-    index: null,
-    itemId: null,
-  });
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [audioToastLabel, setAudioToastLabel] = useState<string | null>(null);
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
-    isFetchingNextPage,
     isInitialLoading,
   });
   const initialPosition = useMemo(
     () =>
       resolveInitialFullscreenPagerPosition({
-        initialIndex,
+        entryIndex,
         itemCount: items.length,
         mountedWithItems: mountedWithItemsRef.current,
         hasCompletedPostLoadAlignment: hasCompletedPostLoadAlignmentRef.current,
       }),
-    [initialIndex, items.length]
+    [entryIndex, items.length]
   );
-  const activeItem = activeIndex === null ? null : (items[activeIndex] ?? null);
-  const activeItemId = activeItem?.id ?? null;
+  const {
+    activeIndex,
+    activeItemId,
+    commitActiveVideo,
+    getRowRenderState,
+    handleDoubleTap,
+    handleHoldEnd,
+    handleHoldStart,
+    handleRowUnmount,
+    handleSingleTap,
+    registerActiveController,
+  } = useFullscreenPlaybackSession({
+    items,
+    onActiveVideoChange,
+  });
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
-
-  const commitActiveVideo = useCallback(
-    (itemId: string, index: number) => {
-      const currentSnapshot = activeSnapshotRef.current;
-      if (currentSnapshot.index === index && currentSnapshot.itemId === itemId) {
-        return;
-      }
-
-      activeSnapshotRef.current = {
-        index,
-        itemId,
-      };
-      setActiveIndex(index);
-      onActiveItemChange(itemId, index);
-    },
-    [onActiveItemChange]
-  );
-
-  useEffect(() => {
-    return () => {
-      if (audioToastTimeoutRef.current) {
-        clearTimeout(audioToastTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!initialPosition.shouldRunPostLoadAlignment) {
@@ -119,7 +98,7 @@ export function FullscreenVideoPager({
   }, [initialPosition]);
 
   useEffect(() => {
-    if (items.length === 0 || activeSnapshotRef.current.index !== null) {
+    if (items.length === 0 || activeIndex !== null) {
       return;
     }
 
@@ -128,28 +107,14 @@ export function FullscreenVideoPager({
       return;
     }
 
-    commitActiveVideo(nextItem.id, initialPosition.targetIndex);
-  }, [commitActiveVideo, initialPosition.targetIndex, items]);
-
-  const handleToggleMuted = useCallback(() => {
-    const nextMutedValue = !isMuted;
-    onToggleMuted();
-
-    if (audioToastTimeoutRef.current) {
-      clearTimeout(audioToastTimeoutRef.current);
-    }
-
-    setAudioToastLabel(nextMutedValue ? 'Muted' : 'Sound On');
-    audioToastTimeoutRef.current = setTimeout(() => {
-      setAudioToastLabel(null);
-    }, audioToastDurationMs);
-  }, [isMuted, onToggleMuted]);
+    commitActiveVideo(nextItem.videoId, initialPosition.targetIndex);
+  }, [activeIndex, commitActiveVideo, initialPosition.targetIndex, items]);
 
   const handleViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
       const nextActiveVideo = resolveActiveVideoChange({
-        currentActiveIndex: activeSnapshotRef.current.index,
-        currentActiveItemId: activeSnapshotRef.current.itemId,
+        currentActiveIndex: activeIndex,
+        currentActiveItemId: activeItemId,
         viewableItems,
       });
 
@@ -159,7 +124,7 @@ export function FullscreenVideoPager({
 
       commitActiveVideo(nextActiveVideo.itemId, nextActiveVideo.index);
     },
-    [commitActiveVideo]
+    [activeIndex, activeItemId, commitActiveVideo]
   );
 
   const handleScrollToIndexFailed = useCallback(({ index }: { index: number }) => {
@@ -174,30 +139,62 @@ export function FullscreenVideoPager({
   const renderState = useMemo(
     () => ({
       activeIndex,
+      activeItemId,
       bottomInset: insets.bottom,
+      getRowRenderState,
       height,
-      isMuted,
       width,
     }),
-    [activeIndex, height, insets.bottom, isMuted, width]
+    [activeIndex, activeItemId, getRowRenderState, height, insets.bottom, width]
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: FeedItem; index: number }) => {
+    ({ item, index }: { item: VideoListItem; index: number }) => {
+      const rowRenderState = getRowRenderState(item.videoId, index);
+      const isCurrentActiveItem = item.videoId === activeItemId;
+
       return (
-        <FullscreenVideoItem
+        <FullscreenVideoRow
+          accessibilityLabel={rowRenderState.accessibilityLabel}
+          activeVisitToken={rowRenderState.activeVisitToken}
           bottomInset={insets.bottom}
           height={height}
-          isActive={item.id === activeItemId}
-          isMuted={isMuted}
-          onToggleMuted={handleToggleMuted}
+          hudState={rowRenderState.hudState}
+          isActive={isCurrentActiveItem}
+          measurementCache={descriptionMeasurementCacheRef.current}
+          onActionPress={onActionPress}
+          onDoubleTap={handleDoubleTap}
+          onHoldEnd={handleHoldEnd}
+          onHoldStart={handleHoldStart}
+          onRowUnmount={handleRowUnmount}
+          onSingleTap={handleSingleTap}
+          playbackRate={rowRenderState.effectivePlaybackState.playbackRate}
+          registerActiveController={
+            isCurrentActiveItem ? registerActiveController : undefined
+          }
+          shouldEnableBackgroundGestures={rowRenderState.shouldEnableBackgroundGestures}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
+          shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
           video={item}
           width={width}
         />
       );
     },
-    [activeIndex, activeItemId, handleToggleMuted, height, insets.bottom, isMuted, width]
+    [
+      activeIndex,
+      activeItemId,
+      getRowRenderState,
+      handleDoubleTap,
+      handleHoldEnd,
+      handleHoldStart,
+      handleRowUnmount,
+      handleSingleTap,
+      height,
+      insets.bottom,
+      onActionPress,
+      registerActiveController,
+      width,
+    ]
   );
 
   return (
@@ -205,11 +202,10 @@ export function FullscreenVideoPager({
       <FlatList
         ref={listRef}
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.videoId}
         renderItem={renderItem}
         // Fullscreen paging relies on exact viewport-sized items. Automatic
         // content insets shift the initial offset and break first-entry snap.
-        bounces={false}
         decelerationRate="fast"
         extraData={renderState}
         getItemLayout={(_, index) => ({
@@ -217,29 +213,26 @@ export function FullscreenVideoPager({
           offset: height * index,
           index,
         })}
-        initialNumToRender={3}
+        initialNumToRender={5}
         initialScrollIndex={initialPosition.initialScrollIndex}
-        maxToRenderPerBatch={4}
+        maxToRenderPerBatch={6}
         pagingEnabled
         onScrollToIndexFailed={handleScrollToIndexFailed}
         removeClippedSubviews
         showsVerticalScrollIndicator={false}
         viewabilityConfig={viewabilityConfigRef.current}
-        windowSize={5}
+        windowSize={7}
         onViewableItemsChanged={handleViewableItemsChanged}
       />
 
-      {loadingState.showInitialBottomLoader || loadingState.showPaginationBottomLoader ? (
+      {loadingState.showInitialBottomLoader ? (
         <View
           pointerEvents="none"
           style={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom:
-              activeItem && loadingState.showPaginationBottomLoader
-                ? insets.bottom + 118
-                : insets.bottom + 42,
+            bottom: insets.bottom + 42,
             alignItems: 'center',
           }}
         >
@@ -256,14 +249,17 @@ export function FullscreenVideoPager({
           >
             <ActivityIndicator color="#FFFFFF" size="small" />
             <Text selectable style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
-              {loadingState.showInitialBottomLoader ? 'Loading video feed...' : 'Loading next page...'}
+              Loading video feed...
             </Text>
           </View>
         </View>
       ) : null}
 
-      <ActiveVideoOverlay activeIndex={activeIndex} topInset={insets.top} totalItems={items.length} />
-      <PlaybackFeedbackOverlay audioToastLabel={audioToastLabel} />
+      <TopChromeOverlay
+        activeIndex={activeIndex}
+        topInset={insets.top}
+        totalItems={items.length}
+      />
     </View>
   );
 }

@@ -1,6 +1,12 @@
-export type VideoAsset = {
-  assetId: string;
-  uri: string;
-  defaultTitle: string;
-  defaultSubtitle: string;
+export type VideoListItem = {
+  videoId: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  coverImageUrl?: string | null;
+  durationSeconds: number;
+  viewCount: number;
+  tags: string[];
+  isLiked: boolean;
+  isFavorited: boolean;
 };

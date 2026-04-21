@@ -9,7 +9,7 @@
 - 当前参考稿真正稳定下来的视觉语言是什么
 - 这套视觉语言在 Expo + React Native + 当前轻量 FSD 结构中应该如何抽象
 - 哪些内容属于 `shared/theme` 与 `shared/ui`，哪些应停留在 `features / widgets / pages / app`
-- 这套风格如何服务当前产品模型：当前最小运行态是 `Feed 列表页 -> Fullscreen Video 页`，并可继续扩展到收藏夹、我的、登录等页面
+- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> NativeTabs(Feed / Save / Me) -> Fullscreen Video 页`
 
 本文档是实现导向规范，不是设计赏析文档。默认约束如下：
 
@@ -45,6 +45,7 @@
   - 收藏夹与学习沉淀页
   - 我的页与学习概览页
   - 登录与认证入口页
+  - app 启动阶段的 native splash / JS launch screen
 
 不适用范围：
 
@@ -227,6 +228,8 @@ src/shared/ui/editorial-paper/
   soft-action-button.tsx
   segmented-filter-bar.tsx
   icon-pill.tsx
+src/shared/ui/startup/
+  launch-screen.tsx
 ```
 
 原语职责固定如下：
@@ -247,6 +250,9 @@ src/shared/ui/editorial-paper/
   负责筛选/模式切换容器与选中态外壳
 - `IconPill`
   负责小型圆角图标胶囊或圆形 icon capsule
+- `LaunchScreen`
+  负责 app 启动后的正式 JS 过渡屏
+  不承担业务页面模板职责，但必须复用 `Editorial Paper` 主题和品牌语言
 
 ### 4.3 Shared 层禁止进入的内容
 
@@ -330,8 +336,8 @@ src/shared/ui/editorial-paper/
 `Editorial Paper` 在当前仓库中的正式落位应遵循：
 
 - `app/`
-  - 路由壳、stack、modal、header 配置
-  - 如未来扩展多一级主导航，再引入 tabs / app shell
+  - 路由壳、stack、NativeTabs、modal、header 配置
+  - 当前最小运行态已在 `app/` 中引入 tabs / app shell
 - `pages/`
   - 页面组合与模板实例
 - `widgets/`
@@ -339,9 +345,10 @@ src/shared/ui/editorial-paper/
 - `features/`
   - 用户动作与能力相关 UI
 - `entities/`
-  - `feed / video / favorite` 的实体与映射
+  - `feed / video / transcript` 的实体与映射
 - `shared/`
   - token、原语、底层视觉能力
+  - app 启动期的共享视觉与状态基础设施
 
 ### 5.5 推荐目录形态
 
@@ -366,12 +373,12 @@ src/
     grouped-action-list/
   features/
     auth/ui/
-    favorite/ui/
+    video-runtime/
     video-playback/ui/
   entities/
     feed/
     video/
-    favorite/
+    transcript/
   shared/
     theme/editorial-paper/
     ui/editorial-paper/
@@ -383,12 +390,13 @@ src/
 
 当前产品模型固定如下：
 
-1. App 首屏是 `YouTube-like Feed`
-2. 用户点击任意视频卡片
-3. 通过 `Stack push` 进入 `Fullscreen Video`
-4. `Fullscreen Video` 支持纵向滑动切视频
-5. 视频页滑到阈值时触发统一分页请求
-6. 返回 Feed 页后恢复到最后播放视频的卡片位置
+1. App 首屏是 `登录页`
+2. 用户通过登录页主按钮进入 `YouTube-like Feed`
+3. 用户点击任意视频卡片
+4. 通过 `Stack push` 进入 `Fullscreen Video`
+5. `Fullscreen Video` 支持纵向滑动切视频
+6. 视频页滑到阈值时触发统一分页请求
+7. 返回 Feed 页后恢复到最后播放视频的卡片位置
 
 ### 6.2 Feed 与 Video 的关系
 
@@ -406,8 +414,9 @@ src/
 
 ### 6.3 路由壳归属
 
-- 当前最小运行态没有底部 tab bar
-- 若未来引入主导航，底部 tab bar 只属于 `app shell`，不是 shared 组件
+- 当前最小运行态先使用 `NativeTabs` 承担底部 tab bar
+- 若未来需要更高品牌化的悬浮玻璃胶囊，再评估 custom tab shell
+- 底部 tab bar 只属于 `app shell`，不是 shared 组件
 - `Fullscreen Video` 是 stack detail，不显示 tab
 - 页面自定义 header 不能替代全部原生导航能力
 - 一级页面允许保留 editorial header block
@@ -453,6 +462,8 @@ src/
 - iOS 26+ 优先 `expo-glass-effect`
 - fallback 使用 `expo-blur`
 - 不允许在普通页面结构内层层嵌套 glass
+- `NativeTabs`、`AdaptiveGlass` 及其祖先节点不允许通过 `opacity: 0 -> 1` 的启动淡入来显隐；物理机上这会导致 liquid glass 整体不渲染
+- app 启动阶段若需要过渡，只允许淡出最上层 launch overlay，底下的 app shell 必须从首帧开始保持非透明
 
 ### 7.5 Fullscreen Video 的实现边界
 
@@ -461,7 +472,7 @@ src/
 - 不重复创造新的播放器壳
 - 视频切换、预取阈值、active item 选择继续依附现有 feed/video 能力模型
 - 该页面的工作重点是 page template、overlay、动作布局与导航关系，而不是推翻现有播放内核
-- 其中 `Fullscreen Video` 的 overlay 分层设计单独定义在 [Fullscreen Video Overlay设计规范](./Fullscreen%20Video%20Overlay设计规范.md)
+- 其中 `Fullscreen Video` 的 overlay 架构单独定义在 [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay架构设计规范.md)
 
 ### 7.6 Theme 收口要求
 
@@ -596,5 +607,5 @@ widgets 至少要有以下变体语义：
 - 当前只设计 `light theme`
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
-- 当前最小运行态只落地 `Feed + Fullscreen Video`
-- `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；若未来引入主导航，再在 `app` 内扩展 app shell
+- 当前最小运行态只落地 `Auth + NativeTabs(Feed / Save / Me) + Fullscreen Video`
+- `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；当前 tabs 也只允许落在 `app` 这一层

@@ -1,2 +1,9 @@
-export { VIDEO_ASSETS } from './model/videos';
-export type { VideoAsset } from './model/types';
+export {
+  findVideoListItemIndex,
+} from './model/find-video-list-item-index';
+export {
+  mapFeedItemToVideoListItem,
+} from './model/map-feed-item-to-video-list-item';
+export type {
+  VideoListItem,
+} from './model/types';

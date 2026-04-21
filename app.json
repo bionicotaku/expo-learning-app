@@ -8,7 +8,8 @@
     "scheme": "app",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.cyberdingzhen.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,21 +18,35 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.cyberdingzhen.app"
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/editorial-paper/fraunces-variable.ttf",
+            "./assets/fonts/editorial-paper/TW-Kai-98_1.ttf"
+          ]
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#F4EFE6",
+          "image": "./assets/images/splash-lockup.png",
+          "imageWidth": 172,
           "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
+            "resizeMode": "contain"
+          },
+          "ios": {
+            "resizeMode": "contain"
           }
         }
       ],

@@ -3,39 +3,56 @@ import { describe, expect, it } from 'vitest';
 import { getFeedListLoadingState } from './loading-state';
 
 describe('feed list loading state', () => {
-  it('shows only the footer loader during the initial empty-list fetch', () => {
+  it('reports the initial loading state while the first snapshot request is pending', () => {
     expect(
       getFeedListLoadingState({
-        itemCount: 0,
         isPending: true,
-        isFetchingNextPage: false,
+        hasItems: false,
+        hasError: false,
+        isExtending: false,
       })
     ).toEqual({
-      showFooterLoader: true,
+      kind: 'initial-loading',
     });
   });
 
-  it('shows the same footer loader while appending more cards', () => {
+  it('reports an error state when the request failed and there is nothing cached', () => {
     expect(
       getFeedListLoadingState({
-        itemCount: 10,
         isPending: false,
-        isFetchingNextPage: true,
+        hasItems: false,
+        hasError: true,
+        isExtending: false,
       })
     ).toEqual({
-      showFooterLoader: true,
+      kind: 'error',
     });
   });
 
-  it('does not show the footer loader during pull-to-refresh with existing items', () => {
+  it('reports an empty state after a successful read with no items', () => {
     expect(
       getFeedListLoadingState({
-        itemCount: 10,
         isPending: false,
-        isFetchingNextPage: false,
+        hasItems: false,
+        hasError: false,
+        isExtending: false,
       })
     ).toEqual({
-      showFooterLoader: false,
+      kind: 'empty',
+    });
+  });
+
+  it('reports success whenever at least one item is already on screen', () => {
+    expect(
+      getFeedListLoadingState({
+        isPending: true,
+        hasItems: true,
+        hasError: false,
+        isExtending: true,
+      })
+    ).toEqual({
+      kind: 'success',
+      showFooterLoader: true,
     });
   });
 });

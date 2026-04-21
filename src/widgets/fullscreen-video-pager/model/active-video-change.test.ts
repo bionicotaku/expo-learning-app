@@ -12,7 +12,7 @@ describe('resolveActiveVideoChange', () => {
           {
             index: 3,
             isViewable: true,
-            item: { id: 'feed-4' },
+            item: { videoId: 'feed-4' },
           },
         ],
       })
@@ -31,7 +31,7 @@ describe('resolveActiveVideoChange', () => {
           {
             index: 3,
             isViewable: true,
-            item: { id: 'feed-4' },
+            item: { videoId: 'feed-4' },
           },
         ],
       })

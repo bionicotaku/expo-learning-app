@@ -1,52 +1,94 @@
 import { describe, expect, it } from 'vitest';
 
+import type { FullscreenVideoRowRenderProps } from './render-props';
 import {
-  areFullscreenVideoItemRenderPropsEqual,
+  areFullscreenVideoRowRenderPropsEqual,
   arePlayableVideoSurfacePropsEqual,
 } from './render-props';
+
+const baseRowRenderProps: FullscreenVideoRowRenderProps = {
+  activeVisitToken: 1,
+  height: 852,
+  hudPauseIndicatorVisible: false,
+  hudTransientFeedbackKind: null,
+  hudTransientSeekDeltaSeconds: null,
+  isActive: true,
+  playbackRate: 1,
+  shouldEnableBackgroundGestures: true,
+  shouldUsePlayer: true,
+  shouldPlay: true,
+  videoId: 'feed-4',
+  width: 393,
+};
 
 describe('fullscreen video render props', () => {
   it('keeps the row stable when only unrelated parent state changes', () => {
     expect(
-      areFullscreenVideoItemRenderPropsEqual(
-        {
-          height: 852,
-          isActive: true,
-          isMuted: true,
-          shouldUsePlayer: true,
-          videoId: 'feed-4',
-          width: 393,
-        },
-        {
-          height: 852,
-          isActive: true,
-          isMuted: true,
-          shouldUsePlayer: true,
-          videoId: 'feed-4',
-          width: 393,
-        }
-      )
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+      })
     ).toBe(true);
   });
 
   it('re-renders the row when active state changes', () => {
     expect(
-      areFullscreenVideoItemRenderPropsEqual(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+        isActive: false,
+        shouldEnableBackgroundGestures: false,
+        shouldPlay: false,
+      })
+    ).toBe(false);
+  });
+
+  it('re-renders the row when a new active visit token arrives', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+        activeVisitToken: 2,
+      })
+    ).toBe(false);
+  });
+
+  it('re-renders the row when background gesture availability changes for the active item', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+        shouldEnableBackgroundGestures: false,
+      })
+    ).toBe(false);
+  });
+
+  it('re-renders the row when pause indicator visibility changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+        hudPauseIndicatorVisible: true,
+      })
+    ).toBe(false);
+  });
+
+  it('re-renders the row when transient feedback kind changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+        hudTransientFeedbackKind: 'rate',
+      })
+    ).toBe(false);
+  });
+
+  it('re-renders the row when seek delta changes', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(
         {
-          height: 852,
-          isActive: true,
-          isMuted: true,
-          shouldUsePlayer: true,
-          videoId: 'feed-4',
-          width: 393,
+          ...baseRowRenderProps,
+          hudTransientFeedbackKind: 'seek',
+          hudTransientSeekDeltaSeconds: -5,
         },
         {
-          height: 852,
-          isActive: false,
-          isMuted: true,
-          shouldUsePlayer: true,
-          videoId: 'feed-4',
-          width: 393,
+          ...baseRowRenderProps,
+          hudTransientFeedbackKind: 'seek',
+          hudTransientSeekDeltaSeconds: 5,
         }
       )
     ).toBe(false);
@@ -56,30 +98,55 @@ describe('fullscreen video render props', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
-          isActive: true,
-          isMuted: true,
+          playbackRate: 1,
+          shouldPlay: true,
           videoId: 'feed-4',
         },
         {
-          isActive: true,
-          isMuted: true,
+          playbackRate: 1,
+          shouldPlay: true,
           videoId: 'feed-4',
         }
       )
     ).toBe(true);
   });
 
-  it('re-renders the player surface when muted state changes', () => {
+  it('keeps the pager-level row compare free of progress snapshot concerns', () => {
+    expect(
+      areFullscreenVideoRowRenderPropsEqual(baseRowRenderProps, {
+        ...baseRowRenderProps,
+      })
+    ).toBe(true);
+  });
+
+  it('re-renders the player surface when playback intent changes', () => {
     expect(
       arePlayableVideoSurfacePropsEqual(
         {
-          isActive: true,
-          isMuted: true,
+          playbackRate: 1,
+          shouldPlay: true,
           videoId: 'feed-4',
         },
         {
-          isActive: true,
-          isMuted: false,
+          playbackRate: 1,
+          shouldPlay: false,
+          videoId: 'feed-4',
+        }
+      )
+    ).toBe(false);
+  });
+
+  it('re-renders the player surface when playback rate changes during a temporary hold', () => {
+    expect(
+      arePlayableVideoSurfacePropsEqual(
+        {
+          playbackRate: 1,
+          shouldPlay: true,
+          videoId: 'feed-4',
+        },
+        {
+          playbackRate: 2,
+          shouldPlay: true,
           videoId: 'feed-4',
         }
       )

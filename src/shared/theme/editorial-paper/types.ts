@@ -51,7 +51,6 @@ export type EditorialPaperTokens = {
     xxl: number;
     pageX: number;
     pageTop: number;
-    pageBottomWithTab: number;
   };
   radius: {
     cardLg: number;
@@ -75,5 +74,4 @@ export type EditorialPaperTokens = {
 export type EditorialPaperThemeContextValue = {
   themeKey: EditorialPaperThemeKey;
   tokens: EditorialPaperTokens;
-  fontsLoaded: boolean;
 };
