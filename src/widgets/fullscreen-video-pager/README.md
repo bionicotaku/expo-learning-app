@@ -65,6 +65,10 @@ FullscreenVideoPager
   - 支持 optimistic seek 和外部订阅
 - `model/render-props.ts`
   - row 与 player surface 的 memo compare contract
+- `model/fullscreen-video-overlay-theme.ts`
+  - row-owned overlay 的固定视觉尺寸 theme
+  - 统一提供 title / description / `展开 / 收起` 的文本指标
+  - 统一提供 description action lane 的几何常量
 - `ui/fullscreen-video-pager.tsx`
   - FlatList 壳层
   - mount-scoped `entryIndex` 初始定位与 post-load alignment
@@ -72,7 +76,7 @@ FullscreenVideoPager
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
-  - cache 是有上限的 session-scoped 插入序缓存；读取只做纯命中，不在 render 路径里改共享顺序
+  - cache 是有上限的 session-scoped 插入序缓存
   - page-attached overlays 渲染
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
@@ -81,18 +85,19 @@ FullscreenVideoPager
   - row-owned 内容层
   - 持有标题与底部内容文案区的排版壳
   - 标题与 description 共用同一条文本列宽；内容区整体向左扩并缩小 rail 前留白
-  - title / description / `展开 / 收起` 固定视觉尺寸，显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
-  - 父层只负责 title + description 区整体向上/向下的布局动画，不再持有 description 的内部展开态或按钮显隐态
-  - 消费 `expandable-overlay-description` 模块导出的完整 layout contract，并把文本列与固定 action lane 分别挂到动画树内外
-  - 折叠态不为 action lane 预留底部空行，`展开` 与 description 第二行并排；展开态由 layout contract 驱动内容列整体上抬，为 `收起` 单独留一行
+  - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
+  - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态
+  - 只消费 description 模块导出的语义结果 `actionPlacement`，再把它映射成自身的底部几何偏移
+  - 折叠态不为 action lane 预留底部空行，`展开` 与 description 第二行并排；展开态由 `actionPlacement='footer'` 驱动内容列整体上抬，为 `收起` 单独留一行
   - 装配右侧 action rail 与 row-local 的可展开 description
 - `ui/expandable-overlay-description.tsx`
   - row-local description 状态模块 + presenter
   - 默认最多 2 行；折叠态直接使用 native tail ellipsis，让 `...` 跟在 description 文本后面
-  - 持有 description 的 measurement 与 `expandedExpansionKey`；当前 `isExpanded` 由 `activeVisitToken + measurementKey` 同步派生，active visit 一变更就首帧失效，不再靠 effect 事后清理
-  - 同一模块同时导出 description state hook、完整 layout contract、文本 presenter 和固定 `展开 / 收起` action presenter，不再通过父子 callback 桥同步按钮显隐
+  - 持有 description 的 measurement 与 row-local 展开态；当前 `isExpanded` 由 `activeVisitToken + measurementKey` 同步派生，active visit 一变更就首帧失效，不再靠 effect 事后清理
+  - 同一模块同时导出 description state hook、纯语义 `viewState`、文本 presenter 和固定 `展开 / 收起` action presenter，不再通过父子 callback 桥同步按钮显隐
   - 先做 hidden text measurement，再进入稳定的 `measuring | static | collapsed | expanded` 渲染阶段
   - measurement key 只绑定 description measurement typography、宽度和 description 文本；title / action / lane 样式调整不再误伤 description measurement cache
+  - `viewState` 只表达 description 自己的语义状态：`mode`、`isExpandable`、`isExpanded`、`actionPlacement` 与文本高度，不再输出父层几何
   - `展开 / 收起` action presenter 挂在父层 absolute sibling，避开内容列的 layout animation；折叠态与第二行同 baseline，展开态作为独立最后一行；标签只在固定槽位里做 opacity crossfade，不再通过 enter/exit 重新挂载
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层

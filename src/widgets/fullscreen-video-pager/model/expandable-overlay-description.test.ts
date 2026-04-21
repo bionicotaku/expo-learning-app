@@ -4,39 +4,19 @@ import {
   createExpandableOverlayDescriptionMeasurementCache,
   createExpandableOverlayDescriptionMeasurementKey,
   createExpandableOverlayDescriptionMeasurementTypographyKey,
-  fullscreenVideoOverlayTypography,
-  getExpandableOverlayDescriptionState,
   normalizeExpandableOverlayDescriptionMeasuredLineText,
   peekExpandableOverlayDescriptionMeasurementCache,
-  resolveExpandableOverlayDescriptionViewModel,
+  resolveExpandableOverlayDescriptionViewState,
   writeExpandableOverlayDescriptionMeasurementCache,
 } from './expandable-overlay-description';
+import {
+  createFullscreenVideoOverlayDescriptionMeasurementTypography,
+  fullscreenVideoOverlayTheme,
+} from './fullscreen-video-overlay-theme';
 
 describe('expandable overlay description model', () => {
-  it('treats two natural lines as non-expandable', () => {
-    expect(
-      getExpandableOverlayDescriptionState([
-        { text: 'first line' },
-        { text: 'second line' },
-      ])
-    ).toEqual({
-      isExpandable: false,
-      visibleLineCount: 2,
-    });
-  });
-
-  it('treats more than two natural lines as expandable', () => {
-    expect(
-      getExpandableOverlayDescriptionState([
-        { text: 'first line' },
-        { text: 'second line' },
-        { text: 'third line' },
-      ])
-    ).toEqual({
-      isExpandable: true,
-      visibleLineCount: 2,
-    });
-  });
+  const descriptionLineHeight =
+    fullscreenVideoOverlayTheme.descriptionText.lineHeight;
 
   it('normalizes measured line text by trimming trailing whitespace', () => {
     expect(
@@ -48,10 +28,9 @@ describe('expandable overlay description model', () => {
 
   it('uses a dedicated measuring phase before the description can render collapsed or expanded content', () => {
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: null,
+        descriptionLineHeight,
         expandedExpansionKey: null,
         isMeasurementReady: false,
         lineCount: 0,
@@ -60,10 +39,9 @@ describe('expandable overlay description model', () => {
     ).toBe('measuring');
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 3,
@@ -72,10 +50,9 @@ describe('expandable overlay description model', () => {
     ).toBe('collapsed');
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey: '1:key-a',
         isMeasurementReady: true,
         lineCount: 3,
@@ -84,10 +61,9 @@ describe('expandable overlay description model', () => {
     ).toBe('expanded');
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 2,
@@ -97,23 +73,35 @@ describe('expandable overlay description model', () => {
   });
 
   it('uses only description measurement typography inside the measurement key', () => {
-    const defaultTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
-      fullscreenVideoOverlayTypography
-    );
-    const updatedVisualTypography = {
-      ...fullscreenVideoOverlayTypography,
-      titleFontSize: 99,
-      titleLineHeight: 99,
-      actionFontSize: 77,
-      actionLineHeight: 77,
-      actionLaneHeight: 44,
-    };
+    const defaultTypographyKey =
+      createExpandableOverlayDescriptionMeasurementTypographyKey(
+        createFullscreenVideoOverlayDescriptionMeasurementTypography(
+          fullscreenVideoOverlayTheme
+        )
+      );
+    const updatedVisualTypography =
+      createFullscreenVideoOverlayDescriptionMeasurementTypography({
+        ...fullscreenVideoOverlayTheme,
+        descriptionActionGap: 99,
+        descriptionActionLaneHeight: 44,
+        descriptionActionReserveWidth: 48,
+        descriptionActionText: {
+          fontSize: 77,
+          lineHeight: 77,
+        },
+        titleText: {
+          fontSize: 99,
+          lineHeight: 99,
+        },
+      });
     const updatedTypographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
       updatedVisualTypography
     );
     const updatedDescriptionTypographyKey =
       createExpandableOverlayDescriptionMeasurementTypographyKey({
-        ...fullscreenVideoOverlayTypography,
+        ...createFullscreenVideoOverlayDescriptionMeasurementTypography(
+          fullscreenVideoOverlayTheme
+        ),
         descriptionFontSize: 18,
         descriptionLineHeight: 18,
       });
@@ -188,16 +176,17 @@ describe('expandable overlay description model', () => {
       description: 'same text',
       maxTextWidth: 248,
       typographyKey: createExpandableOverlayDescriptionMeasurementTypographyKey(
-        fullscreenVideoOverlayTypography
+        createFullscreenVideoOverlayDescriptionMeasurementTypography(
+          fullscreenVideoOverlayTheme
+        )
       ),
     });
     const expandedExpansionKey = `1:${measurementKey}`;
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey,
         isMeasurementReady: true,
         lineCount: 3,
@@ -206,71 +195,75 @@ describe('expandable overlay description model', () => {
     ).toBe(true);
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 2,
+        descriptionLineHeight,
         expandedExpansionKey,
         isMeasurementReady: true,
         lineCount: 3,
         measurementKey,
       })
     ).toMatchObject({
+      actionPlacement: 'inline',
       isExpanded: false,
-      layoutContract: {
-        actionPlacement: 'inline',
-        contentBottomLift: 0,
-      },
       mode: 'collapsed',
     });
   });
 
-  it('returns a complete layout contract so parents do not assemble conditional offsets themselves', () => {
+  it('returns action placement without leaking parent geometry into the description model', () => {
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: null,
+        descriptionLineHeight,
         expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 2,
         measurementKey: 'key-a',
-      }).layoutContract
+      })
     ).toEqual({
       actionPlacement: 'hidden',
-      contentBottomLift: 0,
+      collapsedViewportHeight:
+        fullscreenVideoOverlayTheme.descriptionText.lineHeight * 2,
+      descriptionContainerHeight:
+        fullscreenVideoOverlayTheme.descriptionText.lineHeight * 2,
+      isExpandable: false,
+      isExpanded: false,
+      isMeasurementReady: true,
+      mode: 'static',
     });
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey: null,
         isMeasurementReady: true,
         lineCount: 3,
         measurementKey: 'key-a',
-      }).layoutContract
-    ).toEqual({
-      actionPlacement: 'inline',
-      contentBottomLift: 0,
-    });
+      }).actionPlacement
+    ).toBe('inline');
 
     expect(
-      resolveExpandableOverlayDescriptionViewModel({
-        actionGap: 4,
-        actionLaneHeight: fullscreenVideoOverlayTypography.actionLaneHeight,
+      resolveExpandableOverlayDescriptionViewState({
         activeVisitToken: 1,
+        descriptionLineHeight,
         expandedExpansionKey: '1:key-a',
         isMeasurementReady: true,
         lineCount: 3,
         measurementKey: 'key-a',
-      }).layoutContract
-    ).toEqual({
-      actionPlacement: 'footer',
-      contentBottomLift:
-        fullscreenVideoOverlayTypography.actionLaneHeight + 4,
-    });
+      }).actionPlacement
+    ).toBe('footer');
+
+    expect(
+      resolveExpandableOverlayDescriptionViewState({
+        activeVisitToken: 1,
+        descriptionLineHeight,
+        expandedExpansionKey: '1:key-a',
+        isMeasurementReady: true,
+        lineCount: 3,
+        measurementKey: 'key-a',
+      })
+    ).not.toHaveProperty('currentExpansionKey');
   });
 
   it('keeps the newest inserted entries when the cache overflows', () => {

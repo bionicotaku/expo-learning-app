@@ -7,10 +7,13 @@ import {
   createExpandableOverlayDescriptionMeasurementKey,
   createExpandableOverlayDescriptionMeasurementTypographyKey,
   createExpandableOverlayDescriptionMeasurementCache,
-  fullscreenVideoOverlayTypography,
   writeExpandableOverlayDescriptionMeasurementCache,
   type ExpandableOverlayDescriptionMeasurementCache,
 } from '../model/expandable-overlay-description';
+import {
+  createFullscreenVideoOverlayDescriptionMeasurementTypography,
+  fullscreenVideoOverlayTheme,
+} from '../model/fullscreen-video-overlay-theme';
 import { useExpandableOverlayDescriptionState } from './expandable-overlay-description';
 
 vi.mock('react-native', async () => {
@@ -94,18 +97,18 @@ function DescriptionStateHarness({
     measurementCache,
   });
   onRenderSnapshot?.({
-    isExpanded: state.viewModel.isExpanded,
-    mode: state.viewModel.mode,
-    placement: state.viewModel.layoutContract.actionPlacement,
+    isExpanded: state.viewState.isExpanded,
+    mode: state.viewState.mode,
+    placement: state.viewState.actionPlacement,
     activeVisitToken,
   });
 
   return (
     <View>
-      <Text testID="mode">{state.viewModel.mode}</Text>
-      <Text testID="expandable">{String(state.viewModel.isExpandable)}</Text>
-      <Text testID="expanded">{String(state.viewModel.isExpanded)}</Text>
-      <Text testID="placement">{state.viewModel.layoutContract.actionPlacement}</Text>
+      <Text testID="mode">{state.viewState.mode}</Text>
+      <Text testID="expandable">{String(state.viewState.isExpandable)}</Text>
+      <Text testID="expanded">{String(state.viewState.isExpanded)}</Text>
+      <Text testID="placement">{state.viewState.actionPlacement}</Text>
       <Pressable testID="expand" onPress={state.handleExpandPress} />
       <Pressable testID="collapse" onPress={state.handleCollapsePress} />
       <Text testID="measure" onTextLayout={state.handleDescriptionTextLayout}>
@@ -126,7 +129,9 @@ describe('expandable overlay description runtime', () => {
   it('collapses immediately when switching to a different warm-cache content key', () => {
     const measurementCache = createExpandableOverlayDescriptionMeasurementCache();
     const typographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
-      fullscreenVideoOverlayTypography
+      createFullscreenVideoOverlayDescriptionMeasurementTypography(
+        fullscreenVideoOverlayTheme
+      )
     );
     const renderSnapshots: {
       isExpanded: boolean;

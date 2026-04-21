@@ -3,10 +3,8 @@ import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
-import {
-  fullscreenVideoOverlayTypography,
-  type ExpandableOverlayDescriptionMeasurementCache,
-} from '../model/expandable-overlay-description';
+import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
+import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
 import {
   ExpandableOverlayDescription,
   ExpandableOverlayDescriptionAction,
@@ -53,8 +51,12 @@ function RowOwnedVideoOverlayComponent({
     maxTextWidth: descriptionTextWidth,
     measurementCache,
   });
-  const contentColumnBottomOffset =
-    contentBottomOffset + descriptionState.viewModel.layoutContract.contentBottomLift;
+  const contentBottomLift =
+    descriptionState.viewState.actionPlacement === 'footer'
+      ? fullscreenVideoOverlayTheme.descriptionActionLaneHeight +
+        fullscreenVideoOverlayTheme.descriptionActionGap
+      : 0;
+  const contentColumnBottomOffset = contentBottomOffset + contentBottomLift;
 
   return (
     <View
@@ -99,8 +101,8 @@ function RowOwnedVideoOverlayComponent({
             allowFontScaling={false}
             selectable={false}
             style={{
-              fontSize: fullscreenVideoOverlayTypography.titleFontSize,
-              lineHeight: fullscreenVideoOverlayTypography.titleLineHeight,
+              fontSize: fullscreenVideoOverlayTheme.titleText.fontSize,
+              lineHeight: fullscreenVideoOverlayTheme.titleText.lineHeight,
               letterSpacing: -0.08,
               fontWeight: '700',
               color: 'rgba(251,247,238,0.97)',

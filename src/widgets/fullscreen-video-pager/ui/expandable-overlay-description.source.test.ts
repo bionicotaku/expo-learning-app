@@ -17,9 +17,10 @@ describe('expandable overlay description source', () => {
     expect(source).toContain('measurementCache');
     expect(source).toContain('activeVisitToken');
     expect(source).toContain('onTextLayout');
-    expect(source).toContain('resolveExpandableOverlayDescriptionViewModel');
+    expect(source).toContain('resolveExpandableOverlayDescriptionViewState');
     expect(source).toContain('peekExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('writeExpandableOverlayDescriptionMeasurementCache');
+    expect(source).toContain("../model/fullscreen-video-overlay-theme");
     expect(source).toContain('allowFontScaling={false}');
     expect(source).toContain("numberOfLines={mode === 'collapsed' ? 2 : undefined}");
     expect(source).toContain(
@@ -35,15 +36,18 @@ describe('expandable overlay description source', () => {
     expect(source).toContain('withTiming');
     expect(source).toContain("mode === 'measuring'");
     expect(source).toContain("mode === 'collapsed'");
+    expect(source).toContain('viewState');
+    expect(source).toContain('actionPlacement');
     expect(source).toContain('isExpanded');
     expect(source).toContain('isExpandable');
-    expect(source).toContain('layoutContract');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementKey');
     expect(source).toContain('normalizeExpandableOverlayDescriptionMeasuredLineText');
     expect(source).toContain("position: 'absolute'");
     expect(source).toContain('opacity: 0');
     expect(source).not.toContain('stateOwnerKey');
     expect(source).not.toContain('isActive');
+    expect(source).not.toContain('fullscreenVideoOverlayTypography');
+    expect(source).not.toContain('layoutContract');
     expect(source).not.toContain('resolveExpandableOverlayDescriptionRenderMode');
     expect(source).not.toContain('resolveExpandableOverlayDescriptionLayoutContract');
     expect(source).not.toContain('reduceExpandableOverlayDescriptionUiState');
