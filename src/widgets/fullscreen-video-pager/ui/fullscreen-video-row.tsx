@@ -185,6 +185,7 @@ function FullscreenVideoRowComponent({
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
         title={video.title}
+        videoId={video.videoId}
       />
       <RowPlaybackHudOverlay
         hudState={hudState}

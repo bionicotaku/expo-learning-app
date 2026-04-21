@@ -26,16 +26,32 @@ export function VideoDetailPage() {
       }),
     [canonicalItems, normalizedVideoId]
   );
-  const latestActiveItemIdRef = useRef<string | null>(null);
+  const latestRestoreVideoIdRef = useRef<string | null>(null);
+  const seededSessionKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (seededSessionKeyRef.current !== routeTarget.sessionKey) {
+      seededSessionKeyRef.current = routeTarget.sessionKey;
+      latestRestoreVideoIdRef.current = routeTarget.entryVideoId;
+      return;
+    }
+
+    if (
+      latestRestoreVideoIdRef.current === null &&
+      routeTarget.entryVideoId !== null
+    ) {
+      latestRestoreVideoIdRef.current = routeTarget.entryVideoId;
+    }
+  }, [routeTarget.entryVideoId, routeTarget.sessionKey]);
 
   useEffect(() => {
     return () => {
-      setPendingRestoreVideoId(latestActiveItemIdRef.current);
+      setPendingRestoreVideoId(latestRestoreVideoIdRef.current);
     };
   }, []);
 
   const handleLatestActiveVideoIdChange = useCallback((itemId: string) => {
-    latestActiveItemIdRef.current = itemId;
+    latestRestoreVideoIdRef.current = itemId;
   }, []);
 
   return (

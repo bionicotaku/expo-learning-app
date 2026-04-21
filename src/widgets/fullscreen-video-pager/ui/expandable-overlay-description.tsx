@@ -3,7 +3,6 @@ import {
   Pressable,
   Text,
   View,
-  useWindowDimensions,
   type GestureResponderEvent,
   type NativeSyntheticEvent,
   type TextLayoutEventData,
@@ -15,11 +14,15 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {
+  createExpandableOverlayDescriptionContentKey,
   createExpandableOverlayDescriptionMeasurementKey,
+  createExpandableOverlayDescriptionMeasurementTypographyKey,
+  fullscreenVideoOverlayTypography,
   getExpandableOverlayDescriptionState,
   normalizeExpandableOverlayDescriptionMeasuredLineText,
   readExpandableOverlayDescriptionMeasurementCache,
   reduceExpandableOverlayDescriptionUiState,
+  resolveExpandableOverlayDescriptionExpandedState,
   resolveExpandableOverlayDescriptionLayoutContract,
   resolveExpandableOverlayDescriptionCollapsedViewportHeight,
   resolveExpandableOverlayDescriptionHeights,
@@ -30,21 +33,26 @@ import {
   type ExpandableOverlayDescriptionMeasurementCache,
   type ExpandableOverlayDescriptionMeasurement,
   type ExpandableOverlayDescriptionMeasuredLine,
+  type ExpandableOverlayDescriptionUiState,
 } from '../model/expandable-overlay-description';
 
 export const descriptionActionReserveWidth = 34;
-export const descriptionActionLaneHeight = 16;
+export const descriptionActionLaneHeight =
+  fullscreenVideoOverlayTypography.actionLaneHeight;
 export const descriptionActionGap = 4;
 
 const expandLabel = '展开';
 const collapseLabel = '收起';
 const actionHitSlop = 8;
 const actionLabelFadeDurationMs = 80;
-const descriptionMeasurementTypographyKey = '13.5:16:v1';
+const descriptionMeasurementTypographyKey =
+  createExpandableOverlayDescriptionMeasurementTypographyKey(
+    fullscreenVideoOverlayTypography
+  );
 
 const descriptionTextStyle = {
-  fontSize: 13.5,
-  lineHeight: 16,
+  fontSize: fullscreenVideoOverlayTypography.descriptionFontSize,
+  lineHeight: fullscreenVideoOverlayTypography.descriptionLineHeight,
   color: 'rgba(251,247,238,0.9)',
   textShadowColor: 'rgba(17,13,10,0.24)',
   textShadowOffset: { width: 1, height: 1 },
@@ -52,8 +60,8 @@ const descriptionTextStyle = {
 } as const;
 
 const descriptionActionTextStyle = {
-  fontSize: 13.5,
-  lineHeight: 16,
+  fontSize: fullscreenVideoOverlayTypography.actionFontSize,
+  lineHeight: fullscreenVideoOverlayTypography.actionLineHeight,
   color: 'rgba(251,247,238,0.98)',
   fontWeight: '700' as const,
   textShadowColor: 'rgba(17,13,10,0.24)',
@@ -88,6 +96,7 @@ type UseExpandableOverlayDescriptionStateArgs = {
   isActive: boolean;
   maxTextWidth: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
+  stateOwnerKey: string;
 };
 
 export function useExpandableOverlayDescriptionState({
@@ -95,23 +104,32 @@ export function useExpandableOverlayDescriptionState({
   isActive,
   maxTextWidth,
   measurementCache,
+  stateOwnerKey,
 }: UseExpandableOverlayDescriptionStateArgs): ExpandableOverlayDescriptionState {
-  const { fontScale } = useWindowDimensions();
   const measurementKey = useMemo(
     () =>
       createExpandableOverlayDescriptionMeasurementKey({
         description,
-        fontScale,
         maxTextWidth,
         typographyKey: descriptionMeasurementTypographyKey,
       }),
-    [description, fontScale, maxTextWidth]
+    [description, maxTextWidth]
+  );
+  const contentKey = useMemo(
+    () =>
+      createExpandableOverlayDescriptionContentKey({
+        measurementKey,
+        stateOwnerKey,
+      }),
+    [measurementKey, stateOwnerKey]
   );
   const [measurement, setMeasurement] = useState<ExpandableOverlayDescriptionMeasurement>({
     key: '',
     lines: [],
   });
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [uiState, setUiState] = useState<ExpandableOverlayDescriptionUiState>({
+    expandedContentKey: null,
+  });
 
   const measurementSnapshot = useMemo(() => {
     const cachedLines = readExpandableOverlayDescriptionMeasurementCache(
@@ -144,6 +162,18 @@ export function useExpandableOverlayDescriptionState({
     () => resolveExpandableOverlayDescriptionCollapsedViewportHeight(),
     []
   );
+  const isExpandable =
+    measurementSnapshot.isMeasurementReady && descriptionState.isExpandable;
+  const isExpanded = useMemo(
+    () =>
+      resolveExpandableOverlayDescriptionExpandedState({
+        contentKey,
+        expandedContentKey: uiState.expandedContentKey,
+        isActive,
+        isExpandable,
+      }),
+    [contentKey, isActive, isExpandable, uiState.expandedContentKey]
+  );
   const mode = useMemo(
     () =>
       resolveExpandableOverlayDescriptionRenderMode({
@@ -153,8 +183,6 @@ export function useExpandableOverlayDescriptionState({
       }),
     [isExpanded, measuredLines.length, measurementSnapshot.isMeasurementReady]
   );
-  const isExpandable =
-    measurementSnapshot.isMeasurementReady && descriptionState.isExpandable;
   const layoutContract = useMemo(
     () =>
       resolveExpandableOverlayDescriptionLayoutContract({
@@ -167,35 +195,35 @@ export function useExpandableOverlayDescriptionState({
   );
 
   useEffect(() => {
-    setIsExpanded((previousState) =>
-      reduceExpandableOverlayDescriptionUiState(
-        { isExpanded: previousState },
-        { type: 'description-changed' }
-      ).isExpanded
+    if (
+      uiState.expandedContentKey === null ||
+      (uiState.expandedContentKey === contentKey && isActive && isExpandable)
+    ) {
+      return;
+    }
+
+    setUiState((previousState) =>
+      previousState.expandedContentKey === null
+        ? previousState
+        : reduceExpandableOverlayDescriptionUiState(previousState, {
+            type: 'content-invalidated',
+          })
     );
-  }, [description]);
+  }, [contentKey, isActive, isExpandable, uiState.expandedContentKey]);
 
   useEffect(() => {
-    if (!isActive) {
-      setIsExpanded((previousState) =>
-        reduceExpandableOverlayDescriptionUiState(
-          { isExpanded: previousState },
-          { type: 'became-inactive' }
-        ).isExpanded
-      );
+    if (measurementSnapshot.isMeasurementReady) {
+      return;
     }
-  }, [isActive]);
 
-  useEffect(() => {
-    if (!isExpandable) {
-      setIsExpanded((previousState) =>
-        reduceExpandableOverlayDescriptionUiState(
-          { isExpanded: previousState },
-          { type: 'lost-expandability' }
-        ).isExpanded
-      );
-    }
-  }, [isExpandable]);
+    setUiState((previousState) =>
+      previousState.expandedContentKey === null
+        ? previousState
+        : reduceExpandableOverlayDescriptionUiState(previousState, {
+            type: 'content-invalidated',
+          })
+    );
+  }, [measurementSnapshot.isMeasurementReady]);
 
   const handleDescriptionTextLayout = useCallback(
     (event: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -223,21 +251,20 @@ export function useExpandableOverlayDescriptionState({
 
   const handleExpandPress = useCallback((event: GestureResponderEvent) => {
     event.stopPropagation?.();
-    setIsExpanded((previousState) =>
-      reduceExpandableOverlayDescriptionUiState(
-        { isExpanded: previousState },
-        { type: 'expand-pressed' }
-      ).isExpanded
+    setUiState((previousState) =>
+      reduceExpandableOverlayDescriptionUiState(previousState, {
+        contentKey,
+        type: 'expand-pressed',
+      })
     );
-  }, []);
+  }, [contentKey]);
 
   const handleCollapsePress = useCallback((event: GestureResponderEvent) => {
     event.stopPropagation?.();
-    setIsExpanded((previousState) =>
-      reduceExpandableOverlayDescriptionUiState(
-        { isExpanded: previousState },
-        { type: 'collapse-pressed' }
-      ).isExpanded
+    setUiState((previousState) =>
+      reduceExpandableOverlayDescriptionUiState(previousState, {
+        type: 'collapse-pressed',
+      })
     );
   }, []);
 
@@ -295,6 +322,7 @@ function ExpandableOverlayDescriptionComponent({
         }}
       >
         <Text
+          allowFontScaling={false}
           selectable={false}
           onTextLayout={handleDescriptionTextLayout}
           style={descriptionTextStyle}
@@ -304,7 +332,11 @@ function ExpandableOverlayDescriptionComponent({
       </View>
 
       {mode === 'static' ? (
-        <Text selectable={false} style={[descriptionTextStyle, { width: maxTextWidth }]}>
+        <Text
+          allowFontScaling={false}
+          selectable={false}
+          style={[descriptionTextStyle, { width: maxTextWidth }]}
+        >
           {description}
         </Text>
       ) : mode === 'measuring' ? (
@@ -312,12 +344,17 @@ function ExpandableOverlayDescriptionComponent({
       ) : isExpandable ? (
         mode === 'expanded' ? (
           <View style={{ width: maxTextWidth }}>
-            <Text selectable={false} style={descriptionTextStyle}>
+            <Text
+              allowFontScaling={false}
+              selectable={false}
+              style={descriptionTextStyle}
+            >
               {description}
             </Text>
           </View>
         ) : (
           <Text
+            allowFontScaling={false}
             selectable={false}
             style={[descriptionTextStyle, { width: maxTextWidth }]}
             numberOfLines={mode === 'collapsed' ? 2 : undefined}
@@ -327,7 +364,11 @@ function ExpandableOverlayDescriptionComponent({
           </Text>
         )
       ) : (
-        <Text selectable={false} style={[descriptionTextStyle, { width: maxTextWidth }]}>
+        <Text
+          allowFontScaling={false}
+          selectable={false}
+          style={[descriptionTextStyle, { width: maxTextWidth }]}
+        >
           {description}
         </Text>
       )}
@@ -402,6 +443,7 @@ function ExpandableOverlayDescriptionActionComponent({
           }}
         >
           <Animated.Text
+            allowFontScaling={false}
             pointerEvents="none"
             selectable={false}
             style={[
@@ -417,6 +459,7 @@ function ExpandableOverlayDescriptionActionComponent({
             {expandLabel}
           </Animated.Text>
           <Animated.Text
+            allowFontScaling={false}
             pointerEvents="none"
             selectable={false}
             style={[

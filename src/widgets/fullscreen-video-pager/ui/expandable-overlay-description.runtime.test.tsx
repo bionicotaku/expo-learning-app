@@ -4,7 +4,11 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { Pressable, Text, View } from 'react-native';
 
 import {
+  createExpandableOverlayDescriptionMeasurementKey,
+  createExpandableOverlayDescriptionMeasurementTypographyKey,
   createExpandableOverlayDescriptionMeasurementCache,
+  fullscreenVideoOverlayTypography,
+  writeExpandableOverlayDescriptionMeasurementCache,
   type ExpandableOverlayDescriptionMeasurementCache,
 } from '../model/expandable-overlay-description';
 import { useExpandableOverlayDescriptionState } from './expandable-overlay-description';
@@ -31,12 +35,6 @@ vi.mock('react-native', async () => {
     Pressable: createHostComponent('Pressable'),
     Text: createHostComponent('Text'),
     View: createHostComponent('View'),
-    useWindowDimensions: () => ({
-      fontScale: 1,
-      height: 844,
-      scale: 3,
-      width: 390,
-    }),
   };
 });
 
@@ -74,6 +72,13 @@ type DescriptionStateHarnessProps = {
   isActive: boolean;
   maxTextWidth?: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
+  onRenderSnapshot?: (snapshot: {
+    isExpanded: boolean;
+    mode: string;
+    placement: string;
+    stateOwnerKey: string;
+  }) => void;
+  stateOwnerKey: string;
 };
 
 function DescriptionStateHarness({
@@ -81,12 +86,21 @@ function DescriptionStateHarness({
   isActive,
   maxTextWidth = 279,
   measurementCache,
+  onRenderSnapshot,
+  stateOwnerKey,
 }: DescriptionStateHarnessProps) {
   const state = useExpandableOverlayDescriptionState({
     description,
     isActive,
     maxTextWidth,
     measurementCache,
+    stateOwnerKey,
+  });
+  onRenderSnapshot?.({
+    isExpanded: state.isExpanded,
+    mode: state.mode,
+    placement: state.layoutContract.actionPlacement,
+    stateOwnerKey,
   });
 
   return (
@@ -112,6 +126,89 @@ function readTestValue(
 }
 
 describe('expandable overlay description runtime', () => {
+  it('collapses immediately when switching to a different warm-cache content key', () => {
+    const measurementCache = createExpandableOverlayDescriptionMeasurementCache();
+    const typographyKey = createExpandableOverlayDescriptionMeasurementTypographyKey(
+      fullscreenVideoOverlayTypography
+    );
+    const renderSnapshots: {
+      isExpanded: boolean;
+      mode: string;
+      placement: string;
+      stateOwnerKey: string;
+    }[] = [];
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    writeExpandableOverlayDescriptionMeasurementCache({
+      cache: measurementCache,
+      lines: [{ text: 'line 1' }, { text: 'line 2' }, { text: 'line 3' }],
+      measurementKey: createExpandableOverlayDescriptionMeasurementKey({
+        description: 'description b',
+        maxTextWidth: 279,
+        typographyKey,
+      }),
+    });
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <DescriptionStateHarness
+          description="description a"
+          isActive
+          measurementCache={measurementCache}
+          onRenderSnapshot={(snapshot) => {
+            renderSnapshots.push(snapshot);
+          }}
+          stateOwnerKey="video-a"
+        />
+      );
+    });
+
+    act(() => {
+      renderer!.root.findByProps({ testID: 'measure' }).props.onTextLayout({
+        nativeEvent: {
+          lines: [{ text: 'line 1' }, { text: 'line 2' }, { text: 'line 3' }],
+        },
+      });
+    });
+
+    act(() => {
+      renderer!.root.findByProps({ testID: 'expand' }).props.onPress({
+        stopPropagation: vi.fn(),
+      });
+    });
+
+    expect(readTestValue(renderer!, 'mode')).toBe('expanded');
+    expect(readTestValue(renderer!, 'placement')).toBe('footer');
+
+    const snapshotCountBeforeSwitch = renderSnapshots.length;
+
+    act(() => {
+      renderer!.update(
+        <DescriptionStateHarness
+          description="description b"
+          isActive
+          measurementCache={measurementCache}
+          onRenderSnapshot={(snapshot) => {
+            renderSnapshots.push(snapshot);
+          }}
+          stateOwnerKey="video-b"
+        />
+      );
+    });
+
+    const switchSnapshots = renderSnapshots.slice(snapshotCountBeforeSwitch);
+
+    expect(switchSnapshots[0]).toMatchObject({
+      isExpanded: false,
+      mode: 'collapsed',
+      placement: 'inline',
+      stateOwnerKey: 'video-b',
+    });
+    expect(readTestValue(renderer!, 'expanded')).toBe('false');
+    expect(readTestValue(renderer!, 'mode')).toBe('collapsed');
+    expect(readTestValue(renderer!, 'placement')).toBe('inline');
+  });
+
   it('reuses pager-scoped measurement cache while resetting expanded state across inactive switches and remounts', () => {
     const measurementCache = createExpandableOverlayDescriptionMeasurementCache();
     const description =
@@ -124,6 +221,7 @@ describe('expandable overlay description runtime', () => {
           description={description}
           isActive
           measurementCache={measurementCache}
+          stateOwnerKey="video-a"
         />
       );
     });
@@ -162,6 +260,7 @@ describe('expandable overlay description runtime', () => {
           description={description}
           isActive={false}
           measurementCache={measurementCache}
+          stateOwnerKey="video-a"
         />
       );
     });
@@ -180,6 +279,7 @@ describe('expandable overlay description runtime', () => {
           description={description}
           isActive
           measurementCache={measurementCache}
+          stateOwnerKey="video-a"
         />
       );
     });

@@ -15,14 +15,16 @@ describe('expandable overlay description source', () => {
     expect(source).toContain('useExpandableOverlayDescriptionState');
     expect(source).toContain('ExpandableOverlayDescriptionAction');
     expect(source).toContain('measurementCache');
+    expect(source).toContain('stateOwnerKey');
     expect(source).toContain('isActive');
     expect(source).toContain('onTextLayout');
-    expect(source).toContain('useWindowDimensions');
     expect(source).toContain('resolveExpandableOverlayDescriptionRenderMode');
     expect(source).toContain('resolveExpandableOverlayDescriptionLayoutContract');
     expect(source).toContain('reduceExpandableOverlayDescriptionUiState');
+    expect(source).toContain('resolveExpandableOverlayDescriptionExpandedState');
     expect(source).toContain('readExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('writeExpandableOverlayDescriptionMeasurementCache');
+    expect(source).toContain('allowFontScaling={false}');
     expect(source).toContain("numberOfLines={mode === 'collapsed' ? 2 : undefined}");
     expect(source).toContain(
       "ellipsizeMode={mode === 'collapsed' ? 'tail' : undefined}"
@@ -53,6 +55,8 @@ describe('expandable overlay description source', () => {
     expect(source).not.toContain('setMeasuredLines([])');
     expect(source).not.toContain('left: -9999');
     expect(source).not.toContain('top: -9999');
+    expect(source).not.toContain('useWindowDimensions');
+    expect(source).not.toContain('fontScale');
     expect(source).not.toContain('LinearTransition');
     expect(source).not.toContain('Animated.View');
     expect(source).not.toContain('paddingBottom: descriptionTextStyle.lineHeight');

@@ -17,5 +17,6 @@ describe('fullscreen video session source', () => {
     expect(source).toContain('entryIndex');
     expect(source).not.toContain('useVideoRuntimeStore');
     expect(source).not.toContain('routeVideoId');
+    expect(source).not.toContain('pendingRestoreVideoId');
   });
 });

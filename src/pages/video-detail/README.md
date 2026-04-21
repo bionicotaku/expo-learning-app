@@ -15,7 +15,10 @@
 - 复用共享 feed source 找到进入位置
 - 通过 `resolveVideoDetailRouteTarget(...)` 计算当前 route 对应的 `entryIndex / entryVideoId / sessionKey`
 - 用 `key={sessionKey}` 渲染 `FullscreenVideoSession`
-- 在离开页面时把最后一次上报的 `activeItemId` 写入 `pendingRestoreVideoId`
+- 维护 page-lifetime 的 `latestRestoreVideoId`
+- route/session 变化时先用 `routeTarget.entryVideoId` 预置 restore target
+- pager 后续上报 committed active 时再覆盖 restore target
+- 在离开页面时把 `latestRestoreVideoId` 写入 `pendingRestoreVideoId`
 - route `videoId` 找不到匹配项时回退到第一个视频
 
 当前组件树：
@@ -38,6 +41,7 @@ VideoDetailPage
 
 - page 不维护 transcript active state；这部分属于 `FullscreenVideoSession`
 - page 不维护 `activeIndex / activeItemId` 本地状态；这部分属于 pager 内部播放会话
+- page 维护的是 restore target，不是“只等 pager committed active 才存在的 latest active state”
 - page 不维护 `basePausedByUser`、`transientHoldState`、HUD 或任何 row 级交互状态
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository

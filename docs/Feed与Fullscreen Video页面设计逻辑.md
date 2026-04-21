@@ -94,7 +94,9 @@ VideoDetailPage
 
 - 从 route param 读取 `videoId`
 - 消费共享 `feed source`
-- 维护页面退出时需要写回的 `latestActiveItemIdRef`
+- 维护页面退出时需要写回的 page-lifetime `latestRestoreVideoId`
+- route/session 变化时先用 `entryVideoId` 预置 restore target
+- pager committed active 到来后再覆盖 restore target
 - 计算当前 route 对应的 `fullscreenSessionKey`
 - 渲染 `FullscreenVideoSession`
 
@@ -103,6 +105,17 @@ VideoDetailPage
 - transcript active state
 - pager active state
 - route change 与 pager retarget 的兼容逻辑
+
+这里需要明确区分：
+
+- page 的 restore target
+  - 属于 page-lifetime state
+  - 服务“退出 fullscreen 后 Feed 恢复到哪条视频”
+- session 的 pager active
+  - 属于 session-lifetime state
+  - 服务 transcript source、near-tail requestMore 和当前 session 内的真实 active 语义
+
+两者不是同一个 owner，也不要求完全同步更新。
 
 ### 4.2 `FullscreenVideoSession`
 

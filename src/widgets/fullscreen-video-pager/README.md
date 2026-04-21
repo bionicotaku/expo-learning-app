@@ -80,6 +80,7 @@ FullscreenVideoPager
   - row-owned 内容层
   - 持有标题与底部内容文案区的排版壳
   - 标题与 description 共用同一条文本列宽；内容区整体向左扩并缩小 rail 前留白
+  - title / description / `展开 / 收起` 固定视觉尺寸，显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不再持有 description 的内部展开态或按钮显隐态
   - 消费 `expandable-overlay-description` 模块导出的完整 layout contract，并把文本列与固定 action lane 分别挂到动画树内外
   - 折叠态不为 action lane 预留底部空行，`展开` 与 description 第二行并排；展开态由 layout contract 驱动内容列整体上抬，为 `收起` 单独留一行
@@ -87,10 +88,10 @@ FullscreenVideoPager
 - `ui/expandable-overlay-description.tsx`
   - row-local description 状态模块 + presenter
   - 默认最多 2 行；折叠态直接使用 native tail ellipsis，让 `...` 跟在 description 文本后面
-  - 持有 description 的 measurement、`isExpandable`、`isExpanded`
+  - 持有 description 的 measurement 与 `expandedContentKey`；当前 `isExpanded` 由 `stateOwnerKey + measurementKey + isActive + isExpandable` 同步派生，不再靠 effect 事后修正 correctness
   - 同一模块同时导出 description state hook、完整 layout contract、文本 presenter 和固定 `展开 / 收起` action presenter，不再通过父子 callback 桥同步按钮显隐
   - 先做 hidden text measurement，再进入稳定的 `measuring | static | collapsed | expanded` 渲染阶段
-  - measurement key 会绑定 typography 版本、font scale 和宽度；measurement cache 有上限，并由 pager 提供生命周期
+  - measurement key 固定绑定 overlay typography contract、宽度和 description 文本；measurement cache 有上限，读命中会刷新最近使用顺序，并由 pager 提供生命周期
   - `展开 / 收起` action presenter 挂在父层 absolute sibling，避开内容列的 layout animation；折叠态与第二行同 baseline，展开态作为独立最后一行；标签只在固定槽位里做 opacity crossfade，不再通过 enter/exit 重新挂载
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层

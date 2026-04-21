@@ -7,6 +7,16 @@ export type ExpandableOverlayDescriptionMeasurement = {
   lines: readonly ExpandableOverlayDescriptionMeasuredLine[];
 };
 
+export type FullscreenVideoOverlayTypography = {
+  actionFontSize: number;
+  actionLaneHeight: number;
+  actionLineHeight: number;
+  descriptionFontSize: number;
+  descriptionLineHeight: number;
+  titleFontSize: number;
+  titleLineHeight: number;
+};
+
 export type ExpandableOverlayDescriptionMeasurementCache = {
   entries: Map<string, readonly ExpandableOverlayDescriptionMeasuredLine[]>;
   limit: number;
@@ -18,15 +28,13 @@ export type ExpandableOverlayDescriptionLayoutContract = {
 };
 
 export type ExpandableOverlayDescriptionUiState = {
-  isExpanded: boolean;
+  expandedContentKey: string | null;
 };
 
 type ExpandableOverlayDescriptionUiEvent =
-  | { type: 'became-inactive' }
   | { type: 'collapse-pressed' }
-  | { type: 'description-changed' }
-  | { type: 'expand-pressed' }
-  | { type: 'lost-expandability' };
+  | { type: 'content-invalidated' }
+  | { contentKey: string; type: 'expand-pressed' };
 
 type ExpandableOverlayDescriptionRenderMode =
   | 'measuring'
@@ -35,24 +43,51 @@ type ExpandableOverlayDescriptionRenderMode =
   | 'expanded';
 
 const collapsedLineCount = 2;
-const descriptionLineHeight = 16;
 const defaultMeasurementCacheLimit = 120;
+
+export const fullscreenVideoOverlayTypography: Readonly<FullscreenVideoOverlayTypography> = {
+  actionFontSize: 13.5,
+  actionLaneHeight: 16,
+  actionLineHeight: 16,
+  descriptionFontSize: 13.5,
+  descriptionLineHeight: 16,
+  titleFontSize: 15,
+  titleLineHeight: 18,
+};
+
+export function createExpandableOverlayDescriptionMeasurementTypographyKey(
+  typography: FullscreenVideoOverlayTypography
+) {
+  return [
+    `title:${typography.titleFontSize}/${typography.titleLineHeight}`,
+    `description:${typography.descriptionFontSize}/${typography.descriptionLineHeight}`,
+    `action:${typography.actionFontSize}/${typography.actionLineHeight}`,
+    `lane:${typography.actionLaneHeight}`,
+  ].join('|');
+}
+
+export function createExpandableOverlayDescriptionContentKey({
+  measurementKey,
+  stateOwnerKey,
+}: {
+  measurementKey: string;
+  stateOwnerKey: string;
+}) {
+  return `${stateOwnerKey}:${measurementKey}`;
+}
 
 export function createExpandableOverlayDescriptionMeasurementKey({
   description,
-  fontScale,
   maxTextWidth,
   typographyKey,
 }: {
   description: string;
-  fontScale: number;
   maxTextWidth: number;
   typographyKey: string;
 }) {
   const normalizedWidth = maxTextWidth.toFixed(2);
-  const normalizedFontScale = fontScale.toFixed(2);
 
-  return `${typographyKey}:${normalizedFontScale}:${normalizedWidth}:${description}`;
+  return `${typographyKey}:${normalizedWidth}:${description}`;
 }
 
 export function createExpandableOverlayDescriptionMeasurementCache(
@@ -68,7 +103,16 @@ export function readExpandableOverlayDescriptionMeasurementCache(
   cache: ExpandableOverlayDescriptionMeasurementCache,
   measurementKey: string
 ) {
-  return cache.entries.get(measurementKey);
+  const lines = cache.entries.get(measurementKey);
+
+  if (!lines) {
+    return undefined;
+  }
+
+  cache.entries.delete(measurementKey);
+  cache.entries.set(measurementKey, lines);
+
+  return lines;
 }
 
 export function writeExpandableOverlayDescriptionMeasurementCache({
@@ -141,6 +185,20 @@ export function resolveExpandableOverlayDescriptionRenderMode({
   return isExpanded ? 'expanded' : 'collapsed';
 }
 
+export function resolveExpandableOverlayDescriptionExpandedState({
+  contentKey,
+  expandedContentKey,
+  isActive,
+  isExpandable,
+}: {
+  contentKey: string;
+  expandedContentKey: string | null;
+  isActive: boolean;
+  isExpandable: boolean;
+}) {
+  return isActive && isExpandable && expandedContentKey === contentKey;
+}
+
 export function getExpandableOverlayDescriptionState(
   lines: readonly ExpandableOverlayDescriptionMeasuredLine[]
 ) {
@@ -187,12 +245,10 @@ export function reduceExpandableOverlayDescriptionUiState(
 ): ExpandableOverlayDescriptionUiState {
   switch (event.type) {
     case 'expand-pressed':
-      return { isExpanded: true };
+      return { expandedContentKey: event.contentKey };
     case 'collapse-pressed':
-    case 'description-changed':
-    case 'became-inactive':
-    case 'lost-expandability':
-      return { isExpanded: false };
+    case 'content-invalidated':
+      return { expandedContentKey: null };
     default:
       return state;
   }
@@ -200,7 +256,8 @@ export function reduceExpandableOverlayDescriptionUiState(
 
 export function resolveExpandableOverlayDescriptionHeights(lineCount: number) {
   const visibleLineCount = Math.min(Math.max(0, lineCount), collapsedLineCount);
-  const collapsedHeight = visibleLineCount * descriptionLineHeight;
+  const collapsedHeight =
+    visibleLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight;
 
   if (lineCount <= collapsedLineCount) {
     return {
@@ -211,10 +268,13 @@ export function resolveExpandableOverlayDescriptionHeights(lineCount: number) {
 
   return {
     collapsedHeight,
-    expandedHeight: lineCount * descriptionLineHeight,
+    expandedHeight:
+      lineCount * fullscreenVideoOverlayTypography.descriptionLineHeight,
   };
 }
 
 export function resolveExpandableOverlayDescriptionCollapsedViewportHeight() {
-  return collapsedLineCount * descriptionLineHeight;
+  return (
+    collapsedLineCount * fullscreenVideoOverlayTypography.descriptionLineHeight
+  );
 }
