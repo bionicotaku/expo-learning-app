@@ -23,6 +23,7 @@ describe('fullscreen video pager source', () => {
     );
 
     expect(source).toContain('useFullscreenPlaybackSession');
+    expect(source).toContain('handleViewableItemsChanged');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('FullscreenVideoRow');
     expect(source).toContain('entryIndex');
@@ -39,6 +40,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');
+    expect(source).not.toContain('resolveActiveVideoChange');
     expect(source).not.toContain('progressSnapshot');
   });
 });

@@ -18,6 +18,10 @@ import type {
   FullscreenActivePlayerSurfaceState,
 } from './active-player-controller';
 import {
+  resolveActiveVideoChange,
+  type ViewableItemToken,
+} from './active-video-change';
+import {
   clearFullscreenRowPlaybackHudState,
   clearFullscreenRowTransientFeedback,
   clearFullscreenRowTransientFeedbackByKind,
@@ -57,6 +61,7 @@ export function useFullscreenPlaybackSession({
   const transientFeedbackTimeoutsRef = useRef(
     new Map<string, ReturnType<typeof setTimeout>>()
   );
+  const onActiveVideoChangeRef = useRef(onActiveVideoChange);
   const activeVisitTokenRef = useRef(0);
   const activeSnapshotRef = useRef<{
     index: number | null;
@@ -65,6 +70,7 @@ export function useFullscreenPlaybackSession({
     index: null,
     itemId: null,
   });
+  onActiveVideoChangeRef.current = onActiveVideoChange;
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeVisitToken, setActiveVisitToken] = useState<number | null>(null);
@@ -236,9 +242,31 @@ export function useFullscreenPlaybackSession({
       activeVisitTokenRef.current += 1;
       setActiveIndex(index);
       setActiveVisitToken(activeVisitTokenRef.current);
-      onActiveVideoChange(itemId, index);
+      onActiveVideoChangeRef.current(itemId, index);
     },
-    [clearTransientFeedbackByKindForVideo, onActiveVideoChange]
+    [clearTransientFeedbackByKindForVideo]
+  );
+
+  const handleViewableItemsChanged = useCallback(
+    ({
+      viewableItems,
+    }: {
+      viewableItems: ViewableItemToken<VideoListItem>[];
+    }) => {
+      const currentSnapshot = activeSnapshotRef.current;
+      const nextActiveVideo = resolveActiveVideoChange({
+        currentActiveIndex: currentSnapshot.index,
+        currentActiveItemId: currentSnapshot.itemId,
+        viewableItems,
+      });
+
+      if (!nextActiveVideo) {
+        return;
+      }
+
+      commitActiveVideo(nextActiveVideo.itemId, nextActiveVideo.index);
+    },
+    [commitActiveVideo]
   );
 
   const handleSingleTap = useCallback(() => {
@@ -377,6 +405,7 @@ export function useFullscreenPlaybackSession({
     handleHoldStart,
     handleRowUnmount,
     handleSingleTap,
+    handleViewableItemsChanged,
     registerActiveController,
   };
 }

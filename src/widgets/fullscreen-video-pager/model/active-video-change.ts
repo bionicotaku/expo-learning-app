@@ -2,7 +2,7 @@ type ViewableItemWithVideoId = {
   videoId: string;
 };
 
-type ViewableItemToken<T extends ViewableItemWithVideoId> = {
+export type ViewableItemToken<T extends ViewableItemWithVideoId> = {
   index?: number | null;
   isViewable?: boolean;
   item?: T | null;

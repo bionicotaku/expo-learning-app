@@ -47,6 +47,7 @@ FullscreenVideoPager
   - 持有 `activeIndex`、`activeItemId`、`basePausedByUser`、`transientHoldState`
   - 持有当前 active row 的 `activePlayerControllerRef`
   - 持有 `videoId -> rowPlaybackHudState` 的稀疏 HUD store
+  - 持有 `FlatList` viewability 的稳定 handler；active 判定读取 session refs，不让 `FlatList` 注册入口跟随 active state 换引用
   - 管理 pause / seek / rate 的生命周期与 timer
 - `model/row-playback-hud-state.ts`
   - row HUD store 的纯数据结构与更新 helper
@@ -72,7 +73,7 @@ FullscreenVideoPager
 - `ui/fullscreen-video-pager.tsx`
   - FlatList 壳层
   - mount-scoped `entryIndex` 初始定位与 post-load alignment
-  - active row 切换装配
+  - 注册稳定的 viewability handler，并把 active row 切换交给 playback session
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局

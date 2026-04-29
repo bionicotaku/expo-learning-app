@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import type { FlatList as FlatListType, ViewToken } from 'react-native';
+import type { FlatList as FlatListType } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { VideoListItem } from '@/entities/video';
 import { shouldMountPlayer } from '@/features/video-playback';
-import { resolveActiveVideoChange } from '../model/active-video-change';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
@@ -70,6 +69,7 @@ export function FullscreenVideoPager({
     handleHoldStart,
     handleRowUnmount,
     handleSingleTap,
+    handleViewableItemsChanged,
     registerActiveController,
   } = useFullscreenPlaybackSession({
     items,
@@ -109,23 +109,6 @@ export function FullscreenVideoPager({
 
     commitActiveVideo(nextItem.videoId, initialPosition.targetIndex);
   }, [activeIndex, commitActiveVideo, initialPosition.targetIndex, items]);
-
-  const handleViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
-      const nextActiveVideo = resolveActiveVideoChange({
-        currentActiveIndex: activeIndex,
-        currentActiveItemId: activeItemId,
-        viewableItems,
-      });
-
-      if (!nextActiveVideo) {
-        return;
-      }
-
-      commitActiveVideo(nextActiveVideo.itemId, nextActiveVideo.index);
-    },
-    [activeIndex, activeItemId, commitActiveVideo]
-  );
 
   const handleScrollToIndexFailed = useCallback(({ index }: { index: number }) => {
     setTimeout(() => {
