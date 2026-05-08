@@ -13,6 +13,7 @@
   - append 去重和单飞控制
   - `FeedItem[] -> VideoListItem[]` 映射出口
   - 成功 fetch 后通过 `video-runtime` 执行 source-aware handoff
+  - 续接读取失败时触发统一全局 error toast：`加载更多视频失败`
 
 边界约束：
 
@@ -20,6 +21,7 @@
 - 不定义 `videoId -> runtime override`
 - 不承担播放器状态
 - 不定义卡片展示文案
+- 不处理首屏全页 error UI；首屏失败仍由页面 loading state 渲染 error 页面
 
 这个 feature 的职责是：
 

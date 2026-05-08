@@ -5,6 +5,7 @@ import * as feedEntity from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
 import { mapFeedItemToVideoListItem, type VideoListItem } from '@/entities/video';
 import { useVideoRuntimeStore } from '@/features/video-runtime';
+import { toast } from '@/shared/lib/toast';
 
 import * as feedSource from './feed-source';
 
@@ -27,6 +28,7 @@ describe('feed source helpers', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
+    vi.restoreAllMocks();
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -38,6 +40,7 @@ describe('feed source helpers', () => {
       },
     });
     useVideoRuntimeStore.getState().clearAll();
+    toast.clear();
   });
 
   it('uses a stable query key for the main feed snapshot', () => {
@@ -277,6 +280,7 @@ describe('feed source helpers', () => {
   });
 
   it('does not mutate runtime override or membership when a feed request fails', async () => {
+    const toastSpy = vi.spyOn(toast, 'show');
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
         fetchFeed: () => Promise<{ items: FeedItem[] }>;
@@ -298,6 +302,10 @@ describe('feed source helpers', () => {
 
     await expect(controller.requestMore(queryClient)).rejects.toThrow('network failed');
 
+    expect(toastSpy).toHaveBeenCalledWith({
+      kind: 'error',
+      title: '加载更多视频失败',
+    });
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
       'the-office-health-care-video-1': {
         isLiked: true,

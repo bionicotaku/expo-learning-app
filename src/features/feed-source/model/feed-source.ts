@@ -6,6 +6,7 @@ import {
   type VideoListItem,
 } from '@/entities/video';
 import { useVideoRuntimeStore } from '@/features/video-runtime';
+import { toast } from '@/shared/lib/toast';
 import { batchSourceHandoff } from './batch-source-handoff';
 
 export const FEED_QUERY_KEY = ['feed', 'main'] as const;
@@ -98,6 +99,10 @@ export function createFeedSourceController(repository: FeedSourceRepository) {
         ...snapshot,
         isExtending: false,
       }));
+      toast.show({
+        kind: 'error',
+        title: '加载更多视频失败',
+      });
       throw error;
     }
   };
