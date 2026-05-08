@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('video detail page source', () => {
-  it('renders a route-keyed fullscreen session, keeps transcript source ownership out of the page, and seeds restore target from the route entry target', () => {
+  it('renders a route-keyed fullscreen session, keeps fullscreen resources out of the page, and seeds restore target from the route entry target', () => {
     const source = readFileSync(
       new URL('./video-detail-page.tsx', import.meta.url).pathname,
       'utf8'

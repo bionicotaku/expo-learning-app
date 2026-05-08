@@ -12,9 +12,9 @@ function createVideoListItem(overrides: Partial<VideoListItem> = {}): VideoListI
     coverImageUrl: 'https://example.com/cover.webp',
     durationSeconds: 72,
     viewCount: 7800,
+    likeCount: 420,
+    favoriteCount: 36,
     tags: ['PHRASAL VERB', 'LISTENING CUE'],
-    isLiked: false,
-    isFavorited: true,
     ...overrides,
   };
 }

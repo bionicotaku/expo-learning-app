@@ -10,9 +10,9 @@ export function mapFeedItemToVideoListItem(item: FeedItem): VideoListItem {
     videoUrl: item.videoUrl,
     coverImageUrl: item.coverImageUrl ?? null,
     durationSeconds: item.durationSeconds,
+    favoriteCount: item.favoriteCount,
+    likeCount: item.likeCount,
     viewCount: item.viewCount,
     tags: item.tags,
-    isLiked: item.isLiked,
-    isFavorited: item.isFavorited,
   };
 }

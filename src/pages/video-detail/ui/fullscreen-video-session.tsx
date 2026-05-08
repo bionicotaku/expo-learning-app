@@ -5,7 +5,8 @@ import {
   usePresentPlaybackSettingsSheet,
   useSubtitleDisplayMode,
 } from '@/features/playback-settings';
-import { useFullscreenTranscriptSource } from '@/features/transcript-source';
+import { createTailRequestGate } from '@/features/feed-source';
+import { useFullscreenVideoResources } from '@/features/fullscreen-video-resources';
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
 
 const trailingRequestThreshold = 3;
@@ -32,20 +33,38 @@ export function FullscreenVideoSession({
   onLatestActiveVideoIdChange,
   requestMore,
 }: FullscreenVideoSessionProps) {
-  const lastRequestedTailVideoIdRef = useRef<string | null>(null);
+  const tailRequestGateRef = useRef(createTailRequestGate());
   const subtitleDisplayMode = useSubtitleDisplayMode();
   const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
   const [pagerReportedActive, setPagerReportedActive] =
     useState<FullscreenPagerReportedActive>(null);
-  const activeTranscriptVideoId = pagerReportedActive?.itemId ?? entryVideoId;
-  const activeTranscriptIndex =
+  const activeResourceVideoId = pagerReportedActive?.itemId ?? entryVideoId;
+  const activeResourceIndex =
     pagerReportedActive?.index ?? (entryVideoId === null ? null : entryIndex);
 
-  const { activeTranscript } = useFullscreenTranscriptSource({
-    activeIndex: activeTranscriptIndex,
-    activeVideoId: activeTranscriptVideoId,
+  const { activeTranscript, videoMetaByVideoId } = useFullscreenVideoResources({
+    activeIndex: activeResourceIndex,
+    activeVideoId: activeResourceVideoId,
     items,
   });
+
+  const requestMoreForTail = useCallback((tailVideoId: string | null) => {
+    const tailRequestGate = tailRequestGateRef.current;
+
+    if (tailVideoId === null || !tailRequestGate.canStart(tailVideoId)) {
+      return;
+    }
+
+    tailRequestGate.markStarted(tailVideoId);
+    void Promise.resolve(requestMore())
+      .then(() => {
+        tailRequestGate.markSucceeded(tailVideoId);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        tailRequestGate.markSettled(tailVideoId);
+      });
+  }, [requestMore]);
 
   const handleActiveVideoChange = useCallback(
     (itemId: string, index: number) => {
@@ -64,14 +83,9 @@ export function FullscreenVideoSession({
         return;
       }
 
-      if (tailVideoId === lastRequestedTailVideoIdRef.current) {
-        return;
-      }
-
-      lastRequestedTailVideoIdRef.current = tailVideoId;
-      void requestMore();
+      requestMoreForTail(tailVideoId);
     },
-    [items, onLatestActiveVideoIdChange, requestMore]
+    [items, onLatestActiveVideoIdChange, requestMoreForTail]
   );
 
   return (
@@ -83,6 +97,7 @@ export function FullscreenVideoSession({
       onActiveVideoChange={handleActiveVideoChange}
       onCenterHoldStart={presentPlaybackSettingsSheet}
       subtitleDisplayMode={subtitleDisplayMode}
+      videoMetaByVideoId={videoMetaByVideoId}
     />
   );
 }

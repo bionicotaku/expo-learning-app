@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
+import type { VideoMeta } from '@/entities/video-meta';
 import {
   useCycleSubtitleDisplayMode,
   type SubtitleDisplayMode,
@@ -61,6 +62,7 @@ type FullscreenVideoRowProps = {
   shouldPlay: boolean;
   subtitleDisplayMode: SubtitleDisplayMode;
   video: VideoListItem;
+  videoMeta: VideoMeta | null;
   width: number;
 };
 
@@ -87,6 +89,7 @@ function FullscreenVideoRowComponent({
   shouldUsePlayer,
   shouldPlay,
   subtitleDisplayMode,
+  videoMeta,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
@@ -96,10 +99,11 @@ function FullscreenVideoRowComponent({
   const presentWordDetailDialog = usePresentWordDetailDialog();
   const cycleSubtitleDisplayMode = useCycleSubtitleDisplayMode();
   const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
-    baseIsFavorited: video.isFavorited,
-    baseIsLiked: video.isLiked,
+    baseIsFavorited: videoMeta?.isFavorited ?? false,
+    baseIsLiked: videoMeta?.isLiked ?? false,
     videoId: video.videoId,
   });
+  const areEngagementActionsDisabled = videoMeta === null;
   const showCenteredPause = shouldReserveCenterForPause({
     pauseVisible: hudState.pauseIndicatorVisible,
     transientFeedbackKind: hudState.transientFeedback?.kind ?? null,
@@ -147,11 +151,19 @@ function FullscreenVideoRowComponent({
 
   const handleActionPress = useCallback((item: FullscreenVideoOverlayActionItem) => {
     if (item.id === 'like') {
+      if (areEngagementActionsDisabled) {
+        return;
+      }
+
       toggleLiked();
       return;
     }
 
     if (item.id === 'favorite') {
+      if (areEngagementActionsDisabled) {
+        return;
+      }
+
       toggleFavorited();
       return;
     }
@@ -164,6 +176,7 @@ function FullscreenVideoRowComponent({
     onActionPress?.(video.videoId, item);
   }, [
     onActionPress,
+    areEngagementActionsDisabled,
     cycleSubtitleDisplayMode,
     toggleFavorited,
     toggleLiked,
@@ -214,6 +227,7 @@ function FullscreenVideoRowComponent({
         activeVisitToken={activeVisitToken}
         bottomInset={bottomInset}
         description={video.description}
+        areEngagementActionsDisabled={areEngagementActionsDisabled}
         isFavorited={isFavorited}
         isLiked={isLiked}
         measurementCache={measurementCache}
@@ -277,8 +291,7 @@ function areFullscreenVideoRowComponentPropsEqual(
   return (
     areFullscreenVideoRowRenderPropsEqual(previousRenderProps, nextRenderProps) &&
     previousProps.bottomInset === nextProps.bottomInset &&
-    previousProps.video.isLiked === nextProps.video.isLiked &&
-    previousProps.video.isFavorited === nextProps.video.isFavorited &&
+    previousProps.videoMeta === nextProps.videoMeta &&
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description &&

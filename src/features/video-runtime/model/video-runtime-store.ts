@@ -92,9 +92,6 @@ export const useVideoRuntimeStore = create<VideoRuntimeState>()((set) => ({
       const nextSourceIds = normalizeSourceVideoIds(videoIds);
       const currentSourceIds = state.sourceVideoIds[source];
       let didChange = false;
-      const nextOverridesByVideoId = {
-        ...state.overridesByVideoId,
-      };
       let nextSourceVideoIds = state.sourceVideoIds;
 
       for (const videoId of Object.keys(nextSourceIds)) {
@@ -113,21 +110,11 @@ export const useVideoRuntimeStore = create<VideoRuntimeState>()((set) => ({
         }
       }
 
-      for (const videoId of Object.keys(nextSourceIds)) {
-        if (!(videoId in nextOverridesByVideoId)) {
-          continue;
-        }
-
-        delete nextOverridesByVideoId[videoId];
-        didChange = true;
-      }
-
       if (!didChange) {
         return state;
       }
 
       return {
-        overridesByVideoId: nextOverridesByVideoId,
         sourceVideoIds: nextSourceVideoIds,
       };
     });
@@ -143,19 +130,14 @@ export const useVideoRuntimeStore = create<VideoRuntimeState>()((set) => ({
       };
 
       for (const videoId of Object.keys(currentSourceIds)) {
+        if (nextSourceIds[videoId] === true) {
+          continue;
+        }
+
         if (isVideoIdPresentInOtherSources(state.sourceVideoIds, source, videoId)) {
           continue;
         }
 
-        if (!(videoId in nextOverridesByVideoId)) {
-          continue;
-        }
-
-        delete nextOverridesByVideoId[videoId];
-        didChange = true;
-      }
-
-      for (const videoId of Object.keys(nextSourceIds)) {
         if (!(videoId in nextOverridesByVideoId)) {
           continue;
         }

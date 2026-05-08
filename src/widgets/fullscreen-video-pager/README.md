@@ -104,7 +104,7 @@ FullscreenVideoPager
   - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog，payload 中的 `semantic_element.coarse_id` 可以是 `null`
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
   - 字幕显示由 `features/playback-settings` 的 `subtitleDisplayMode` 全局 session 偏好控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `explanation`
-  - 字幕显示模式只控制 UI 展示，不停止 transcript source 读取或缓存
+  - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
@@ -174,6 +174,7 @@ FullscreenVideoPager
 - 在 row 内维护 center owner，避免 pause / loading / seek 之间的布局抖动
 - 只为 active row 订阅 progress，并在 row 内局部渲染底部 seek bar
 - 只为 active row 接收 session 层传入的 `activeTranscript`，并用 row-local progress 显示基础字幕
+- row 的 like/favorite base 值来自 session 层传入的 `videoMetaByVideoId`
 - 让 description 展开态保持 row-local UI state，不并入 page 或 runtime
 
 当前 widget 不承担：
@@ -321,16 +322,16 @@ fullscreen 右侧 action rail 当前固定为：
 
 但这层 runtime toggle 不是长期真值：
 
-- 当前会话里，点击后会立即覆盖当前 row 的 canonical 值
-- 只要后续 `feed` 成功 fetch 到同一 `videoId` 的新数据，就重新以新的 source 值为准
-- fullscreen 不再保留“本地状态永远压过后续 source refresh”的语义
+- 当前会话里，点击后会立即覆盖当前 row 的 `VideoMeta` base 值
+- 后续 feed refresh 不会重置同一 `videoId` 的本地 like/favorite override
+- 如果当前 row 的 `VideoMeta` 尚未加载或加载失败，like/favorite 按钮禁用
 
 当前颜色更新链固定为：
 
 - `FullscreenVideoPager`
   - 继续消费 canonical `VideoListItem[]`
 - `FullscreenVideoRow`
-  - 通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
+  - 以 `VideoMeta` 为 base，通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
   - `like / favorite` 也在 row 内直接写入 runtime
   - `subtitle` 在 row 内循环全局字幕显示模式：`off -> english -> bilingual -> off`
   - `share` 如有外部 handler 再向外冒泡

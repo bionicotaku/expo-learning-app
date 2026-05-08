@@ -153,7 +153,7 @@ describe('video runtime store', () => {
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({});
   });
 
-  it('accepts fetched ids into source membership and drops overrides for those ids', () => {
+  it('accepts fetched ids into source membership without dropping overrides for those ids', () => {
     useVideoRuntimeStore.getState().setFlags(
       'the-office-health-care-video-1',
       {
@@ -180,6 +180,9 @@ describe('video runtime store', () => {
       .acceptFetchedIds('feed', ['the-office-health-care-video-1', 'the-office-health-care-video-2']);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-1': {
+        isLiked: true,
+      },
       'the-office-health-care-video-3': {
         isFavorited: true,
       },
@@ -193,7 +196,7 @@ describe('video runtime store', () => {
     });
   });
 
-  it('replaces a source snapshot, prunes feed-only orphan overrides, and keeps ids still owned by another source', () => {
+  it('replaces a source snapshot, prunes feed-only orphan overrides, keeps returned ids, and keeps ids still owned by another source', () => {
     useVideoRuntimeStore
       .getState()
       .acceptFetchedIds('feed', [
@@ -226,6 +229,16 @@ describe('video runtime store', () => {
       }
     );
     useVideoRuntimeStore.getState().setFlags(
+      'the-office-health-care-video-3',
+      {
+        isLiked: true,
+      },
+      {
+        isLiked: false,
+        isFavorited: false,
+      }
+    );
+    useVideoRuntimeStore.getState().setFlags(
       'the-office-health-care-video-4',
       {
         isLiked: true,
@@ -243,6 +256,9 @@ describe('video runtime store', () => {
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
       'the-office-health-care-video-2': {
         isFavorited: true,
+      },
+      'the-office-health-care-video-3': {
+        isLiked: true,
       },
       'the-office-health-care-video-4': {
         isLiked: true,

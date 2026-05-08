@@ -32,6 +32,11 @@ describe('fullscreen video row source', () => {
     expect(source).toContain("if (item.id === 'subtitle')");
     expect(source).toContain('cycleSubtitleDisplayMode();');
     expect(source).toContain('onActionPress?.(video.videoId, item);');
+    expect(source).toContain('videoMeta');
+    expect(source).toContain('baseIsFavorited: videoMeta?.isFavorited ?? false');
+    expect(source).toContain('baseIsLiked: videoMeta?.isLiked ?? false');
+    expect(source).toContain('const areEngagementActionsDisabled = videoMeta === null;');
+    expect(source).toContain('areEngagementActionsDisabled={areEngagementActionsDisabled}');
     expect(source).toContain('activeVisitToken={activeVisitToken}');
     expect(source).toContain('activeTranscript={activeTranscript}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
@@ -41,8 +46,9 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('activeVisitToken: previousProps.activeVisitToken');
     expect(source).toContain('activeVisitToken: nextProps.activeVisitToken');
     expect(source).toContain('isActive={isActive}');
-    expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
-    expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
+    expect(source).toContain('previousProps.videoMeta === nextProps.videoMeta');
+    expect(source).not.toContain('previousProps.video.isLiked === nextProps.video.isLiked');
+    expect(source).not.toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('previousProps.activeTranscript === nextProps.activeTranscript');
     expect(source).toContain('previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode');
     expect(source).toContain('showCenteredPause={showCenteredPause}');

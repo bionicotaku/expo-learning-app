@@ -9,6 +9,7 @@ import {
 import { VideoOverlayActionButton } from './video-overlay-action-button';
 
 type VideoOverlayActionRailProps = {
+  areEngagementActionsDisabled: boolean;
   bottomInset: number;
   isFavorited: boolean;
   isLiked: boolean;
@@ -34,6 +35,7 @@ function getSubtitleActionPresentation(subtitleDisplayMode: SubtitleDisplayMode)
 }
 
 function VideoOverlayActionRailComponent({
+  areEngagementActionsDisabled,
   bottomInset,
   isFavorited,
   isLiked,
@@ -80,6 +82,7 @@ function VideoOverlayActionRailComponent({
           }
           key={item.id}
           item={item}
+          disabled={areEngagementActionsDisabled && (item.id === 'like' || item.id === 'favorite')}
           onPress={onActionPress}
           tintColor={
             item.id === 'subtitle'

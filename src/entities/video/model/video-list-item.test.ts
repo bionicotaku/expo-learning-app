@@ -16,9 +16,9 @@ function createFeedItem(overrides: Partial<FeedItem> = {}): FeedItem {
     coverImageUrl: 'https://example.com/video-1.webp',
     durationSeconds: 72,
     viewCount: 7800,
+    likeCount: 420,
+    favoriteCount: 36,
     tags: ['PHRASAL VERB', 'LISTENING CUE'],
-    isLiked: true,
-    isFavorited: false,
     ...overrides,
   };
 }
@@ -35,10 +35,12 @@ describe('video list item entity', () => {
       coverImageUrl: 'https://example.com/video-1.webp',
       durationSeconds: 72,
       viewCount: 7800,
+      likeCount: 420,
+      favoriteCount: 36,
       tags: ['PHRASAL VERB', 'LISTENING CUE'],
-      isLiked: true,
-      isFavorited: false,
     });
+    expect(mapped).not.toHaveProperty('isLiked');
+    expect(mapped).not.toHaveProperty('isFavorited');
   });
 
   it('finds the index of a canonical video item by video id', () => {

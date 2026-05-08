@@ -12,8 +12,11 @@
   - `requestMore / refresh` controller
   - append 去重和单飞控制
   - `FeedItem[] -> VideoListItem[]` 映射出口
-  - 成功 fetch 后通过 `video-runtime` 执行 source-aware handoff
+  - 成功 fetch 后通过 `video-runtime` 更新 source membership
   - 续接读取失败时触发统一全局 error toast：`加载更多视频失败`
+- `model/tail-request-gate.ts`
+  - 管理页面级 tail 续接触发 gate
+  - 请求中阻止重复并发，成功后阻止同一 tail 重复续接，失败后释放同一 tail 以允许用户再次触发
 
 边界约束：
 
@@ -32,12 +35,12 @@
 它不负责：
 
 - 本地 like/favorite runtime state
+- 当前用户态 meta 读取
 - `effectiveVideoItem` 聚合
 - fullscreen 的长期数据模型
 
 当前与 `video-runtime` 的边界固定为：
 
-- 本地点击 `like / favorite` 时，runtime override 可以先覆盖当前 canonical 值
-- `feed` full refresh / initial fetch 成功后，调用 `replaceSourceSnapshot('feed', videoIds)`
-- `feed` append / requestMore 成功后，调用 `acceptFetchedIds('feed', videoIds)`
-- 也就是说，`feed-source` 不拥有 runtime store，但它负责在 fetch 成功边界上把 feed 的 source truth 重新接管回来
+- `feed` full refresh / initial fetch 成功后，调用 `replaceSourceSnapshot('feed', videoIds)` 更新 membership，并清理离开 feed 且不属于其他 source 的孤儿 override
+- `feed` append / requestMore 成功后，调用 `acceptFetchedIds('feed', videoIds)` 追加 membership
+- feed fetch 不再因为拿到同一 `videoId` 就覆盖本地 like/favorite override；这些 base 值来自 `VideoMeta`

@@ -15,12 +15,13 @@
   - 8 条真实 clip 的 `coverImageUrl` / `videoUrl` 作为循环复用的素材槽位
   - `coverImageUrl` 当前对齐到 `test-video/cover/...` 真实封面路径
   - `feed-repository` facade 默认保留 `2000ms` mock 延迟
-  - 其余字段按 `videoId` 稳定伪随机派生
+  - `likeCount / favoriteCount` 等统计字段按 `videoId` 稳定伪随机派生
 
 边界约束：
 
 - 这里只描述 feed 数据和 feed 数据读取
 - 不放卡片 tone、封面 fallback 状态、overlay 文案布局
 - 不放播放状态、静音状态、可见项判定
+- 不放当前用户的 `isLiked / isFavorited`；这些属于 `entities/video-meta`
 
 当前这里仍然是 mock repository，但接口语义已经对齐无状态读取的真实异步 feed。

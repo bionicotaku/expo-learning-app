@@ -7,6 +7,7 @@ import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 
 type VideoOverlayActionButtonProps = {
   activeTintColor?: string;
+  disabled?: boolean;
   iosSymbol?: FullscreenVideoOverlayActionItem['iosSymbol'];
   isActive?: boolean;
   item: FullscreenVideoOverlayActionItem;
@@ -19,6 +20,7 @@ const iconTint = 'rgba(251,247,238,0.96)';
 
 function VideoOverlayActionButtonComponent({
   activeTintColor,
+  disabled = false,
   iosSymbol,
   isActive = false,
   item,
@@ -28,18 +30,22 @@ function VideoOverlayActionButtonComponent({
 }: VideoOverlayActionButtonProps) {
   const resolvedTintColor = tintColor ?? (isActive ? (activeTintColor ?? iconTint) : iconTint);
   const handlePress = useCallback(() => {
+    if (disabled) {
+      return;
+    }
+
     onPress?.(item);
-  }, [item, onPress]);
+  }, [disabled, item, onPress]);
 
   return (
     <Pressable
       accessibilityLabel={item.accessibilityLabel}
       accessibilityRole="button"
-      accessibilityState={{ disabled: onPress === undefined }}
+      accessibilityState={{ disabled: disabled || onPress === undefined }}
       onPress={handlePress}
       style={({ pressed }) => ({
-        opacity: pressed && onPress ? 0.92 : 1,
-        transform: [{ scale: pressed && onPress ? 0.97 : 1 }],
+        opacity: disabled ? 0.5 : pressed && onPress ? 0.92 : 1,
+        transform: [{ scale: pressed && onPress && !disabled ? 0.97 : 1 }],
       })}
     >
       <AdaptiveGlass

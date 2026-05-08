@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
+import type { VideoMeta } from '@/entities/video-meta';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
@@ -33,6 +34,7 @@ export type FullscreenVideoPagerProps = {
   ) => void;
   onCenterHoldStart?: () => void;
   subtitleDisplayMode: SubtitleDisplayMode;
+  videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
 };
 
 export function FullscreenVideoPager({
@@ -44,6 +46,7 @@ export function FullscreenVideoPager({
   onActiveVideoChange,
   onCenterHoldStart,
   subtitleDisplayMode,
+  videoMetaByVideoId,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -147,6 +150,7 @@ export function FullscreenVideoPager({
       getRowRenderState,
       height,
       subtitleDisplayMode,
+      videoMetaByVideoId,
       width,
     }),
     [
@@ -157,6 +161,7 @@ export function FullscreenVideoPager({
       height,
       insets.bottom,
       subtitleDisplayMode,
+      videoMetaByVideoId,
       width,
     ]
   );
@@ -191,6 +196,7 @@ export function FullscreenVideoPager({
           shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
           subtitleDisplayMode={subtitleDisplayMode}
           video={item}
+          videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}
           width={width}
         />
       );
@@ -210,6 +216,7 @@ export function FullscreenVideoPager({
       onActionPress,
       registerActiveController,
       subtitleDisplayMode,
+      videoMetaByVideoId,
       width,
     ]
   );

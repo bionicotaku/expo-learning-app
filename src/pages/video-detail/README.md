@@ -4,7 +4,7 @@
 
 相关设计文档：
 
-- [Fullscreen Transcript Source设计规范](../../../docs/Fullscreen%20Transcript%20Source设计规范.md)
+- [Fullscreen Video Resources设计规范](../../../docs/Fullscreen%20Transcript%20Source设计规范.md)
 - [Fullscreen Video Overlay架构设计规范](../../../docs/Fullscreen%20Video%20Overlay架构设计规范.md)
 - [Video 真值与 Runtime 设计规范](../../../docs/Video%20真值与%20Runtime%20设计规范.md)
 
@@ -26,32 +26,33 @@
 ```text
 VideoDetailPage
 └── FullscreenVideoSession
-    ├── useFullscreenTranscriptSource(...)
+    ├── useFullscreenVideoResources(...)
     └── FullscreenVideoPager
 ```
 
 其中 `FullscreenVideoSession` 负责：
 
 - 持有 `pagerReportedActive`
-- 用 `pagerReportedActive ?? entryTarget` 派生 transcript source 输入
-- 接收 `features/transcript-source` 返回的 active transcript，并把结果传给 `FullscreenVideoPager`
+- 用 `pagerReportedActive ?? entryTarget` 派生 fullscreen resources 输入
+- 接收 `features/fullscreen-video-resources` 返回的 active transcript 与 video meta map，并把结果传给 `FullscreenVideoPager`
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
+- near-tail 续接通过 `createTailRequestGate()` 区分 in-flight 与 fulfilled：失败后允许用户再次进入尾部区域手动触发，成功后同一 tail 不重复请求
 - 通过 `usePresentPlaybackSettingsSheet()` 把 fullscreen 中间长按接到播放设置 sheet
 
 边界约束：
 
-- page 不维护 transcript active state；这部分属于 `FullscreenVideoSession`
+- page 不维护 fullscreen resource active state；这部分属于 `FullscreenVideoSession`
 - page 不维护 `activeIndex / activeItemId` 本地状态；这部分属于 pager 内部播放会话
 - page 维护的是 restore target，不是“只等 pager committed active 才存在的 latest active state”
 - page 不维护 `basePausedByUser`、`transientHoldState`、HUD 或任何 row 级交互状态
 - page 只注入 center hold 的 sheet presenter，不接管 row 级手势识别
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
-- page 不直接实现 transcript query cache；这层属于 `features/transcript-source`，由 session 组件消费
+- page 不直接实现 video meta 或 transcript asset query cache；这层属于 `features/fullscreen-video-resources`，由 session 组件消费
 - page 不直接消费或渲染 transcript 内容；基础字幕展示由 session 把 active transcript 下传给 fullscreen pager/row 后完成
-- 字幕显示模式由 `features/playback-settings` 提供，session 只把当前全局 `subtitleDisplayMode` 传给 pager；关闭字幕不影响 transcript source 读取
+- 字幕显示模式由 `features/playback-settings` 提供，session 只把当前全局 `subtitleDisplayMode` 传给 pager；关闭字幕不影响 fullscreen resources 读取
 - page 不直接定义 runtime store 结构
 - page 不持有跨页面长期状态
 - page 不定义 `dangerouslySingular`；route 单实例约束属于 `app/_layout.tsx`
-- fullscreen row 的 `isLiked / isFavorited` 读写都不经过 page relay，而是在 row 内按 `videoId` 直接进入 runtime
+- fullscreen row 的 `isLiked / isFavorited` base 值来自 `VideoMeta`，读写不经过 page relay，而是在 row 内按 `videoId` 进入 runtime

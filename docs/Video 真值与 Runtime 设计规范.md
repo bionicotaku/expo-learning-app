@@ -26,8 +26,9 @@
 相关文档：
 
 - [Feed API设计](./Feed%20API设计.md)
-- [Transcript API设计](./Transcript%20API设计.md)
-- [Fullscreen Transcript Source设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
+- [Video Meta API设计](./Video%20Meta%20API设计.md)
+- [Transcript Asset API设计](./Transcript%20API设计.md)
+- [Fullscreen Video Resources设计规范](./Fullscreen%20Transcript%20Source设计规范.md)
 - [Feed与Fullscreen Video页面设计逻辑](./Feed%E4%B8%8EFullscreen%20Video%E9%A1%B5%E9%9D%A2%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91.md)
 - [Fullscreen Video Overlay架构设计规范](./Fullscreen%20Video%20Overlay%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.md)
 - [项目规范](./项目规范.md)
@@ -51,11 +52,12 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 8. 当前状态层固定采用：
    - `React Query` 管 source/server state cache
    - `Zustand` 管 client/runtime state store
-9. transcript 属于按 `videoId` 键控的 interactive-read 子资源，应走 React Query cache，而不是 `video-runtime`。
+9. 当前用户态属于 `VideoMeta` 读取；feed 和 canonical video item 不保存 `isLiked / isFavorited`。
+10. transcript 属于由 `VideoMeta.transcriptUrl` 定位的 asset-read 资源，应走 React Query cache，而不是 `video-runtime`。
 
 一句话收口：
 
-当前结构必须从 “`feed` 直接驱动 UI” 收口成 “`source truth -> canonical video truth -> runtime override -> UI`”，并通过独立的 source membership 机制管理 authority handoff 与 cleanup。
+当前结构必须从 “`feed` 直接驱动 UI” 收口成 “`source truth -> canonical video truth + video meta -> runtime override -> UI`”，并通过独立的 source membership 机制管理 cleanup。
 
 ## 3. 概念边界
 
@@ -109,7 +111,7 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 其中：
 
 - `overridesByVideoId` 负责本地覆盖值
-- `sourceVideoIds` 负责 source authority / cleanup
+- `sourceVideoIds` 负责 source membership / cleanup
 
 典型 runtime override 字段：
 
@@ -121,6 +123,7 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 当前明确不属于 runtime override 的典型远程读资源包括：
 
 - transcript
+- video meta
 
 ### 3.5 `Effective video state`
 
@@ -164,15 +167,15 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverrideByVideoId[videoId]
 - `coverImageUrl`
 - `durationSeconds`
 - `viewCount`
+- `likeCount`
+- `favoriteCount`
 - `tags`
-- `isLiked`
-- `isFavorited`
 
 这里需要特别强调：
 
-- 即使 `FeedItem` 当前已经包含 `isLiked / isFavorited`
-- 它也仍然只是 **feed source 在读取时给出的 snapshot**
-- 它不等于前端当前会话里的实时用户态
+- `FeedItem` 不包含当前用户态 `isLiked / isFavorited`
+- 这些字段属于 `VideoMeta`
+- `likeCount / favoriteCount` 是全局统计字段，当前不参与本地 toggle
 
 `entities/feed` 不负责：
 
@@ -212,9 +215,9 @@ type VideoListItem = {
   coverImageUrl?: string | null;
   durationSeconds: number;
   viewCount: number;
+  likeCount: number;
+  favoriteCount: number;
   tags: string[];
-  isLiked: boolean;
-  isFavorited: boolean;
 };
 ```
 
@@ -224,7 +227,7 @@ type VideoListItem = {
 - 不是 `feed item`
 - 不是 `history item`
 
-当前 `src/entities/video` 已经正式化为 canonical video entity；mock clip catalog 仍然保留在该 entity 内，作为 feed / transcript mock 的共享资源目录。
+当前 `src/entities/video` 已经正式化为 canonical video entity；mock clip catalog 仍然保留在该 entity 内，作为 feed / video-meta mock 的共享资源目录。
 
 ## 4.3 `feed entity` 和 `video entity` 的区别
 
@@ -465,9 +468,9 @@ type VideoListItem = {
   coverImageUrl?: string | null;
   durationSeconds: number;
   viewCount: number;
+  likeCount: number;
+  favoriteCount: number;
   tags: string[];
-  isLiked: boolean;
-  isFavorited: boolean;
 };
 ```
 
@@ -543,15 +546,15 @@ effectiveVideoItem = {
 
 - 高交互页面可以走 per-item runtime subscription
 - 普通列表也可以走整表 merge
-- 但 membership 只服务 authority / cleanup，不直接参与 `effectiveVideoItem` 结构
+- 但 membership 只服务 source cleanup，不直接参与 `effectiveVideoItem` 结构
 
-## 7.6 Source authority 与 cleanup 机制
+## 7.6 Source membership 与 cleanup 机制
 
-source authority 的固定规则是：
+source membership 的固定规则是：
 
 - 本地点击可以先写 runtime override
-- 但任一 source 一旦成功 fetch 到某个 `videoId`
-- 这个 `videoId` 就立即重新以该 source 的新 truth 为准
+- feed append / refresh 只更新 membership，不重置同一 `videoId` 的 like/favorite override
+- full refresh 可以清理离开当前 source 且不属于其他 source 的孤儿 override
 
 这套机制必须通过 source membership 收口，而不是靠页面层级或导航关系决定。
 
@@ -562,7 +565,7 @@ full refresh 的固定语义是：
 1. 读取旧 `sourceVideoIds[source]`
 2. 基于旧集合做 scoped cleanup
 3. 清空并替换该 source 的 membership
-4. 对新返回的 `videoId[]` 执行 `replaceSourceSnapshot(source, newIds)` 内部的 source-truth acceptance
+4. 新返回的 `videoId[]` 继续保留已存在的 runtime override
 
 其中第 2 步的规则固定为：
 
@@ -738,15 +741,15 @@ append / requestMore 的固定语义是：
 所以：
 
 - full refresh 可以声明旧 source 集合里一部分成员已经离场
-- append 只能声明“这次返回的 ids 的 source truth 最新”，不能声明未返回成员失效
+- append 只能声明“这次返回的 ids 属于该 source”，不能声明未返回成员失效
 
-### 9.10 为什么这套机制必须对 `feed` / `history` 对称，而不是只给 `feed` 特判
+### 9.10 为什么 membership cleanup 必须对 `feed` / `history` 对称，而不是只给 `feed` 特判
 
-因为 source authority 应由“哪个 source 刚成功 fetch 到了某个 `videoId`”决定，而不是由页面层级或导航关系决定。
+因为 orphan cleanup 应由“某个 `videoId` 还属于哪些 source”决定，而不是由页面层级或导航关系决定。
 
 如果只给 `feed` 特判，会导致：
 
-- `history-source` 没有对等 authority
+- `history-source` 没有对等 cleanup
 - runtime cleanup 规则依赖页面关系，而不是 source truth
 - 多 source 结构在继续扩展时变形
 
@@ -755,9 +758,9 @@ append / requestMore 的固定语义是：
 因为：
 
 - `effectiveVideoItem` 负责回答 UI 当前该显示什么
-- membership registry 负责回答 source authority 和 orphan cleanup
+- membership registry 负责回答 source membership 和 orphan cleanup
 
-前者是显示层语义，后者是存储与 handoff 语义，两者不能混成同一层。
+前者是显示层语义，后者是存储与 cleanup 语义，两者不能混成同一层。
 
 ### 9.12 fullscreen 以后还该不该依赖 `FeedItem`
 

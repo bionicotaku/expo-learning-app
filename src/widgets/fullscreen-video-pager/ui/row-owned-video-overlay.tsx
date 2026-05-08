@@ -35,6 +35,7 @@ const contentLayoutTransition = LinearTransition.springify()
 type RowOwnedVideoOverlayProps = {
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
+  areEngagementActionsDisabled: boolean;
   bottomInset: number;
   description: string;
   isFavorited: boolean;
@@ -50,6 +51,7 @@ type RowOwnedVideoOverlayProps = {
 function RowOwnedVideoOverlayComponent({
   activeTranscript,
   activeVisitToken,
+  areEngagementActionsDisabled,
   bottomInset,
   description,
   isFavorited,
@@ -173,6 +175,7 @@ function RowOwnedVideoOverlayComponent({
 
       <VideoOverlayActionRail
         bottomInset={bottomInset}
+        areEngagementActionsDisabled={areEngagementActionsDisabled}
         isFavorited={isFavorited}
         isLiked={isLiked}
         onActionPress={onActionPress}

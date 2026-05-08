@@ -1,5 +1,4 @@
 import { ApiError } from '@/shared/api';
-import { resolveMockClipAssetByVideoId } from '@/entities/video/model/mock-clip-catalog';
 
 import type { TranscriptResponseDto } from '../model/dto';
 import { mapTranscriptDtoToDomain } from '../model/mappers';
@@ -14,26 +13,26 @@ function isTranscriptResponseDto(value: unknown): value is TranscriptResponseDto
   );
 }
 
-async function parseTranscriptResponse(
+async function parseTranscriptAssetResponse(
   response: Response,
-  videoId: string
+  transcriptUrl: string
 ): Promise<TranscriptResponseDto> {
   let payload: unknown;
 
   try {
     payload = await response.json();
   } catch (error) {
-    throw new ApiError(`Transcript payload was not valid JSON for ${videoId}`, {
+    throw new ApiError(`Transcript asset payload was not valid JSON for ${transcriptUrl}`, {
       cause: error,
-      code: 'TRANSCRIPT_FETCH_FAILED',
+      code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
       retryable: false,
       status: response.status,
     });
   }
 
   if (!isTranscriptResponseDto(payload)) {
-    throw new ApiError(`Transcript payload was missing sentences for ${videoId}`, {
-      code: 'TRANSCRIPT_FETCH_FAILED',
+    throw new ApiError(`Transcript asset payload was missing sentences for ${transcriptUrl}`, {
+      code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
       retryable: false,
       status: response.status,
     });
@@ -42,37 +41,27 @@ async function parseTranscriptResponse(
   return payload;
 }
 
-export async function fetchMockTranscript(videoId: string): Promise<Transcript> {
-  const clipAsset = resolveMockClipAssetByVideoId(videoId);
-
-  if (!clipAsset) {
-    throw new ApiError(`Transcript was not found for videoId ${videoId}`, {
-      code: 'TRANSCRIPT_NOT_FOUND',
-      retryable: false,
-      status: 404,
-    });
-  }
-
+export async function fetchTranscriptAsset(transcriptUrl: string): Promise<Transcript> {
   let response: Response;
 
   try {
-    response = await fetch(clipAsset.transcriptUrl);
+    response = await fetch(transcriptUrl);
   } catch (error) {
-    throw new ApiError(`Failed to fetch transcript for ${videoId}`, {
+    throw new ApiError(`Failed to fetch transcript asset ${transcriptUrl}`, {
       cause: error,
-      code: 'TRANSCRIPT_FETCH_FAILED',
+      code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
       retryable: true,
     });
   }
 
   if (!response.ok) {
-    throw new ApiError(`Failed to fetch transcript for ${videoId}`, {
-      code: 'TRANSCRIPT_FETCH_FAILED',
+    throw new ApiError(`Failed to fetch transcript asset ${transcriptUrl}`, {
+      code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
       retryable: response.status >= 500,
       status: response.status,
     });
   }
 
-  const dto = await parseTranscriptResponse(response, videoId);
+  const dto = await parseTranscriptAssetResponse(response, transcriptUrl);
   return mapTranscriptDtoToDomain(dto);
 }

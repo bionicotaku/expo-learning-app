@@ -100,11 +100,6 @@ function buildTags(asset: SeededClipAsset): string[] {
   return [firstTag, secondTag];
 }
 
-function buildUserBoolean(asset: SeededClipAsset, salt: string): boolean {
-  const seed = hashString(`${asset.videoId}:${salt}`);
-  return seed % 2 === 0;
-}
-
 function createVideoId(itemNumber: number) {
   return `the-office-health-care-video-${itemNumber}`;
 }
@@ -129,9 +124,9 @@ function createMockFeedItem(itemNumber: number): FeedItem {
     coverImageUrl: asset.coverImageUrl,
     durationSeconds: buildDurationSeconds(seededAsset),
     viewCount: buildViewCount(seededAsset),
+    likeCount: 120 + (hashString(`${videoId}:likes`) % 1800),
+    favoriteCount: 20 + (hashString(`${videoId}:favorites`) % 420),
     tags: buildTags(seededAsset),
-    isLiked: buildUserBoolean(seededAsset, 'liked'),
-    isFavorited: buildUserBoolean(seededAsset, 'favorited'),
   };
 }
 

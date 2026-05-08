@@ -11,6 +11,7 @@ describe('video overlay action rail source', () => {
 
     expect(source).toContain('isLiked');
     expect(source).toContain('isFavorited');
+    expect(source).toContain('areEngagementActionsDisabled');
     expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('getSubtitleActionPresentation');
     expect(source).toContain("'text.bubble'");
@@ -24,6 +25,7 @@ describe('video overlay action rail source', () => {
     expect(source).toContain('activeTintColor={');
     expect(source).toContain('iosSymbol={');
     expect(source).toContain('onPress={onActionPress}');
+    expect(source).toContain("disabled={areEngagementActionsDisabled && (item.id === 'like' || item.id === 'favorite')}");
     expect(source).not.toContain('() => {');
     expect(source).not.toContain('onActionPress(item);');
   });

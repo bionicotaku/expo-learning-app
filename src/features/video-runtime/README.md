@@ -15,7 +15,7 @@
 - `model/resolve-next-video-runtime-override.ts`
   - 按当前有效值和 base 值推导下一个稀疏 override
 - `model/use-video-runtime-state.ts`
-  - UI 按 `videoId` 直接读取并写入当前 `isLiked / isFavorited`
+  - UI 以 `VideoMeta` 的 base flags 为基准，按 `videoId` 读取并写入当前 `isLiked / isFavorited`
 
 当前 store 固定分成两层：
 
@@ -33,6 +33,6 @@
 - 不调用真实 like / favorite 写 API
 - UI 主读链不依赖整表 `effective items`
 - fullscreen 的 `like / favorite` 激活态由 row 直接按 `videoId` 订阅和写入 runtime
-- runtime override 只在下一次成功 source fetch 之前有效；同一 `videoId` 的新 source 值一旦到达，就覆盖本地 runtime override
+- runtime override 不由 feed item 刷新覆盖；只有离开 source membership 且不属于其他 source 的孤儿 override 会被清理
 - full refresh 走 `replaceSourceSnapshot(source, videoIds)`
 - append / requestMore 走 `acceptFetchedIds(source, videoIds)`

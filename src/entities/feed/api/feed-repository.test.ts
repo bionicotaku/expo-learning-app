@@ -20,12 +20,14 @@ describe('feed repository facade', () => {
           videoUrl: expect.stringContaining('playlist.m3u8'),
           durationSeconds: expect.any(Number),
           viewCount: expect.any(Number),
+          likeCount: expect.any(Number),
+          favoriteCount: expect.any(Number),
           tags: expect.any(Array),
-          isLiked: expect.any(Boolean),
-          isFavorited: expect.any(Boolean),
         }),
       ]),
     });
+    expect(response.items[0]).not.toHaveProperty('isLiked');
+    expect(response.items[0]).not.toHaveProperty('isFavorited');
   });
 
   it('keeps the mock feed facade on a 2 second delay by default', async () => {

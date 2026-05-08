@@ -1,4 +1,4 @@
-export { fetchTranscript } from './api/transcript-repository';
+export { fetchTranscriptAsset } from './api/transcript-asset-repository';
 export type {
   Transcript,
   TranscriptSemanticElement,

@@ -18,9 +18,9 @@ function createFeedItem(index: number): FeedItem {
     coverImageUrl: `https://example.com/${index + 1}.webp`,
     durationSeconds: 70 + index,
     viewCount: 7000 + index * 100,
+    likeCount: 300 + index,
+    favoriteCount: 40 + index,
     tags: [`TAG ${index + 1}`],
-    isLiked: false,
-    isFavorited: false,
   };
 }
 
@@ -47,7 +47,7 @@ describe('feed source helpers', () => {
     expect(feedSource.FEED_QUERY_KEY).toEqual(['feed', 'main']);
   });
 
-  it('lets the initial successful feed fetch replace local runtime overrides for returned video ids', async () => {
+  it('lets the initial successful feed fetch register membership without replacing local runtime overrides', async () => {
     const fetchFeedSpy = vi.spyOn(feedEntity, 'fetchFeed').mockResolvedValue({
       items: [createFeedItem(0), createFeedItem(1)],
     });
@@ -70,6 +70,9 @@ describe('feed source helpers', () => {
       mapFeedItemToVideoListItem(createFeedItem(1)),
     ]);
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-1': {
+        isLiked: true,
+      },
       'the-office-health-care-video-3': {
         isFavorited: true,
       },
@@ -200,7 +203,7 @@ describe('feed source helpers', () => {
     });
   });
 
-  it('lets append union returned ids into feed membership and replace local runtime overrides for those ids', async () => {
+  it('lets append union returned ids into feed membership without replacing local runtime overrides for those ids', async () => {
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
         fetchFeed: () => Promise<{ items: FeedItem[] }>;
@@ -233,6 +236,9 @@ describe('feed source helpers', () => {
     await controller.requestMore(queryClient);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-1': {
+        isLiked: true,
+      },
       'the-office-health-care-video-3': {
         isFavorited: true,
       },
@@ -262,6 +268,9 @@ describe('feed source helpers', () => {
     await controller.refresh(queryClient);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
+      'the-office-health-care-video-1': {
+        isLiked: true,
+      },
       'the-office-health-care-video-2': {
         isLiked: true,
       },

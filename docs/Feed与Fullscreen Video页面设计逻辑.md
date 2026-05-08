@@ -83,7 +83,7 @@ fullscreen 的当前结构固定为：
 ```text
 VideoDetailPage
 └── FullscreenVideoSession
-    ├── useFullscreenTranscriptSource(...)
+    ├── useFullscreenVideoResources(...)
     └── FullscreenVideoPager
         └── useFullscreenPlaybackSession(...)
 ```
@@ -113,7 +113,7 @@ VideoDetailPage
   - 服务“退出 fullscreen 后 Feed 恢复到哪条视频”
 - session 的 pager active
   - 属于 session-lifetime state
-  - 服务 transcript source、near-tail requestMore 和当前 session 内的真实 active 语义
+  - 服务 fullscreen video resources、near-tail requestMore 和当前 session 内的真实 active 语义
 
 两者不是同一个 owner，也不要求完全同步更新。
 
@@ -125,7 +125,7 @@ VideoDetailPage
 
 - 根据 `routeVideoId + canonicalItems` 解析本次 session 的 entry target
 - 持有 `pagerReportedActive`
-- 派生 transcript source 输入
+- 派生 fullscreen resources 输入
 - 接收 pager active change
 - 收口 near-tail `requestMore()` 触发
 - 渲染 `FullscreenVideoPager`
@@ -133,7 +133,7 @@ VideoDetailPage
 它是：
 
 - route target 与 pager active 的对齐层
-- transcript source 的正式 owner
+- fullscreen video resources 的正式 owner
 
 ### 4.3 `FullscreenVideoPager`
 
@@ -148,7 +148,7 @@ pager 继续承担 widget-lifetime 职责：
 
 - route retarget
 - page-level session reset
-- transcript source read/cache
+- video meta / transcript asset read/cache
 
 其中：
 
@@ -388,7 +388,7 @@ fullscreen 右侧 action rail 当前固定消费 `effective video item`：
 />
 ```
 
-5. session 先用 `entryVideoId` 建立 transcript source 输入
+5. session 先用 `entryVideoId` 建立 fullscreen resources 输入
 6. pager mount 后再通过 `onActiveVideoChange(...)` 报告真正 active item
 
 ### 9.2 fullscreen 内滑动切换
@@ -398,7 +398,7 @@ fullscreen 右侧 action rail 当前固定消费 `effective video item`：
 1. pager 内部 viewability 识别出新的 active row
 2. pager 上报 `onActiveVideoChange(itemId, index)`
 3. session 更新 `pagerReportedActive`
-4. transcript source 自动切到新的 `itemId`
+4. fullscreen resources 自动切到新的 `itemId`
 5. session 继续根据该 `index` 判断是否接近尾部，并触发 `requestMore()`
 
 ### 9.3 singular route 下切到另一条视频
@@ -411,7 +411,7 @@ fullscreen 右侧 action rail 当前固定消费 `effective video item`：
 2. `VideoDetailPage` 复用 page instance，但重新计算出新的 `fullscreenSessionKey`
 3. 旧 `FullscreenVideoSession` 整体卸载
 4. 新 `FullscreenVideoSession` 按新的 route target 重建
-5. transcript source 立即使用新的 route target，而不是继续粘旧视频
+5. fullscreen resources 立即使用新的 route target，而不是继续粘旧视频
 6. pager 重新用新的 `entryIndex` 初始化
 
 ### 9.4 页面退出

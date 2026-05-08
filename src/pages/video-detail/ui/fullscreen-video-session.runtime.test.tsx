@@ -3,6 +3,7 @@ import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
 import type { VideoListItem } from '@/entities/video';
+import type { VideoMeta } from '@/entities/video-meta';
 import type { Transcript } from '@/entities/transcript';
 
 import { FullscreenVideoSession } from './fullscreen-video-session';
@@ -12,13 +13,13 @@ const {
   presentPlaybackSettingsSheetMock,
   requestMoreMock,
   useSubtitleDisplayModeMock,
-  useFullscreenTranscriptSourceMock,
+  useFullscreenVideoResourcesMock,
 } = vi.hoisted(() => ({
   onLatestActiveVideoIdChangeMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
   requestMoreMock: vi.fn(),
   useSubtitleDisplayModeMock: vi.fn(),
-  useFullscreenTranscriptSourceMock: vi.fn(),
+  useFullscreenVideoResourcesMock: vi.fn(),
 }));
 
 const items: VideoListItem[] = [
@@ -26,8 +27,8 @@ const items: VideoListItem[] = [
     coverImageUrl: null,
     description: 'desc 1',
     durationSeconds: 10,
-    isFavorited: false,
-    isLiked: false,
+    favoriteCount: 1,
+    likeCount: 10,
     tags: [],
     title: 'Video 1',
     videoId: 'video-a',
@@ -38,8 +39,8 @@ const items: VideoListItem[] = [
     coverImageUrl: null,
     description: 'desc 2',
     durationSeconds: 20,
-    isFavorited: false,
-    isLiked: false,
+    favoriteCount: 2,
+    likeCount: 20,
     tags: [],
     title: 'Video 2',
     videoId: 'video-b',
@@ -50,8 +51,8 @@ const items: VideoListItem[] = [
     coverImageUrl: null,
     description: 'desc 3',
     durationSeconds: 30,
-    isFavorited: false,
-    isLiked: false,
+    favoriteCount: 3,
+    likeCount: 30,
     tags: [],
     title: 'Video 3',
     videoId: 'video-c',
@@ -73,12 +74,29 @@ const activeTranscript: Transcript = {
   ],
 };
 
+const activeVideoMeta: VideoMeta = {
+  videoId: 'video-a',
+  isLiked: true,
+  isFavorited: false,
+  transcriptUrl: 'https://example.com/transcript-a.json',
+};
+
+const videoMetaByVideoId = new Map<string, VideoMeta>([
+  [activeVideoMeta.videoId, activeVideoMeta],
+]);
+
+function createHandledRejectedRequest() {
+  const request = Promise.reject(new Error('load more failed'));
+  request.catch(() => undefined);
+  return request;
+}
+
 const hoistedState = vi.hoisted(() => ({
   latestFullscreenVideoPagerProps: null as React.ComponentProps<any> | null,
 }));
 
-vi.mock('@/features/transcript-source', () => ({
-  useFullscreenTranscriptSource: useFullscreenTranscriptSourceMock,
+vi.mock('@/features/fullscreen-video-resources', () => ({
+  useFullscreenVideoResources: useFullscreenVideoResourcesMock,
 }));
 
 vi.mock('@/features/playback-settings', () => ({
@@ -105,17 +123,21 @@ describe('fullscreen video session runtime', () => {
     onLatestActiveVideoIdChangeMock.mockReset();
     presentPlaybackSettingsSheetMock.mockReset();
     requestMoreMock.mockReset();
+    requestMoreMock.mockResolvedValue(undefined);
     useSubtitleDisplayModeMock.mockReset();
     useSubtitleDisplayModeMock.mockReturnValue('english');
-    useFullscreenTranscriptSourceMock.mockReset();
-    useFullscreenTranscriptSourceMock.mockReturnValue({
+    useFullscreenVideoResourcesMock.mockReset();
+    useFullscreenVideoResourcesMock.mockReturnValue({
+      activeVideoMeta: null,
+      activeVideoMetaStatus: 'idle',
       activeTranscript: null,
       activeTranscriptError: null,
       activeTranscriptStatus: 'idle',
+      videoMetaByVideoId: new Map(),
     });
   });
 
-  it('uses the entry target as the initial transcript source input before the pager reports an active item', () => {
+  it('uses the entry target as the initial fullscreen resource input before the pager reports an active item', () => {
     act(() => {
       TestRenderer.create(
         <FullscreenVideoSession
@@ -129,7 +151,7 @@ describe('fullscreen video session runtime', () => {
       );
     });
 
-    expect(useFullscreenTranscriptSourceMock).toHaveBeenLastCalledWith({
+    expect(useFullscreenVideoResourcesMock).toHaveBeenLastCalledWith({
       activeIndex: 1,
       activeVideoId: 'video-b',
       items,
@@ -141,7 +163,7 @@ describe('fullscreen video session runtime', () => {
     });
   });
 
-  it('switches transcript input to the pager-reported active video once the pager emits', () => {
+  it('switches fullscreen resource input to the pager-reported active video once the pager emits', () => {
     act(() => {
       TestRenderer.create(
         <FullscreenVideoSession
@@ -162,7 +184,7 @@ describe('fullscreen video session runtime', () => {
       );
     });
 
-    expect(useFullscreenTranscriptSourceMock).toHaveBeenLastCalledWith({
+    expect(useFullscreenVideoResourcesMock).toHaveBeenLastCalledWith({
       activeIndex: 2,
       activeVideoId: 'video-c',
       items,
@@ -192,10 +214,13 @@ describe('fullscreen video session runtime', () => {
   });
 
   it('passes loaded active transcript through to the pager without subtitle layout reserve state', () => {
-    useFullscreenTranscriptSourceMock.mockReturnValue({
+    useFullscreenVideoResourcesMock.mockReturnValue({
+      activeVideoMeta,
+      activeVideoMetaStatus: 'success',
       activeTranscript,
       activeTranscriptError: null,
       activeTranscriptStatus: 'success',
+      videoMetaByVideoId,
     });
 
     act(() => {
@@ -214,6 +239,7 @@ describe('fullscreen video session runtime', () => {
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       activeTranscript,
       subtitleDisplayMode: 'english',
+      videoMetaByVideoId,
     });
     expect(hoistedState.latestFullscreenVideoPagerProps).not.toHaveProperty(
       'shouldReserveSubtitleSpace'
@@ -239,5 +265,75 @@ describe('fullscreen video session runtime', () => {
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       subtitleDisplayMode: 'bilingual',
     });
+  });
+
+  it('allows near-tail requestMore to run again for the same tail after a failure', async () => {
+    requestMoreMock.mockImplementation(createHandledRejectedRequest);
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-b',
+        1
+      );
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-c',
+        2
+      );
+    });
+
+    expect(requestMoreMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not repeat a successful near-tail request for the same tail', async () => {
+    requestMoreMock.mockResolvedValue(undefined);
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-b',
+        1
+      );
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-c',
+        2
+      );
+    });
+
+    expect(requestMoreMock).toHaveBeenCalledTimes(1);
   });
 });

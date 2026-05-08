@@ -8,6 +8,8 @@
 - 把 canonical `VideoListItem[]` 映射成 `MediaFeatureCard` 所需的展示 props
 - 顶部下拉刷新，保留当前页面内容直到新的 source 成功替换
 - 当当前已加载尾 item 进入可见区时请求下一批
+- 列表末尾 `onEndReached` 也会触发同一套尾部续接逻辑，便于续接失败后用户再次手动触发
+- 尾部续接通过 `createTailRequestGate()` 区分 in-flight 与 fulfilled：失败后释放 gate，成功后同一 tail 不重复请求
 - 在续接读取进行中显示底部 footer loader
 - 处理 `initial loading / error / empty / success` 四态
 - 点击卡片后使用 `router.navigate()` 进入 `Fullscreen Video`

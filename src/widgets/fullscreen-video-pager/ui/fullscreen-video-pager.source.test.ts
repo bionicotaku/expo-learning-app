@@ -35,6 +35,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('const renderState = useMemo');
     expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('activeTranscript');
+    expect(source).toContain('videoMetaByVideoId');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('extraData={renderState}');
     expect(source).toContain(
@@ -44,6 +45,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain(
       'activeTranscript={isCurrentActiveItem ? activeTranscript : null}'
     );
+    expect(source).toContain('videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');

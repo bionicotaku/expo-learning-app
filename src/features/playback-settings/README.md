@@ -15,5 +15,5 @@
 - 当前不做持久化，app 重启后恢复 `1.0x` 和 `subtitleDisplayMode='english'`
 - 当前不调用后端 API
 - 当前不直接操作 `expo-video` player
-- 字幕显示模式只控制 fullscreen subtitle UI 显示为 `off / english / bilingual`，不控制 transcript source 读取或缓存
+- 字幕显示模式只控制 fullscreen subtitle UI 显示为 `off / english / bilingual`，不控制 fullscreen video resources 读取或缓存
 - `分享 / 测试题 / 反馈` 是 sheet 内的纯 UI 占位按钮，不执行业务动作

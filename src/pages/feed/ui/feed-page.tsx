@@ -20,6 +20,7 @@ import {
   getPendingRestoreVideoId,
 } from '@/features/feed-session';
 import {
+  createTailRequestGate,
   useFeedSource,
 } from '@/features/feed-source';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
@@ -113,7 +114,7 @@ export function FeedPage() {
   const { tokens } = useEditorialPaperTheme();
   const listRef = useRef<FlatList<VideoListItem>>(null);
   const restoreTargetVideoIdRef = useRef<string | null>(null);
-  const lastRequestedTailVideoIdRef = useRef<string | null>(null);
+  const tailRequestGateRef = useRef(createTailRequestGate());
   const visibleItemIdsRef = useRef<Set<string>>(new Set());
   const itemsRef = useRef<VideoListItem[]>([]);
   const viewabilityConfigRef = useRef({
@@ -194,6 +195,29 @@ export function FeedPage() {
     [router]
   );
 
+  const requestMoreForTail = useCallback((tailVideoId: string | null) => {
+    const tailRequestGate = tailRequestGateRef.current;
+
+    if (tailVideoId === null || !tailRequestGate.canStart(tailVideoId)) {
+      return;
+    }
+
+    tailRequestGate.markStarted(tailVideoId);
+    void Promise.resolve(requestMore())
+      .then(() => {
+        tailRequestGate.markSucceeded(tailVideoId);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        tailRequestGate.markSettled(tailVideoId);
+      });
+  }, [requestMore]);
+
+  const requestMoreForCurrentTail = useCallback(() => {
+    const tailVideoId = itemsRef.current[itemsRef.current.length - 1]?.videoId ?? null;
+    requestMoreForTail(tailVideoId);
+  }, [requestMoreForTail]);
+
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken<VideoListItem>[] }) => {
       visibleItemIdsRef.current = new Set(
@@ -213,12 +237,7 @@ export function FeedPage() {
         return;
       }
 
-      if (tailVideoId === lastRequestedTailVideoIdRef.current) {
-        return;
-      }
-
-      lastRequestedTailVideoIdRef.current = tailVideoId;
-      void requestMore();
+      requestMoreForTail(tailVideoId);
     }
   );
 
@@ -326,6 +345,8 @@ export function FeedPage() {
             listRef.current?.scrollToIndex(buildFeedRestoreScrollParams(index));
           }, 60);
         }}
+        onEndReached={requestMoreForCurrentTail}
+        onEndReachedThreshold={0.2}
         viewabilityConfig={viewabilityConfigRef.current}
         onViewableItemsChanged={onViewableItemsChanged.current}
       />
