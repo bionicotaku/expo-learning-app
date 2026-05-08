@@ -111,6 +111,7 @@ describe('basic subtitle overlay runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <BasicSubtitleOverlay
+          displayMode="english"
           maxTextWidth={240}
           onTokenPress={onTokenPress}
           seekBarStore={createStoreAtCurrentSentence()}
@@ -174,6 +175,7 @@ describe('basic subtitle overlay runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <BasicSubtitleOverlay
+          displayMode="english"
           maxTextWidth={240}
           onTokenPress={onTokenPress}
           seekBarStore={createStoreAtCurrentSentence()}
@@ -221,6 +223,7 @@ describe('basic subtitle overlay runtime', () => {
     act(() => {
       renderer = TestRenderer.create(
         <BasicSubtitleOverlay
+          displayMode="english"
           maxTextWidth={240}
           onTokenPress={vi.fn()}
           seekBarStore={createStoreAtCurrentSentence()}
@@ -230,5 +233,67 @@ describe('basic subtitle overlay runtime', () => {
     });
 
     expect(findTextNode(renderer!, 'Plain fallback sentence.')).toBeTruthy();
+  });
+
+  it('renders the current sentence explanation below the English subtitle in bilingual mode', () => {
+    const transcript: Transcript = {
+      sentences: [
+        {
+          end: 2000,
+          explanation: '这是一句中文解释。',
+          index: 0,
+          start: 1000,
+          text: 'Plain fallback sentence.',
+          tokens: [],
+        },
+      ],
+    };
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <BasicSubtitleOverlay
+          displayMode="bilingual"
+          maxTextWidth={240}
+          onTokenPress={vi.fn()}
+          seekBarStore={createStoreAtCurrentSentence()}
+          transcript={transcript}
+        />
+      );
+    });
+
+    expect(findTextNode(renderer!, 'Plain fallback sentence.')).toBeTruthy();
+    expect(findTextNode(renderer!, '这是一句中文解释。')).toBeTruthy();
+    expect(findTextNode(renderer!, '这是一句中文解释。')?.props.onPress).toBeUndefined();
+  });
+
+  it('renders nothing when subtitle display mode is off', () => {
+    const transcript: Transcript = {
+      sentences: [
+        {
+          end: 2000,
+          explanation: '这是一句中文解释。',
+          index: 0,
+          start: 1000,
+          text: 'Plain fallback sentence.',
+          tokens: [],
+        },
+      ],
+    };
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <BasicSubtitleOverlay
+          displayMode="off"
+          maxTextWidth={240}
+          onTokenPress={vi.fn()}
+          seekBarStore={createStoreAtCurrentSentence()}
+          transcript={transcript}
+        />
+      );
+    });
+
+    expect(renderer!.toJSON()).toBeNull();
   });
 });

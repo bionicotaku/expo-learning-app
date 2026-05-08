@@ -16,7 +16,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('RowSurfaceStatusOverlay');
     expect(source).toContain('usePresentWordDetailDialog');
     expect(source).toContain('createWordDetailDialogPayloadFromTranscriptToken');
-    expect(source).toContain('useToggleSubtitlesVisible');
+    expect(source).toContain('useCycleSubtitleDisplayMode');
     expect(source).toContain('onRowUnmount');
     expect(source).not.toContain('ActiveVideoGestureSurface');
     expect(source).not.toContain('railGestureBlockers');
@@ -30,11 +30,11 @@ describe('fullscreen video row source', () => {
     expect(source).toContain("if (item.id === 'like')");
     expect(source).toContain("if (item.id === 'favorite')");
     expect(source).toContain("if (item.id === 'subtitle')");
-    expect(source).toContain('toggleSubtitlesVisible();');
+    expect(source).toContain('cycleSubtitleDisplayMode();');
     expect(source).toContain('onActionPress?.(video.videoId, item);');
     expect(source).toContain('activeVisitToken={activeVisitToken}');
     expect(source).toContain('activeTranscript={activeTranscript}');
-    expect(source).toContain('areSubtitlesVisible={areSubtitlesVisible}');
+    expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('seekBarStore={seekBarStore}');
     expect(source).toContain('onSubtitleTokenPress={handleSubtitleTokenPress}');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
@@ -44,7 +44,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
     expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('previousProps.activeTranscript === nextProps.activeTranscript');
-    expect(source).toContain('previousProps.areSubtitlesVisible === nextProps.areSubtitlesVisible');
+    expect(source).toContain('previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode');
     expect(source).toContain('showCenteredPause={showCenteredPause}');
     expect(source).toContain('centerOwner={centerOwner}');
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');

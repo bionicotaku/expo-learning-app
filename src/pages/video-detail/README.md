@@ -50,7 +50,7 @@ VideoDetailPage
 - page 不直接定义 feed repository
 - page 不直接实现 transcript query cache；这层属于 `features/transcript-source`，由 session 组件消费
 - page 不直接消费或渲染 transcript 内容；基础字幕展示由 session 把 active transcript 下传给 fullscreen pager/row 后完成
-- 字幕显隐偏好由 `features/playback-settings` 提供，session 只把当前全局值传给 pager；关闭字幕不影响 transcript source 读取
+- 字幕显示模式由 `features/playback-settings` 提供，session 只把当前全局 `subtitleDisplayMode` 传给 pager；关闭字幕不影响 transcript source 读取
 - page 不直接定义 runtime store 结构
 - page 不持有跨页面长期状态
 - page 不定义 `dangerouslySingular`；route 单实例约束属于 `app/_layout.tsx`

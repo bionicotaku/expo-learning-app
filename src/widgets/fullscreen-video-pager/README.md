@@ -103,7 +103,8 @@ FullscreenVideoPager
   - 当前播放 token 使用纯色高亮；高亮只改变 token 的 `color` 与 `textShadow`，不改变字号、行高、字重、间距或换行模型
   - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog，payload 中的 `semantic_element.coarse_id` 可以是 `null`
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
-  - 字幕是否显示由 `features/playback-settings` 的 `areSubtitlesVisible` 全局 session 偏好控制；关闭时只是不挂载 `BasicSubtitleOverlay`，不停止 transcript source
+  - 字幕显示由 `features/playback-settings` 的 `subtitleDisplayMode` 全局 session 偏好控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `explanation`
+  - 字幕显示模式只控制 UI 展示，不停止 transcript source 读取或缓存
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
@@ -130,6 +131,7 @@ FullscreenVideoPager
   - row-owned 内容层内的基础字幕 presenter
   - 通过 `useSyncExternalStore` 订阅 row-local `seekBarStore`
   - 只负责解析当前句、解析当前 token、渲染 token 文本、在 token 被点击时调用 `onTokenPress`
+  - 在 `bilingual` 模式下额外渲染当前句 `TranscriptSentence.explanation`；句子 explanation 不可点击，也不参与 token 高亮
   - 当前 token 高亮跟随 row-local playback time；不新增播放器监听或独立 timer
   - 不承担 word detail modal、句子导航、学习状态、收藏状态或 API 请求
 - `ui/row-playback-media-layer.tsx`
@@ -310,8 +312,10 @@ fullscreen 右侧 action rail 当前固定为：
   - active 时 star 变黄
 - `share`
 - `subtitle`
-  - 对应 `features/playback-settings` 的 `areSubtitlesVisible`
-  - active 时 text bubble 变蓝
+  - 对应 `features/playback-settings` 的 `subtitleDisplayMode`
+  - `off` 使用空心 `text.bubble`
+  - `english` 使用实心 `text.bubble.fill`
+  - `bilingual` 使用实心 `text.bubble.fill`，并把图标 tint 切到蓝色
 
 当前 `like / favorite` 只做本地 runtime toggle，不调真实 API。
 
@@ -328,7 +332,7 @@ fullscreen 右侧 action rail 当前固定为：
 - `FullscreenVideoRow`
   - 通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
   - `like / favorite` 也在 row 内直接写入 runtime
-  - `subtitle` 在 row 内切换全局字幕显示偏好
+  - `subtitle` 在 row 内循环全局字幕显示模式：`off -> english -> bilingual -> off`
   - `share` 如有外部 handler 再向外冒泡
 
 也就是说，fullscreen 的 action active state 不再依赖整表 effective items、page relay 或 `FlatList.extraData` 才能刷新。

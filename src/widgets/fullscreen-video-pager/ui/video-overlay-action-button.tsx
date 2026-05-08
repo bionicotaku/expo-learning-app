@@ -7,22 +7,26 @@ import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 
 type VideoOverlayActionButtonProps = {
   activeTintColor?: string;
+  iosSymbol?: FullscreenVideoOverlayActionItem['iosSymbol'];
   isActive?: boolean;
   item: FullscreenVideoOverlayActionItem;
   onPress?: (item: FullscreenVideoOverlayActionItem) => void;
   size?: number;
+  tintColor?: string;
 };
 
 const iconTint = 'rgba(251,247,238,0.96)';
 
 function VideoOverlayActionButtonComponent({
   activeTintColor,
+  iosSymbol,
   isActive = false,
   item,
   onPress,
   size = 54,
+  tintColor,
 }: VideoOverlayActionButtonProps) {
-  const resolvedTintColor = isActive ? (activeTintColor ?? iconTint) : iconTint;
+  const resolvedTintColor = tintColor ?? (isActive ? (activeTintColor ?? iconTint) : iconTint);
   const handlePress = useCallback(() => {
     onPress?.(item);
   }, [item, onPress]);
@@ -75,7 +79,7 @@ function VideoOverlayActionButtonComponent({
                 {item.fallbackGlyph}
               </Text>
             }
-            name={{ ios: item.iosSymbol }}
+            name={{ ios: iosSymbol ?? item.iosSymbol }}
             size={22}
             tintColor={resolvedTintColor}
             type="hierarchical"

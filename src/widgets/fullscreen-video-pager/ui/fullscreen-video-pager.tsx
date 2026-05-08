@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
+import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
@@ -22,7 +23,6 @@ import { TopChromeOverlay } from './top-chrome-overlay';
 
 export type FullscreenVideoPagerProps = {
   activeTranscript: Transcript | null;
-  areSubtitlesVisible: boolean;
   entryIndex: number;
   isInitialLoading: boolean;
   items: VideoListItem[];
@@ -32,17 +32,18 @@ export type FullscreenVideoPagerProps = {
     item: FullscreenVideoOverlayActionItem
   ) => void;
   onCenterHoldStart?: () => void;
+  subtitleDisplayMode: SubtitleDisplayMode;
 };
 
 export function FullscreenVideoPager({
   activeTranscript,
-  areSubtitlesVisible,
   entryIndex,
   isInitialLoading,
   items,
   onActionPress,
   onActiveVideoChange,
   onCenterHoldStart,
+  subtitleDisplayMode,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -142,20 +143,20 @@ export function FullscreenVideoPager({
       activeIndex,
       activeItemId,
       activeTranscript,
-      areSubtitlesVisible,
       bottomInset: insets.bottom,
       getRowRenderState,
       height,
+      subtitleDisplayMode,
       width,
     }),
     [
       activeIndex,
       activeItemId,
       activeTranscript,
-      areSubtitlesVisible,
       getRowRenderState,
       height,
       insets.bottom,
+      subtitleDisplayMode,
       width,
     ]
   );
@@ -170,7 +171,6 @@ export function FullscreenVideoPager({
           accessibilityLabel={rowRenderState.accessibilityLabel}
           activeTranscript={isCurrentActiveItem ? activeTranscript : null}
           activeVisitToken={rowRenderState.activeVisitToken}
-          areSubtitlesVisible={areSubtitlesVisible}
           bottomInset={insets.bottom}
           height={height}
           hudState={rowRenderState.hudState}
@@ -189,6 +189,7 @@ export function FullscreenVideoPager({
           shouldEnableBackgroundGestures={rowRenderState.shouldEnableBackgroundGestures}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
           shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
+          subtitleDisplayMode={subtitleDisplayMode}
           video={item}
           width={width}
         />
@@ -198,7 +199,6 @@ export function FullscreenVideoPager({
       activeIndex,
       activeItemId,
       activeTranscript,
-      areSubtitlesVisible,
       getRowRenderState,
       handleDoubleTap,
       handleHoldEnd,
@@ -209,6 +209,7 @@ export function FullscreenVideoPager({
       insets.bottom,
       onActionPress,
       registerActiveController,
+      subtitleDisplayMode,
       width,
     ]
   );

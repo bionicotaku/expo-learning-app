@@ -19,7 +19,7 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('measurementCache');
     expect(source).toContain('activeVisitToken');
     expect(source).toContain('activeTranscript');
-    expect(source).toContain('areSubtitlesVisible');
+    expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('seekBarStore');
     expect(source).toContain('onSubtitleTokenPress');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
@@ -36,8 +36,9 @@ describe('row owned video overlay source', () => {
     expect(source).toContain("bottom: '100%'");
     expect(source).toContain('paddingBottom: subtitleTitleGap');
     expect(source).toContain('pointerEvents="box-none"');
-    expect(source).toContain('{areSubtitlesVisible ? (');
-    expect(source).toContain('areSubtitlesVisible={areSubtitlesVisible}');
+    expect(source).toContain('<BasicSubtitleOverlay');
+    expect(source).toContain('displayMode={subtitleDisplayMode}');
+    expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('titleDescriptionColumnStyle');
     expect(source).not.toContain('useState');
     expect(source).not.toContain('useEffect');

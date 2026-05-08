@@ -2,6 +2,7 @@ import { memo, useRef, useSyncExternalStore } from 'react';
 import { Text, View, type GestureResponderEvent } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
+import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { resolveCurrentTranscriptSentence } from '../model/current-transcript-sentence';
 import { resolveCurrentTranscriptToken } from '../model/current-transcript-token';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
@@ -9,6 +10,7 @@ import type { RowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-sto
 import { getTranscriptTokenTrailingText } from '../model/transcript-token-display';
 
 type BasicSubtitleOverlayProps = {
+  displayMode: SubtitleDisplayMode;
   maxTextWidth: number;
   onTokenPress?: (token: TranscriptToken) => void;
   seekBarStore: RowPlaybackSeekBarStore;
@@ -23,6 +25,7 @@ const activeSubtitleTokenStyle = {
 } as const;
 
 function BasicSubtitleOverlayComponent({
+  displayMode,
   maxTextWidth,
   onTokenPress,
   seekBarStore,
@@ -41,6 +44,10 @@ function BasicSubtitleOverlayComponent({
     previousTranscriptRef.current = transcript;
     previousSentenceIndexRef.current = null;
     previousTokenIndexRef.current = null;
+  }
+
+  if (displayMode === 'off') {
+    return null;
   }
 
   const currentTimeMs =
@@ -62,6 +69,8 @@ function BasicSubtitleOverlayComponent({
   }
   const currentTokens = currentSentence.sentence.tokens;
   const shouldRenderTokens = currentTokens.length > 0;
+  const shouldRenderExplanation =
+    displayMode === 'bilingual' && currentSentence.sentence.explanation.length > 0;
   const currentToken = shouldRenderTokens
     ? resolveCurrentTranscriptToken({
         currentTimeMs,
@@ -83,6 +92,7 @@ function BasicSubtitleOverlayComponent({
         width: maxTextWidth,
         minHeight: fullscreenVideoOverlayTheme.subtitleText.lineHeight,
         justifyContent: 'flex-end',
+        gap: 5,
       }}
     >
       <Text
@@ -125,6 +135,24 @@ function BasicSubtitleOverlayComponent({
             })
           : currentSentence.sentence.text}
       </Text>
+      {shouldRenderExplanation ? (
+        <Text
+          allowFontScaling={false}
+          selectable={false}
+          style={{
+            width: maxTextWidth,
+            fontSize: 15,
+            lineHeight: 19,
+            fontWeight: '400',
+            color: 'rgba(232,226,213,0.82)',
+            textShadowColor: 'rgba(12,9,7,0.18)',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2,
+          }}
+        >
+          {currentSentence.sentence.explanation}
+        </Text>
+      ) : null}
     </View>
   );
 }

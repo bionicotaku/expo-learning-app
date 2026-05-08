@@ -3,7 +3,10 @@ import { View } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
-import { useToggleSubtitlesVisible } from '@/features/playback-settings';
+import {
+  useCycleSubtitleDisplayMode,
+  type SubtitleDisplayMode,
+} from '@/features/playback-settings';
 import {
   createWordDetailDialogPayloadFromTranscriptToken,
   usePresentWordDetailDialog,
@@ -38,7 +41,6 @@ type FullscreenVideoRowProps = {
   accessibilityLabel: string;
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
-  areSubtitlesVisible: boolean;
   bottomInset: number;
   height: number;
   hudState: FullscreenRowPlaybackHudState;
@@ -57,6 +59,7 @@ type FullscreenVideoRowProps = {
   shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
+  subtitleDisplayMode: SubtitleDisplayMode;
   video: VideoListItem;
   width: number;
 };
@@ -65,7 +68,6 @@ function FullscreenVideoRowComponent({
   accessibilityLabel,
   activeTranscript,
   activeVisitToken,
-  areSubtitlesVisible,
   video,
   width,
   height,
@@ -84,6 +86,7 @@ function FullscreenVideoRowComponent({
   shouldEnableBackgroundGestures,
   shouldUsePlayer,
   shouldPlay,
+  subtitleDisplayMode,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
@@ -91,7 +94,7 @@ function FullscreenVideoRowComponent({
   const pauseCenterReservationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
   const presentWordDetailDialog = usePresentWordDetailDialog();
-  const toggleSubtitlesVisible = useToggleSubtitlesVisible();
+  const cycleSubtitleDisplayMode = useCycleSubtitleDisplayMode();
   const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
     baseIsFavorited: video.isFavorited,
     baseIsLiked: video.isLiked,
@@ -154,16 +157,16 @@ function FullscreenVideoRowComponent({
     }
 
     if (item.id === 'subtitle') {
-      toggleSubtitlesVisible();
+      cycleSubtitleDisplayMode();
       return;
     }
 
     onActionPress?.(video.videoId, item);
   }, [
     onActionPress,
+    cycleSubtitleDisplayMode,
     toggleFavorited,
     toggleLiked,
-    toggleSubtitlesVisible,
     video.videoId,
   ]);
   const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
@@ -209,7 +212,6 @@ function FullscreenVideoRowComponent({
       <RowOwnedVideoOverlay
         activeTranscript={activeTranscript}
         activeVisitToken={activeVisitToken}
-        areSubtitlesVisible={areSubtitlesVisible}
         bottomInset={bottomInset}
         description={video.description}
         isFavorited={isFavorited}
@@ -218,6 +220,7 @@ function FullscreenVideoRowComponent({
         onActionPress={handleActionPress}
         onSubtitleTokenPress={handleSubtitleTokenPress}
         seekBarStore={seekBarStore}
+        subtitleDisplayMode={subtitleDisplayMode}
         title={video.title}
       />
       <RowPlaybackHudOverlay
@@ -280,7 +283,7 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description &&
     previousProps.activeTranscript === nextProps.activeTranscript &&
-    previousProps.areSubtitlesVisible === nextProps.areSubtitlesVisible
+    previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode
   );
 }
 

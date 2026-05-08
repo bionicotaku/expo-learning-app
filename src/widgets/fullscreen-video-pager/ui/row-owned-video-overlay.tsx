@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
+import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
@@ -34,7 +35,6 @@ const contentLayoutTransition = LinearTransition.springify()
 type RowOwnedVideoOverlayProps = {
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
-  areSubtitlesVisible: boolean;
   bottomInset: number;
   description: string;
   isFavorited: boolean;
@@ -43,13 +43,13 @@ type RowOwnedVideoOverlayProps = {
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   onSubtitleTokenPress?: (token: TranscriptToken) => void;
   seekBarStore: RowPlaybackSeekBarStore;
+  subtitleDisplayMode: SubtitleDisplayMode;
   title: string;
 };
 
 function RowOwnedVideoOverlayComponent({
   activeTranscript,
   activeVisitToken,
-  areSubtitlesVisible,
   bottomInset,
   description,
   isFavorited,
@@ -58,6 +58,7 @@ function RowOwnedVideoOverlayComponent({
   onActionPress,
   onSubtitleTokenPress,
   seekBarStore,
+  subtitleDisplayMode,
   title,
 }: RowOwnedVideoOverlayProps) {
   const descriptionState = useExpandableOverlayDescriptionState({
@@ -127,14 +128,13 @@ function RowOwnedVideoOverlayComponent({
                 paddingBottom: subtitleTitleGap,
               }}
             >
-              {areSubtitlesVisible ? (
-                <BasicSubtitleOverlay
-                  maxTextWidth={sharedTextWidth}
-                  onTokenPress={onSubtitleTokenPress}
-                  seekBarStore={seekBarStore}
-                  transcript={activeTranscript}
-                />
-              ) : null}
+              <BasicSubtitleOverlay
+                displayMode={subtitleDisplayMode}
+                maxTextWidth={sharedTextWidth}
+                onTokenPress={onSubtitleTokenPress}
+                seekBarStore={seekBarStore}
+                transcript={activeTranscript}
+              />
             </View>
             <View style={titleDescriptionColumnStyle}>
               <Text
@@ -172,11 +172,11 @@ function RowOwnedVideoOverlayComponent({
       </View>
 
       <VideoOverlayActionRail
-        areSubtitlesVisible={areSubtitlesVisible}
         bottomInset={bottomInset}
         isFavorited={isFavorited}
         isLiked={isLiked}
         onActionPress={onActionPress}
+        subtitleDisplayMode={subtitleDisplayMode}
       />
     </View>
   );

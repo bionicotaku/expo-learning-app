@@ -11,13 +11,13 @@ const {
   onLatestActiveVideoIdChangeMock,
   presentPlaybackSettingsSheetMock,
   requestMoreMock,
-  useAreSubtitlesVisibleMock,
+  useSubtitleDisplayModeMock,
   useFullscreenTranscriptSourceMock,
 } = vi.hoisted(() => ({
   onLatestActiveVideoIdChangeMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
   requestMoreMock: vi.fn(),
-  useAreSubtitlesVisibleMock: vi.fn(),
+  useSubtitleDisplayModeMock: vi.fn(),
   useFullscreenTranscriptSourceMock: vi.fn(),
 }));
 
@@ -82,8 +82,8 @@ vi.mock('@/features/transcript-source', () => ({
 }));
 
 vi.mock('@/features/playback-settings', () => ({
-  useAreSubtitlesVisible: useAreSubtitlesVisibleMock,
   usePresentPlaybackSettingsSheet: () => presentPlaybackSettingsSheetMock,
+  useSubtitleDisplayMode: useSubtitleDisplayModeMock,
 }));
 
 vi.mock('@/widgets/fullscreen-video-pager', async () => {
@@ -105,8 +105,8 @@ describe('fullscreen video session runtime', () => {
     onLatestActiveVideoIdChangeMock.mockReset();
     presentPlaybackSettingsSheetMock.mockReset();
     requestMoreMock.mockReset();
-    useAreSubtitlesVisibleMock.mockReset();
-    useAreSubtitlesVisibleMock.mockReturnValue(true);
+    useSubtitleDisplayModeMock.mockReset();
+    useSubtitleDisplayModeMock.mockReturnValue('english');
     useFullscreenTranscriptSourceMock.mockReset();
     useFullscreenTranscriptSourceMock.mockReturnValue({
       activeTranscript: null,
@@ -213,15 +213,15 @@ describe('fullscreen video session runtime', () => {
 
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       activeTranscript,
-      areSubtitlesVisible: true,
+      subtitleDisplayMode: 'english',
     });
     expect(hoistedState.latestFullscreenVideoPagerProps).not.toHaveProperty(
       'shouldReserveSubtitleSpace'
     );
   });
 
-  it('passes the global subtitle visibility preference through to the pager', () => {
-    useAreSubtitlesVisibleMock.mockReturnValue(false);
+  it('passes the global subtitle display mode preference through to the pager', () => {
+    useSubtitleDisplayModeMock.mockReturnValue('bilingual');
 
     act(() => {
       TestRenderer.create(
@@ -237,7 +237,7 @@ describe('fullscreen video session runtime', () => {
     });
 
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
-      areSubtitlesVisible: false,
+      subtitleDisplayMode: 'bilingual',
     });
   });
 });

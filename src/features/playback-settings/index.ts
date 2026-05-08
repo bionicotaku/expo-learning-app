@@ -1,12 +1,13 @@
 export {
-  DEFAULT_ARE_SUBTITLES_VISIBLE,
   DEFAULT_PLAYBACK_RATE,
+  DEFAULT_SUBTITLE_DISPLAY_MODE,
   PLAYBACK_RATE_OPTIONS,
-  useAreSubtitlesVisible,
+  useCycleSubtitleDisplayMode,
   usePlaybackRate,
   useSetPlaybackRate,
-  useSetSubtitlesVisible,
-  useToggleSubtitlesVisible,
+  useSetSubtitleDisplayMode,
+  useSubtitleDisplayMode,
   type PlaybackRate,
+  type SubtitleDisplayMode,
 } from './model/playback-settings-store';
 export { usePresentPlaybackSettingsSheet } from './model/use-present-playback-settings-sheet';

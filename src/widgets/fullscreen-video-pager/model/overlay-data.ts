@@ -6,6 +6,7 @@ export type FullscreenVideoOverlayActionItem = {
     | 'heart.fill'
     | 'star.fill'
     | 'square.and.arrow.up'
+    | 'text.bubble'
     | 'text.bubble.fill';
 };
 

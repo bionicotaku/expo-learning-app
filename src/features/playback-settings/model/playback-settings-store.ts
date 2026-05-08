@@ -1,43 +1,51 @@
 import { create } from 'zustand';
 
 export type PlaybackRate = 0.5 | 1 | 1.5 | 2;
+export type SubtitleDisplayMode = 'off' | 'english' | 'bilingual';
 
-export const DEFAULT_ARE_SUBTITLES_VISIBLE = true;
 export const DEFAULT_PLAYBACK_RATE: PlaybackRate = 1;
+export const DEFAULT_SUBTITLE_DISPLAY_MODE: SubtitleDisplayMode = 'english';
 export const PLAYBACK_RATE_OPTIONS = [0.5, 1, 1.5, 2] as const satisfies readonly PlaybackRate[];
 
 export type PlaybackSettingsState = {
-  areSubtitlesVisible: boolean;
+  cycleSubtitleDisplayMode: () => void;
   playbackRate: PlaybackRate;
   resetPlaybackRate: () => void;
-  resetSubtitlesVisible: () => void;
+  resetSubtitleDisplayMode: () => void;
   setPlaybackRate: (nextRate: PlaybackRate) => void;
-  setSubtitlesVisible: (visible: boolean) => void;
-  toggleSubtitlesVisible: () => void;
+  setSubtitleDisplayMode: (mode: SubtitleDisplayMode) => void;
+  subtitleDisplayMode: SubtitleDisplayMode;
 };
 
 export const usePlaybackSettingsStore = create<PlaybackSettingsState>()((set) => ({
-  areSubtitlesVisible: DEFAULT_ARE_SUBTITLES_VISIBLE,
+  cycleSubtitleDisplayMode: () => {
+    set((state) => ({
+      subtitleDisplayMode:
+        state.subtitleDisplayMode === 'off'
+          ? 'english'
+          : state.subtitleDisplayMode === 'english'
+            ? 'bilingual'
+            : 'off',
+    }));
+  },
   playbackRate: DEFAULT_PLAYBACK_RATE,
+  subtitleDisplayMode: DEFAULT_SUBTITLE_DISPLAY_MODE,
   resetPlaybackRate: () => {
     set({ playbackRate: DEFAULT_PLAYBACK_RATE });
   },
-  resetSubtitlesVisible: () => {
-    set({ areSubtitlesVisible: DEFAULT_ARE_SUBTITLES_VISIBLE });
+  resetSubtitleDisplayMode: () => {
+    set({ subtitleDisplayMode: DEFAULT_SUBTITLE_DISPLAY_MODE });
   },
   setPlaybackRate: (nextRate) => {
     set({ playbackRate: nextRate });
   },
-  setSubtitlesVisible: (visible) => {
-    set({ areSubtitlesVisible: visible });
-  },
-  toggleSubtitlesVisible: () => {
-    set((state) => ({ areSubtitlesVisible: !state.areSubtitlesVisible }));
+  setSubtitleDisplayMode: (mode) => {
+    set({ subtitleDisplayMode: mode });
   },
 }));
 
-export function useAreSubtitlesVisible() {
-  return usePlaybackSettingsStore((state) => state.areSubtitlesVisible);
+export function useCycleSubtitleDisplayMode() {
+  return usePlaybackSettingsStore((state) => state.cycleSubtitleDisplayMode);
 }
 
 export function usePlaybackRate() {
@@ -48,10 +56,10 @@ export function useSetPlaybackRate() {
   return usePlaybackSettingsStore((state) => state.setPlaybackRate);
 }
 
-export function useSetSubtitlesVisible() {
-  return usePlaybackSettingsStore((state) => state.setSubtitlesVisible);
+export function useSetSubtitleDisplayMode() {
+  return usePlaybackSettingsStore((state) => state.setSubtitleDisplayMode);
 }
 
-export function useToggleSubtitlesVisible() {
-  return usePlaybackSettingsStore((state) => state.toggleSubtitlesVisible);
+export function useSubtitleDisplayMode() {
+  return usePlaybackSettingsStore((state) => state.subtitleDisplayMode);
 }
