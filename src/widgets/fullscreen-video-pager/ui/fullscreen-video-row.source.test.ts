@@ -18,6 +18,9 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('createWordDetailDialogPayloadFromTranscriptToken');
     expect(source).toContain('acquirePlaybackHold?: () => () => void');
     expect(source).toContain('const releasePlaybackHold = acquirePlaybackHold?.();');
+    expect(source).toContain('const didPresentWordDetailDialog = presentWordDetailDialog(payload, {');
+    expect(source).toContain('if (!didPresentWordDetailDialog) {');
+    expect(source).toContain('releasePlaybackHold?.();');
     expect(source).toContain('onDismissComplete: releasePlaybackHold');
     expect(source).toContain('useCycleSubtitleDisplayMode');
     expect(source).toContain('onRowUnmount');

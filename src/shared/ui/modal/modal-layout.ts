@@ -1,5 +1,3 @@
-import type { ModalId } from '@/shared/lib/modal/types';
-
 export function resolveDialogModalLayout({
   viewportWidth,
   viewportHeight,
@@ -39,11 +37,4 @@ export function resolveSheetModalLayout({
     width: viewportWidth,
     maxHeight: Math.max(0, viewportHeight - topInset - pageTopOffset),
   };
-}
-
-export function resolveTopmostModalId<T extends { id: ModalId }>(
-  items: readonly T[]
-) {
-  const topmostItem = items.at(-1);
-  return topmostItem?.id ?? null;
 }

@@ -6,7 +6,7 @@
 
 - 视觉壳
 - 展示与关闭能力
-- 栈管理能力
+- singleton 管理能力
 - 动画与手势能力
 - FSD 边界与接入方式
 
@@ -33,7 +33,8 @@
 - 居中对话框与底部抽屉两种呈现方式
 - enter / exit 动画
 - 底部抽屉下滑关闭
-- 多个 modal 的栈式管理
+- 全局 singleton modal 管理，任意时刻最多只有一个 current modal
+- current modal 存在期间重复 `present` 会被拒绝，不排队、不替换
 - 后续承载按钮、回调、异步事件和复杂业务交互
 
 ### 2.2 明确非目标
@@ -57,7 +58,7 @@
 旧项目里需要保留的是：
 
 - 视觉层的 glass / blur modal 表现
-- modal stack 的基本行为
+- 全局 current modal 的展示、关闭和动画收尾行为
 - 进出场和交互关闭动画
 
 旧项目里不应继续沿用的是：
@@ -195,9 +196,9 @@ src/
 
 负责：
 
-- 维护模块级 modal stack
+- 维护模块级 singleton current modal
 - 暴露 `present / dismiss / dismissTop / clear`
-- 定义 stack item、presentation、phase 等通用类型
+- 定义 modal record、presentation、phase 等通用类型
 - 暴露供 `ModalHost` 订阅的 store
 
 不负责：
@@ -212,16 +213,15 @@ src/
 
 负责：
 
-- 根部渲染 modal stack
+- 根部渲染当前 singleton modal
 - 渲染 backdrop
 - 渲染 `dialog` / `sheet` 两种 frame
 - 执行 enter / exit 动画
 - 执行 V1 下滑关闭
-- 屏蔽非顶层 modal 的交互
 
 不负责：
 
-- 持有全局 stack 状态
+- 持有全局 modal 状态
 - 暴露业务 API
 - 决定具体业务内容
 
@@ -306,9 +306,10 @@ V1 要提供以下能力：
 #### 展示能力
 
 - 支持从业务代码触发全局 modal
-- 支持栈式展示多个 modal
-- 只允许顶层 modal 响应 backdrop 和 gesture
-- 关闭顶层后展示下一层
+- 支持 `dialog` / `sheet` 共享一个 singleton runtime
+- 只允许一个 current modal 存在
+- current modal 进入、可见或退出动画期间，新的 `present` 都返回 `didPresent=false`
+- current modal 响应 backdrop 和 gesture；退出动画期间 backdrop 不接收点击
 - 当前只在 native 端挂载 host，web 不启用
 
 #### 呈现类型
@@ -354,7 +355,7 @@ V1 要提供以下能力：
 - 不做半屏 / 全屏 detent 切换
 - 不做 Promise 返回值协议
 - 不做全局字符串业务注册表
-- 不做复杂 stacked card 联动动画
+- 不做 modal queue 或 replace-current
 - 不做 sheet 拖拽时的内容 stretch / rubber band 特效
 - 不做 Expo Web fallback
 
@@ -372,15 +373,14 @@ V2 预期支持以下增强：
 
 - sheet 拖拽过程中的 backdrop 联动透明度
 - dialog / sheet 的 scale 联动
-- 顶层和次顶层的 stack 过渡联动
+- current modal enter / exit 的更细动画曲线
 - 更平滑的 velocity-based dismiss
-- 顶层关闭时次顶层的微回弹或复位动画
 
 #### 更强的布局体系
 
 - sheet detents
 - 内容高度自适应
-- 顶层 modal 的 max-height 策略
+- current modal 的 max-height 策略
 - 可选支持“接近系统 form sheet”的中号布局
 
 #### 更强的交互体系
@@ -399,7 +399,7 @@ V2 预期支持以下增强：
 #### 更强的调试能力
 
 - `debugLabel`
-- stack inspection
+- current modal inspection
 - 开发态日志
 - 测试态简化动画
 
@@ -408,7 +408,7 @@ V2 预期支持以下增强：
 V2 里的能力大部分都与：
 
 - 更复杂的 gesture 协调
-- 更复杂的 stacked transition
+- 更复杂的 enter / exit transition
 - 更复杂的结果协议
 
 强相关。
@@ -444,12 +444,16 @@ type ModalDescriptor = {
     dismiss: () => void;
     dismissTop: () => void;
     clear: () => void;
-    isTopMost: boolean;
   }) => React.ReactNode;
 };
 
+type ModalPresentResult = {
+  id: string | null;
+  didPresent: boolean;
+};
+
 type ModalService = {
-  present: (descriptor: ModalDescriptor) => string;
+  present: (descriptor: ModalDescriptor) => ModalPresentResult;
   dismiss: (id: string) => void;
   dismissTop: () => void;
   clear: () => void;
@@ -594,15 +598,14 @@ function usePresentPlaybackSettingsModal() {
 - 未超过阈值时回弹
 - 超过阈值时关闭
 - velocity 很大时可直接判定为关闭
-- 非顶层 sheet 不响应手势
+- exiting sheet 不响应手势
 
 ### 11.3 V2 动画扩展规范
 
 V2 中，sheet 拖拽时建议加入：
 
 - backdrop opacity 连续联动
-- 顶层 sheet 的 scale / translate 跟手
-- 次顶层 modal 轻微 scale 恢复
+- current sheet 的 scale / translate 跟手
 - release velocity 对 dismiss 决策加权
 
 但这些都属于增强，不影响 V1 基座成立。
@@ -611,9 +614,9 @@ V2 中，sheet 拖拽时建议加入：
 
 ## 12. 生命周期与状态机
 
-### 12.1 modal item 建议状态
+### 12.1 modal record 状态
 
-每个 modal item 建议至少经历以下 phase：
+current modal 至少经历以下 phase：
 
 - `entering`
 - `visible`
@@ -623,14 +626,16 @@ V2 中，sheet 拖拽时建议加入：
 
 - host 能正确执行 enter / exit 动画
 - dismiss 不会立即删除节点，避免动画被截断
-- 栈更新和动画收尾可以解耦
+- `present` 拒绝窗口和动画收尾可以解耦
 
-### 12.2 顶层原则
+### 12.2 Singleton 原则
 
 任意时刻：
 
-- 只有顶层 modal 接受手势和 backdrop 交互
-- 非顶层 modal 只保留视觉存在，不响应触摸
+- store 内部最多只有一个 current modal
+- current modal 为 `entering` / `visible` / `exiting` 时，新的 `present` 都会被拒绝
+- current modal `phase !== 'exiting'` 时接受手势和 backdrop 交互
+- current modal `phase === 'exiting'` 时保留节点完成退出动画，但 backdrop 不可见也不接收点击
 
 ### 12.3 关闭语义
 
@@ -639,7 +644,7 @@ V1 至少需要区分以下关闭来源：
 - imperative dismiss
 - backdrop dismiss
 - gesture dismiss
-- clear all
+- clear current
 
 V1 不一定要把 reason 全量暴露给业务，但内部状态设计应预留 reason 扩展位。
 
@@ -742,14 +747,17 @@ src/features/subtitle-explanation/
 
 #### `shared/lib/modal`
 
-- `present` 会新增顶部 item
-- `dismiss` 只会标记目标 item 为 exiting
-- `dismissTop` 只影响顶层
-- `clear` 会把所有可见 item 标记为 exiting
+- 首次 `present` 返回 `{ didPresent: true, id }`
+- current modal 存在时，后续 `present` 返回 `{ didPresent: false, id: null }`
+- current modal 为 `exiting` 但尚未 remove 时，后续 `present` 仍被拒绝
+- `dismissTop` 是 `dismiss current` 的别名
+- `clear` 只把 current modal 标记为 exiting
+- `remove(id)` 只在 id 匹配 current modal 时清空
 
 #### `shared/ui/modal`
 
-- host 的挂载接线和 topmost 派生逻辑
+- host 的挂载接线和 current modal 订阅逻辑
+- backdrop 只在 current modal 非 exiting 时可见并响应点击
 - sheet 关闭阈值和回弹判定
 - dialog / sheet 的纯布局计算
 - `_layout.tsx` 已挂载 `ModalHost`
@@ -758,7 +766,7 @@ src/features/subtitle-explanation/
 
 - 下滑不足阈值时回弹
 - 下滑超过阈值时关闭
-- 非顶层 sheet 不响应 gesture dismiss
+- exiting sheet 不响应 gesture dismiss
 
 ### 15.2 当前阶段不要求的验证
 
@@ -766,7 +774,7 @@ src/features/subtitle-explanation/
 
 - Promise 返回链路测试
 - detent 切换测试
-- 多层 stack 联动过渡视觉测试
+- queue / replace-current 语义测试
 - RN 组件渲染 harness
 
 ---

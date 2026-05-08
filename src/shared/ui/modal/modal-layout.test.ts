@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   resolveDialogModalLayout,
   resolveSheetModalLayout,
-  resolveTopmostModalId,
 } from './modal-layout';
 
 describe('modal layout helpers', () => {
@@ -48,14 +47,4 @@ describe('modal layout helpers', () => {
     });
   });
 
-  it('returns the topmost modal id from the current stack order', () => {
-    expect(resolveTopmostModalId([])).toBeNull();
-    expect(
-      resolveTopmostModalId([
-        { id: 'modal-1' },
-        { id: 'modal-2' },
-        { id: 'modal-3' },
-      ])
-    ).toBe('modal-3');
-  });
 });

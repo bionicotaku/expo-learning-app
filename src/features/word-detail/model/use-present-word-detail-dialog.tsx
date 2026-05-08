@@ -32,7 +32,7 @@ export function usePresentWordDetailDialog() {
       payload: WordDetailDialogPayload,
       options: PresentWordDetailDialogOptions = {}
     ) => {
-      modal.present({
+      const presentResult = modal.present({
         debugLabel: 'word-detail',
         presentation: 'dialog',
         render: () => (
@@ -43,6 +43,8 @@ export function usePresentWordDetailDialog() {
           </WordDetailDialogLifecycleBoundary>
         ),
       });
+
+      return presentResult.didPresent;
     },
     [modal]
   );

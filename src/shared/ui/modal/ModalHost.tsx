@@ -6,21 +6,18 @@ import { modalStore } from '@/shared/lib/modal/store';
 
 import { ModalBackdrop } from './ModalBackdrop';
 import { MODAL_HOST_Z_INDEX } from './modal-design';
-import { resolveTopmostModalId } from './modal-layout';
 import { ModalItem } from './ModalItem';
 
 export function ModalHost() {
   const insets = useSafeAreaInsets();
   const { height, width } = useWindowDimensions();
-  const items = useSyncExternalStore(
+  const currentModal = useSyncExternalStore(
     modalStore.subscribe,
     modalStore.getSnapshot,
     modalStore.getSnapshot
   );
-  const topmostModalId = resolveTopmostModalId(items);
-  const topmostModal = topmostModalId
-    ? items.find((item) => item.id === topmostModalId) ?? null
-    : null;
+  const isBackdropVisible =
+    currentModal !== null && currentModal.phase !== 'exiting';
 
   if (Platform.OS === 'web') {
     return null;
@@ -42,28 +39,26 @@ export function ModalHost() {
       <ModalBackdrop
         onPress={() => {
           if (
-            topmostModal &&
-            topmostModal.phase !== 'exiting' &&
-            topmostModal.dismissOnBackdropPress
+            currentModal &&
+            currentModal.phase !== 'exiting' &&
+            currentModal.dismissOnBackdropPress
           ) {
-            modalStore.dismiss(topmostModal.id, 'backdrop');
+            modalStore.dismiss(currentModal.id, 'backdrop');
           }
         }}
-        visible={items.length > 0}
+        visible={isBackdropVisible}
       />
 
-      {items.map((item, index) => (
+      {currentModal ? (
         <ModalItem
-          key={item.id}
+          key={currentModal.id}
           bottomInset={insets.bottom}
-          isTopMost={item.id === topmostModalId}
-          record={item}
-          stackIndex={index}
+          record={currentModal}
           topInset={insets.top}
           viewportHeight={height}
           viewportWidth={width}
         />
-      ))}
+      ) : null}
     </View>
   );
 }

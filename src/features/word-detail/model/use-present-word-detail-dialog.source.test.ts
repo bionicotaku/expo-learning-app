@@ -19,6 +19,8 @@ describe('use present word detail dialog source', () => {
     expect(source).toContain('WordDetailDialogContent');
     expect(source).toContain('WordDetailDialogLifecycleBoundary');
     expect(source).toContain('onDismissComplete');
+    expect(source).toContain('const presentResult = modal.present({');
+    expect(source).toContain('return presentResult.didPresent;');
     expect(source).toContain('<WordDetailDialogContent payload={payload} />');
     expect(source).toContain('WordDetailDialogPayload');
     expect(source).not.toContain("presentation: 'sheet'");

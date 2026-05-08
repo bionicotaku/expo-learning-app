@@ -199,9 +199,13 @@ function FullscreenVideoRowComponent({
     const releasePlaybackHold = acquirePlaybackHold?.();
 
     try {
-      presentWordDetailDialog(payload, {
+      const didPresentWordDetailDialog = presentWordDetailDialog(payload, {
         onDismissComplete: releasePlaybackHold,
       });
+
+      if (!didPresentWordDetailDialog) {
+        releasePlaybackHold?.();
+      }
     } catch (error) {
       releasePlaybackHold?.();
       throw error;

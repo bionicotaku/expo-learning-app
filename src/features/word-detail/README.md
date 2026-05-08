@@ -9,6 +9,7 @@
 - 暴露 `createWordDetailDialogPayloadFromTranscriptToken(...)`
 - 使用 shared modal 的 `dialog` presentation 展示单词详情
 - `usePresentWordDetailDialog` 支持 `onDismissComplete` 回调，供调用方在 dialog 完全消失后释放业务侧临时状态
+- `usePresentWordDetailDialog` 返回 `boolean`；shared modal 已有 current modal 时返回 `false`
 - 展示 `text`、`semantic_element.base_form`、上下文释义和字典释义
 
 ## Transcript token 接入
@@ -30,4 +31,5 @@
 - 详情内容不接收或展示解释原因字段
 - 当前内容区不提供 Close 按钮，关闭依赖 shared modal 的 backdrop / imperative dismiss
 - word detail 自身不直接控制视频播放；fullscreen 字幕入口会在打开 dialog 前申请 playback hold，并通过 `onDismissComplete` 释放
+- 如果 shared modal 拒绝本次展示，fullscreen 字幕入口会立即释放 playback hold
 - 上下文释义和字典释义以纯文本区块展示，不使用额外卡片外框

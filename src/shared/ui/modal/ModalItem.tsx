@@ -24,7 +24,7 @@ import {
   MODAL_SHEET_ENTER_DURATION_MS,
   MODAL_SHEET_EXIT_DURATION_MS,
   MODAL_SHEET_SETTLE_SPRING,
-  MODAL_STACK_BASE_Z_INDEX,
+  MODAL_ITEM_Z_INDEX,
 } from './modal-design';
 import { shouldDismissSheetGesture } from './modal-gesture';
 import {
@@ -34,8 +34,6 @@ import {
 
 type ModalItemProps = {
   record: ModalRecord;
-  isTopMost: boolean;
-  stackIndex: number;
   viewportWidth: number;
   viewportHeight: number;
   topInset: number;
@@ -44,8 +42,6 @@ type ModalItemProps = {
 
 export function ModalItem({
   record,
-  isTopMost,
-  stackIndex,
   viewportWidth,
   viewportHeight,
   topInset,
@@ -183,7 +179,7 @@ export function ModalItem({
 
   const gesture = useMemo(() => {
     const canDrag =
-      isTopMost && record.presentation === 'sheet' && record.phase !== 'exiting';
+      record.presentation === 'sheet' && record.phase !== 'exiting';
 
     return Gesture.Pan()
       .enabled(canDrag)
@@ -207,7 +203,7 @@ export function ModalItem({
 
         translateY.value = withSpring(0, MODAL_SHEET_SETTLE_SPRING);
       });
-  }, [isTopMost, record.id, record.phase, record.presentation, translateY]);
+  }, [record.id, record.phase, record.presentation, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -238,7 +234,6 @@ export function ModalItem({
     clear: () => {
       modalStore.clear();
     },
-    isTopMost,
   });
 
   return (
@@ -247,7 +242,7 @@ export function ModalItem({
       style={[
         StyleSheet.absoluteFillObject,
         {
-          zIndex: MODAL_STACK_BASE_Z_INDEX + stackIndex,
+          zIndex: MODAL_ITEM_Z_INDEX,
         },
       ]}
     >
@@ -260,7 +255,7 @@ export function ModalItem({
           ]}
         >
           <Animated.View
-            pointerEvents={isTopMost ? 'auto' : 'none'}
+            pointerEvents={record.phase === 'exiting' ? 'none' : 'auto'}
             style={animatedStyle}
           >
             <ModalFrame

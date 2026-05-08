@@ -15,7 +15,7 @@ export const MODAL_SHEET_DISMISS_VELOCITY_Y = 900;
 export const MODAL_SHEET_HANDLE_WIDTH = 44;
 export const MODAL_SHEET_HANDLE_HEIGHT = 5;
 export const MODAL_SHEET_HANDLE_OPACITY = 0.2;
-export const MODAL_STACK_BASE_Z_INDEX = 1;
+export const MODAL_ITEM_Z_INDEX = 1;
 export const MODAL_SHEET_SETTLE_SPRING = {
   damping: 22,
   stiffness: 240,

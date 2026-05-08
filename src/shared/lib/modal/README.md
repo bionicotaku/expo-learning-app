@@ -4,7 +4,7 @@
 
 它只负责：
 
-- 维护模块级 modal stack
+- 维护模块级 singleton current modal
 - 暴露 `present / dismiss / dismissTop / clear`
 - 定义 modal 的内部类型、phase 和 dismiss reason
 
@@ -22,7 +22,7 @@
   - `ModalDescriptor`、`ModalRecord`、`ModalController` 等运行时类型
 - `store.ts`
   - 模块级单例 store
-  - 维护 stack item 与 phase 变化
+  - 维护 current modal 与 phase 变化
 - `service.ts`
   - 供 hook 和 UI 层复用的内部 imperative API
 - `use-modal-controller.ts`

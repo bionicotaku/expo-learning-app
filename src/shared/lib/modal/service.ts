@@ -1,8 +1,13 @@
 import { modalStore } from './store';
-import type { ModalController, ModalDescriptor, ModalId } from './types';
+import type {
+  ModalController,
+  ModalDescriptor,
+  ModalId,
+  ModalPresentResult,
+} from './types';
 
 export const modalService: ModalController = {
-  present(descriptor: ModalDescriptor): ModalId {
+  present(descriptor: ModalDescriptor): ModalPresentResult {
     return modalStore.present(descriptor);
   },
 

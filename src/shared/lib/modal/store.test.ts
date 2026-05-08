@@ -20,19 +20,19 @@ function createModalDescriptor(
 }
 
 describe('modal store', () => {
-  it('creates an entering modal and fills backdrop dismiss by default', () => {
+  it('creates an entering singleton modal and fills backdrop dismiss by default', () => {
     const store = createModalStore({
       createId: createTestIdFactory(),
     });
 
-    const id = store.present(
+    const result = store.present(
       createModalDescriptor({
         debugLabel: 'example-dialog',
       })
     );
 
-    expect(id).toBe('modal-1');
-    expect(store.getSnapshot()).toEqual([
+    expect(result).toEqual({ id: 'modal-1', didPresent: true });
+    expect(store.getSnapshot()).toEqual(
       {
         id: 'modal-1',
         debugLabel: 'example-dialog',
@@ -41,8 +41,8 @@ describe('modal store', () => {
         render: expect.any(Function),
         phase: 'entering',
         dismissReason: undefined,
-      },
-    ]);
+      }
+    );
   });
 
   it('marks a modal visible and does not revive it after dismiss', () => {
@@ -53,90 +53,117 @@ describe('modal store', () => {
     store.present(createModalDescriptor());
 
     store.markVisible('modal-1');
-    expect(store.getSnapshot()[0]?.phase).toBe('visible');
+    expect(store.getSnapshot()?.phase).toBe('visible');
 
     store.dismiss('modal-1', 'imperative');
-    expect(store.getSnapshot()[0]).toMatchObject({
+    expect(store.getSnapshot()).toMatchObject({
       id: 'modal-1',
       phase: 'exiting',
       dismissReason: 'imperative',
     });
 
     store.markVisible('modal-1');
-    expect(store.getSnapshot()[0]).toMatchObject({
+    expect(store.getSnapshot()).toMatchObject({
       id: 'modal-1',
       phase: 'exiting',
       dismissReason: 'imperative',
     });
   });
 
-  it('dismisses only the topmost non-exiting modal', () => {
+  it('rejects a second present while any current modal exists', () => {
+    const store = createModalStore({
+      createId: createTestIdFactory(),
+    });
+
+    expect(
+      store.present(createModalDescriptor({ debugLabel: 'first' }))
+    ).toEqual({ id: 'modal-1', didPresent: true });
+    expect(
+      store.present(createModalDescriptor({ debugLabel: 'second' }))
+    ).toEqual({ id: null, didPresent: false });
+
+    expect(store.getSnapshot()).toMatchObject({
+      id: 'modal-1',
+      debugLabel: 'first',
+      phase: 'entering',
+    });
+  });
+
+  it('rejects present while current modal is exiting but not removed', () => {
     const store = createModalStore({
       createId: createTestIdFactory(),
     });
 
     store.present(createModalDescriptor({ debugLabel: 'first' }));
-    store.present(createModalDescriptor({ debugLabel: 'second' }));
-    store.present(createModalDescriptor({ debugLabel: 'third' }));
+    store.dismiss('modal-1', 'backdrop');
 
-    store.dismiss('modal-3', 'imperative');
-    store.dismissTop('gesture');
-
-    expect(store.getSnapshot()).toMatchObject([
-      {
-        id: 'modal-1',
-        phase: 'entering',
-        dismissReason: undefined,
-      },
-      {
-        id: 'modal-2',
-        phase: 'exiting',
-        dismissReason: 'gesture',
-      },
-      {
-        id: 'modal-3',
-        phase: 'exiting',
-        dismissReason: 'imperative',
-      },
-    ]);
+    expect(
+      store.present(createModalDescriptor({ debugLabel: 'second' }))
+    ).toEqual({ id: null, didPresent: false });
+    expect(store.getSnapshot()).toMatchObject({
+      id: 'modal-1',
+      phase: 'exiting',
+      dismissReason: 'backdrop',
+    });
   });
 
-  it('marks every visible modal exiting when cleared and ignores repeated dismisses', () => {
+  it('dismissTop dismisses current and repeated dismiss does not replace its reason', () => {
     const store = createModalStore({
       createId: createTestIdFactory(),
     });
 
     store.present(createModalDescriptor({ presentation: 'sheet' }));
-    store.present(createModalDescriptor());
 
-    store.dismiss('modal-2', 'backdrop');
-    store.dismiss('modal-2', 'gesture');
-    store.clear();
+    store.dismissTop('gesture');
+    store.dismissTop('imperative');
 
-    expect(store.getSnapshot()).toMatchObject([
-      {
-        id: 'modal-1',
-        phase: 'exiting',
-        dismissReason: 'clear',
-      },
-      {
-        id: 'modal-2',
-        phase: 'exiting',
-        dismissReason: 'backdrop',
-      },
-    ]);
+    expect(store.getSnapshot()).toMatchObject({
+      id: 'modal-1',
+      phase: 'exiting',
+      dismissReason: 'gesture',
+    });
   });
 
-  it('removes a dismissed modal explicitly', () => {
+  it('clear only marks current exiting', () => {
     const store = createModalStore({
       createId: createTestIdFactory(),
     });
 
     store.present(createModalDescriptor());
+    store.clear();
+
+    expect(store.getSnapshot()).toMatchObject({
+      id: 'modal-1',
+      phase: 'exiting',
+      dismissReason: 'clear',
+    });
+  });
+
+  it('removes current only when the id matches', () => {
+    const store = createModalStore({
+      createId: createTestIdFactory(),
+    });
+
     store.present(createModalDescriptor());
 
     store.remove('modal-2');
+    expect(store.getSnapshot()).toMatchObject({ id: 'modal-1' });
 
-    expect(store.getSnapshot().map((item) => item.id)).toEqual(['modal-1']);
+    store.remove('modal-1');
+    expect(store.getSnapshot()).toBeNull();
+  });
+
+  it('allows a new present after current is removed', () => {
+    const store = createModalStore({
+      createId: createTestIdFactory(),
+    });
+
+    store.present(createModalDescriptor());
+    store.remove('modal-1');
+
+    expect(store.present(createModalDescriptor())).toEqual({
+      id: 'modal-2',
+      didPresent: true,
+    });
   });
 });

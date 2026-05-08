@@ -2,12 +2,15 @@ import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ModalDescriptor } from '@/shared/lib/modal/types';
+import type {
+  ModalDescriptor,
+  ModalPresentResult,
+} from '@/shared/lib/modal/types';
 import type { WordDetailDialogPayload } from '../ui/word-detail-dialog-content';
 import { usePresentWordDetailDialog } from './use-present-word-detail-dialog';
 
 const hoisted = vi.hoisted(() => ({
-  modalPresent: vi.fn<(descriptor: ModalDescriptor) => string>(),
+  modalPresent: vi.fn<(descriptor: ModalDescriptor) => ModalPresentResult>(),
 }));
 
 vi.mock('@/shared/lib/modal', () => ({
@@ -46,8 +49,38 @@ function Harness() {
 describe('usePresentWordDetailDialog runtime', () => {
   beforeEach(() => {
     hoisted.modalPresent.mockReset();
-    hoisted.modalPresent.mockReturnValue('modal-1');
+    hoisted.modalPresent.mockReturnValue({ id: 'modal-1', didPresent: true });
     latestPresentWordDetailDialog = null;
+  });
+
+  it('returns true when the shared modal accepts the dialog', () => {
+    act(() => {
+      TestRenderer.create(<Harness />);
+    });
+
+    let didPresent = false;
+
+    act(() => {
+      didPresent = latestPresentWordDetailDialog?.(payload) ?? false;
+    });
+
+    expect(didPresent).toBe(true);
+  });
+
+  it('returns false and does not mount a lifecycle boundary when modal present is rejected', () => {
+    hoisted.modalPresent.mockReturnValue({ id: null, didPresent: false });
+
+    act(() => {
+      TestRenderer.create(<Harness />);
+    });
+
+    let didPresent = true;
+
+    act(() => {
+      didPresent = latestPresentWordDetailDialog?.(payload) ?? true;
+    });
+
+    expect(didPresent).toBe(false);
   });
 
   it('calls onDismissComplete when the dialog content unmounts', () => {
@@ -78,7 +111,6 @@ describe('usePresentWordDetailDialog runtime', () => {
             clear: vi.fn(),
             dismiss: vi.fn(),
             dismissTop: vi.fn(),
-            isTopMost: true,
           })}
         </>
       );

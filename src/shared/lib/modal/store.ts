@@ -48,7 +48,7 @@ function markRecordExiting(
 export function createModalStore({
   createId = createModalId,
 }: CreateModalStoreOptions = {}): ModalStore {
-  let items: readonly ModalRecord[] = [];
+  let current: ModalRecord | null = null;
   const listeners = new Set<ModalStoreListener>();
 
   const emit = () => {
@@ -57,35 +57,29 @@ export function createModalStore({
     });
   };
 
-  const commit = (nextItems: readonly ModalRecord[]) => {
-    items = nextItems;
+  const commit = (nextCurrent: ModalRecord | null) => {
+    current = nextCurrent;
     emit();
   };
 
-  const updateOne = (
+  const updateCurrent = (
     id: ModalId,
     updater: (item: ModalRecord) => ModalRecord
   ) => {
-    let hasChanged = false;
+    if (current?.id !== id) {
+      return;
+    }
 
-    const nextItems = items.map((item) => {
-      if (item.id !== id) {
-        return item;
-      }
+    const nextCurrent = updater(current);
 
-      const nextItem = updater(item);
-      hasChanged = hasChanged || nextItem !== item;
-      return nextItem;
-    });
-
-    if (hasChanged) {
-      commit(nextItems);
+    if (nextCurrent !== current) {
+      commit(nextCurrent);
     }
   };
 
   return {
     getSnapshot() {
-      return items;
+      return current;
     },
 
     subscribe(listener) {
@@ -97,16 +91,26 @@ export function createModalStore({
     },
 
     present(descriptor) {
+      if (current !== null) {
+        return {
+          id: null,
+          didPresent: false,
+        };
+      }
+
       const id = descriptor.id ?? createId();
       const record = createModalRecord(descriptor, id);
 
-      commit([...items, record]);
+      commit(record);
 
-      return id;
+      return {
+        id,
+        didPresent: true,
+      };
     },
 
     markVisible(id) {
-      updateOne(id, (item) => {
+      updateCurrent(id, (item) => {
         if (item.phase !== 'entering') {
           return item;
         }
@@ -119,39 +123,29 @@ export function createModalStore({
     },
 
     dismiss(id, reason) {
-      updateOne(id, (item) => markRecordExiting(item, reason));
+      updateCurrent(id, (item) => markRecordExiting(item, reason));
     },
 
     dismissTop(reason) {
-      const topmostItem = [...items].reverse().find((item) => item.phase !== 'exiting');
-
-      if (!topmostItem) {
+      if (!current || current.phase === 'exiting') {
         return;
       }
 
-      updateOne(topmostItem.id, (item) => markRecordExiting(item, reason));
+      commit(markRecordExiting(current, reason));
     },
 
     remove(id) {
-      const nextItems = items.filter((item) => item.id !== id);
-
-      if (nextItems.length !== items.length) {
-        commit(nextItems);
+      if (current?.id === id) {
+        commit(null);
       }
     },
 
     clear() {
-      let hasChanged = false;
-
-      const nextItems = items.map((item) => {
-        const nextItem = markRecordExiting(item, 'clear');
-        hasChanged = hasChanged || nextItem !== item;
-        return nextItem;
-      });
-
-      if (hasChanged) {
-        commit(nextItems);
+      if (!current) {
+        return;
       }
+
+      commit(markRecordExiting(current, 'clear'));
     },
   };
 }

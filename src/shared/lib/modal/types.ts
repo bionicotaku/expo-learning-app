@@ -12,7 +12,11 @@ export type ModalRenderContext = {
   dismiss: () => void;
   dismissTop: () => void;
   clear: () => void;
-  isTopMost: boolean;
+};
+
+export type ModalPresentResult = {
+  readonly id: ModalId | null;
+  readonly didPresent: boolean;
 };
 
 export type ModalDescriptor = {
@@ -36,9 +40,9 @@ export type ModalRecord = {
 export type ModalStoreListener = () => void;
 
 export type ModalStore = {
-  getSnapshot: () => readonly ModalRecord[];
+  getSnapshot: () => ModalRecord | null;
   subscribe: (listener: ModalStoreListener) => () => void;
-  present: (descriptor: ModalDescriptor) => ModalId;
+  present: (descriptor: ModalDescriptor) => ModalPresentResult;
   markVisible: (id: ModalId) => void;
   dismiss: (id: ModalId, reason: ModalDismissReason) => void;
   dismissTop: (reason: ModalDismissReason) => void;
@@ -47,7 +51,7 @@ export type ModalStore = {
 };
 
 export type ModalController = {
-  present: (descriptor: ModalDescriptor) => ModalId;
+  present: (descriptor: ModalDescriptor) => ModalPresentResult;
   dismiss: (id: ModalId) => void;
   dismissTop: () => void;
   clear: () => void;

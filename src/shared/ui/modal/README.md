@@ -4,7 +4,7 @@
 
 它只负责：
 
-- 在根布局前景渲染 modal stack
+- 在根布局前景渲染当前 singleton modal
 - 渲染共享 backdrop
 - 渲染 `dialog` / `sheet` 两种 frame
 - 执行 enter / exit 动画
@@ -13,7 +13,7 @@
 它不负责：
 
 - 暴露业务层 imperative API
-- 持有模块级 stack 状态
+- 持有模块级 modal 状态
 - 注册任何业务 modal
 - 处理页面业务副作用
 
@@ -33,7 +33,7 @@
 - `modal-gesture.ts`
   - sheet 关闭阈值判定
 - `modal-layout.ts`
-  - dialog / sheet 布局和 topmost 派生逻辑
+  - dialog / sheet 布局逻辑
 - `index.ts`
   - 仅导出 `ModalHost`
 
