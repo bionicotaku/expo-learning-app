@@ -64,6 +64,9 @@ FullscreenVideoPager
 - `model/current-transcript-sentence.ts`
   - 基础字幕的当前句解析 helper
   - 优先检查上次命中的句子，再检查相邻前后句，最后回退二分搜索
+- `model/transcript-token-display.ts`
+  - 基础字幕 token 文本拼接 helper
+  - 只处理 token 后置空格与常见前置标点，不承担完整排版引擎职责
 - `model/row-playback-seek-bar-store.ts`
   - row-local seek bar runtime store
   - 持有真实 `progressSnapshot` 与 row-local `seekController`
@@ -86,13 +89,20 @@ FullscreenVideoPager
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
   - 装配 row-local media layer、interaction layer、content overlay、HUD overlay、surface status overlay
+  - 作为 row 组合层接入 `features/word-detail`，把字幕 token 点击转换成 shared dialog payload
 - `ui/row-owned-video-overlay.tsx`
   - row-owned 内容层
   - 持有基础字幕、标题与底部内容文案区的排版壳
   - 基础字幕、标题与 description 共用同一条文本列宽；内容区整体向左扩并缩小 rail 前留白
-  - 基础字幕位于 title 上方，属于同一个 layout animation 内容列；description 展开导致内容列上移时，字幕一起上移
-  - 基础字幕只显示当前 `TranscriptSentence.text`，不可点击，不显示 explanation / token，也不打开弹层
+  - 基础字幕位于 title 上方，锚定同一个内容列，但通过 absolute sibling 脱离 title / description 的 normal flow
+  - 基础字幕文本高度变化只向上增长，不重新布局 title / description；description 展开导致内容列上移时，字幕仍跟随锚点上移
+  - 基础字幕优先渲染当前 `TranscriptSentence.tokens`；没有 token 时才 fallback 到整句 `TranscriptSentence.text`
+  - 只有带 `semanticElement.coarseId` 的 token 可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog
+  - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
+  - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
+  - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
+  - 点击字幕 token 不暂停、不 seek、不改变播放状态；空白区和不可点击 token 不拦截背景手势
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态
   - 只消费 description 模块导出的语义结果 `actionPlacement`，再把它映射成自身的底部几何偏移
@@ -114,7 +124,8 @@ FullscreenVideoPager
 - `ui/basic-subtitle-overlay.tsx`
   - row-owned 内容层内的基础字幕 presenter
   - 通过 `useSyncExternalStore` 订阅 row-local `seekBarStore`
-  - 当前只做 read-only sentence text 展示；不承担 token 点击、解释弹层、句子导航或手势命中
+  - 只负责解析当前句、渲染 token 文本、在可解释 token 被点击时调用 `onTokenPress`
+  - 不承担 word detail modal、句子导航、学习状态、收藏状态或 API 请求
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
   - 持有 row-local `surfacePresentation`

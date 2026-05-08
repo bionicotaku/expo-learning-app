@@ -1,8 +1,12 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import type { Transcript } from '@/entities/transcript';
+import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
+import {
+  createWordDetailDialogPayloadFromTranscriptToken,
+  usePresentWordDetailDialog,
+} from '@/features/word-detail';
 import { useVideoRuntimeState } from '@/features/video-runtime';
 import type {
   FullscreenHoldZone,
@@ -51,7 +55,6 @@ type FullscreenVideoRowProps = {
   shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
-  shouldReserveSubtitleSpace: boolean;
   video: VideoListItem;
   width: number;
 };
@@ -78,13 +81,13 @@ function FullscreenVideoRowComponent({
   shouldEnableBackgroundGestures,
   shouldUsePlayer,
   shouldPlay,
-  shouldReserveSubtitleSpace,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
   const [pauseCenterReserved, setPauseCenterReserved] = useState(false);
   const pauseCenterReservationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
+  const presentWordDetailDialog = usePresentWordDetailDialog();
   const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
     baseIsFavorited: video.isFavorited,
     baseIsLiked: video.isLiked,
@@ -148,6 +151,15 @@ function FullscreenVideoRowComponent({
 
     onActionPress?.(video.videoId, item);
   }, [onActionPress, toggleFavorited, toggleLiked, video.videoId]);
+  const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
+    const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
+
+    if (payload === null) {
+      return;
+    }
+
+    presentWordDetailDialog(payload);
+  }, [presentWordDetailDialog]);
 
   return (
     <View
@@ -192,8 +204,8 @@ function FullscreenVideoRowComponent({
         isLiked={isLiked}
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
+        onSubtitleTokenPress={handleSubtitleTokenPress}
         seekBarStore={seekBarStore}
-        shouldReserveSubtitleSpace={shouldReserveSubtitleSpace}
         title={video.title}
       />
       <RowPlaybackHudOverlay
@@ -255,8 +267,7 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description &&
-    previousProps.activeTranscript === nextProps.activeTranscript &&
-    previousProps.shouldReserveSubtitleSpace === nextProps.shouldReserveSubtitleSpace
+    previousProps.activeTranscript === nextProps.activeTranscript
   );
 }
 

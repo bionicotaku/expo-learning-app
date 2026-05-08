@@ -20,7 +20,8 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('activeVisitToken');
     expect(source).toContain('activeTranscript');
     expect(source).toContain('seekBarStore');
-    expect(source).toContain('shouldReserveSubtitleSpace');
+    expect(source).toContain('onSubtitleTokenPress');
+    expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain("../model/fullscreen-video-overlay-theme");
     expect(source).toContain('viewState.actionPlacement');
     expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionLaneHeight');
@@ -30,6 +31,11 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('isFavorited');
     expect(source).toContain('LinearTransition.springify()');
     expect(source).toContain("position: 'absolute'");
+    expect(source).toContain('subtitleTitleGap');
+    expect(source).toContain("bottom: '100%'");
+    expect(source).toContain('paddingBottom: subtitleTitleGap');
+    expect(source).toContain('pointerEvents="box-none"');
+    expect(source).toContain('titleDescriptionColumnStyle');
     expect(source).not.toContain('useState');
     expect(source).not.toContain('useEffect');
     expect(source).not.toContain("expandLabel = '展开'");

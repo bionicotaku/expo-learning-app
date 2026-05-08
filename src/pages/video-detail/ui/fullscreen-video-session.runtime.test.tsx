@@ -186,7 +186,7 @@ describe('fullscreen video session runtime', () => {
     expect(presentPlaybackSettingsSheetMock).toHaveBeenCalledTimes(1);
   });
 
-  it('passes loaded active transcript state through to the pager', () => {
+  it('passes loaded active transcript through to the pager without subtitle layout reserve state', () => {
     useFullscreenTranscriptSourceMock.mockReturnValue({
       activeTranscript,
       activeTranscriptError: null,
@@ -208,7 +208,9 @@ describe('fullscreen video session runtime', () => {
 
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       activeTranscript,
-      shouldReserveSubtitleSpace: true,
     });
+    expect(hoistedState.latestFullscreenVideoPagerProps).not.toHaveProperty(
+      'shouldReserveSubtitleSpace'
+    );
   });
 });

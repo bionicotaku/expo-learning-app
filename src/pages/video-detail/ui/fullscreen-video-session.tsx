@@ -37,13 +37,11 @@ export function FullscreenVideoSession({
   const activeTranscriptIndex =
     pagerReportedActive?.index ?? (entryVideoId === null ? null : entryIndex);
 
-  const { activeTranscript, activeTranscriptStatus } = useFullscreenTranscriptSource({
+  const { activeTranscript } = useFullscreenTranscriptSource({
     activeIndex: activeTranscriptIndex,
     activeVideoId: activeTranscriptVideoId,
     items,
   });
-  const shouldReserveSubtitleSpace =
-    activeTranscriptStatus === 'loading' || activeTranscriptStatus === 'success';
 
   const handleActiveVideoChange = useCallback(
     (itemId: string, index: number) => {
@@ -80,7 +78,6 @@ export function FullscreenVideoSession({
       items={items}
       onActiveVideoChange={handleActiveVideoChange}
       onCenterHoldStart={presentPlaybackSettingsSheet}
-      shouldReserveSubtitleSpace={shouldReserveSubtitleSpace}
     />
   );
 }

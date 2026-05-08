@@ -31,7 +31,6 @@ export type FullscreenVideoPagerProps = {
     item: FullscreenVideoOverlayActionItem
   ) => void;
   onCenterHoldStart?: () => void;
-  shouldReserveSubtitleSpace: boolean;
 };
 
 export function FullscreenVideoPager({
@@ -42,7 +41,6 @@ export function FullscreenVideoPager({
   onActionPress,
   onActiveVideoChange,
   onCenterHoldStart,
-  shouldReserveSubtitleSpace,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -145,7 +143,6 @@ export function FullscreenVideoPager({
       bottomInset: insets.bottom,
       getRowRenderState,
       height,
-      shouldReserveSubtitleSpace,
       width,
     }),
     [
@@ -155,7 +152,6 @@ export function FullscreenVideoPager({
       getRowRenderState,
       height,
       insets.bottom,
-      shouldReserveSubtitleSpace,
       width,
     ]
   );
@@ -188,7 +184,6 @@ export function FullscreenVideoPager({
           shouldEnableBackgroundGestures={rowRenderState.shouldEnableBackgroundGestures}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
           shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
-          shouldReserveSubtitleSpace={isCurrentActiveItem && shouldReserveSubtitleSpace}
           video={item}
           width={width}
         />
@@ -208,7 +203,6 @@ export function FullscreenVideoPager({
       insets.bottom,
       onActionPress,
       registerActiveController,
-      shouldReserveSubtitleSpace,
       width,
     ]
   );

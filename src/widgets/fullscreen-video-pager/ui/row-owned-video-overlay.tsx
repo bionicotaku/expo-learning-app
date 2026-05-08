@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
-import type { Transcript } from '@/entities/transcript';
+import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
@@ -19,8 +19,12 @@ const contentBottomOffset = 42;
 const contentTextGap = 4;
 const contentLeftInset = 16;
 const contentRightInset = 64;
+const subtitleTitleGap = 10;
 const sharedTextWidth = 279;
 const descriptionTextWidth = sharedTextWidth;
+const titleDescriptionColumnStyle = {
+  gap: contentTextGap,
+} as const;
 const contentLayoutTransition = LinearTransition.springify()
   .mass(0.85)
   .damping(32)
@@ -36,8 +40,8 @@ type RowOwnedVideoOverlayProps = {
   isLiked: boolean;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
+  onSubtitleTokenPress?: (token: TranscriptToken) => void;
   seekBarStore: RowPlaybackSeekBarStore;
-  shouldReserveSubtitleSpace: boolean;
   title: string;
 };
 
@@ -50,8 +54,8 @@ function RowOwnedVideoOverlayComponent({
   isLiked,
   measurementCache,
   onActionPress,
+  onSubtitleTokenPress,
   seekBarStore,
-  shouldReserveSubtitleSpace,
   title,
 }: RowOwnedVideoOverlayProps) {
   const descriptionState = useExpandableOverlayDescriptionState({
@@ -103,38 +107,57 @@ function RowOwnedVideoOverlayComponent({
             left: contentLeftInset,
             right: contentRightInset,
             bottom: bottomInset + contentColumnBottomOffset,
-            gap: contentTextGap,
           }}
         >
-          <BasicSubtitleOverlay
-            maxTextWidth={sharedTextWidth}
-            seekBarStore={seekBarStore}
-            shouldReserveSpace={shouldReserveSubtitleSpace}
-            transcript={activeTranscript}
-          />
-          <Text
-            allowFontScaling={false}
-            selectable={false}
+          <View
             style={{
-              fontSize: fullscreenVideoOverlayTheme.titleText.fontSize,
-              lineHeight: fullscreenVideoOverlayTheme.titleText.lineHeight,
-              letterSpacing: -0.08,
-              fontWeight: '700',
-              color: 'rgba(251,247,238,0.97)',
-              textShadowColor: 'rgba(17,13,10,0.26)',
-              textShadowOffset: { width: 1, height: 1 },
-              textShadowRadius: 3,
-              maxWidth: sharedTextWidth,
+              position: 'relative',
+              width: sharedTextWidth,
             }}
-            numberOfLines={2}
           >
-            {title}
-          </Text>
-          <ExpandableOverlayDescription
-            description={description}
-            maxTextWidth={descriptionTextWidth}
-            state={descriptionState}
-          />
+            <View
+              pointerEvents="box-none"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: '100%',
+                paddingBottom: subtitleTitleGap,
+              }}
+            >
+              <BasicSubtitleOverlay
+                maxTextWidth={sharedTextWidth}
+                onTokenPress={onSubtitleTokenPress}
+                seekBarStore={seekBarStore}
+                transcript={activeTranscript}
+              />
+            </View>
+            <View style={titleDescriptionColumnStyle}>
+              <Text
+                allowFontScaling={false}
+                selectable={false}
+                style={{
+                  fontSize: fullscreenVideoOverlayTheme.titleText.fontSize,
+                  lineHeight: fullscreenVideoOverlayTheme.titleText.lineHeight,
+                  letterSpacing: -0.08,
+                  fontWeight: '700',
+                  color: 'rgba(251,247,238,0.97)',
+                  textShadowColor: 'rgba(17,13,10,0.26)',
+                  textShadowOffset: { width: 1, height: 1 },
+                  textShadowRadius: 3,
+                  maxWidth: sharedTextWidth,
+                }}
+                numberOfLines={2}
+              >
+                {title}
+              </Text>
+              <ExpandableOverlayDescription
+                description={description}
+                maxTextWidth={descriptionTextWidth}
+                state={descriptionState}
+              />
+            </View>
+          </View>
         </Animated.View>
 
         <ExpandableOverlayDescriptionAction

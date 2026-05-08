@@ -35,7 +35,6 @@ VideoDetailPage
 - 持有 `pagerReportedActive`
 - 用 `pagerReportedActive ?? entryTarget` 派生 transcript source 输入
 - 接收 `features/transcript-source` 返回的 active transcript，并把结果传给 `FullscreenVideoPager`
-- `activeTranscriptStatus` 为 `loading | success` 时让 fullscreen row 预留基础字幕高度；`idle | error` 不预留
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
 - 通过 `usePresentPlaybackSettingsSheet()` 把 fullscreen 中间长按接到播放设置 sheet

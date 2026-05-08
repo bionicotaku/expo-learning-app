@@ -14,6 +14,8 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('RowOwnedVideoOverlay');
     expect(source).toContain('RowPlaybackHudOverlay');
     expect(source).toContain('RowSurfaceStatusOverlay');
+    expect(source).toContain('usePresentWordDetailDialog');
+    expect(source).toContain('createWordDetailDialogPayloadFromTranscriptToken');
     expect(source).toContain('onRowUnmount');
     expect(source).not.toContain('ActiveVideoGestureSurface');
     expect(source).not.toContain('railGestureBlockers');
@@ -30,16 +32,14 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('activeVisitToken={activeVisitToken}');
     expect(source).toContain('activeTranscript={activeTranscript}');
     expect(source).toContain('seekBarStore={seekBarStore}');
-    expect(source).toContain('shouldReserveSubtitleSpace={shouldReserveSubtitleSpace}');
+    expect(source).toContain('onSubtitleTokenPress={handleSubtitleTokenPress}');
+    expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('activeVisitToken: previousProps.activeVisitToken');
     expect(source).toContain('activeVisitToken: nextProps.activeVisitToken');
     expect(source).toContain('isActive={isActive}');
     expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
     expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('previousProps.activeTranscript === nextProps.activeTranscript');
-    expect(source).toContain(
-      'previousProps.shouldReserveSubtitleSpace === nextProps.shouldReserveSubtitleSpace'
-    );
     expect(source).toContain('showCenteredPause={showCenteredPause}');
     expect(source).toContain('centerOwner={centerOwner}');
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');

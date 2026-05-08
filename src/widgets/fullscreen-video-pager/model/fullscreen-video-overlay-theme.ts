@@ -31,7 +31,7 @@ export const fullscreenVideoOverlayTheme: Readonly<FullscreenVideoOverlayTheme> 
     lineHeight: 16,
   },
   subtitleText: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 20,
   },
   titleText: {

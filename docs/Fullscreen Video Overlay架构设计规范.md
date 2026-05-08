@@ -110,13 +110,19 @@ row 内正式顺序固定为：
 
 这层继续只承担内容表达，不承担高频交互协调。
 
-当前基础字幕是 read-only sentence display：
+当前基础字幕是 token-level word detail 入口，但仍属于内容展示层：
 
-- 它位于 title 上方，跟 title / description 同属 row-owned 内容列
-- description 展开让内容列整体上移时，字幕跟随上移
-- 它只显示当前 `TranscriptSentence.text`
+- 它位于 title 上方，锚定同一个 row-owned 内容列
+- 它通过 absolute sibling 脱离 title / description 的 normal flow，字幕高度变化不得触发 title / description 跳动
+- description 展开让内容列整体上移时，字幕跟随同一锚点上移
+- 它优先渲染当前 `TranscriptSentence.tokens`，没有 token 时才 fallback 显示 `TranscriptSentence.text`
+- 它使用比 title 更轻的文字层级，避免和视频标题混淆
+- 它不固定为两行，当前句文本按实际长度自然换行显示
 - 它复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds`，不新增播放器时间监听
-- 它不处理 token 点击、解释弹层、句子导航或字幕手势命中
+- `BasicSubtitleOverlay` 只负责渲染 token 与发出 `onTokenPress`，不直接 import modal hook
+- 只有 `semanticElement.coarseId !== null` 的 token 可点击；点击经 `FullscreenVideoRow` 转成 `features/word-detail` dialog payload
+- 字幕空白区和不可点击 token 不拦截背景手势
+- 点击 token 不暂停、不 seek、不改变播放状态，也不做 token 高亮、收藏、学习状态或 API 请求
 
 ### 5.4 `RowPlaybackHudOverlay`
 
@@ -235,4 +241,5 @@ overlay 架构只有同时满足以下条件，才算正确：
 4. `ActiveVideoGestureSurface` 不再属于目标结构中的正式组件
 5. page shell 只保留真正的 pager 级 UI
 6. HUD、seek bar、surface status、内容层的职责完全分开
-7. 基础字幕只作为 `RowOwnedVideoOverlay` 的 read-only 内容展示层，不进入 interaction layer 或 HUD layer
+7. 基础字幕只作为 `RowOwnedVideoOverlay` 的内容展示层，不进入 interaction layer 或 HUD layer
+8. 可点击字幕只把 token 点击转交给 row 组合层打开 word detail dialog，不在 subtitle presenter 内直接持有业务弹层

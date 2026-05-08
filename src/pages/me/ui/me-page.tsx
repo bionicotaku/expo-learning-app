@@ -4,6 +4,10 @@ import type { SFSymbol } from 'expo-symbols';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
+import {
+  usePresentWordDetailDialog,
+  type WordDetailDialogPayload,
+} from '@/features/word-detail';
 import { toast } from '@/shared/lib/toast';
 import type { ToastKind } from '@/shared/lib/toast/types';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
@@ -38,6 +42,17 @@ type ToastTriggerItem = {
 
 const noopAction = () => {};
 const actionIconTone = 'surface';
+
+const hardcodedWordDetail: WordDetailDialogPayload = {
+  text: 'convinced',
+  explanation: '确信的；这里表示“深信不疑”。',
+  semantic_element: {
+    base_form: 'convinced',
+    dictionary:
+      '形容词，表示某人相信或接受某事为真，或已经被说服。常见结构有“be convinced that（确信……）”、“convinced of（相信……）”、“convinced by（被……说服）”，可接从句或介词短语，侧重说明个人的确信/接受的状态，而不是使某人信服的动作。',
+    coarse_id: 61917,
+  },
+};
 
 const learningActionItems: DeskActionItem[] = [
   {
@@ -554,6 +569,70 @@ function PlaybackSettingsTestCard() {
   );
 }
 
+function WordDetailDialogTestCard() {
+  const { tokens } = useEditorialPaperTheme();
+  const presentWordDetailDialog = usePresentWordDetailDialog();
+
+  return (
+    <RaisedSurface
+      radius="cardMd"
+      style={{
+        gap: tokens.spacing.md,
+        padding: tokens.spacing.lg,
+      }}
+    >
+      <View style={{ gap: tokens.spacing.xs }}>
+        <MetaLabel>Dialog test</MetaLabel>
+        <EditorialTitle
+          numberOfLines={1}
+          style={{
+            fontSize: 20,
+            lineHeight: 24,
+          }}
+          variant="title"
+        >
+          Word detail
+        </EditorialTitle>
+      </View>
+
+      <Pressable
+        accessibilityLabel="Open word detail"
+        accessibilityRole="button"
+        onPress={() => {
+          presentWordDetailDialog(hardcodedWordDetail);
+        }}
+        style={({ pressed }) => ({
+          opacity: pressed ? 0.9 : 1,
+        })}
+      >
+        <RaisedSurface
+          radius="pill"
+          tone="softActionPeach"
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 44,
+            paddingHorizontal: tokens.spacing.lg,
+            paddingVertical: tokens.spacing.sm,
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            style={{
+              color: tokens.color.ink,
+              fontSize: 13,
+              fontWeight: '800',
+              lineHeight: 17,
+            }}
+          >
+            Open word detail
+          </Text>
+        </RaisedSurface>
+      </Pressable>
+    </RaisedSurface>
+  );
+}
+
 function GroupedActionList({
   items,
 }: {
@@ -685,6 +764,7 @@ export function MePage() {
         <WeekIssueTextCard />
         <ToastTriggerPanel />
         <PlaybackSettingsTestCard />
+        <WordDetailDialogTestCard />
         <GroupedActionList items={learningActionItems} />
         <GroupedActionList items={systemActionItems} />
         <FooterLabel />

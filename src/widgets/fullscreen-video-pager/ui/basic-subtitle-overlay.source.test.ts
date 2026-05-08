@@ -11,12 +11,20 @@ describe('basic subtitle overlay source', () => {
 
     expect(source).toContain('useSyncExternalStore');
     expect(source).toContain('resolveCurrentTranscriptSentence');
-    expect(source).toContain('pointerEvents="none"');
-    expect(source).toContain('numberOfLines={2}');
-    expect(source).toContain('shouldReserveSpace');
+    expect(source).toContain('pointerEvents="box-none"');
+    expect(source).toContain('onTokenPress');
+    expect(source).toContain('event.stopPropagation?.()');
+    expect(source).toContain('token.semanticElement.coarseId !== null');
+    expect(source).not.toContain('numberOfLines');
+    expect(source).not.toContain('subtitleLineCount');
+    expect(source).not.toContain('height: subtitleHeight');
+    expect(source).toContain("fontWeight: '500'");
+    expect(source).not.toContain('paddingBottom: 6');
+    expect(source).not.toContain('shouldReserveSpace');
     expect(source).not.toContain('Pressable');
     expect(source).not.toContain('GestureDetector');
     expect(source).not.toContain('Modal');
     expect(source).not.toContain('usePresent');
+    expect(source).not.toContain('usePresentWordDetailDialog');
   });
 });

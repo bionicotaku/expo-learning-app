@@ -83,7 +83,6 @@ export function ModalFrame({
         width,
         maxHeight,
         padding: tokens.spacing.xxl,
-        boxShadow: tokens.elevation.raised,
       }}
     >
       {children}
