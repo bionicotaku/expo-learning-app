@@ -40,6 +40,10 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');
+    expect(source).toContain('onCenterHoldStart?: () => void');
+    expect(source).toContain("if (zone === 'center')");
+    expect(source).toContain('onCenterHoldStart?.()');
+    expect(source).toContain('handleHoldStart(zone)');
     expect(source).not.toContain('resolveActiveVideoChange');
     expect(source).not.toContain('progressSnapshot');
   });

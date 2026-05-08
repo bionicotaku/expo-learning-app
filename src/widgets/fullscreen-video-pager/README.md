@@ -341,9 +341,10 @@ row 内 HUD 不再靠各组件各自定位，而是走固定 slot：
 ### Long press
 
 1. `RowPlaybackInteractionLayer` 的 `BackgroundGestureRegion` 识别左右/中间区
-2. session hook 写入 `transientHoldState`
-3. 左右区写入 `rate` HUD
-4. row 内持续显示 `2x` HUD，直到 `hold end`
+2. `FullscreenVideoPager` 在中间区长按时调用 `onCenterHoldStart`
+3. 页面装配层用该回调打开 playback settings sheet
+4. session hook 写入 `transientHoldState`
+5. 左右区写入 `rate` HUD，row 内持续显示 `2x` HUD，直到 `hold end`
 
 ### Active row 切换
 

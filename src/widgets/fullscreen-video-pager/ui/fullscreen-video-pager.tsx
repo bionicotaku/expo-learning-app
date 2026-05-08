@@ -10,7 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { VideoListItem } from '@/entities/video';
-import { shouldMountPlayer } from '@/features/video-playback';
+import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
@@ -28,6 +28,7 @@ export type FullscreenVideoPagerProps = {
     videoId: string,
     item: FullscreenVideoOverlayActionItem
   ) => void;
+  onCenterHoldStart?: () => void;
 };
 
 export function FullscreenVideoPager({
@@ -36,6 +37,7 @@ export function FullscreenVideoPager({
   items,
   onActionPress,
   onActiveVideoChange,
+  onCenterHoldStart,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -119,6 +121,17 @@ export function FullscreenVideoPager({
     }, 60);
   }, []);
 
+  const handleRowHoldStart = useCallback(
+    (zone: FullscreenHoldZone) => {
+      if (zone === 'center') {
+        onCenterHoldStart?.();
+      }
+
+      handleHoldStart(zone);
+    },
+    [handleHoldStart, onCenterHoldStart]
+  );
+
   const renderState = useMemo(
     () => ({
       activeIndex,
@@ -148,7 +161,7 @@ export function FullscreenVideoPager({
           onActionPress={onActionPress}
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
-          onHoldStart={handleHoldStart}
+          onHoldStart={handleRowHoldStart}
           onRowUnmount={handleRowUnmount}
           onSingleTap={handleSingleTap}
           playbackRate={rowRenderState.effectivePlaybackState.playbackRate}
@@ -169,7 +182,7 @@ export function FullscreenVideoPager({
       getRowRenderState,
       handleDoubleTap,
       handleHoldEnd,
-      handleHoldStart,
+      handleRowHoldStart,
       handleRowUnmount,
       handleSingleTap,
       height,

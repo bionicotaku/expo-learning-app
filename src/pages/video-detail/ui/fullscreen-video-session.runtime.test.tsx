@@ -8,10 +8,12 @@ import { FullscreenVideoSession } from './fullscreen-video-session';
 
 const {
   onLatestActiveVideoIdChangeMock,
+  presentPlaybackSettingsSheetMock,
   requestMoreMock,
   useFullscreenTranscriptSourceMock,
 } = vi.hoisted(() => ({
   onLatestActiveVideoIdChangeMock: vi.fn(),
+  presentPlaybackSettingsSheetMock: vi.fn(),
   requestMoreMock: vi.fn(),
   useFullscreenTranscriptSourceMock: vi.fn(),
 }));
@@ -63,6 +65,10 @@ vi.mock('@/features/transcript-source', () => ({
   useFullscreenTranscriptSource: useFullscreenTranscriptSourceMock,
 }));
 
+vi.mock('@/features/playback-settings', () => ({
+  usePresentPlaybackSettingsSheet: () => presentPlaybackSettingsSheetMock,
+}));
+
 vi.mock('@/widgets/fullscreen-video-pager', async () => {
   const ReactModule = await import('react');
 
@@ -80,6 +86,7 @@ describe('fullscreen video session runtime', () => {
   beforeEach(() => {
     hoistedState.latestFullscreenVideoPagerProps = null;
     onLatestActiveVideoIdChangeMock.mockReset();
+    presentPlaybackSettingsSheetMock.mockReset();
     requestMoreMock.mockReset();
     useFullscreenTranscriptSourceMock.mockReset();
   });
@@ -137,5 +144,26 @@ describe('fullscreen video session runtime', () => {
       items,
     });
     expect(onLatestActiveVideoIdChangeMock).toHaveBeenLastCalledWith('video-c');
+  });
+
+  it('passes the playback settings sheet presenter to center hold gestures', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onCenterHoldStart();
+    });
+
+    expect(presentPlaybackSettingsSheetMock).toHaveBeenCalledTimes(1);
   });
 });

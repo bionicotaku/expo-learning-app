@@ -6,7 +6,8 @@
 
 - 保存全局默认 `playbackRate`
 - 暴露 `usePlaybackRate()` 和 `useSetPlaybackRate()`
-- 通过 shared modal sheet 展示播放设置测试面板
+- 通过 shared modal sheet 展示播放设置面板
+- 暴露 `usePresentPlaybackSettingsSheet()`，供 Me 页测试入口和 fullscreen center 长按入口复用
 
 边界约束：
 

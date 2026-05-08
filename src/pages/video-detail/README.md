@@ -36,6 +36,7 @@ VideoDetailPage
 - 用 `pagerReportedActive ?? entryTarget` 派生 transcript source 输入
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
+- 通过 `usePresentPlaybackSettingsSheet()` 把 fullscreen 中间长按接到播放设置 sheet
 
 边界约束：
 
@@ -43,6 +44,7 @@ VideoDetailPage
 - page 不维护 `activeIndex / activeItemId` 本地状态；这部分属于 pager 内部播放会话
 - page 维护的是 restore target，不是“只等 pager committed active 才存在的 latest active state”
 - page 不维护 `basePausedByUser`、`transientHoldState`、HUD 或任何 row 级交互状态
+- page 只注入 center hold 的 sheet presenter，不接管 row 级手势识别
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
 - page 不直接实现 transcript query cache；这层属于 `features/transcript-source`，由 session 组件消费

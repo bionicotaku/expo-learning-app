@@ -10,8 +10,10 @@ describe('fullscreen video session source', () => {
     );
 
     expect(source).toContain('useFullscreenTranscriptSource');
+    expect(source).toContain('usePresentPlaybackSettingsSheet');
     expect(source).toContain('requestMore');
     expect(source).toContain('onActiveVideoChange');
+    expect(source).toContain('onCenterHoldStart={presentPlaybackSettingsSheet}');
     expect(source).toContain('pagerReportedActive');
     expect(source).toContain('entryVideoId');
     expect(source).toContain('entryIndex');

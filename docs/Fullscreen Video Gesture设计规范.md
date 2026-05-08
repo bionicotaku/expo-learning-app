@@ -127,10 +127,12 @@ seek bar lane 上不触发 `double tap`。
 分区规则保持不变：
 
 - 左区：临时 `2x`
-- 中区：占位接口
+- 中区：打开播放设置 sheet
 - 右区：临时 `2x`
 
-seek bar lane 上不触发 `long press`，因此不会在底部 control lane 内误进临时 `2x`。
+中区长按不改变当前播放/暂停基态，也不写入 `rate` HUD；它只通过页面装配层触发 `features/playback-settings` 的 shared modal sheet。
+
+seek bar lane 上不触发 `long press`，因此不会在底部 control lane 内误进临时 `2x` 或打开播放设置 sheet。
 
 ## 6. Seek Bar 手势语义
 
