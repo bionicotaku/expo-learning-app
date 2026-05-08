@@ -15,7 +15,7 @@
   - 8 条真实 clip 的 `coverImageUrl` / `videoUrl` 作为循环复用的素材槽位
   - `coverImageUrl` 当前对齐到 `test-video/cover/...` 真实封面路径
   - `feed-repository` facade 默认保留 `2000ms` mock 延迟
-  - `likeCount / favoriteCount` 等统计字段按 `videoId` 稳定伪随机派生
+  - `likeCount / favoriteCount` 等统计字段按 `videoId` 稳定伪随机派生，当前范围为 `8000..12000`
 
 边界约束：
 

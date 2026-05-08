@@ -11,6 +11,9 @@ describe('video overlay action rail source', () => {
 
     expect(source).toContain('isLiked');
     expect(source).toContain('isFavorited');
+    expect(source).toContain('likeCount');
+    expect(source).toContain('favoriteCount');
+    expect(source).toContain('formatEngagementCount');
     expect(source).toContain('areEngagementActionsDisabled');
     expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('getSubtitleActionPresentation');
@@ -20,12 +23,15 @@ describe('video overlay action rail source', () => {
     expect(source).toContain("item.id === 'like'");
     expect(source).toContain("item.id === 'favorite'");
     expect(source).toContain("item.id === 'subtitle'");
+    expect(source).toContain('countLabel={');
     expect(source).toContain('subtitleTint');
     expect(source).toContain('isActive={');
     expect(source).toContain('activeTintColor={');
     expect(source).toContain('iosSymbol={');
     expect(source).toContain('onPress={onActionPress}');
     expect(source).toContain("disabled={areEngagementActionsDisabled && (item.id === 'like' || item.id === 'favorite')}");
+    expect(source).not.toContain("item.id === 'share'");
+    expect(source).not.toContain("'square.and.arrow.up'");
     expect(source).not.toContain('() => {');
     expect(source).not.toContain('onActionPress(item);');
   });

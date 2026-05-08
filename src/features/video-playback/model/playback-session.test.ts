@@ -30,6 +30,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: false,
         defaultPlaybackRate: 1,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -46,6 +47,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -62,6 +64,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -75,12 +78,50 @@ describe('playback session', () => {
     });
   });
 
+  it('pauses the active row while playback is temporarily held', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: false,
+        defaultPlaybackRate: 1,
+        isPlaybackHeld: true,
+        itemIndex: 4,
+        transientHoldState: null,
+      })
+    ).toEqual({
+      isGestureLocked: false,
+      playbackRate: 1,
+      shouldPlay: false,
+    });
+  });
+
+  it('keeps a playback hold above a temporary 2x hold', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: false,
+        defaultPlaybackRate: 1,
+        isPlaybackHeld: true,
+        itemIndex: 4,
+        transientHoldState: createTransientHoldState({
+          basePausedByUser: false,
+          zone: 'right',
+        }),
+      })
+    ).toEqual({
+      isGestureLocked: true,
+      playbackRate: 1,
+      shouldPlay: false,
+    });
+  });
+
   it('keeps the base playback state during a center hold while still locking other gestures', () => {
     expect(
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -100,6 +141,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: false,
         defaultPlaybackRate: 1,
+        isPlaybackHeld: false,
         itemIndex: 3,
         transientHoldState: createTransientHoldState({
           basePausedByUser: false,
@@ -119,6 +161,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: false,
         defaultPlaybackRate: 1.5,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -135,6 +178,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1.5,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -151,6 +195,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1.5,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -170,6 +215,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: true,
         defaultPlaybackRate: 1.5,
+        isPlaybackHeld: false,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -189,6 +235,7 @@ describe('playback session', () => {
         activeIndex: 4,
         basePausedByUser: false,
         defaultPlaybackRate: 1.5,
+        isPlaybackHeld: false,
         itemIndex: 3,
         transientHoldState: null,
       })

@@ -24,6 +24,7 @@ describe('fullscreen video pager source', () => {
 
     expect(source).toContain('useFullscreenPlaybackSession');
     expect(source).toContain('handleViewableItemsChanged');
+    expect(source).toContain('acquirePlaybackHold');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementCache');
     expect(source).toContain('FullscreenVideoRow');
     expect(source).toContain('entryIndex');
@@ -41,6 +42,9 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain(
       'registerActiveController={\n            isCurrentActiveItem ? registerActiveController : undefined'
     );
+    expect(source).toContain(
+      'acquirePlaybackHold={isCurrentActiveItem ? acquirePlaybackHold : undefined}'
+    );
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
     expect(source).toContain(
       'activeTranscript={isCurrentActiveItem ? activeTranscript : null}'
@@ -48,7 +52,8 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
-    expect(source).toContain('onActionPress={onActionPress}');
+    expect(source).not.toContain('onActionPress?:');
+    expect(source).not.toContain('onActionPress={onActionPress}');
     expect(source).toContain('onCenterHoldStart?: () => void');
     expect(source).toContain("if (zone === 'center')");
     expect(source).toContain('onCenterHoldStart?.()');

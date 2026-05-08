@@ -23,6 +23,7 @@ import {
   shouldReserveCenterForPause,
 } from '../model/row-hud-layout';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
+import { resolveEffectiveEngagementCount } from '../model/engagement-count';
 import {
   areFullscreenVideoRowRenderPropsEqual,
   type FullscreenVideoRowRenderProps,
@@ -40,6 +41,7 @@ import { RowSurfaceStatusOverlay } from './row-surface-status-overlay';
 
 type FullscreenVideoRowProps = {
   accessibilityLabel: string;
+  acquirePlaybackHold?: () => () => void;
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
   bottomInset: number;
@@ -47,7 +49,6 @@ type FullscreenVideoRowProps = {
   hudState: FullscreenRowPlaybackHudState;
   isActive: boolean;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
-  onActionPress?: (videoId: string, item: FullscreenVideoOverlayActionItem) => void;
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
@@ -68,6 +69,7 @@ type FullscreenVideoRowProps = {
 
 function FullscreenVideoRowComponent({
   accessibilityLabel,
+  acquirePlaybackHold,
   activeTranscript,
   activeVisitToken,
   video,
@@ -77,7 +79,6 @@ function FullscreenVideoRowComponent({
   hudState,
   isActive,
   measurementCache,
-  onActionPress,
   onDoubleTap,
   onHoldEnd,
   onHoldStart,
@@ -104,6 +105,22 @@ function FullscreenVideoRowComponent({
     videoId: video.videoId,
   });
   const areEngagementActionsDisabled = videoMeta === null;
+  const effectiveLikeCount =
+    videoMeta === null
+      ? video.likeCount
+      : resolveEffectiveEngagementCount({
+          baseCount: video.likeCount,
+          baseIsActive: videoMeta.isLiked,
+          effectiveIsActive: isLiked,
+        });
+  const effectiveFavoriteCount =
+    videoMeta === null
+      ? video.favoriteCount
+      : resolveEffectiveEngagementCount({
+          baseCount: video.favoriteCount,
+          baseIsActive: videoMeta.isFavorited,
+          effectiveIsActive: isFavorited,
+        });
   const showCenteredPause = shouldReserveCenterForPause({
     pauseVisible: hudState.pauseIndicatorVisible,
     transientFeedbackKind: hudState.transientFeedback?.kind ?? null,
@@ -170,23 +187,26 @@ function FullscreenVideoRowComponent({
 
     if (item.id === 'subtitle') {
       cycleSubtitleDisplayMode();
-      return;
     }
-
-    onActionPress?.(video.videoId, item);
   }, [
-    onActionPress,
     areEngagementActionsDisabled,
     cycleSubtitleDisplayMode,
     toggleFavorited,
     toggleLiked,
-    video.videoId,
   ]);
   const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
     const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
+    const releasePlaybackHold = acquirePlaybackHold?.();
 
-    presentWordDetailDialog(payload);
-  }, [presentWordDetailDialog]);
+    try {
+      presentWordDetailDialog(payload, {
+        onDismissComplete: releasePlaybackHold,
+      });
+    } catch (error) {
+      releasePlaybackHold?.();
+      throw error;
+    }
+  }, [acquirePlaybackHold, presentWordDetailDialog]);
 
   return (
     <View
@@ -228,8 +248,10 @@ function FullscreenVideoRowComponent({
         bottomInset={bottomInset}
         description={video.description}
         areEngagementActionsDisabled={areEngagementActionsDisabled}
+        favoriteCount={effectiveFavoriteCount}
         isFavorited={isFavorited}
         isLiked={isLiked}
+        likeCount={effectiveLikeCount}
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
         onSubtitleTokenPress={handleSubtitleTokenPress}
@@ -295,7 +317,10 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description &&
+    previousProps.video.likeCount === nextProps.video.likeCount &&
+    previousProps.video.favoriteCount === nextProps.video.favoriteCount &&
     previousProps.activeTranscript === nextProps.activeTranscript &&
+    previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
     previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode
   );
 }

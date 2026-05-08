@@ -38,8 +38,10 @@ type RowOwnedVideoOverlayProps = {
   areEngagementActionsDisabled: boolean;
   bottomInset: number;
   description: string;
+  favoriteCount: number;
   isFavorited: boolean;
   isLiked: boolean;
+  likeCount: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   onSubtitleTokenPress?: (token: TranscriptToken) => void;
@@ -54,8 +56,10 @@ function RowOwnedVideoOverlayComponent({
   areEngagementActionsDisabled,
   bottomInset,
   description,
+  favoriteCount,
   isFavorited,
   isLiked,
+  likeCount,
   measurementCache,
   onActionPress,
   onSubtitleTokenPress,
@@ -176,8 +180,10 @@ function RowOwnedVideoOverlayComponent({
       <VideoOverlayActionRail
         bottomInset={bottomInset}
         areEngagementActionsDisabled={areEngagementActionsDisabled}
+        favoriteCount={favoriteCount}
         isFavorited={isFavorited}
         isLiked={isLiked}
+        likeCount={likeCount}
         onActionPress={onActionPress}
         subtitleDisplayMode={subtitleDisplayMode}
       />

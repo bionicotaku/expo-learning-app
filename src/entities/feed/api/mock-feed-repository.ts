@@ -88,6 +88,10 @@ function buildViewCount(asset: SeededClipAsset): number {
   return 6200 + (seed % 18800);
 }
 
+function buildEngagementCount(videoId: string, salt: string): number {
+  return 8000 + (hashString(`${videoId}:${salt}`) % 4001);
+}
+
 function buildTags(asset: SeededClipAsset): string[] {
   const seed = hashString(`${asset.videoId}:tags`);
   const firstTag = tagPool[seed % tagPool.length];
@@ -124,8 +128,8 @@ function createMockFeedItem(itemNumber: number): FeedItem {
     coverImageUrl: asset.coverImageUrl,
     durationSeconds: buildDurationSeconds(seededAsset),
     viewCount: buildViewCount(seededAsset),
-    likeCount: 120 + (hashString(`${videoId}:likes`) % 1800),
-    favoriteCount: 20 + (hashString(`${videoId}:favorites`) % 420),
+    likeCount: buildEngagementCount(videoId, 'likes'),
+    favoriteCount: buildEngagementCount(videoId, 'favorites'),
     tags: buildTags(seededAsset),
   };
 }

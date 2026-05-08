@@ -124,10 +124,23 @@ row 内正式顺序固定为：
 - 字幕显示由 `features/playback-settings` 的全局 `subtitleDisplayMode` 控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `TranscriptSentence.explanation`
 - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存
 - 所有 token 都可点击；点击经 `FullscreenVideoRow` 转成 `features/word-detail` dialog payload，`semantic_element.coarse_id` 可以是 `null`
+- token word detail dialog 打开期间，`FullscreenVideoRow` 通过 playback session hold 临时让 active row `shouldPlay=false`；dialog 完全消失后释放 hold，并回到原本的用户 pause 状态
 - 字幕空白区不拦截背景手势
-- 点击 token 不暂停、不 seek、不改变播放状态，也不做收藏、学习状态或 API 请求
+- 点击 token 不 seek、不显示 pause HUD、不做收藏、学习状态或 API 请求
 
-### 5.4 `RowPlaybackHudOverlay`
+### 5.4 右侧 action rail 统计数
+
+右侧 `like / favorite` action 当前在 icon 下方显示统计数：
+
+- 基础值来自 feed 返回的 `VideoListItem.likeCount / favoriteCount`
+- 当前用户 base state 来自 `VideoMeta.isLiked / isFavorited`
+- 本地 effective state 来自 `features/video-runtime`
+- row 层只派生展示值，不把派生 count 写回 feed truth，也不调用 API
+- 本地点赞 / 收藏会让显示值 `+1`；取消会让显示值 `-1`
+- 小于 `10000` 显示完整数字；大于等于 `10000` 显示为 `1万 / 1.1万`
+- `VideoMeta` 未加载或失败时 like/favorite 按钮禁用，但仍显示 feed count
+
+### 5.5 `RowPlaybackHudOverlay`
 
 负责低频、瞬时、feedback-driven 的播放 HUD：
 
@@ -137,7 +150,7 @@ row 内正式顺序固定为：
 
 它继续跟随 row 渲染，但不承担底部 seek bar control strip。
 
-### 5.5 `RowPlaybackSeekBarOverlay`
+### 5.6 `RowPlaybackSeekBarOverlay`
 
 它保留为目标组件名，但定位已经变化：
 
@@ -145,7 +158,7 @@ row 内正式顺序固定为：
 - 它是 presenter/control strip
 - 它不再是向外暴露手势 blocker 的独立交互节点
 
-### 5.6 `RowSurfaceStatusOverlay`
+### 5.7 `RowSurfaceStatusOverlay`
 
 负责：
 

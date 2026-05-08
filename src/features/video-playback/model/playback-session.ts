@@ -23,6 +23,7 @@ type ResolveEffectivePlaybackStateArgs = {
   activeIndex: number | null;
   basePausedByUser: boolean;
   defaultPlaybackRate: number;
+  isPlaybackHeld: boolean;
   itemIndex: number;
   transientHoldState: FullscreenTransientHoldState | null;
 };
@@ -111,6 +112,7 @@ export function resolveEffectivePlaybackState({
   activeIndex,
   basePausedByUser,
   defaultPlaybackRate,
+  isPlaybackHeld,
   itemIndex,
   transientHoldState,
 }: ResolveEffectivePlaybackStateArgs): {
@@ -120,6 +122,14 @@ export function resolveEffectivePlaybackState({
 } {
   const gestureLocked = isGestureLocked(transientHoldState);
   if (activeIndex !== itemIndex) {
+    return {
+      isGestureLocked: gestureLocked,
+      playbackRate: defaultPlaybackRate,
+      shouldPlay: false,
+    };
+  }
+
+  if (isPlaybackHeld) {
     return {
       isGestureLocked: gestureLocked,
       playbackRate: defaultPlaybackRate,

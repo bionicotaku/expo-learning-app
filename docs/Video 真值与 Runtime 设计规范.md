@@ -175,7 +175,8 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverrideByVideoId[videoId]
 
 - `FeedItem` 不包含当前用户态 `isLiked / isFavorited`
 - 这些字段属于 `VideoMeta`
-- `likeCount / favoriteCount` 是全局统计字段，当前不参与本地 toggle
+- `likeCount / favoriteCount` 是全局统计字段，fullscreen action rail 会用它们和本地 runtime toggle 派生显示值
+- 派生后的显示值不写回 feed truth，也不调用 API
 
 `entities/feed` 不负责：
 

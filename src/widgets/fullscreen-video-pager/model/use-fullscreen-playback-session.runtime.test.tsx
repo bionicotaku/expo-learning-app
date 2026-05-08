@@ -185,7 +185,124 @@ describe('useFullscreenPlaybackSession runtime', () => {
 
     expect(
       latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
-        .playbackRate
+      .playbackRate
     ).toBe(1.5);
+  });
+
+  it('temporarily pauses active playback while a playback hold is active', () => {
+    const onActiveVideoChange = vi.fn();
+    let releaseHold: (() => void) | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(true);
+
+    act(() => {
+      releaseHold = latestSession?.acquirePlaybackHold() ?? null;
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      releaseHold?.();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(true);
+  });
+
+  it('does not resume playback after releasing a hold when the user had paused', () => {
+    const onActiveVideoChange = vi.fn();
+    let releaseHold: (() => void) | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.handleSingleTap();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      releaseHold = latestSession?.acquirePlaybackHold() ?? null;
+    });
+
+    act(() => {
+      releaseHold?.();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+  });
+
+  it('keeps playback held until every hold is released and ignores duplicate release calls', () => {
+    const onActiveVideoChange = vi.fn();
+    let releaseFirstHold: (() => void) | null = null;
+    let releaseSecondHold: (() => void) | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    act(() => {
+      releaseFirstHold = latestSession?.acquirePlaybackHold() ?? null;
+      releaseSecondHold = latestSession?.acquirePlaybackHold() ?? null;
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      releaseFirstHold?.();
+      releaseFirstHold?.();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      releaseSecondHold?.();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(true);
   });
 });

@@ -17,7 +17,6 @@ import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-pla
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
-import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import { useFullscreenPlaybackSession } from '../model/use-fullscreen-playback-session';
 import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
@@ -28,10 +27,6 @@ export type FullscreenVideoPagerProps = {
   isInitialLoading: boolean;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
-  onActionPress?: (
-    videoId: string,
-    item: FullscreenVideoOverlayActionItem
-  ) => void;
   onCenterHoldStart?: () => void;
   subtitleDisplayMode: SubtitleDisplayMode;
   videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
@@ -42,7 +37,6 @@ export function FullscreenVideoPager({
   entryIndex,
   isInitialLoading,
   items,
-  onActionPress,
   onActiveVideoChange,
   onCenterHoldStart,
   subtitleDisplayMode,
@@ -73,6 +67,7 @@ export function FullscreenVideoPager({
   const {
     activeIndex,
     activeItemId,
+    acquirePlaybackHold,
     commitActiveVideo,
     getRowRenderState,
     handleDoubleTap,
@@ -174,6 +169,7 @@ export function FullscreenVideoPager({
       return (
         <FullscreenVideoRow
           accessibilityLabel={rowRenderState.accessibilityLabel}
+          acquirePlaybackHold={isCurrentActiveItem ? acquirePlaybackHold : undefined}
           activeTranscript={isCurrentActiveItem ? activeTranscript : null}
           activeVisitToken={rowRenderState.activeVisitToken}
           bottomInset={insets.bottom}
@@ -181,7 +177,6 @@ export function FullscreenVideoPager({
           hudState={rowRenderState.hudState}
           isActive={isCurrentActiveItem}
           measurementCache={descriptionMeasurementCacheRef.current}
-          onActionPress={onActionPress}
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleRowHoldStart}
@@ -204,6 +199,7 @@ export function FullscreenVideoPager({
     [
       activeIndex,
       activeItemId,
+      acquirePlaybackHold,
       activeTranscript,
       getRowRenderState,
       handleDoubleTap,
@@ -213,7 +209,6 @@ export function FullscreenVideoPager({
       handleSingleTap,
       height,
       insets.bottom,
-      onActionPress,
       registerActiveController,
       subtitleDisplayMode,
       videoMetaByVideoId,

@@ -18,7 +18,7 @@
 - 返回 `{ items: FeedItem[] }`
 - 每次返回多少条由服务端决定；当前 mock 每次返回 8 条
 - feed item 不再包含 `isLiked / isFavorited`
-- feed item 包含 `likeCount / favoriteCount`，当前只作为统计字段保留
+- feed item 包含 `likeCount / favoriteCount`，供 fullscreen action rail 展示基础统计数
 
 当前用户态读取属于 `Video Meta API`，不属于 feed。
 
@@ -49,7 +49,7 @@ type FeedItem = {
 - `title / description`：视频基础文案。
 - `videoUrl / coverImageUrl`：播放资源和封面资源。
 - `durationSeconds / viewCount`：基础展示统计。
-- `likeCount / favoriteCount`：全局统计数，当前 v1 不展示、不随本地 toggle optimistic 改动。
+- `likeCount / favoriteCount`：全局统计数；fullscreen action rail 会在当前用户本地 toggle 后派生展示值，但不会把派生值写回 feed truth 或调用 API。
 - `tags`：卡片标签来源。
 
 ## 4. 前端映射
@@ -72,6 +72,7 @@ FeedResponse.items
 - 使用共享 mock clip catalog 生成 `videoUrl / coverImageUrl`
 - 使用递增 `videoId` 模拟无状态 batch 续接
 - 按 `videoId` 稳定生成 `title / description / viewCount / likeCount / favoriteCount / tags`
+- `likeCount / favoriteCount` 当前稳定落在 `8000..12000`
 - 不生成 `isLiked / isFavorited`
 
 当前用户态 mock 已移动到 `entities/video-meta`。

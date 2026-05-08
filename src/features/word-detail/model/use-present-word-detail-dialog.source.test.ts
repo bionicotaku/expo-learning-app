@@ -17,9 +17,10 @@ describe('use present word detail dialog source', () => {
     expect(source).toContain("presentation: 'dialog'");
     expect(source).toContain("debugLabel: 'word-detail'");
     expect(source).toContain('WordDetailDialogContent');
+    expect(source).toContain('WordDetailDialogLifecycleBoundary');
+    expect(source).toContain('onDismissComplete');
     expect(source).toContain('<WordDetailDialogContent payload={payload} />');
     expect(source).toContain('WordDetailDialogPayload');
-    expect(source).not.toContain('onDismiss');
     expect(source).not.toContain("presentation: 'sheet'");
     expect(source).not.toContain('router.');
     expect(source).not.toContain('fetch(');

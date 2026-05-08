@@ -305,7 +305,8 @@ fullscreen 页固定承担：
 - 右侧 action rail 做：
   - `like` 本地 toggle
   - `favorite` 本地 toggle
-  - `share / annotate` 的现有 UI 行为
+  - `subtitle` 全局显示模式切换
+  - `share` 已迁移到 playback settings sheet，不再由 fullscreen 右侧 action rail 承载
 
 ### 5.1 背景区职责
 
@@ -335,14 +336,18 @@ fullscreen 右侧 action rail 当前固定消费 `effective video item`：
 
 - `isLiked === true`
   - heart 显示为红色
+  - like 数字在 feed `likeCount` 基础上按当前本地 toggle 派生
 - `isFavorited === true`
   - star 显示为黄色
+  - favorite 数字在 feed `favoriteCount` 基础上按当前本地 toggle 派生
+- 数字小于 `10000` 时完整显示；大于等于 `10000` 时显示为 `1万 / 1.1万` 这类格式
 
 当前这两个动作都只修改 `features/video-runtime`：
 
 - 不调 API
 - 不复用旧的 `features/favorite`
 - 不把本地 toggle 混回 `feed-source`
+- 不把派生 count 写回 `VideoListItem`
 
 ## 8. Shared Feed Source
 

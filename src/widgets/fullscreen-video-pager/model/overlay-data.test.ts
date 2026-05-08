@@ -6,13 +6,15 @@ import {
 } from './overlay-data';
 
 describe('fullscreen overlay data', () => {
-  it('defines the four action rail items in a stable order', () => {
+  it('defines the visible action rail items in a stable order without fullscreen share', () => {
     expect(fullscreenVideoOverlayActionItems.map((item) => item.id)).toEqual([
       'like',
       'favorite',
-      'share',
       'subtitle',
     ]);
+    expect(fullscreenVideoOverlayActionItems.map((item) => item.iosSymbol)).not.toContain(
+      'square.and.arrow.up'
+    );
   });
 
   it('formats the top chrome counter from the active item index', () => {

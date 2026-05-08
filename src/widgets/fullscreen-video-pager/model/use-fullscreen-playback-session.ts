@@ -57,6 +57,9 @@ export function useFullscreenPlaybackSession({
 }: FullscreenPlaybackSessionArgs) {
   const activePlayerControllerRef = useRef<FullscreenActivePlayerController | null>(null);
   const basePausedByUserRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const nextPlaybackHoldIdRef = useRef(0);
+  const playbackHoldIdsRef = useRef(new Set<number>());
   const transientHoldStateRef = useRef<FullscreenTransientHoldState | null>(null);
   const pauseIndicatorTimeoutsRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const transientFeedbackTimeoutsRef = useRef(
@@ -76,6 +79,7 @@ export function useFullscreenPlaybackSession({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeVisitToken, setActiveVisitToken] = useState<number | null>(null);
   const [basePausedByUser, setBasePausedByUser] = useState(false);
+  const [playbackHoldCount, setPlaybackHoldCount] = useState(0);
   const [transientHoldState, setTransientHoldState] =
     useState<FullscreenTransientHoldState | null>(null);
   const [activeSurfaceState, setActiveSurfaceState] =
@@ -185,9 +189,13 @@ export function useFullscreenPlaybackSession({
 
   useEffect(() => {
     const pauseIndicatorTimeouts = pauseIndicatorTimeoutsRef.current;
+    const playbackHoldIds = playbackHoldIdsRef.current;
     const transientFeedbackTimeouts = transientFeedbackTimeoutsRef.current;
 
     return () => {
+      isMountedRef.current = false;
+      playbackHoldIds.clear();
+
       for (const timeout of pauseIndicatorTimeouts.values()) {
         clearTimeout(timeout);
       }
@@ -197,6 +205,28 @@ export function useFullscreenPlaybackSession({
         clearTimeout(timeout);
       }
       transientFeedbackTimeouts.clear();
+    };
+  }, []);
+
+  const acquirePlaybackHold = useCallback(() => {
+    const holdId = nextPlaybackHoldIdRef.current;
+    nextPlaybackHoldIdRef.current += 1;
+    playbackHoldIdsRef.current.add(holdId);
+    setPlaybackHoldCount(playbackHoldIdsRef.current.size);
+
+    let hasReleased = false;
+
+    return () => {
+      if (hasReleased) {
+        return;
+      }
+
+      hasReleased = true;
+      playbackHoldIdsRef.current.delete(holdId);
+
+      if (isMountedRef.current) {
+        setPlaybackHoldCount(playbackHoldIdsRef.current.size);
+      }
     };
   }, []);
 
@@ -366,6 +396,7 @@ export function useFullscreenPlaybackSession({
         activeIndex,
         basePausedByUser,
         defaultPlaybackRate,
+        isPlaybackHeld: playbackHoldCount > 0,
         itemIndex: index,
         transientHoldState,
       });
@@ -392,6 +423,7 @@ export function useFullscreenPlaybackSession({
       activeSurfaceState,
       basePausedByUser,
       defaultPlaybackRate,
+      playbackHoldCount,
       rowPlaybackHudStateByVideoId,
       transientHoldState,
     ]
@@ -401,6 +433,7 @@ export function useFullscreenPlaybackSession({
     activeIndex,
     activeItemId,
     activeSurfaceState,
+    acquirePlaybackHold,
     basePausedByUser,
     commitActiveVideo,
     getRowRenderState,

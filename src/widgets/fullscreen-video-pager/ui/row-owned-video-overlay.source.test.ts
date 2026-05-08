@@ -30,8 +30,12 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('allowFontScaling={false}');
     expect(source).toContain('isLiked');
     expect(source).toContain('isFavorited');
+    expect(source).toContain('likeCount');
+    expect(source).toContain('favoriteCount');
     expect(source).toContain('areEngagementActionsDisabled');
     expect(source).toContain('areEngagementActionsDisabled={areEngagementActionsDisabled}');
+    expect(source).toContain('likeCount={likeCount}');
+    expect(source).toContain('favoriteCount={favoriteCount}');
     expect(source).toContain('LinearTransition.springify()');
     expect(source).toContain("position: 'absolute'");
     expect(source).toContain('subtitleTitleGap');

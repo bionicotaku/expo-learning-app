@@ -7,6 +7,7 @@ import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 
 type VideoOverlayActionButtonProps = {
   activeTintColor?: string;
+  countLabel?: string;
   disabled?: boolean;
   iosSymbol?: FullscreenVideoOverlayActionItem['iosSymbol'];
   isActive?: boolean;
@@ -20,6 +21,7 @@ const iconTint = 'rgba(251,247,238,0.96)';
 
 function VideoOverlayActionButtonComponent({
   activeTintColor,
+  countLabel,
   disabled = false,
   iosSymbol,
   isActive = false,
@@ -44,55 +46,83 @@ function VideoOverlayActionButtonComponent({
       accessibilityState={{ disabled: disabled || onPress === undefined }}
       onPress={handlePress}
       style={({ pressed }) => ({
+        alignItems: 'center',
         opacity: disabled ? 0.5 : pressed && onPress ? 0.92 : 1,
         transform: [{ scale: pressed && onPress && !disabled ? 0.97 : 1 }],
+        width: size + 8,
       })}
     >
-      <AdaptiveGlass
-        appearance="clear"
-        interactive
-        radius={size / 2}
+      <View
+        pointerEvents="none"
         style={{
-          width: size,
-          height: size,
           alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow:
-            '5px 8px 14px rgba(17,13,10,0.14), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -2px 5px rgba(17,13,10,0.08)',
+          gap: 5,
         }}
-        variant="pill"
       >
-        <View
-          pointerEvents="none"
+        <AdaptiveGlass
+          appearance="clear"
+          interactive
+          radius={size / 2}
           style={{
+            width: size,
+            height: size,
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow:
+              '5px 8px 14px rgba(17,13,10,0.14), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -2px 5px rgba(17,13,10,0.08)',
           }}
+          variant="pill"
         >
-          <SymbolView
-            fallback={
-              <Text
-                style={{
-                  color: resolvedTintColor,
-                  fontSize: 22,
-                  lineHeight: 22,
-                  fontWeight: '700',
-                  textShadowColor: 'rgba(17,13,10,0.22)',
-                  textShadowOffset: { width: 1, height: 1 },
-                  textShadowRadius: 2,
-                }}
-              >
-                {item.fallbackGlyph}
-              </Text>
-            }
-            name={{ ios: iosSymbol ?? item.iosSymbol }}
-            size={22}
-            tintColor={resolvedTintColor}
-            type="hierarchical"
-            weight="semibold"
-          />
-        </View>
-      </AdaptiveGlass>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <SymbolView
+              fallback={
+                <Text
+                  style={{
+                    color: resolvedTintColor,
+                    fontSize: 22,
+                    lineHeight: 22,
+                    fontWeight: '700',
+                    textShadowColor: 'rgba(17,13,10,0.22)',
+                    textShadowOffset: { width: 1, height: 1 },
+                    textShadowRadius: 2,
+                  }}
+                >
+                  {item.fallbackGlyph}
+                </Text>
+              }
+              name={{ ios: iosSymbol ?? item.iosSymbol }}
+              size={22}
+              tintColor={resolvedTintColor}
+              type="hierarchical"
+              weight="semibold"
+            />
+          </View>
+        </AdaptiveGlass>
+        {countLabel ? (
+          <Text
+            allowFontScaling={false}
+            selectable={false}
+            style={{
+              color: 'rgba(251,247,238,0.92)',
+              fontSize: 12,
+              fontVariant: ['tabular-nums'],
+              fontWeight: '700',
+              lineHeight: 14,
+              textAlign: 'center',
+              textShadowColor: 'rgba(17,13,10,0.32)',
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 2,
+            }}
+          >
+            {countLabel}
+          </Text>
+        ) : null}
+      </View>
     </Pressable>
   );
 }

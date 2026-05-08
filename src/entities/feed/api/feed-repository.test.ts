@@ -30,6 +30,17 @@ describe('feed repository facade', () => {
     expect(response.items[0]).not.toHaveProperty('isFavorited');
   });
 
+  it('generates mock like and favorite counts in the 8000 to 12000 range', async () => {
+    const response = await fetchFeed();
+
+    for (const item of response.items) {
+      expect(item.likeCount).toBeGreaterThanOrEqual(8000);
+      expect(item.likeCount).toBeLessThanOrEqual(12000);
+      expect(item.favoriteCount).toBeGreaterThanOrEqual(8000);
+      expect(item.favoriteCount).toBeLessThanOrEqual(12000);
+    }
+  });
+
   it('keeps the mock feed facade on a 2 second delay by default', async () => {
     vi.useFakeTimers();
 

@@ -11,11 +11,14 @@ describe('video overlay action button source', () => {
 
     expect(source).toContain('isActive');
     expect(source).toContain('disabled');
+    expect(source).toContain('countLabel');
     expect(source).toContain('activeTintColor');
     expect(source).toContain('const resolvedTintColor');
     expect(source).toContain('const handlePress = useCallback(');
     expect(source).toContain('if (disabled) {');
     expect(source).toContain('disabled: disabled || onPress === undefined');
     expect(source).toContain('AdaptiveGlass');
+    expect(source).toContain("fontVariant: ['tabular-nums']");
+    expect(source).toContain('allowFontScaling={false}');
   });
 });

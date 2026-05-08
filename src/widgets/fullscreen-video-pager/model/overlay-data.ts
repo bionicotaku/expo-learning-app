@@ -1,11 +1,10 @@
 export type FullscreenVideoOverlayActionItem = {
   accessibilityLabel: string;
   fallbackGlyph: string;
-  id: 'like' | 'favorite' | 'share' | 'subtitle';
+  id: 'like' | 'favorite' | 'subtitle';
   iosSymbol:
     | 'heart.fill'
     | 'star.fill'
-    | 'square.and.arrow.up'
     | 'text.bubble'
     | 'text.bubble.fill';
 };
@@ -22,12 +21,6 @@ export const fullscreenVideoOverlayActionItems: readonly FullscreenVideoOverlayA
     accessibilityLabel: 'Favorite',
     iosSymbol: 'star.fill',
     fallbackGlyph: '★',
-  },
-  {
-    id: 'share',
-    accessibilityLabel: 'Share',
-    iosSymbol: 'square.and.arrow.up',
-    fallbackGlyph: '↗',
   },
   {
     id: 'subtitle',

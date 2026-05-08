@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
+import { formatEngagementCount } from '../model/engagement-count';
 import {
   fullscreenVideoOverlayActionItems,
   type FullscreenVideoOverlayActionItem,
@@ -11,8 +12,10 @@ import { VideoOverlayActionButton } from './video-overlay-action-button';
 type VideoOverlayActionRailProps = {
   areEngagementActionsDisabled: boolean;
   bottomInset: number;
+  favoriteCount: number;
   isFavorited: boolean;
   isLiked: boolean;
+  likeCount: number;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
   subtitleDisplayMode: SubtitleDisplayMode;
 };
@@ -34,11 +37,29 @@ function getSubtitleActionPresentation(subtitleDisplayMode: SubtitleDisplayMode)
   };
 }
 
+function getEngagementActionCountLabel(
+  item: FullscreenVideoOverlayActionItem,
+  likeCount: number,
+  favoriteCount: number
+) {
+  if (item.id === 'like') {
+    return formatEngagementCount(likeCount);
+  }
+
+  if (item.id === 'favorite') {
+    return formatEngagementCount(favoriteCount);
+  }
+
+  return undefined;
+}
+
 function VideoOverlayActionRailComponent({
   areEngagementActionsDisabled,
   bottomInset,
+  favoriteCount,
   isFavorited,
   isLiked,
+  likeCount,
   onActionPress,
   subtitleDisplayMode,
 }: VideoOverlayActionRailProps) {
@@ -80,6 +101,7 @@ function VideoOverlayActionRailComponent({
                   ? subtitleActionPresentation.isActive
                   : false
           }
+          countLabel={getEngagementActionCountLabel(item, likeCount, favoriteCount)}
           key={item.id}
           item={item}
           disabled={areEngagementActionsDisabled && (item.id === 'like' || item.id === 'favorite')}

@@ -45,6 +45,7 @@ FullscreenVideoPager
 - `model/use-fullscreen-playback-session.ts`
   - fullscreen 播放会话入口
   - 持有 `activeIndex`、`activeItemId`、`basePausedByUser`、`transientHoldState`
+  - 持有 session-scoped playback hold；业务 modal 可临时遮罩 active row 的 `shouldPlay`
   - 持有当前 active row 的 `activePlayerControllerRef`
   - 持有 `videoId -> rowPlaybackHudState` 的稀疏 HUD store
   - 持有 `FlatList` viewability 的稳定 handler；active 判定读取 session refs，不让 `FlatList` 注册入口跟随 active state 换引用
@@ -93,6 +94,8 @@ FullscreenVideoPager
   - 单条 fullscreen row
   - 装配 row-local media layer、interaction layer、content overlay、HUD overlay、surface status overlay
   - 作为 row 组合层接入 `features/word-detail`，把字幕 token 点击转换成 shared dialog payload
+  - token word detail dialog 打开期间申请 playback hold；dialog 完全消失后释放
+  - 使用 `video.likeCount / favoriteCount` 与 `VideoMeta + video-runtime` 的有效用户态派生 action rail 统计显示值
 - `ui/row-owned-video-overlay.tsx`
   - row-owned 内容层
   - 持有基础字幕、标题与底部内容文案区的排版壳
@@ -108,7 +111,8 @@ FullscreenVideoPager
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
-  - 点击字幕 token 不暂停、不 seek、不改变播放状态；字幕空白区不拦截背景手势
+  - 点击字幕 token 不 seek、不触发 pause HUD；word detail dialog 打开期间只通过 session playback hold 临时暂停 active row
+  - 字幕空白区不拦截背景手势
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态
   - 只消费 description 模块导出的语义结果 `actionPlacement`，再把它映射成自身的底部几何偏移
@@ -196,6 +200,7 @@ FullscreenVideoPager
 - `activeVisitToken`
 - `basePausedByUser`
 - `transientHoldState`
+- `playbackHoldCount`
 - `activeSurfaceState`
 - `activePlayerControllerRef`
 - `rowPlaybackHudStateByVideoId`
@@ -205,6 +210,7 @@ FullscreenVideoPager
 - `activeVisitToken` 是当前 active row 的访问轮次；只要真实 active video 发生切换就递增，用来让 row-local description 展开态首帧同步失效
 - `basePausedByUser` 是正常播/停基态
 - `transientHoldState` 是左右/中间长按期间的临时覆盖态
+- `playbackHoldCount > 0` 是业务 overlay 的临时播放遮罩；它不修改 `basePausedByUser`
 - `activeSurfaceState` 只反映当前 active row 的 `loading | ready | error`
 - `rowPlaybackHudStateByVideoId` 允许旧 row 的 HUD 在 active row 切换后继续跟随该 row 自然消失
 
@@ -256,6 +262,7 @@ type FullscreenRowPlaybackHudState = {
 - 点视频空白背景：pause / resume
 - 点 rail 或 thumb：seek
 - 点左右时间文本：不 seek，也不 pause
+- 点字幕 token：打开 word detail dialog；dialog 存在期间 active row 暂停，关闭后按打开前的用户 pause 状态恢复或保持暂停
 - drag 期间背景手势不会命中 seek bar lane
 
 `PlayableVideoSurface` 当前固定为执行层，不再直接渲染 loading / error UI。它只负责：
@@ -308,17 +315,29 @@ fullscreen 右侧 action rail 当前固定为：
 - `like`
   - 对应 `isLiked`
   - active 时 heart 变红
+  - icon 下方显示 like 数字
 - `favorite`
   - 对应 `isFavorited`
   - active 时 star 变黄
-- `share`
+  - icon 下方显示 favorite 数字
 - `subtitle`
   - 对应 `features/playback-settings` 的 `subtitleDisplayMode`
   - `off` 使用空心 `text.bubble`
   - `english` 使用实心 `text.bubble.fill`
   - `bilingual` 使用实心 `text.bubble.fill`，并把图标 tint 切到蓝色
 
+`share` 已迁移到 playback settings sheet，fullscreen 右侧 action rail 不再渲染分享按钮，也不再保留分享 action 的外部冒泡入口。
+
 当前 `like / favorite` 只做本地 runtime toggle，不调真实 API。
+
+count 显示规则：
+
+- 基础 count 来自 `VideoListItem.likeCount / favoriteCount`
+- 当前显示值由 row 根据 `VideoMeta` base state 与 `video-runtime` effective state 派生
+- 用户本地点赞 / 收藏会让显示值 `+1`；取消会让显示值 `-1`
+- 派生显示值不写回 `VideoListItem`，也不进入 `video-runtime-store`
+- 小于 `10000` 显示完整数字；大于等于 `10000` 显示为 `1万 / 1.1万`
+- 如果 `VideoMeta` 尚未加载或加载失败，按钮禁用，但仍展示 feed count
 
 但这层 runtime toggle 不是长期真值：
 
@@ -334,7 +353,6 @@ fullscreen 右侧 action rail 当前固定为：
   - 以 `VideoMeta` 为 base，通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
   - `like / favorite` 也在 row 内直接写入 runtime
   - `subtitle` 在 row 内循环全局字幕显示模式：`off -> english -> bilingual -> off`
-  - `share` 如有外部 handler 再向外冒泡
 
 也就是说，fullscreen 的 action active state 不再依赖整表 effective items、page relay 或 `FlatList.extraData` 才能刷新。
 
