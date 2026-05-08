@@ -13,12 +13,12 @@ export default function TabLayout() {
         />
         <NativeTabs.Trigger.Label hidden>Feed</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="save">
+      <NativeTabs.Trigger name="word-list">
         <NativeTabs.Trigger.Icon
           sf={{ default: 'bookmark', selected: 'bookmark.fill' }}
           md="bookmark"
         />
-        <NativeTabs.Trigger.Label hidden>Save</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label hidden>Word List</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="me">
         <NativeTabs.Trigger.Icon
