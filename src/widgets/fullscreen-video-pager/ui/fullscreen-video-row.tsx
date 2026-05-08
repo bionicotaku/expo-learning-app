@@ -32,6 +32,7 @@ import type { FullscreenRowPlaybackHudState } from '../model/row-playback-hud-st
 import { createRowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
 import type { FullscreenRowSurfacePresentation } from '../model/row-surface-presentation';
 import type { FullscreenActivePlayerController } from '../model/active-player-controller';
+import type { FullscreenRowProgressSnapshot } from '../model/row-progress-snapshot';
 import { RowPlaybackHudOverlay } from './row-playback-hud-overlay';
 import { RowPlaybackInteractionLayer } from './row-playback-interaction-layer';
 import { RowPlaybackMediaLayer } from './row-playback-media-layer';
@@ -51,6 +52,11 @@ type FullscreenVideoRowProps = {
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
+  onProgressSnapshotForTelemetry?: (
+    videoId: string,
+    activeVisitToken: number | null,
+    snapshot: FullscreenRowProgressSnapshot | null
+  ) => void;
   onRowUnmount: (videoId: string) => void;
   onSingleTap: () => void;
   playbackRate: number;
@@ -81,6 +87,7 @@ function FullscreenVideoRowComponent({
   onDoubleTap,
   onHoldEnd,
   onHoldStart,
+  onProgressSnapshotForTelemetry,
   onRowUnmount,
   onSingleTap,
   playbackRate,
@@ -192,6 +199,12 @@ function FullscreenVideoRowComponent({
     setLiked,
     videoMeta,
   ]);
+  const handleActiveProgressSnapshotChange = useCallback(
+    (snapshot: FullscreenRowProgressSnapshot | null) => {
+      onProgressSnapshotForTelemetry?.(video.videoId, activeVisitToken, snapshot);
+    },
+    [activeVisitToken, onProgressSnapshotForTelemetry, video.videoId]
+  );
   const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
     const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
     const releasePlaybackHold = acquirePlaybackHold?.();
@@ -220,6 +233,7 @@ function FullscreenVideoRowComponent({
     >
       <RowPlaybackMediaLayer
         isActive={isActive}
+        onActiveProgressSnapshotChange={handleActiveProgressSnapshotChange}
         onSurfacePresentationChange={setSurfacePresentation}
         playbackRate={playbackRate}
         registerActiveController={registerActiveController}
@@ -324,6 +338,8 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.favoriteCount === nextProps.video.favoriteCount &&
     previousProps.activeTranscript === nextProps.activeTranscript &&
     previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
+    previousProps.onProgressSnapshotForTelemetry ===
+      nextProps.onProgressSnapshotForTelemetry &&
     previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode
   );
 }

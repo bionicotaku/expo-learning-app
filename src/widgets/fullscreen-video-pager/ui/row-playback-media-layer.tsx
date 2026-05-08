@@ -8,11 +8,15 @@ import type {
   FullscreenRowSeekController,
   RowPlaybackSeekBarStore,
 } from '../model/row-playback-seek-bar-store';
+import type { FullscreenRowProgressSnapshot } from '../model/row-progress-snapshot';
 import type { FullscreenRowSurfacePresentation } from '../model/row-surface-presentation';
 import { PlayableVideoSurface } from './playable-video-surface';
 
 type RowPlaybackMediaLayerProps = {
   isActive: boolean;
+  onActiveProgressSnapshotChange?: (
+    snapshot: FullscreenRowProgressSnapshot | null
+  ) => void;
   onSurfacePresentationChange: (presentation: FullscreenRowSurfacePresentation | null) => void;
   playbackRate: number;
   registerActiveController?:
@@ -26,6 +30,7 @@ type RowPlaybackMediaLayerProps = {
 
 function RowPlaybackMediaLayerComponent({
   isActive,
+  onActiveProgressSnapshotChange,
   onSurfacePresentationChange,
   playbackRate,
   registerActiveController,
@@ -43,8 +48,9 @@ function RowPlaybackMediaLayerComponent({
   const setProgressSnapshot = useCallback(
     (snapshot: ReturnType<RowPlaybackSeekBarStore['getSnapshot']>['progressSnapshot']) => {
       seekBarStore.setProgressSnapshot(snapshot);
+      onActiveProgressSnapshotChange?.(snapshot);
     },
-    [seekBarStore]
+    [onActiveProgressSnapshotChange, seekBarStore]
   );
   const setSeekController = useCallback(
     (controller: FullscreenRowSeekController | null) => {

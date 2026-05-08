@@ -16,6 +16,7 @@ describe('row playback media layer source', () => {
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');
     expect(source).toContain('onActiveProgressSnapshotChange={isActive ? setProgressSnapshot : undefined}');
     expect(source).toContain('seekBarStore.setProgressSnapshot');
+    expect(source).toContain('onActiveProgressSnapshotChange?.(snapshot)');
     expect(source).toContain('seekBarStore.setSeekController');
     expect(source).toContain('if (isActive && shouldUsePlayer) {');
     expect(source).not.toContain('if (!shouldUsePlayer) {');

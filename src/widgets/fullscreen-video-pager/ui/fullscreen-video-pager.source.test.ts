@@ -23,6 +23,7 @@ describe('fullscreen video pager source', () => {
     );
 
     expect(source).toContain('useFullscreenPlaybackSession');
+    expect(source).toContain('useVideoWatchProgressReporter');
     expect(source).toContain('activeTranscript,');
     expect(source).toContain('handleViewableItemsChanged');
     expect(source).toContain('acquirePlaybackHold');
@@ -38,6 +39,11 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('activeTranscript');
     expect(source).toContain('videoMetaByVideoId');
+    expect(source).toContain('handleProgressSnapshotForTelemetry');
+    expect(source).toContain('watchProgressReporter.reportSample');
+    expect(source).toContain('setInterval(() => {');
+    expect(source).toContain('}, 15_000)');
+    expect(source).toContain('void watchProgressReporter.flush();');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('extraData={renderState}');
     expect(source).toContain(
@@ -47,6 +53,9 @@ describe('fullscreen video pager source', () => {
       'acquirePlaybackHold={isCurrentActiveItem ? acquirePlaybackHold : undefined}'
     );
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
+    expect(source).toContain(
+      'onProgressSnapshotForTelemetry={\n            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined'
+    );
     expect(source).toContain(
       'activeTranscript={isCurrentActiveItem ? activeTranscript : null}'
     );
@@ -60,6 +69,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('onCenterHoldStart?.()');
     expect(source).toContain('handleHoldStart(zone)');
     expect(source).not.toContain('resolveActiveVideoChange');
-    expect(source).not.toContain('progressSnapshot');
+    expect(source).not.toContain('reportVideoWatchProgress');
+    expect(source).not.toContain('requestJson');
   });
 });

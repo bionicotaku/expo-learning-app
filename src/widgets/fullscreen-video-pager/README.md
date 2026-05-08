@@ -88,6 +88,9 @@ FullscreenVideoPager
   - mount-scoped `entryIndex` 初始定位与 post-load alignment
   - 注册稳定的 viewability handler，并把 active row 切换交给 playback session
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
+  - 持有 fullscreen watch-progress reporter；只接收 active row 的 progress sample
+  - 每 `15s` 定时 flush watch-progress queue；active video 切换、completed sample 与 pager unmount 也会触发 flush
+  - 用户 pause / resume 不触发 watch-progress flush
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
   - cache 是有上限的 session-scoped 插入序缓存
@@ -146,6 +149,7 @@ FullscreenVideoPager
   - row 内 player / progress / seek controller 的局部装配层
   - 持有 row-local `surfacePresentation`
   - 把真实 `progressSnapshot` 与 row-local `seekController` 写入 seek bar store
+  - active row 的 progress snapshot 同时向 pager reporter 回调一份；non-active row 不传 telemetry callback
   - 把 progress 的高频更新限制在 media layer 内
 - `ui/row-playback-interaction-layer.tsx`
   - row 内唯一正式 interaction owner
@@ -181,6 +185,7 @@ FullscreenVideoPager
 - 把 player surface 的 loading / error / retry 收口到 row-local presenter
 - 在 row 内维护 center owner，避免 pause / loading / seek 之间的布局抖动
 - 只为 active row 订阅 progress，并在 row 内局部渲染底部 seek bar
+- 只为 active row 把 progress sample 转给 `features/video-watch-progress` reporter
 - 只为 active row 接收 session 层传入的 `activeTranscript`，并用 row-local progress 显示基础字幕
 - row 的 like/favorite base 值来自 session 层传入的 `videoMetaByVideoId`
 - 让 description 展开态保持 row-local UI state，不并入 page 或 runtime
@@ -277,6 +282,7 @@ type FullscreenRowPlaybackHudState = {
 - 暴露 active controller `{ seekBy, seekTo, getCurrentTimeSeconds, getDurationSeconds, surfaceState }`
 - 向 row 上报 `surfacePresentation`
 - 仅在 active row 存在 progress callback 时开启 `timeUpdate`，向 row 上报 progress snapshot
+- 不 import watch-progress、telemetry 或 API repository
 
 `RowSurfaceStatusOverlay` 负责：
 

@@ -30,6 +30,9 @@ describe('playable video surface source', () => {
     expect(source).toContain(
       'previousProps.registerActiveController === nextProps.registerActiveController'
     );
+    expect(source).not.toContain('video-watch-progress');
+    expect(source).not.toContain('shared/telemetry');
+    expect(source).not.toContain('requestJson');
     expect(source).not.toContain('onActiveProgressSnapshotChange?.(null)');
     expect(source).not.toContain('player.timeUpdateEventInterval = 0;');
   });

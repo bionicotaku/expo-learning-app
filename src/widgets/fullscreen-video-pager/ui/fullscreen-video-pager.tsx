@@ -3,6 +3,7 @@ import type { FlatList as FlatListType } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Text,
   useWindowDimensions,
   View,
@@ -14,9 +15,14 @@ import type { VideoListItem } from '@/entities/video';
 import type { VideoMeta } from '@/entities/video-meta';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
+import {
+  useVideoWatchProgressReporter,
+  type WatchProgressSource,
+} from '@/features/video-watch-progress';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
+import type { FullscreenRowProgressSnapshot } from '../model/row-progress-snapshot';
 import { useFullscreenPlaybackSession } from '../model/use-fullscreen-playback-session';
 import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
@@ -31,6 +37,14 @@ export type FullscreenVideoPagerProps = {
   subtitleDisplayMode: SubtitleDisplayMode;
   videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
 };
+
+function resolveWatchProgressSource(): WatchProgressSource {
+  if (Platform.OS === 'ios' || Platform.OS === 'android') {
+    return Platform.OS;
+  }
+
+  return 'web';
+}
 
 export function FullscreenVideoPager({
   activeTranscript,
@@ -50,6 +64,16 @@ export function FullscreenVideoPager({
   );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
+  const watchProgressReporter = useVideoWatchProgressReporter({
+    source: resolveWatchProgressSource(),
+  });
+  const handleActiveVideoChange = useCallback(
+    (itemId: string, index: number) => {
+      void watchProgressReporter.flush();
+      onActiveVideoChange(itemId, index);
+    },
+    [onActiveVideoChange, watchProgressReporter]
+  );
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
     isInitialLoading,
@@ -80,11 +104,22 @@ export function FullscreenVideoPager({
   } = useFullscreenPlaybackSession({
     activeTranscript,
     items,
-    onActiveVideoChange,
+    onActiveVideoChange: handleActiveVideoChange,
   });
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      void watchProgressReporter.flush();
+    }, 15_000);
+
+    return () => {
+      clearInterval(interval);
+      void watchProgressReporter.flush();
+    };
+  }, [watchProgressReporter]);
 
   useEffect(() => {
     if (!initialPosition.shouldRunPostLoadAlignment) {
@@ -137,6 +172,26 @@ export function FullscreenVideoPager({
     [handleHoldStart, onCenterHoldStart]
   );
 
+  const handleProgressSnapshotForTelemetry = useCallback(
+    (
+      videoId: string,
+      activeVisitToken: number | null,
+      snapshot: FullscreenRowProgressSnapshot | null
+    ) => {
+      if (!snapshot) {
+        return;
+      }
+
+      watchProgressReporter.reportSample({
+        activeVisitToken,
+        currentTimeSeconds: snapshot.currentTimeSeconds,
+        durationSeconds: snapshot.durationSeconds,
+        videoId,
+      });
+    },
+    [watchProgressReporter]
+  );
+
   const renderState = useMemo(
     () => ({
       activeIndex,
@@ -181,6 +236,9 @@ export function FullscreenVideoPager({
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleRowHoldStart}
+          onProgressSnapshotForTelemetry={
+            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined
+          }
           onRowUnmount={handleRowUnmount}
           onSingleTap={handleSingleTap}
           playbackRate={rowRenderState.effectivePlaybackState.playbackRate}
@@ -206,6 +264,7 @@ export function FullscreenVideoPager({
       handleDoubleTap,
       handleHoldEnd,
       handleRowHoldStart,
+      handleProgressSnapshotForTelemetry,
       handleRowUnmount,
       handleSingleTap,
       height,
