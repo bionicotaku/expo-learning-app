@@ -49,6 +49,7 @@ FullscreenVideoPager
   - 持有 `videoId -> rowPlaybackHudState` 的稀疏 HUD store
   - 持有 `FlatList` viewability 的稳定 handler；active 判定读取 session refs，不让 `FlatList` 注册入口跟随 active state 换引用
   - 管理 pause / seek / rate 的生命周期与 timer
+  - 读取 `features/playback-settings` 的全局默认倍速并注入播放派生规则
 - `model/row-playback-hud-state.ts`
   - row HUD store 的纯数据结构与更新 helper
 - `model/row-hud-layout.ts`
@@ -230,7 +231,7 @@ type FullscreenRowPlaybackHudState = {
 
 - 本地持有 `VideoPlayer`
 - 同步 `shouldPlay`
-- 同步 `playbackRate`
+- 同步 `playbackRate`，普通播放使用全局默认倍速，左右长按临时覆盖为 `2x`
 - 暴露最小 active controller `{ seekBy, surfaceState }`
 - 向 row 上报 `surfacePresentation`
 - 仅在 active row 存在 progress callback 时开启 `timeUpdate`，向 row 上报 progress snapshot

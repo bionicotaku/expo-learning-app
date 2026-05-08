@@ -10,7 +10,7 @@
   - single tap / double tap / long press 的分区规则
   - `basePausedByUser` 的 toggle 规则
   - active row 变化时的 pause / hold reset 规则
-  - `activeIndex + basePausedByUser + transientHoldState -> shouldPlay / playbackRate / gestureLock` 的派生规则
+  - `activeIndex + basePausedByUser + transientHoldState + defaultPlaybackRate -> shouldPlay / playbackRate / gestureLock` 的派生规则
 
 边界约束：
 
@@ -19,3 +19,4 @@
 - 不持有 React state
 - 不在这里渲染播放器 UI
 - 不直接调用 `expo-video` player 的实例方法
+- 不持有全局播放偏好；默认倍速由 `features/playback-settings` 注入

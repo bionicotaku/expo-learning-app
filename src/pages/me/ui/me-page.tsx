@@ -3,6 +3,9 @@ import { SymbolView } from 'expo-symbols';
 import type { SFSymbol } from 'expo-symbols';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
+import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
+import { toast } from '@/shared/lib/toast';
+import type { ToastKind } from '@/shared/lib/toast/types';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
   EditorialTitle,
@@ -16,6 +19,21 @@ type DeskActionItem = {
   fallbackGlyph: string;
   accentTone: 'accent' | 'gold' | 'cocoa' | 'inkSoft';
   danger?: boolean;
+};
+
+type ToastTriggerItem = {
+  kind: ToastKind;
+  label: string;
+  accessibilityLabel: string;
+  title: string;
+  message: string;
+  tone:
+    | 'softActionRose'
+    | 'softActionPeach'
+    | 'softActionButter'
+    | 'softActionSky'
+    | 'softActionPistachio';
+  textColor: 'accent' | 'gold' | 'cocoa' | 'inkSoft';
 };
 
 const noopAction = () => {};
@@ -70,9 +88,65 @@ const systemActionItems: DeskActionItem[] = [
   },
 ];
 
+const toastTriggerItems: ToastTriggerItem[] = [
+  {
+    kind: 'success',
+    label: 'Success',
+    accessibilityLabel: 'Show success toast',
+    title: 'Saved',
+    message: 'Your desk note is ready.',
+    tone: 'softActionPistachio',
+    textColor: 'inkSoft',
+  },
+  {
+    kind: 'error',
+    label: 'Error',
+    accessibilityLabel: 'Show error toast',
+    title: 'Sync failed',
+    message: 'Please try again in a moment.',
+    tone: 'softActionRose',
+    textColor: 'accent',
+  },
+  {
+    kind: 'warning',
+    label: 'Warning',
+    accessibilityLabel: 'Show warning toast',
+    title: 'Review due',
+    message: 'Ten phrases need another pass.',
+    tone: 'softActionButter',
+    textColor: 'cocoa',
+  },
+  {
+    kind: 'info',
+    label: 'Info',
+    accessibilityLabel: 'Show info toast',
+    title: 'Reading mode',
+    message: 'Editorial hints are enabled.',
+    tone: 'softActionSky',
+    textColor: 'inkSoft',
+  },
+];
+
 function resolveAccentColor(
   tokens: ReturnType<typeof useEditorialPaperTheme>['tokens'],
   tone: DeskActionItem['accentTone']
+) {
+  switch (tone) {
+    case 'accent':
+      return tokens.color.accent;
+    case 'gold':
+      return tokens.color.gold;
+    case 'cocoa':
+      return tokens.color.cocoa;
+    case 'inkSoft':
+    default:
+      return tokens.color.inkSoft;
+  }
+}
+
+function resolveToastTriggerTextColor(
+  tokens: ReturnType<typeof useEditorialPaperTheme>['tokens'],
+  tone: ToastTriggerItem['textColor']
 ) {
   switch (tone) {
     case 'accent':
@@ -119,6 +193,14 @@ function DeskSymbol({
       weight="semibold"
     />
   );
+}
+
+function showToastTrigger(item: ToastTriggerItem) {
+  toast.show({
+    kind: item.kind,
+    title: item.title,
+    message: item.message,
+  });
 }
 
 function ProfileSummaryCard() {
@@ -330,6 +412,148 @@ function WeekIssueTextCard() {
   );
 }
 
+function ToastTriggerPanel() {
+  const { tokens } = useEditorialPaperTheme();
+
+  return (
+    <RaisedSurface
+      radius="cardMd"
+      style={{
+        gap: tokens.spacing.md,
+        padding: tokens.spacing.lg,
+      }}
+    >
+      <View style={{ gap: tokens.spacing.xs }}>
+        <MetaLabel>Feedback test</MetaLabel>
+        <EditorialTitle
+          numberOfLines={1}
+          style={{
+            fontSize: 20,
+            lineHeight: 24,
+          }}
+          variant="title"
+        >
+          Toast colors
+        </EditorialTitle>
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: tokens.spacing.sm,
+        }}
+      >
+        {toastTriggerItems.map((item) => {
+          const textColor = resolveToastTriggerTextColor(tokens, item.textColor);
+
+          return (
+            <Pressable
+              accessibilityLabel={item.accessibilityLabel}
+              accessibilityRole="button"
+              key={item.kind}
+              onPress={() => {
+                showToastTrigger(item);
+              }}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.9 : 1,
+                width: '48%',
+                minWidth: 0,
+              })}
+            >
+              <RaisedSurface
+                radius="pill"
+                tone={item.tone}
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: 44,
+                  paddingHorizontal: tokens.spacing.md,
+                  paddingVertical: tokens.spacing.sm,
+                }}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    color: textColor,
+                    fontSize: 12,
+                    fontWeight: '700',
+                    lineHeight: 16,
+                  }}
+                >
+                  {item.label}
+                </Text>
+              </RaisedSurface>
+            </Pressable>
+          );
+        })}
+      </View>
+    </RaisedSurface>
+  );
+}
+
+function PlaybackSettingsTestCard() {
+  const { tokens } = useEditorialPaperTheme();
+  const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
+
+  return (
+    <RaisedSurface
+      radius="cardMd"
+      style={{
+        gap: tokens.spacing.md,
+        padding: tokens.spacing.lg,
+      }}
+    >
+      <View style={{ gap: tokens.spacing.xs }}>
+        <MetaLabel>Sheet test</MetaLabel>
+        <EditorialTitle
+          numberOfLines={1}
+          style={{
+            fontSize: 20,
+            lineHeight: 24,
+          }}
+          variant="title"
+        >
+          Playback settings
+        </EditorialTitle>
+      </View>
+
+      <Pressable
+        accessibilityLabel="Open playback settings"
+        accessibilityRole="button"
+        onPress={presentPlaybackSettingsSheet}
+        style={({ pressed }) => ({
+          opacity: pressed ? 0.9 : 1,
+        })}
+      >
+        <RaisedSurface
+          radius="pill"
+          tone="softActionSky"
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 44,
+            paddingHorizontal: tokens.spacing.lg,
+            paddingVertical: tokens.spacing.sm,
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            style={{
+              color: tokens.color.ink,
+              fontSize: 13,
+              fontWeight: '800',
+              lineHeight: 17,
+            }}
+          >
+            Open sheet
+          </Text>
+        </RaisedSurface>
+      </Pressable>
+    </RaisedSurface>
+  );
+}
+
 function GroupedActionList({
   items,
 }: {
@@ -459,6 +683,8 @@ export function MePage() {
         <ProfileSummaryCard />
         <StatsStrip />
         <WeekIssueTextCard />
+        <ToastTriggerPanel />
+        <PlaybackSettingsTestCard />
         <GroupedActionList items={learningActionItems} />
         <GroupedActionList items={systemActionItems} />
         <FooterLabel />

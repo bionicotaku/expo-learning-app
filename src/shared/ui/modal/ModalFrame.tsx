@@ -40,7 +40,6 @@ export function ModalFrame({
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
           padding: 0,
-          boxShadow: tokens.elevation.soft,
         }}
       >
         <View

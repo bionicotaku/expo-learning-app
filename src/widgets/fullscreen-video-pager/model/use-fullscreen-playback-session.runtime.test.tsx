@@ -3,6 +3,7 @@ import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
 import type { VideoListItem } from '@/entities/video';
+import { usePlaybackSettingsStore } from '@/features/playback-settings/model/playback-settings-store';
 
 import { useFullscreenPlaybackSession } from './use-fullscreen-playback-session';
 
@@ -63,6 +64,7 @@ let latestSession: SessionWithViewability | null = null;
 describe('useFullscreenPlaybackSession runtime', () => {
   beforeEach(() => {
     latestSession = null;
+    usePlaybackSettingsStore.getState().resetPlaybackRate();
   });
 
   it('keeps a stable viewability handler while committing active video changes', () => {
@@ -164,5 +166,26 @@ describe('useFullscreenPlaybackSession runtime', () => {
     expect(firstOnActiveVideoChange).not.toHaveBeenCalled();
     expect(secondOnActiveVideoChange).toHaveBeenCalledTimes(1);
     expect(secondOnActiveVideoChange).toHaveBeenLastCalledWith('video-b', 1);
+  });
+
+  it('reads the global default playback rate for row render state', () => {
+    const onActiveVideoChange = vi.fn();
+
+    usePlaybackSettingsStore.getState().setPlaybackRate(1.5);
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .playbackRate
+    ).toBe(1.5);
   });
 });

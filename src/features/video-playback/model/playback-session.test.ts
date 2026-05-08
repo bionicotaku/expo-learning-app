@@ -29,6 +29,7 @@ describe('playback session', () => {
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: false,
+        defaultPlaybackRate: 1,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -44,6 +45,7 @@ describe('playback session', () => {
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: true,
+        defaultPlaybackRate: 1,
         itemIndex: 4,
         transientHoldState: null,
       })
@@ -59,6 +61,7 @@ describe('playback session', () => {
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: true,
+        defaultPlaybackRate: 1,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -77,6 +80,7 @@ describe('playback session', () => {
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: true,
+        defaultPlaybackRate: 1,
         itemIndex: 4,
         transientHoldState: createTransientHoldState({
           basePausedByUser: true,
@@ -95,6 +99,7 @@ describe('playback session', () => {
       resolveEffectivePlaybackState({
         activeIndex: 4,
         basePausedByUser: false,
+        defaultPlaybackRate: 1,
         itemIndex: 3,
         transientHoldState: createTransientHoldState({
           basePausedByUser: false,
@@ -104,6 +109,92 @@ describe('playback session', () => {
     ).toEqual({
       isGestureLocked: true,
       playbackRate: 1,
+      shouldPlay: false,
+    });
+  });
+
+  it('uses the global default playback rate for normal active playback', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: false,
+        defaultPlaybackRate: 1.5,
+        itemIndex: 4,
+        transientHoldState: null,
+      })
+    ).toEqual({
+      isGestureLocked: false,
+      playbackRate: 1.5,
+      shouldPlay: true,
+    });
+  });
+
+  it('keeps the global default playback rate while paused', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: true,
+        defaultPlaybackRate: 1.5,
+        itemIndex: 4,
+        transientHoldState: null,
+      })
+    ).toEqual({
+      isGestureLocked: false,
+      playbackRate: 1.5,
+      shouldPlay: false,
+    });
+  });
+
+  it('keeps the global default playback rate during a center hold', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: true,
+        defaultPlaybackRate: 1.5,
+        itemIndex: 4,
+        transientHoldState: createTransientHoldState({
+          basePausedByUser: true,
+          zone: 'center',
+        }),
+      })
+    ).toEqual({
+      isGestureLocked: true,
+      playbackRate: 1.5,
+      shouldPlay: false,
+    });
+  });
+
+  it('keeps the temporary 2x hold override above the global default playback rate', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: true,
+        defaultPlaybackRate: 1.5,
+        itemIndex: 4,
+        transientHoldState: createTransientHoldState({
+          basePausedByUser: true,
+          zone: 'right',
+        }),
+      })
+    ).toEqual({
+      isGestureLocked: true,
+      playbackRate: 2,
+      shouldPlay: true,
+    });
+  });
+
+  it('returns the global default playback rate for inactive rows without playing them', () => {
+    expect(
+      resolveEffectivePlaybackState({
+        activeIndex: 4,
+        basePausedByUser: false,
+        defaultPlaybackRate: 1.5,
+        itemIndex: 3,
+        transientHoldState: null,
+      })
+    ).toEqual({
+      isGestureLocked: false,
+      playbackRate: 1.5,
       shouldPlay: false,
     });
   });

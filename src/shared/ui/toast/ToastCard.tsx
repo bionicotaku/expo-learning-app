@@ -200,7 +200,9 @@ export function ToastCard({
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
-        layout={LinearTransition.duration(TOAST_ENTER_DURATION_MS)}
+        layout={LinearTransition.duration(TOAST_ENTER_DURATION_MS).easing(
+          Easing.out(Easing.cubic)
+        )}
         style={[
           animatedStyle,
           {

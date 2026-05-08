@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { VideoListItem } from '@/entities/video';
+import { usePlaybackRate } from '@/features/playback-settings/model/playback-settings-store';
 import {
   createTransientHoldState,
   isGestureLocked,
@@ -81,6 +82,7 @@ export function useFullscreenPlaybackSession({
     useState<FullscreenActivePlayerSurfaceState | null>(null);
   const [rowPlaybackHudStateByVideoId, setRowPlaybackHudStateByVideoId] =
     useState<FullscreenRowPlaybackHudStateByVideoId>({});
+  const defaultPlaybackRate = usePlaybackRate();
 
   const activeItemId = useMemo(
     () => (activeIndex === null ? null : (items[activeIndex]?.videoId ?? null)),
@@ -363,6 +365,7 @@ export function useFullscreenPlaybackSession({
       const effectivePlaybackState = resolveEffectivePlaybackState({
         activeIndex,
         basePausedByUser,
+        defaultPlaybackRate,
         itemIndex: index,
         transientHoldState,
       });
@@ -388,6 +391,7 @@ export function useFullscreenPlaybackSession({
       activeVisitToken,
       activeSurfaceState,
       basePausedByUser,
+      defaultPlaybackRate,
       rowPlaybackHudStateByVideoId,
       transientHoldState,
     ]
