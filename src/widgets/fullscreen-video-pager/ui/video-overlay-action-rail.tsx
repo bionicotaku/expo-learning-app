@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { View } from 'react-native';
 
+import { formatEngagementCount } from '@/features/video-engagement';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
-import { formatEngagementCount } from '../model/engagement-count';
 import {
   fullscreenVideoOverlayActionItems,
   type FullscreenVideoOverlayActionItem,
@@ -10,9 +10,10 @@ import {
 import { VideoOverlayActionButton } from './video-overlay-action-button';
 
 type VideoOverlayActionRailProps = {
-  areEngagementActionsDisabled: boolean;
   bottomInset: number;
   favoriteCount: number;
+  isFavoriteActionDisabled: boolean;
+  isLikeActionDisabled: boolean;
   isFavorited: boolean;
   isLiked: boolean;
   likeCount: number;
@@ -54,9 +55,10 @@ function getEngagementActionCountLabel(
 }
 
 function VideoOverlayActionRailComponent({
-  areEngagementActionsDisabled,
   bottomInset,
   favoriteCount,
+  isFavoriteActionDisabled,
+  isLikeActionDisabled,
   isFavorited,
   isLiked,
   likeCount,
@@ -104,7 +106,13 @@ function VideoOverlayActionRailComponent({
           countLabel={getEngagementActionCountLabel(item, likeCount, favoriteCount)}
           key={item.id}
           item={item}
-          disabled={areEngagementActionsDisabled && (item.id === 'like' || item.id === 'favorite')}
+          disabled={
+            item.id === 'like'
+              ? isLikeActionDisabled
+              : item.id === 'favorite'
+                ? isFavoriteActionDisabled
+                : false
+          }
           onPress={onActionPress}
           tintColor={
             item.id === 'subtitle'

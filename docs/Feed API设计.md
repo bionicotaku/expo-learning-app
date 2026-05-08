@@ -49,7 +49,7 @@ type FeedItem = {
 - `title / description`：视频基础文案。
 - `videoUrl / coverImageUrl`：播放资源和封面资源。
 - `durationSeconds / viewCount`：基础展示统计。
-- `likeCount / favoriteCount`：全局统计数；fullscreen action rail 会在当前用户本地 toggle 后派生展示值，但不会把派生值写回 feed truth 或调用 API。
+- `likeCount / favoriteCount`：全局统计数；fullscreen action rail 会在当前用户写入 like / favorite 时派生展示值，但不会把派生值写回 feed truth，也不要求写 API 返回 count。
 - `tags`：卡片标签来源。
 
 ## 4. 前端映射

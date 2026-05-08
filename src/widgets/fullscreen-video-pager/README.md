@@ -328,7 +328,7 @@ fullscreen 右侧 action rail 当前固定为：
 
 `share` 已迁移到 playback settings sheet，fullscreen 右侧 action rail 不再渲染分享按钮，也不再保留分享 action 的外部冒泡入口。
 
-当前 `like / favorite` 只做本地 runtime toggle，不调真实 API。
+当前 `like / favorite` 通过 `features/video-engagement` 发起写 API，并继续用本地 runtime override 驱动即时 UI。
 
 count 显示规则：
 
@@ -336,12 +336,13 @@ count 显示规则：
 - 当前显示值由 row 根据 `VideoMeta` base state 与 `video-runtime` effective state 派生
 - 用户本地点赞 / 收藏会让显示值 `+1`；取消会让显示值 `-1`
 - 派生显示值不写回 `VideoListItem`，也不进入 `video-runtime-store`
+- 写 API 成功后不更新 feed count 或 video meta cache；失败后回滚 runtime override
 - 小于 `10000` 显示完整数字；大于等于 `10000` 显示为 `1万 / 1.1万`
 - 如果 `VideoMeta` 尚未加载或加载失败，按钮禁用，但仍展示 feed count
 
 但这层 runtime toggle 不是长期真值：
 
-- 当前会话里，点击后会立即覆盖当前 row 的 `VideoMeta` base 值
+- 当前会话里，点击后会立即基于当前 row 的 `VideoMeta` base 值写入 runtime override
 - 后续 feed refresh 不会重置同一 `videoId` 的本地 like/favorite override
 - 如果当前 row 的 `VideoMeta` 尚未加载或加载失败，like/favorite 按钮禁用
 
@@ -350,8 +351,8 @@ count 显示规则：
 - `FullscreenVideoPager`
   - 继续消费 canonical `VideoListItem[]`
 - `FullscreenVideoRow`
-  - 以 `VideoMeta` 为 base，通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
-  - `like / favorite` 也在 row 内直接写入 runtime
+  - 以 `VideoMeta` 为 base，通过 `features/video-engagement` 按 `videoId` 订阅当前 `isLiked / isFavorited`
+  - `like / favorite` 在 engagement feature 内发起 mutation，并乐观写入 runtime
   - `subtitle` 在 row 内循环全局字幕显示模式：`off -> english -> bilingual -> off`
 
 也就是说，fullscreen 的 action active state 不再依赖整表 effective items、page relay 或 `FlatList.extraData` 才能刷新。

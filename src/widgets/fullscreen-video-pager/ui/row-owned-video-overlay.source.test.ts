@@ -32,8 +32,10 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('isFavorited');
     expect(source).toContain('likeCount');
     expect(source).toContain('favoriteCount');
-    expect(source).toContain('areEngagementActionsDisabled');
-    expect(source).toContain('areEngagementActionsDisabled={areEngagementActionsDisabled}');
+    expect(source).toContain('isLikeActionDisabled');
+    expect(source).toContain('isFavoriteActionDisabled');
+    expect(source).toContain('isLikeActionDisabled={isLikeActionDisabled}');
+    expect(source).toContain('isFavoriteActionDisabled={isFavoriteActionDisabled}');
     expect(source).toContain('likeCount={likeCount}');
     expect(source).toContain('favoriteCount={favoriteCount}');
     expect(source).toContain('LinearTransition.springify()');

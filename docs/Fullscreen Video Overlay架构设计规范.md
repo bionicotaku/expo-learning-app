@@ -135,7 +135,7 @@ row 内正式顺序固定为：
 - 基础值来自 feed 返回的 `VideoListItem.likeCount / favoriteCount`
 - 当前用户 base state 来自 `VideoMeta.isLiked / isFavorited`
 - 本地 effective state 来自 `features/video-runtime`
-- row 层只派生展示值，不把派生 count 写回 feed truth，也不调用 API
+- row 层通过 `features/video-engagement` 发起 like / favorite 写 API，但只派生展示 count，不把派生 count 写回 feed truth
 - 本地点赞 / 收藏会让显示值 `+1`；取消会让显示值 `-1`
 - 小于 `10000` 显示完整数字；大于等于 `10000` 显示为 `1万 / 1.1万`
 - `VideoMeta` 未加载或失败时 like/favorite 按钮禁用，但仍显示 feed count

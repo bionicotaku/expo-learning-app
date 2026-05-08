@@ -42,3 +42,4 @@ type VideoMeta = {
 - feed 不返回 `isLiked / isFavorited / transcriptUrl`
 - fullscreen resources 读取 active `±1` 的 video meta
 - video runtime 以 video meta 的 flags 为 base，保存本地 override
+- like / favorite 写入由 `features/video-engagement` 负责；成功后不主动更新 video meta cache

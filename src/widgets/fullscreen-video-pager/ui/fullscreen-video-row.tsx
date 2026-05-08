@@ -8,11 +8,11 @@ import {
   useCycleSubtitleDisplayMode,
   type SubtitleDisplayMode,
 } from '@/features/playback-settings';
+import { useVideoEngagementState } from '@/features/video-engagement';
 import {
   createWordDetailDialogPayloadFromTranscriptToken,
   usePresentWordDetailDialog,
 } from '@/features/word-detail';
-import { useVideoRuntimeState } from '@/features/video-runtime';
 import type {
   FullscreenHoldZone,
   FullscreenTapZone,
@@ -23,7 +23,6 @@ import {
   shouldReserveCenterForPause,
 } from '../model/row-hud-layout';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
-import { resolveEffectiveEngagementCount } from '../model/engagement-count';
 import {
   areFullscreenVideoRowRenderPropsEqual,
   type FullscreenVideoRowRenderProps,
@@ -99,28 +98,23 @@ function FullscreenVideoRowComponent({
   const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
   const presentWordDetailDialog = usePresentWordDetailDialog();
   const cycleSubtitleDisplayMode = useCycleSubtitleDisplayMode();
-  const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
+  const {
+    favoriteCount,
+    isFavoritePending,
+    isFavorited,
+    isLikePending,
+    isLiked,
+    likeCount,
+    setFavorited,
+    setLiked,
+  } = useVideoEngagementState({
+    baseFavoriteCount: video.favoriteCount,
     baseIsFavorited: videoMeta?.isFavorited ?? false,
     baseIsLiked: videoMeta?.isLiked ?? false,
+    baseLikeCount: video.likeCount,
+    isEnabled: videoMeta !== null,
     videoId: video.videoId,
   });
-  const areEngagementActionsDisabled = videoMeta === null;
-  const effectiveLikeCount =
-    videoMeta === null
-      ? video.likeCount
-      : resolveEffectiveEngagementCount({
-          baseCount: video.likeCount,
-          baseIsActive: videoMeta.isLiked,
-          effectiveIsActive: isLiked,
-        });
-  const effectiveFavoriteCount =
-    videoMeta === null
-      ? video.favoriteCount
-      : resolveEffectiveEngagementCount({
-          baseCount: video.favoriteCount,
-          baseIsActive: videoMeta.isFavorited,
-          effectiveIsActive: isFavorited,
-        });
   const showCenteredPause = shouldReserveCenterForPause({
     pauseVisible: hudState.pauseIndicatorVisible,
     transientFeedbackKind: hudState.transientFeedback?.kind ?? null,
@@ -168,20 +162,20 @@ function FullscreenVideoRowComponent({
 
   const handleActionPress = useCallback((item: FullscreenVideoOverlayActionItem) => {
     if (item.id === 'like') {
-      if (areEngagementActionsDisabled) {
+      if (videoMeta === null || isLikePending) {
         return;
       }
 
-      toggleLiked();
+      void setLiked(!isLiked);
       return;
     }
 
     if (item.id === 'favorite') {
-      if (areEngagementActionsDisabled) {
+      if (videoMeta === null || isFavoritePending) {
         return;
       }
 
-      toggleFavorited();
+      void setFavorited(!isFavorited);
       return;
     }
 
@@ -189,10 +183,14 @@ function FullscreenVideoRowComponent({
       cycleSubtitleDisplayMode();
     }
   }, [
-    areEngagementActionsDisabled,
     cycleSubtitleDisplayMode,
-    toggleFavorited,
-    toggleLiked,
+    isFavoritePending,
+    isFavorited,
+    isLikePending,
+    isLiked,
+    setFavorited,
+    setLiked,
+    videoMeta,
   ]);
   const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
     const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
@@ -251,11 +249,12 @@ function FullscreenVideoRowComponent({
         activeVisitToken={activeVisitToken}
         bottomInset={bottomInset}
         description={video.description}
-        areEngagementActionsDisabled={areEngagementActionsDisabled}
-        favoriteCount={effectiveFavoriteCount}
+        favoriteCount={favoriteCount}
+        isFavoriteActionDisabled={videoMeta === null || isFavoritePending}
+        isLikeActionDisabled={videoMeta === null || isLikePending}
         isFavorited={isFavorited}
         isLiked={isLiked}
-        likeCount={effectiveLikeCount}
+        likeCount={likeCount}
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
         onSubtitleTokenPress={handleSubtitleTokenPress}
