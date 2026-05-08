@@ -24,6 +24,7 @@ fullscreen 资源读取固定为：
 - active 切换时不能展示上一条视频的 meta 或 transcript
 - video meta query 失败时触发全局 error toast：`视频数据获取失败`
 - transcript asset query 失败时触发全局 error toast：`字幕获取失败`
+- transcript asset query 会把 React Query `signal` 传给 repository；取消请求不展示 toast
 - 每次 query attempt 失败弹一次 toast；同一次 error 的稳定重渲染不重复弹
 - `refetchOnMount` 只对 cached error query 返回 true；退出 fullscreen 后再次进入会重试失败资源
 - cached success query 继续复用，不因 remount 重新请求
@@ -51,7 +52,7 @@ useFullscreenVideoResources({
 - active meta error：transcript 不请求，返回 `idle / null`
 - active meta success 且 `transcriptUrl === null`：transcript 为 `idle / null`
 - transcript asset error：只影响字幕，不影响视频播放和 action rail
-- meta / transcript asset 的每次实际请求失败都会通过全局红色 toast 给出中文反馈
+- meta / transcript asset 的每次实际请求失败都会通过全局红色 toast 给出中文反馈；React Query 主动取消的 transcript 请求除外
 
 ## 4. UI 边界
 

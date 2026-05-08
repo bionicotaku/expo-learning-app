@@ -13,9 +13,10 @@
 - `model/mappers.ts`
   - DTO -> domain 映射
 - `api/transcript-asset-repository.ts`
-  - `fetchTranscriptAsset(transcriptUrl)` 公开读取入口
+  - `fetchTranscriptAsset(transcriptUrl, options?)` 公开读取入口
   - 只按 `VideoMeta.transcriptUrl` 读取 asset JSON
   - 不再按 `videoId` 推导 transcript 资源
+  - 透传 React Query `signal`，并使用 shared JSON resource timeout
 
 边界约束：
 
@@ -25,3 +26,9 @@
 - 不放 token 点击、解释弹层或字幕交互状态
 
 当前这里读取的是 URL-addressed transcript asset。`videoId -> transcriptUrl` 属于 `entities/video-meta`。
+
+失败语义：
+
+- timeout / network / HTTP 5xx 是 retryable
+- 外部 abort 是 non-retryable，并由 fullscreen resources 过滤为非用户可见失败
+- HTTP 4xx、invalid JSON、缺少 `sentences` 是 non-retryable

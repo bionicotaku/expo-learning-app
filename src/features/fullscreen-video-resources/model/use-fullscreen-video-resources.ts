@@ -4,6 +4,7 @@ import { useQueries } from '@tanstack/react-query';
 import { fetchTranscriptAsset, type Transcript } from '@/entities/transcript';
 import { fetchVideoMeta, type VideoMeta } from '@/entities/video-meta';
 import type { VideoListItem } from '@/entities/video';
+import { ApiError } from '@/shared/api';
 import { toast } from '@/shared/lib/toast';
 
 import { getTranscriptAssetQueryKey, getVideoMetaQueryKey } from './fullscreen-video-resource-query';
@@ -45,7 +46,7 @@ function createVideoMetaQueryOptions(videoId: string) {
 function createTranscriptAssetQueryOptions(transcriptUrl: string) {
   return {
     queryKey: getTranscriptAssetQueryKey(transcriptUrl),
-    queryFn: () => fetchTranscriptAsset(transcriptUrl),
+    queryFn: ({ signal }: { signal: AbortSignal }) => fetchTranscriptAsset(transcriptUrl, { signal }),
     staleTime: Infinity,
     gcTime: 30 * 60 * 1000,
     refetchOnMount: shouldRefetchFailedQueryOnMount,
@@ -77,6 +78,10 @@ function getQueryFailureMarker(query: { errorUpdatedAt: number; failureCount: nu
   return `${query.errorUpdatedAt}:${query.failureCount}`;
 }
 
+function shouldToastResourceError(error: unknown) {
+  return !(error instanceof ApiError && error.code === 'REQUEST_ABORTED');
+}
+
 export function useFullscreenVideoResources({
   activeVideoId,
   activeIndex,
@@ -102,7 +107,7 @@ export function useFullscreenVideoResources({
       }
 
       const failureKey = `video-meta:${videoId}`;
-      if (query.isError) {
+      if (query.isError && shouldToastResourceError(query.error)) {
         const failureMarker = getQueryFailureMarker(query);
         if (toastedFailureMarkersByKeyRef.current.get(failureKey) === failureMarker) {
           return;
@@ -160,7 +165,7 @@ export function useFullscreenVideoResources({
       }
 
       const failureKey = `transcript-asset:${transcriptUrl}`;
-      if (query.isError) {
+      if (query.isError && shouldToastResourceError(query.error)) {
         const failureMarker = getQueryFailureMarker(query);
         if (toastedFailureMarkersByKeyRef.current.get(failureKey) === failureMarker) {
           return;

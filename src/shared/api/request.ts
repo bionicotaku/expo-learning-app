@@ -1,9 +1,21 @@
 import { ApiError } from './api-error';
+import { parseJsonResponse } from './json-response';
+import { createRequestAbortController, isAbortError } from './request-abort-controller';
 import { getRegisteredApiToken } from './token-registry';
+
+export const DEFAULT_API_REQUEST_TIMEOUT_MS = 10_000;
 
 export type RequestAuthMode = 'none' | 'optional' | 'required';
 type QueryValue = string | number | boolean | null | undefined;
 type QueryRecord = Record<string, QueryValue | QueryValue[]>;
+
+type ApiErrorResponseBody = {
+  message?: string;
+  code?: string;
+  details?: unknown;
+  request_id?: string;
+  requestId?: string;
+};
 
 export type RequestJsonOptions<TBody = unknown> = {
   path: string;
@@ -54,18 +66,8 @@ function buildApiUrl(path: string, query?: QueryRecord) {
   return url;
 }
 
-async function parseJsonBody<T>(response: Response): Promise<T> {
-  const text = await response.text();
-
-  if (!text) {
-    return null as T;
-  }
-
-  return JSON.parse(text) as T;
-}
-
-function isAbortError(error: unknown) {
-  return error instanceof DOMException && error.name === 'AbortError';
+function isRetryableHttpStatus(status: number) {
+  return status === 408 || status === 429 || status >= 500;
 }
 
 export async function requestJson<TResponse, TBody = unknown>({
@@ -75,44 +77,22 @@ export async function requestJson<TResponse, TBody = unknown>({
   body,
   headers,
   auth = 'none',
-  timeoutMs,
+  timeoutMs = DEFAULT_API_REQUEST_TIMEOUT_MS,
   signal,
 }: RequestJsonOptions<TBody>): Promise<TResponse> {
   const url = buildApiUrl(path, query);
-  const controller = new AbortController();
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let didTimeout = false;
-
-  if (signal) {
-    if (signal.aborted) {
-      controller.abort(signal.reason);
-    } else {
-      signal.addEventListener(
-        'abort',
-        () => {
-          controller.abort(signal.reason);
-        },
-        { once: true }
-      );
-    }
-  }
-
-  if (timeoutMs !== undefined) {
-    timeoutId = setTimeout(() => {
-      didTimeout = true;
-      controller.abort();
-    }, timeoutMs);
-  }
+  const abortController = createRequestAbortController({
+    signal,
+    timeoutMs,
+  });
 
   const requestHeaders: Record<string, string> = {
+    Accept: 'application/json',
+    ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
     ...headers,
   };
 
   try {
-    if (body !== undefined) {
-      requestHeaders['Content-Type'] = 'application/json';
-    }
-
     if (auth !== 'none') {
       const token = await getRegisteredApiToken();
 
@@ -132,7 +112,7 @@ export async function requestJson<TResponse, TBody = unknown>({
       method,
       headers: requestHeaders,
       body: body === undefined ? undefined : JSON.stringify(body),
-      signal: controller.signal,
+      signal: abortController.signal,
     });
 
     if (response.status === 204) {
@@ -140,25 +120,29 @@ export async function requestJson<TResponse, TBody = unknown>({
     }
 
     if (!response.ok) {
-      const errorBody = await parseJsonBody<{ message?: string; code?: string }>(response).catch(
-        () => null
-      );
+      const errorBody = await parseJsonResponse<ApiErrorResponseBody | null>(response, {
+        invalidJsonMessage: 'Error response payload was not valid JSON',
+      }).catch(() => null);
 
       throw new ApiError(errorBody?.message ?? 'Request failed', {
         status: response.status,
         code: errorBody?.code ?? 'HTTP_ERROR',
-        retryable: false,
+        retryable: isRetryableHttpStatus(response.status),
+        details: errorBody?.details,
+        requestId: errorBody?.request_id ?? errorBody?.requestId,
       });
     }
 
-    return parseJsonBody<TResponse>(response);
+    return parseJsonResponse<TResponse>(response, {
+      invalidJsonMessage: 'Response payload was not valid JSON',
+    });
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
 
     if (isAbortError(error)) {
-      if (didTimeout) {
+      if (abortController.getAbortReason() === 'timeout') {
         throw new ApiError('Request timed out', {
           code: 'TIMEOUT',
           retryable: true,
@@ -179,8 +163,6 @@ export async function requestJson<TResponse, TBody = unknown>({
       cause: error,
     });
   } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
+    abortController.cleanup();
   }
 }

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { VideoListItem } from '@/entities/video';
 import type { VideoMeta } from '@/entities/video-meta';
 import type { Transcript } from '@/entities/transcript';
+import { ApiError } from '@/shared/api';
 import { toast } from '@/shared/lib/toast';
 
 import { getVideoMetaQueryKey } from './fullscreen-video-resource-query';
@@ -176,6 +177,44 @@ describe('useFullscreenVideoResources runtime', () => {
         kind: 'error',
         title: '字幕获取失败',
       });
+    });
+  });
+
+  it('passes the React Query signal to transcript asset loading', async () => {
+    fetchVideoMetaMock.mockResolvedValue(videoMetaWithTranscript);
+    fetchTranscriptAssetMock.mockResolvedValue(transcript);
+
+    renderConsumer();
+
+    await waitForAssertion(() => {
+      expect(fetchTranscriptAssetMock).toHaveBeenCalledWith(
+        videoMetaWithTranscript.transcriptUrl,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+  });
+
+  it('does not show transcript failure toast for React Query abort errors', async () => {
+    fetchVideoMetaMock.mockResolvedValue(videoMetaWithTranscript);
+    fetchTranscriptAssetMock.mockRejectedValue(
+      new ApiError('Request was aborted', {
+        code: 'REQUEST_ABORTED',
+        retryable: false,
+      })
+    );
+
+    renderConsumer();
+
+    await waitForAssertion(() => {
+      expect(fetchTranscriptAssetMock).toHaveBeenCalledTimes(1);
+    });
+    await flushQueryWork();
+
+    expect(toastSpy).not.toHaveBeenCalledWith({
+      kind: 'error',
+      title: '字幕获取失败',
     });
   });
 

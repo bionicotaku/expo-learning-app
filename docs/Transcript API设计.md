@@ -19,6 +19,7 @@
 - query key 使用 `['transcript-asset', transcriptUrl]`
 - transcript JSON transport 仍保持 `snake_case`
 - repository 边界映射成前端内部 `camelCase`
+- asset 请求支持 timeout 和外部 abort signal
 
 ## 3. Asset 响应契约
 
@@ -68,6 +69,18 @@ videoId
 ```
 
 `transcriptUrl === null` 表示该视频没有 transcript，不是错误。
+
+`fetchTranscriptAsset(transcriptUrl, { signal, timeoutMs })` 使用完整 URL 读取 JSON asset，不拼接业务 API base URL，也不附带 auth。默认 timeout 为 `10s`。
+
+错误语义：
+
+- timeout：`TIMEOUT`，`retryable: true`
+- 外部 abort：`REQUEST_ABORTED`，`retryable: false`
+- network failure：`NETWORK_ERROR`，`retryable: true`
+- HTTP 4xx：`TRANSCRIPT_ASSET_FETCH_FAILED`，`retryable: false`
+- HTTP 5xx：`TRANSCRIPT_ASSET_FETCH_FAILED`，`retryable: true`
+- invalid JSON：`INVALID_JSON_RESPONSE`，`retryable: false`
+- 缺少 `sentences`：`TRANSCRIPT_ASSET_FETCH_FAILED`，`retryable: false`
 
 ## 5. 边界
 

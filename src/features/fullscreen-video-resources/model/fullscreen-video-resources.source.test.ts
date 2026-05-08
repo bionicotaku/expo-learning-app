@@ -12,6 +12,8 @@ describe('fullscreen video resources source', () => {
     expect(source).toContain('useQueries');
     expect(source).toContain('fetchVideoMeta');
     expect(source).toContain('fetchTranscriptAsset');
+    expect(source).toContain('fetchTranscriptAsset(transcriptUrl, { signal })');
+    expect(source).toContain('REQUEST_ABORTED');
     expect(source).toContain("import { toast } from '@/shared/lib/toast';");
     expect(source).toContain('getVideoMetaQueryKey');
     expect(source).toContain('getTranscriptAssetQueryKey');

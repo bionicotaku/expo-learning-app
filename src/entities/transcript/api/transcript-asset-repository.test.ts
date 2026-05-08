@@ -34,6 +34,7 @@ const transcriptResponse = {
 describe('transcript asset repository', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it('fetches transcript JSON from a transcript asset url and returns camelCase domain data', async () => {
@@ -62,7 +63,32 @@ describe('transcript asset repository', () => {
         },
       ],
     });
-    expect(fetchMock).toHaveBeenCalledWith(transcriptUrl);
+    expect(fetchMock).toHaveBeenCalledWith(
+      transcriptUrl,
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    );
+  });
+
+  it('passes an external abort signal to the transcript asset fetch', async () => {
+    const controller = new AbortController();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(transcriptResponse), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        status: 200,
+      })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchTranscriptAsset(transcriptUrl, {
+      signal: controller.signal,
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [RequestInfo | URL, RequestInit];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 
   it('rejects HTTP failures', async () => {
@@ -91,7 +117,7 @@ describe('transcript asset repository', () => {
 
     await expect(fetchTranscriptAsset(transcriptUrl)).rejects.toMatchObject({
       name: 'ApiError',
-      code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
+      code: 'INVALID_JSON_RESPONSE',
       retryable: false,
       status: 200,
     });
@@ -114,7 +140,32 @@ describe('transcript asset repository', () => {
       name: 'ApiError',
       code: 'TRANSCRIPT_ASSET_FETCH_FAILED',
       retryable: false,
-      status: 200,
     });
+  });
+
+  it('surfaces transcript asset timeout errors before mapping', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new DOMException('Aborted', 'AbortError'));
+        });
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const request = fetchTranscriptAsset(transcriptUrl, {
+      timeoutMs: 100,
+    });
+    const expectation = expect(request).rejects.toMatchObject({
+      code: 'TIMEOUT',
+      name: 'ApiError',
+      retryable: true,
+    });
+
+    await vi.advanceTimersByTimeAsync(100);
+
+    await expectation;
+    vi.useRealTimers();
   });
 });
