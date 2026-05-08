@@ -2,9 +2,12 @@ import { memo } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
+import type { Transcript } from '@/entities/transcript';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
+import type { RowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
+import { BasicSubtitleOverlay } from './basic-subtitle-overlay';
 import {
   ExpandableOverlayDescription,
   ExpandableOverlayDescriptionAction,
@@ -25,6 +28,7 @@ const contentLayoutTransition = LinearTransition.springify()
   .overshootClamping(1);
 
 type RowOwnedVideoOverlayProps = {
+  activeTranscript: Transcript | null;
   activeVisitToken: number | null;
   bottomInset: number;
   description: string;
@@ -32,10 +36,13 @@ type RowOwnedVideoOverlayProps = {
   isLiked: boolean;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
+  seekBarStore: RowPlaybackSeekBarStore;
+  shouldReserveSubtitleSpace: boolean;
   title: string;
 };
 
 function RowOwnedVideoOverlayComponent({
+  activeTranscript,
   activeVisitToken,
   bottomInset,
   description,
@@ -43,6 +50,8 @@ function RowOwnedVideoOverlayComponent({
   isLiked,
   measurementCache,
   onActionPress,
+  seekBarStore,
+  shouldReserveSubtitleSpace,
   title,
 }: RowOwnedVideoOverlayProps) {
   const descriptionState = useExpandableOverlayDescriptionState({
@@ -97,6 +106,12 @@ function RowOwnedVideoOverlayComponent({
             gap: contentTextGap,
           }}
         >
+          <BasicSubtitleOverlay
+            maxTextWidth={sharedTextWidth}
+            seekBarStore={seekBarStore}
+            shouldReserveSpace={shouldReserveSubtitleSpace}
+            transcript={activeTranscript}
+          />
           <Text
             allowFontScaling={false}
             selectable={false}

@@ -28,11 +28,18 @@ describe('fullscreen video row source', () => {
     expect(source).toContain("if (item.id === 'favorite')");
     expect(source).toContain('onActionPress?.(video.videoId, item);');
     expect(source).toContain('activeVisitToken={activeVisitToken}');
+    expect(source).toContain('activeTranscript={activeTranscript}');
+    expect(source).toContain('seekBarStore={seekBarStore}');
+    expect(source).toContain('shouldReserveSubtitleSpace={shouldReserveSubtitleSpace}');
     expect(source).toContain('activeVisitToken: previousProps.activeVisitToken');
     expect(source).toContain('activeVisitToken: nextProps.activeVisitToken');
     expect(source).toContain('isActive={isActive}');
     expect(source).toContain('previousProps.video.isLiked === nextProps.video.isLiked');
     expect(source).toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
+    expect(source).toContain('previousProps.activeTranscript === nextProps.activeTranscript');
+    expect(source).toContain(
+      'previousProps.shouldReserveSubtitleSpace === nextProps.shouldReserveSubtitleSpace'
+    );
     expect(source).toContain('showCenteredPause={showCenteredPause}');
     expect(source).toContain('centerOwner={centerOwner}');
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');

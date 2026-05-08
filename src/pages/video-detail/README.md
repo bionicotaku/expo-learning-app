@@ -34,6 +34,8 @@ VideoDetailPage
 
 - 持有 `pagerReportedActive`
 - 用 `pagerReportedActive ?? entryTarget` 派生 transcript source 输入
+- 接收 `features/transcript-source` 返回的 active transcript，并把结果传给 `FullscreenVideoPager`
+- `activeTranscriptStatus` 为 `loading | success` 时让 fullscreen row 预留基础字幕高度；`idle | error` 不预留
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
 - 通过 `usePresentPlaybackSettingsSheet()` 把 fullscreen 中间长按接到播放设置 sheet
@@ -48,6 +50,7 @@ VideoDetailPage
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
 - page 不直接实现 transcript query cache；这层属于 `features/transcript-source`，由 session 组件消费
+- page 不直接消费或渲染 transcript 内容；基础字幕展示由 session 把 active transcript 下传给 fullscreen pager/row 后完成
 - page 不直接定义 runtime store 结构
 - page 不持有跨页面长期状态
 - page 不定义 `dangerouslySingular`；route 单实例约束属于 `app/_layout.tsx`

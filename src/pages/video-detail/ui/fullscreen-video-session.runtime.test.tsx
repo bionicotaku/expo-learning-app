@@ -3,6 +3,7 @@ import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
 import type { VideoListItem } from '@/entities/video';
+import type { Transcript } from '@/entities/transcript';
 
 import { FullscreenVideoSession } from './fullscreen-video-session';
 
@@ -57,6 +58,19 @@ const items: VideoListItem[] = [
   },
 ];
 
+const activeTranscript: Transcript = {
+  sentences: [
+    {
+      end: 2000,
+      explanation: 'sentence explanation',
+      index: 0,
+      start: 1000,
+      text: 'Active transcript sentence',
+      tokens: [],
+    },
+  ],
+};
+
 const hoistedState = vi.hoisted(() => ({
   latestFullscreenVideoPagerProps: null as React.ComponentProps<any> | null,
 }));
@@ -89,6 +103,11 @@ describe('fullscreen video session runtime', () => {
     presentPlaybackSettingsSheetMock.mockReset();
     requestMoreMock.mockReset();
     useFullscreenTranscriptSourceMock.mockReset();
+    useFullscreenTranscriptSourceMock.mockReturnValue({
+      activeTranscript: null,
+      activeTranscriptError: null,
+      activeTranscriptStatus: 'idle',
+    });
   });
 
   it('uses the entry target as the initial transcript source input before the pager reports an active item', () => {
@@ -165,5 +184,31 @@ describe('fullscreen video session runtime', () => {
     });
 
     expect(presentPlaybackSettingsSheetMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes loaded active transcript state through to the pager', () => {
+    useFullscreenTranscriptSourceMock.mockReturnValue({
+      activeTranscript,
+      activeTranscriptError: null,
+      activeTranscriptStatus: 'success',
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      activeTranscript,
+      shouldReserveSubtitleSpace: true,
+    });
   });
 });

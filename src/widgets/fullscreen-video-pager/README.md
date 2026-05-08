@@ -61,6 +61,9 @@ FullscreenVideoPager
 - `model/row-progress-snapshot.ts`
   - row-local progress snapshot shape
   - `timeUpdate` payload -> seek bar display snapshot
+- `model/current-transcript-sentence.ts`
+  - 基础字幕的当前句解析 helper
+  - 优先检查上次命中的句子，再检查相邻前后句，最后回退二分搜索
 - `model/row-playback-seek-bar-store.ts`
   - row-local seek bar runtime store
   - 持有真实 `progressSnapshot` 与 row-local `seekController`
@@ -69,7 +72,7 @@ FullscreenVideoPager
   - row 与 player surface 的 memo compare contract
 - `model/fullscreen-video-overlay-theme.ts`
   - row-owned overlay 的固定视觉尺寸 theme
-  - 统一提供 title / description / `展开 / 收起` 的文本指标
+  - 统一提供 subtitle / title / description / `展开 / 收起` 的文本指标
   - 统一提供 description action lane 的几何常量
 - `ui/fullscreen-video-pager.tsx`
   - FlatList 壳层
@@ -85,8 +88,11 @@ FullscreenVideoPager
   - 装配 row-local media layer、interaction layer、content overlay、HUD overlay、surface status overlay
 - `ui/row-owned-video-overlay.tsx`
   - row-owned 内容层
-  - 持有标题与底部内容文案区的排版壳
-  - 标题与 description 共用同一条文本列宽；内容区整体向左扩并缩小 rail 前留白
+  - 持有基础字幕、标题与底部内容文案区的排版壳
+  - 基础字幕、标题与 description 共用同一条文本列宽；内容区整体向左扩并缩小 rail 前留白
+  - 基础字幕位于 title 上方，属于同一个 layout animation 内容列；description 展开导致内容列上移时，字幕一起上移
+  - 基础字幕只显示当前 `TranscriptSentence.text`，不可点击，不显示 explanation / token，也不打开弹层
+  - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态
   - 只消费 description 模块导出的语义结果 `actionPlacement`，再把它映射成自身的底部几何偏移
@@ -105,6 +111,10 @@ FullscreenVideoPager
   - 空 description 直接视为 `static + hidden + zero height`，不保留空白占位或展开入口
   - `viewState` 只表达 description 自己的语义状态：`mode`、`actionPlacement` 与文本高度，不再输出父层几何或并行布尔真相
   - `展开 / 收起` action presenter 挂在父层 absolute sibling，避开内容列的 layout animation；折叠态与第二行同 baseline，展开态作为独立最后一行；标签只在固定槽位里做 opacity crossfade，不再通过 enter/exit 重新挂载
+- `ui/basic-subtitle-overlay.tsx`
+  - row-owned 内容层内的基础字幕 presenter
+  - 通过 `useSyncExternalStore` 订阅 row-local `seekBarStore`
+  - 当前只做 read-only sentence text 展示；不承担 token 点击、解释弹层、句子导航或手势命中
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
   - 持有 row-local `surfacePresentation`
@@ -144,6 +154,7 @@ FullscreenVideoPager
 - 把 player surface 的 loading / error / retry 收口到 row-local presenter
 - 在 row 内维护 center owner，避免 pause / loading / seek 之间的布局抖动
 - 只为 active row 订阅 progress，并在 row 内局部渲染底部 seek bar
+- 只为 active row 接收 session 层传入的 `activeTranscript`，并用 row-local progress 显示基础字幕
 - 让 description 展开态保持 row-local UI state，不并入 page 或 runtime
 
 当前 widget 不承担：

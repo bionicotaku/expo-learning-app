@@ -12,11 +12,15 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('memo');
     expect(source).toContain('export const RowOwnedVideoOverlay = memo(');
     expect(source).toContain('VideoOverlayActionRail');
+    expect(source).toContain('BasicSubtitleOverlay');
     expect(source).toContain('ExpandableOverlayDescription');
     expect(source).toContain('ExpandableOverlayDescriptionAction');
     expect(source).toContain('useExpandableOverlayDescriptionState');
     expect(source).toContain('measurementCache');
     expect(source).toContain('activeVisitToken');
+    expect(source).toContain('activeTranscript');
+    expect(source).toContain('seekBarStore');
+    expect(source).toContain('shouldReserveSubtitleSpace');
     expect(source).toContain("../model/fullscreen-video-overlay-theme");
     expect(source).toContain('viewState.actionPlacement');
     expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionLaneHeight');

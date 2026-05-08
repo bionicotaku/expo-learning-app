@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
@@ -20,6 +21,7 @@ import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
 
 export type FullscreenVideoPagerProps = {
+  activeTranscript: Transcript | null;
   entryIndex: number;
   isInitialLoading: boolean;
   items: VideoListItem[];
@@ -29,15 +31,18 @@ export type FullscreenVideoPagerProps = {
     item: FullscreenVideoOverlayActionItem
   ) => void;
   onCenterHoldStart?: () => void;
+  shouldReserveSubtitleSpace: boolean;
 };
 
 export function FullscreenVideoPager({
+  activeTranscript,
   entryIndex,
   isInitialLoading,
   items,
   onActionPress,
   onActiveVideoChange,
   onCenterHoldStart,
+  shouldReserveSubtitleSpace,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -136,12 +141,23 @@ export function FullscreenVideoPager({
     () => ({
       activeIndex,
       activeItemId,
+      activeTranscript,
       bottomInset: insets.bottom,
       getRowRenderState,
       height,
+      shouldReserveSubtitleSpace,
       width,
     }),
-    [activeIndex, activeItemId, getRowRenderState, height, insets.bottom, width]
+    [
+      activeIndex,
+      activeItemId,
+      activeTranscript,
+      getRowRenderState,
+      height,
+      insets.bottom,
+      shouldReserveSubtitleSpace,
+      width,
+    ]
   );
 
   const renderItem = useCallback(
@@ -152,6 +168,7 @@ export function FullscreenVideoPager({
       return (
         <FullscreenVideoRow
           accessibilityLabel={rowRenderState.accessibilityLabel}
+          activeTranscript={isCurrentActiveItem ? activeTranscript : null}
           activeVisitToken={rowRenderState.activeVisitToken}
           bottomInset={insets.bottom}
           height={height}
@@ -171,6 +188,7 @@ export function FullscreenVideoPager({
           shouldEnableBackgroundGestures={rowRenderState.shouldEnableBackgroundGestures}
           shouldUsePlayer={shouldMountPlayer(index, activeIndex ?? -1)}
           shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
+          shouldReserveSubtitleSpace={isCurrentActiveItem && shouldReserveSubtitleSpace}
           video={item}
           width={width}
         />
@@ -179,6 +197,7 @@ export function FullscreenVideoPager({
     [
       activeIndex,
       activeItemId,
+      activeTranscript,
       getRowRenderState,
       handleDoubleTap,
       handleHoldEnd,
@@ -189,6 +208,7 @@ export function FullscreenVideoPager({
       insets.bottom,
       onActionPress,
       registerActiveController,
+      shouldReserveSubtitleSpace,
       width,
     ]
   );

@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
+import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
 import { useVideoRuntimeState } from '@/features/video-runtime';
 import type {
@@ -30,6 +31,7 @@ import { RowSurfaceStatusOverlay } from './row-surface-status-overlay';
 
 type FullscreenVideoRowProps = {
   accessibilityLabel: string;
+  activeTranscript: Transcript | null;
   activeVisitToken: number | null;
   bottomInset: number;
   height: number;
@@ -49,12 +51,14 @@ type FullscreenVideoRowProps = {
   shouldEnableBackgroundGestures: boolean;
   shouldUsePlayer: boolean;
   shouldPlay: boolean;
+  shouldReserveSubtitleSpace: boolean;
   video: VideoListItem;
   width: number;
 };
 
 function FullscreenVideoRowComponent({
   accessibilityLabel,
+  activeTranscript,
   activeVisitToken,
   video,
   width,
@@ -74,6 +78,7 @@ function FullscreenVideoRowComponent({
   shouldEnableBackgroundGestures,
   shouldUsePlayer,
   shouldPlay,
+  shouldReserveSubtitleSpace,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
@@ -179,6 +184,7 @@ function FullscreenVideoRowComponent({
       ) : null}
 
       <RowOwnedVideoOverlay
+        activeTranscript={activeTranscript}
         activeVisitToken={activeVisitToken}
         bottomInset={bottomInset}
         description={video.description}
@@ -186,6 +192,8 @@ function FullscreenVideoRowComponent({
         isLiked={isLiked}
         measurementCache={measurementCache}
         onActionPress={handleActionPress}
+        seekBarStore={seekBarStore}
+        shouldReserveSubtitleSpace={shouldReserveSubtitleSpace}
         title={video.title}
       />
       <RowPlaybackHudOverlay
@@ -246,7 +254,9 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.isFavorited === nextProps.video.isFavorited &&
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
-    previousProps.video.description === nextProps.video.description
+    previousProps.video.description === nextProps.video.description &&
+    previousProps.activeTranscript === nextProps.activeTranscript &&
+    previousProps.shouldReserveSubtitleSpace === nextProps.shouldReserveSubtitleSpace
   );
 }
 

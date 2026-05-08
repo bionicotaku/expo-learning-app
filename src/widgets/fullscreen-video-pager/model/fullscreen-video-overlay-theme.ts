@@ -14,6 +14,7 @@ export type FullscreenVideoOverlayTheme = {
   descriptionActionReserveWidth: number;
   descriptionActionText: FullscreenVideoOverlayTextMetrics;
   descriptionText: FullscreenVideoOverlayTextMetrics;
+  subtitleText: FullscreenVideoOverlayTextMetrics;
   titleText: FullscreenVideoOverlayTextMetrics;
 };
 
@@ -28,6 +29,10 @@ export const fullscreenVideoOverlayTheme: Readonly<FullscreenVideoOverlayTheme> 
   descriptionText: {
     fontSize: 13.5,
     lineHeight: 16,
+  },
+  subtitleText: {
+    fontSize: 16,
+    lineHeight: 20,
   },
   titleText: {
     fontSize: 15,
