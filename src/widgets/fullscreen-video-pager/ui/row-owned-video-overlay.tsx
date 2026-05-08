@@ -34,6 +34,7 @@ const contentLayoutTransition = LinearTransition.springify()
 type RowOwnedVideoOverlayProps = {
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
+  areSubtitlesVisible: boolean;
   bottomInset: number;
   description: string;
   isFavorited: boolean;
@@ -48,6 +49,7 @@ type RowOwnedVideoOverlayProps = {
 function RowOwnedVideoOverlayComponent({
   activeTranscript,
   activeVisitToken,
+  areSubtitlesVisible,
   bottomInset,
   description,
   isFavorited,
@@ -125,12 +127,14 @@ function RowOwnedVideoOverlayComponent({
                 paddingBottom: subtitleTitleGap,
               }}
             >
-              <BasicSubtitleOverlay
-                maxTextWidth={sharedTextWidth}
-                onTokenPress={onSubtitleTokenPress}
-                seekBarStore={seekBarStore}
-                transcript={activeTranscript}
-              />
+              {areSubtitlesVisible ? (
+                <BasicSubtitleOverlay
+                  maxTextWidth={sharedTextWidth}
+                  onTokenPress={onSubtitleTokenPress}
+                  seekBarStore={seekBarStore}
+                  transcript={activeTranscript}
+                />
+              ) : null}
             </View>
             <View style={titleDescriptionColumnStyle}>
               <Text
@@ -168,6 +172,7 @@ function RowOwnedVideoOverlayComponent({
       </View>
 
       <VideoOverlayActionRail
+        areSubtitlesVisible={areSubtitlesVisible}
         bottomInset={bottomInset}
         isFavorited={isFavorited}
         isLiked={isLiked}

@@ -11,11 +11,13 @@ const {
   onLatestActiveVideoIdChangeMock,
   presentPlaybackSettingsSheetMock,
   requestMoreMock,
+  useAreSubtitlesVisibleMock,
   useFullscreenTranscriptSourceMock,
 } = vi.hoisted(() => ({
   onLatestActiveVideoIdChangeMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
   requestMoreMock: vi.fn(),
+  useAreSubtitlesVisibleMock: vi.fn(),
   useFullscreenTranscriptSourceMock: vi.fn(),
 }));
 
@@ -80,6 +82,7 @@ vi.mock('@/features/transcript-source', () => ({
 }));
 
 vi.mock('@/features/playback-settings', () => ({
+  useAreSubtitlesVisible: useAreSubtitlesVisibleMock,
   usePresentPlaybackSettingsSheet: () => presentPlaybackSettingsSheetMock,
 }));
 
@@ -102,6 +105,8 @@ describe('fullscreen video session runtime', () => {
     onLatestActiveVideoIdChangeMock.mockReset();
     presentPlaybackSettingsSheetMock.mockReset();
     requestMoreMock.mockReset();
+    useAreSubtitlesVisibleMock.mockReset();
+    useAreSubtitlesVisibleMock.mockReturnValue(true);
     useFullscreenTranscriptSourceMock.mockReset();
     useFullscreenTranscriptSourceMock.mockReturnValue({
       activeTranscript: null,
@@ -208,9 +213,31 @@ describe('fullscreen video session runtime', () => {
 
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       activeTranscript,
+      areSubtitlesVisible: true,
     });
     expect(hoistedState.latestFullscreenVideoPagerProps).not.toHaveProperty(
       'shouldReserveSubtitleSpace'
     );
+  });
+
+  it('passes the global subtitle visibility preference through to the pager', () => {
+    useAreSubtitlesVisibleMock.mockReturnValue(false);
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      areSubtitlesVisible: false,
+    });
   });
 });

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
+import { useToggleSubtitlesVisible } from '@/features/playback-settings';
 import {
   createWordDetailDialogPayloadFromTranscriptToken,
   usePresentWordDetailDialog,
@@ -37,6 +38,7 @@ type FullscreenVideoRowProps = {
   accessibilityLabel: string;
   activeTranscript: Transcript | null;
   activeVisitToken: number | null;
+  areSubtitlesVisible: boolean;
   bottomInset: number;
   height: number;
   hudState: FullscreenRowPlaybackHudState;
@@ -63,6 +65,7 @@ function FullscreenVideoRowComponent({
   accessibilityLabel,
   activeTranscript,
   activeVisitToken,
+  areSubtitlesVisible,
   video,
   width,
   height,
@@ -88,6 +91,7 @@ function FullscreenVideoRowComponent({
   const pauseCenterReservationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekBarStore = useMemo(() => createRowPlaybackSeekBarStore(), []);
   const presentWordDetailDialog = usePresentWordDetailDialog();
+  const toggleSubtitlesVisible = useToggleSubtitlesVisible();
   const { isFavorited, isLiked, toggleFavorited, toggleLiked } = useVideoRuntimeState({
     baseIsFavorited: video.isFavorited,
     baseIsLiked: video.isLiked,
@@ -149,14 +153,21 @@ function FullscreenVideoRowComponent({
       return;
     }
 
-    onActionPress?.(video.videoId, item);
-  }, [onActionPress, toggleFavorited, toggleLiked, video.videoId]);
-  const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
-    const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
-
-    if (payload === null) {
+    if (item.id === 'subtitle') {
+      toggleSubtitlesVisible();
       return;
     }
+
+    onActionPress?.(video.videoId, item);
+  }, [
+    onActionPress,
+    toggleFavorited,
+    toggleLiked,
+    toggleSubtitlesVisible,
+    video.videoId,
+  ]);
+  const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
+    const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
 
     presentWordDetailDialog(payload);
   }, [presentWordDetailDialog]);
@@ -198,6 +209,7 @@ function FullscreenVideoRowComponent({
       <RowOwnedVideoOverlay
         activeTranscript={activeTranscript}
         activeVisitToken={activeVisitToken}
+        areSubtitlesVisible={areSubtitlesVisible}
         bottomInset={bottomInset}
         description={video.description}
         isFavorited={isFavorited}
@@ -267,7 +279,8 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.video.title === nextProps.video.title &&
     previousProps.video.description === nextProps.video.description &&
-    previousProps.activeTranscript === nextProps.activeTranscript
+    previousProps.activeTranscript === nextProps.activeTranscript &&
+    previousProps.areSubtitlesVisible === nextProps.areSubtitlesVisible
   );
 }
 

@@ -19,7 +19,7 @@
 - `semantic_element.base_form` 来自 `TranscriptToken.semanticElement.baseForm`
 - `semantic_element.dictionary` 来自 `TranscriptToken.semanticElement.dictionary`
 - `semantic_element.coarse_id` 来自 `TranscriptToken.semanticElement.coarseId`
-- `coarseId === null` 时返回 `null`，调用方不得打开 dialog
+- `semantic_element.coarse_id` 可以是 `null`；调用方仍然可以打开 dialog
 
 边界约束：
 

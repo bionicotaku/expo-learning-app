@@ -64,6 +64,9 @@ FullscreenVideoPager
 - `model/current-transcript-sentence.ts`
   - 基础字幕的当前句解析 helper
   - 优先检查上次命中的句子，再检查相邻前后句，最后回退二分搜索
+- `model/current-transcript-token.ts`
+  - 基础字幕的当前 token 解析 helper
+  - 在当前句 tokens 内优先检查上次命中的 token，再检查相邻前后 token，最后回退二分搜索
 - `model/transcript-token-display.ts`
   - 基础字幕 token 文本拼接 helper
   - 只处理 token 后置空格与常见前置标点，不承担完整排版引擎职责
@@ -97,12 +100,14 @@ FullscreenVideoPager
   - 基础字幕位于 title 上方，锚定同一个内容列，但通过 absolute sibling 脱离 title / description 的 normal flow
   - 基础字幕文本高度变化只向上增长，不重新布局 title / description；description 展开导致内容列上移时，字幕仍跟随锚点上移
   - 基础字幕优先渲染当前 `TranscriptSentence.tokens`；没有 token 时才 fallback 到整句 `TranscriptSentence.text`
-  - 只有带 `semanticElement.coarseId` 的 token 可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog
+  - 当前播放 token 使用纯色高亮；高亮只改变 token 的 `color` 与 `textShadow`，不改变字号、行高、字重、间距或换行模型
+  - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog，payload 中的 `semantic_element.coarse_id` 可以是 `null`
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
+  - 字幕是否显示由 `features/playback-settings` 的 `areSubtitlesVisible` 全局 session 偏好控制；关闭时只是不挂载 `BasicSubtitleOverlay`，不停止 transcript source
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
-  - 点击字幕 token 不暂停、不 seek、不改变播放状态；空白区和不可点击 token 不拦截背景手势
+  - 点击字幕 token 不暂停、不 seek、不改变播放状态；字幕空白区不拦截背景手势
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态
   - 只消费 description 模块导出的语义结果 `actionPlacement`，再把它映射成自身的底部几何偏移
@@ -124,7 +129,8 @@ FullscreenVideoPager
 - `ui/basic-subtitle-overlay.tsx`
   - row-owned 内容层内的基础字幕 presenter
   - 通过 `useSyncExternalStore` 订阅 row-local `seekBarStore`
-  - 只负责解析当前句、渲染 token 文本、在可解释 token 被点击时调用 `onTokenPress`
+  - 只负责解析当前句、解析当前 token、渲染 token 文本、在 token 被点击时调用 `onTokenPress`
+  - 当前 token 高亮跟随 row-local playback time；不新增播放器监听或独立 timer
   - 不承担 word detail modal、句子导航、学习状态、收藏状态或 API 请求
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
@@ -303,7 +309,9 @@ fullscreen 右侧 action rail 当前固定为：
   - 对应 `isFavorited`
   - active 时 star 变黄
 - `share`
-- `annotate`
+- `subtitle`
+  - 对应 `features/playback-settings` 的 `areSubtitlesVisible`
+  - active 时 text bubble 变蓝
 
 当前 `like / favorite` 只做本地 runtime toggle，不调真实 API。
 
@@ -320,7 +328,8 @@ fullscreen 右侧 action rail 当前固定为：
 - `FullscreenVideoRow`
   - 通过 `video-runtime` 按 `videoId` 直接订阅当前 `isLiked / isFavorited`
   - `like / favorite` 也在 row 内直接写入 runtime
-  - `share / annotate` 如有外部 handler 再向外冒泡
+  - `subtitle` 在 row 内切换全局字幕显示偏好
+  - `share` 如有外部 handler 再向外冒泡
 
 也就是说，fullscreen 的 action active state 不再依赖整表 effective items、page relay 或 `FlatList.extraData` 才能刷新。
 

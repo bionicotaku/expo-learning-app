@@ -1,7 +1,7 @@
 export type FullscreenVideoOverlayActionItem = {
   accessibilityLabel: string;
   fallbackGlyph: string;
-  id: 'like' | 'favorite' | 'share' | 'annotate';
+  id: 'like' | 'favorite' | 'share' | 'subtitle';
   iosSymbol:
     | 'heart.fill'
     | 'star.fill'
@@ -29,10 +29,10 @@ export const fullscreenVideoOverlayActionItems: readonly FullscreenVideoOverlayA
     fallbackGlyph: '↗',
   },
   {
-    id: 'annotate',
-    accessibilityLabel: 'Annotate',
+    id: 'subtitle',
+    accessibilityLabel: 'Subtitles',
     iosSymbol: 'text.bubble.fill',
-    fallbackGlyph: '✎',
+    fallbackGlyph: 'CC',
   },
 ] as const;
 

@@ -34,15 +34,19 @@ vi.mock('react-native', async () => {
 
 function createToken({
   coarseId,
+  end = 1800,
   index,
+  start = 1000,
   text,
 }: {
   coarseId: number | null;
+  end?: number;
   index: number;
+  start?: number;
   text: string;
 }): TranscriptToken {
   return {
-    end: 1800,
+    end,
     explanation: `${text} explanation`,
     index,
     semanticElement: {
@@ -51,7 +55,7 @@ function createToken({
       dictionary: `${text} dictionary`,
       reason: `${text} reason`,
     },
-    start: 1000,
+    start,
     text,
   };
 }
@@ -77,7 +81,7 @@ function findTextNode(renderer: TestRenderer.ReactTestRenderer, text: string) {
 }
 
 describe('basic subtitle overlay runtime', () => {
-  it('renders current sentence tokens and only sends clickable coarse-id tokens to the press handler', () => {
+  it('renders current sentence tokens and sends every token to the press handler', () => {
     const clickableToken = createToken({
       coarseId: 108404,
       index: 0,
@@ -119,16 +123,84 @@ describe('basic subtitle overlay runtime', () => {
     const nullCoarseIdNode = findTextNode(renderer!, 'Pam');
 
     expect(clickableNode?.props.onPress).toEqual(expect.any(Function));
-    expect(nullCoarseIdNode?.props.onPress).toBeUndefined();
+    expect(nullCoarseIdNode?.props.onPress).toEqual(expect.any(Function));
 
     act(() => {
       clickableNode!.props.onPress({
         stopPropagation,
       });
     });
+    act(() => {
+      nullCoarseIdNode!.props.onPress({
+        stopPropagation,
+      });
+    });
+
+    expect(stopPropagation).toHaveBeenCalledTimes(2);
+    expect(onTokenPress).toHaveBeenCalledWith(clickableToken);
+    expect(onTokenPress).toHaveBeenCalledWith(nullCoarseIdToken);
+  });
+
+  it('highlights the current token without changing non-current token styles', () => {
+    const firstToken = createToken({
+      coarseId: 108404,
+      end: 1400,
+      index: 0,
+      text: 'Making',
+    });
+    const currentNullCoarseIdToken = createToken({
+      coarseId: null,
+      end: 1800,
+      index: 1,
+      start: 1400,
+      text: 'Pam',
+    });
+    const transcript: Transcript = {
+      sentences: [
+        {
+          end: 2000,
+          explanation: 'sentence explanation',
+          index: 0,
+          start: 1000,
+          text: 'Making Pam.',
+          tokens: [firstToken, currentNullCoarseIdToken],
+        },
+      ],
+    };
+    const onTokenPress = vi.fn();
+    const stopPropagation = vi.fn();
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <BasicSubtitleOverlay
+          maxTextWidth={240}
+          onTokenPress={onTokenPress}
+          seekBarStore={createStoreAtCurrentSentence()}
+          transcript={transcript}
+        />
+      );
+    });
+
+    const firstNode = findTextNode(renderer!, 'Making ');
+    const currentNode = findTextNode(renderer!, 'Pam');
+
+    expect(firstNode?.props.style).toBeUndefined();
+    expect(currentNode?.props.style).toMatchObject({
+      color: 'rgba(255,226,135,0.98)',
+      textShadowColor: 'rgba(74,44,0,0.42)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
+    });
+
+    act(() => {
+      currentNode!.props.onPress({
+        stopPropagation,
+      });
+    });
 
     expect(stopPropagation).toHaveBeenCalledTimes(1);
-    expect(onTokenPress).toHaveBeenCalledWith(clickableToken);
+    expect(onTokenPress).toHaveBeenCalledWith(currentNullCoarseIdToken);
   });
 
   it('falls back to the sentence text when a current sentence has no tokens', () => {

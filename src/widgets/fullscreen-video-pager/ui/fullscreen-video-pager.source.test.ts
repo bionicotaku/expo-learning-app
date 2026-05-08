@@ -33,6 +33,7 @@ describe('fullscreen video pager source', () => {
     expect(source).not.toContain('PausedPlaybackIndicatorOverlay');
     expect(source).not.toContain('PlaybackFeedbackOverlay');
     expect(source).toContain('const renderState = useMemo');
+    expect(source).toContain('areSubtitlesVisible');
     expect(source).toContain('activeTranscript');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('extraData={renderState}');
@@ -43,6 +44,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain(
       'activeTranscript={isCurrentActiveItem ? activeTranscript : null}'
     );
+    expect(source).toContain('areSubtitlesVisible={areSubtitlesVisible}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).toContain('onActionPress={onActionPress}');
     expect(source).toContain('onCenterHoldStart?: () => void');

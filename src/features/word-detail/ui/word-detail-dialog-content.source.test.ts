@@ -17,7 +17,7 @@ describe('word detail dialog content source', () => {
     expect(source).toContain('semantic_element');
     expect(source).toContain('base_form');
     expect(source).toContain('coarse_id');
-    expect(source).toContain('coarse_id: number');
+    expect(source).toContain('coarse_id: number | null');
     expect(source).toContain('上下文释义');
     expect(source).toContain('字典释义');
     expect(source).toContain('payload.text');

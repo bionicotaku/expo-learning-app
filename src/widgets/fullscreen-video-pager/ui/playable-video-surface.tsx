@@ -166,7 +166,7 @@ function PlayableVideoSurfaceComponent({
   }, [registerSeekController, seekController]);
 
   useEffect(() => {
-    player.timeUpdateEventInterval = onActiveProgressSnapshotChange ? 0.25 : 0;
+    player.timeUpdateEventInterval = onActiveProgressSnapshotChange ? 0.1 : 0;
   }, [onActiveProgressSnapshotChange, player]);
 
   useEffect(() => {

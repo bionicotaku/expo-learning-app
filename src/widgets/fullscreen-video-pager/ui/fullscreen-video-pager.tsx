@@ -22,6 +22,7 @@ import { TopChromeOverlay } from './top-chrome-overlay';
 
 export type FullscreenVideoPagerProps = {
   activeTranscript: Transcript | null;
+  areSubtitlesVisible: boolean;
   entryIndex: number;
   isInitialLoading: boolean;
   items: VideoListItem[];
@@ -35,6 +36,7 @@ export type FullscreenVideoPagerProps = {
 
 export function FullscreenVideoPager({
   activeTranscript,
+  areSubtitlesVisible,
   entryIndex,
   isInitialLoading,
   items,
@@ -140,6 +142,7 @@ export function FullscreenVideoPager({
       activeIndex,
       activeItemId,
       activeTranscript,
+      areSubtitlesVisible,
       bottomInset: insets.bottom,
       getRowRenderState,
       height,
@@ -149,6 +152,7 @@ export function FullscreenVideoPager({
       activeIndex,
       activeItemId,
       activeTranscript,
+      areSubtitlesVisible,
       getRowRenderState,
       height,
       insets.bottom,
@@ -166,6 +170,7 @@ export function FullscreenVideoPager({
           accessibilityLabel={rowRenderState.accessibilityLabel}
           activeTranscript={isCurrentActiveItem ? activeTranscript : null}
           activeVisitToken={rowRenderState.activeVisitToken}
+          areSubtitlesVisible={areSubtitlesVisible}
           bottomInset={insets.bottom}
           height={height}
           hudState={rowRenderState.hudState}
@@ -193,6 +198,7 @@ export function FullscreenVideoPager({
       activeIndex,
       activeItemId,
       activeTranscript,
+      areSubtitlesVisible,
       getRowRenderState,
       handleDoubleTap,
       handleHoldEnd,

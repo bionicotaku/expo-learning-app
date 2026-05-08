@@ -8,6 +8,7 @@ import {
 import { VideoOverlayActionButton } from './video-overlay-action-button';
 
 type VideoOverlayActionRailProps = {
+  areSubtitlesVisible: boolean;
   bottomInset: number;
   isFavorited: boolean;
   isLiked: boolean;
@@ -16,8 +17,10 @@ type VideoOverlayActionRailProps = {
 
 const likeTint = 'rgba(255,108,108,0.98)';
 const favoriteTint = 'rgba(255,216,102,0.98)';
+const subtitleTint = 'rgba(142,211,255,0.98)';
 
 function VideoOverlayActionRailComponent({
+  areSubtitlesVisible,
   bottomInset,
   isFavorited,
   isLiked,
@@ -41,14 +44,18 @@ function VideoOverlayActionRailComponent({
               ? likeTint
               : item.id === 'favorite'
                 ? favoriteTint
-                : undefined
+                : item.id === 'subtitle'
+                  ? subtitleTint
+                  : undefined
           }
           isActive={
             item.id === 'like'
               ? isLiked
               : item.id === 'favorite'
                 ? isFavorited
-                : false
+                : item.id === 'subtitle'
+                  ? areSubtitlesVisible
+                  : false
           }
           key={item.id}
           item={item}

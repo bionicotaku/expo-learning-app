@@ -12,7 +12,7 @@ export type WordDetailDialogPayload = {
   semantic_element: {
     base_form: string;
     dictionary: string;
-    coarse_id: number;
+    coarse_id: number | null;
   };
 };
 

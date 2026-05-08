@@ -120,9 +120,11 @@ row 内正式顺序固定为：
 - 它不固定为两行，当前句文本按实际长度自然换行显示
 - 它复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds`，不新增播放器时间监听
 - `BasicSubtitleOverlay` 只负责渲染 token 与发出 `onTokenPress`，不直接 import modal hook
-- 只有 `semanticElement.coarseId !== null` 的 token 可点击；点击经 `FullscreenVideoRow` 转成 `features/word-detail` dialog payload
-- 字幕空白区和不可点击 token 不拦截背景手势
-- 点击 token 不暂停、不 seek、不改变播放状态，也不做 token 高亮、收藏、学习状态或 API 请求
+- 当前播放 token 使用纯色高亮；高亮只改变 `color` 和 `textShadow`，不改变字号、行高、字重、间距或自然换行行为
+- 字幕显隐由 `features/playback-settings` 的全局 session 偏好控制；关闭字幕只是不挂载 `BasicSubtitleOverlay`，不停止 transcript source 读取或缓存
+- 所有 token 都可点击；点击经 `FullscreenVideoRow` 转成 `features/word-detail` dialog payload，`semantic_element.coarse_id` 可以是 `null`
+- 字幕空白区不拦截背景手势
+- 点击 token 不暂停、不 seek、不改变播放状态，也不做收藏、学习状态或 API 请求
 
 ### 5.4 `RowPlaybackHudOverlay`
 

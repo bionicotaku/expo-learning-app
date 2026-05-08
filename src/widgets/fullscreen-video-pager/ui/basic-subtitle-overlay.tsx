@@ -3,6 +3,7 @@ import { Text, View, type GestureResponderEvent } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
 import { resolveCurrentTranscriptSentence } from '../model/current-transcript-sentence';
+import { resolveCurrentTranscriptToken } from '../model/current-transcript-token';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
 import type { RowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
 import { getTranscriptTokenTrailingText } from '../model/transcript-token-display';
@@ -14,6 +15,13 @@ type BasicSubtitleOverlayProps = {
   transcript: Transcript | null;
 };
 
+const activeSubtitleTokenStyle = {
+  color: 'rgba(255,226,135,0.98)',
+  textShadowColor: 'rgba(74,44,0,0.42)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 3,
+} as const;
+
 function BasicSubtitleOverlayComponent({
   maxTextWidth,
   onTokenPress,
@@ -21,6 +29,7 @@ function BasicSubtitleOverlayComponent({
   transcript,
 }: BasicSubtitleOverlayProps) {
   const previousSentenceIndexRef = useRef<number | null>(null);
+  const previousTokenIndexRef = useRef<number | null>(null);
   const previousTranscriptRef = useRef<Transcript | null>(null);
   const storeSnapshot = useSyncExternalStore(
     seekBarStore.subscribe,
@@ -31,6 +40,7 @@ function BasicSubtitleOverlayComponent({
   if (previousTranscriptRef.current !== transcript) {
     previousTranscriptRef.current = transcript;
     previousSentenceIndexRef.current = null;
+    previousTokenIndexRef.current = null;
   }
 
   const currentTimeMs =
@@ -52,6 +62,14 @@ function BasicSubtitleOverlayComponent({
   }
   const currentTokens = currentSentence.sentence.tokens;
   const shouldRenderTokens = currentTokens.length > 0;
+  const currentToken = shouldRenderTokens
+    ? resolveCurrentTranscriptToken({
+        currentTimeMs,
+        previousIndex: previousTokenIndexRef.current,
+        tokens: currentTokens,
+      })
+    : null;
+  previousTokenIndexRef.current = currentToken?.index ?? null;
 
   const handleTokenPress = (token: TranscriptToken, event: GestureResponderEvent) => {
     event.stopPropagation?.();
@@ -86,8 +104,8 @@ function BasicSubtitleOverlayComponent({
               const nextToken = currentTokens[index + 1] ?? null;
               const trailingText = getTranscriptTokenTrailingText(token, nextToken);
               const tokenText = `${token.text}${trailingText}`;
-              const canPressToken =
-                !!onTokenPress && token.semanticElement.coarseId !== null;
+              const canPressToken = !!onTokenPress;
+              const isActiveToken = currentToken?.index === index;
 
               return (
                 <Text
@@ -99,6 +117,7 @@ function BasicSubtitleOverlayComponent({
                         }
                       : undefined
                   }
+                  style={isActiveToken ? activeSubtitleTokenStyle : undefined}
                 >
                   {tokenText}
                 </Text>

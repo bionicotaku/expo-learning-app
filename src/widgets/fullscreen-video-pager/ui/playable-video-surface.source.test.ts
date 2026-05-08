@@ -14,7 +14,7 @@ describe('playable video surface source', () => {
     expect(source).toContain('registerSeekController');
     expect(source).toContain('surfaceState:');
     expect(source).toContain('onActiveProgressSnapshotChange');
-    expect(source).toContain('timeUpdateEventInterval = onActiveProgressSnapshotChange ? 0.25 : 0');
+    expect(source).toContain('timeUpdateEventInterval = onActiveProgressSnapshotChange ? 0.1 : 0');
     expect(source).toContain("useEventListener(player, 'timeUpdate'");
     expect(source).toContain('scheduleProgressResync');
     expect(source).toContain('const seekTo = useCallback');

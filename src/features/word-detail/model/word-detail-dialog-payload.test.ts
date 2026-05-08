@@ -33,7 +33,15 @@ describe('word detail dialog payload', () => {
     });
   });
 
-  it('returns null when the token has no coarse id', () => {
-    expect(createWordDetailDialogPayloadFromTranscriptToken(createToken(null))).toBeNull();
+  it('keeps null coarse_id when the token has no coarse id', () => {
+    expect(createWordDetailDialogPayloadFromTranscriptToken(createToken(null))).toEqual({
+      text: 'Making',
+      explanation: '上下文里的 make 表示制作。',
+      semantic_element: {
+        base_form: 'make',
+        coarse_id: null,
+        dictionary: '制作；做；使成为。',
+      },
+    });
   });
 });

@@ -1,7 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 
 import type { VideoListItem } from '@/entities/video';
-import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
+import {
+  useAreSubtitlesVisible,
+  usePresentPlaybackSettingsSheet,
+} from '@/features/playback-settings';
 import { useFullscreenTranscriptSource } from '@/features/transcript-source';
 import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
 
@@ -30,6 +33,7 @@ export function FullscreenVideoSession({
   requestMore,
 }: FullscreenVideoSessionProps) {
   const lastRequestedTailVideoIdRef = useRef<string | null>(null);
+  const areSubtitlesVisible = useAreSubtitlesVisible();
   const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
   const [pagerReportedActive, setPagerReportedActive] =
     useState<FullscreenPagerReportedActive>(null);
@@ -73,6 +77,7 @@ export function FullscreenVideoSession({
   return (
     <FullscreenVideoPager
       activeTranscript={activeTranscript}
+      areSubtitlesVisible={areSubtitlesVisible}
       entryIndex={entryIndex}
       isInitialLoading={isInitialLoading}
       items={items}

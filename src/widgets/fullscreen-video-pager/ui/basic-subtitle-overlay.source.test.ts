@@ -11,10 +11,13 @@ describe('basic subtitle overlay source', () => {
 
     expect(source).toContain('useSyncExternalStore');
     expect(source).toContain('resolveCurrentTranscriptSentence');
+    expect(source).toContain('resolveCurrentTranscriptToken');
+    expect(source).toContain('activeSubtitleTokenStyle');
     expect(source).toContain('pointerEvents="box-none"');
     expect(source).toContain('onTokenPress');
     expect(source).toContain('event.stopPropagation?.()');
-    expect(source).toContain('token.semanticElement.coarseId !== null');
+    expect(source).not.toContain('token.semanticElement.coarseId !== null');
+    expect(source).not.toContain("fontWeight: isActive");
     expect(source).not.toContain('numberOfLines');
     expect(source).not.toContain('subtitleLineCount');
     expect(source).not.toContain('height: subtitleHeight');

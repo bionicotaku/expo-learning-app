@@ -11,7 +11,7 @@ describe('fullscreen overlay data', () => {
       'like',
       'favorite',
       'share',
-      'annotate',
+      'subtitle',
     ]);
   });
 
