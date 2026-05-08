@@ -2,6 +2,7 @@ import { ApiError, fetchJsonResource, type FetchJsonResourceOptions } from '@/sh
 
 import type { TranscriptResponseDto } from '../model/dto';
 import { mapTranscriptDtoToDomain } from '../model/mappers';
+import { prepareTranscriptForPlayback } from '../model/prepare-transcript-for-playback';
 import type { Transcript } from '../model/types';
 
 function isTranscriptResponseDto(value: unknown): value is TranscriptResponseDto {
@@ -36,5 +37,6 @@ export async function fetchTranscriptAsset(
     failureCode: 'TRANSCRIPT_ASSET_FETCH_FAILED',
   });
   const dto = validateTranscriptAssetResponse(payload, transcriptUrl);
-  return mapTranscriptDtoToDomain(dto);
+  const transcript = mapTranscriptDtoToDomain(dto);
+  return prepareTranscriptForPlayback(transcript);
 }

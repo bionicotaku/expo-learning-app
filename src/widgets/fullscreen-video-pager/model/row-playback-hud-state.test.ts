@@ -13,14 +13,14 @@ describe('row playback hud state', () => {
     const withPause = showFullscreenRowPauseIndicator({}, 'feed-1');
     const withSeek = setFullscreenRowTransientFeedback(withPause, 'feed-1', {
       kind: 'seek',
-      deltaSeconds: -5,
+      direction: 'backward',
     });
 
     expect(getFullscreenRowPlaybackHudState(withSeek, 'feed-1')).toEqual({
       pauseIndicatorVisible: true,
       transientFeedback: {
         kind: 'seek',
-        deltaSeconds: -5,
+        direction: 'backward',
       },
     });
   });
@@ -29,7 +29,7 @@ describe('row playback hud state', () => {
     const withPause = showFullscreenRowPauseIndicator({}, 'feed-1');
     const withSeek = setFullscreenRowTransientFeedback(withPause, 'feed-1', {
       kind: 'seek',
-      deltaSeconds: 5,
+      direction: 'forward',
     });
     const withRate = setFullscreenRowTransientFeedback(withSeek, 'feed-1', {
       kind: 'rate',
@@ -49,7 +49,7 @@ describe('row playback hud state', () => {
     const withPause = showFullscreenRowPauseIndicator({}, 'feed-1');
     const withSeek = setFullscreenRowTransientFeedback(withPause, 'feed-1', {
       kind: 'seek',
-      deltaSeconds: 5,
+      direction: 'forward',
     });
     const withoutSeek = clearFullscreenRowTransientFeedback(withSeek, 'feed-1');
 
@@ -63,7 +63,7 @@ describe('row playback hud state', () => {
       pauseIndicatorVisible: false,
       transientFeedback: {
         kind: 'seek',
-        deltaSeconds: 5,
+        direction: 'forward',
       },
     });
   });
@@ -72,7 +72,7 @@ describe('row playback hud state', () => {
     const withPause = showFullscreenRowPauseIndicator({}, 'feed-1');
     const withSeek = setFullscreenRowTransientFeedback(withPause, 'feed-1', {
       kind: 'seek',
-      deltaSeconds: -5,
+      direction: 'backward',
     });
     const withoutPause = hideFullscreenRowPauseIndicator(withSeek, 'feed-1');
     const pruned = clearFullscreenRowTransientFeedback(withoutPause, 'feed-1');

@@ -128,13 +128,22 @@ function PlayableVideoSurfaceComponent({
     scheduleProgressResync();
     return true;
   }, [emitCurrentProgressSnapshot, player, scheduleProgressResync, status]);
+  const getCurrentTimeSeconds = useCallback((): number | null => {
+    return Number.isFinite(player.currentTime) ? player.currentTime : null;
+  }, [player]);
+  const getDurationSeconds = useCallback((): number | null => {
+    return Number.isFinite(player.duration) && player.duration > 0 ? player.duration : null;
+  }, [player]);
 
   const activeController = useMemo<FullscreenActivePlayerController>(
     () => ({
+      getCurrentTimeSeconds,
+      getDurationSeconds,
       seekBy,
+      seekTo,
       surfaceState: surfaceState,
     }),
-    [seekBy, surfaceState]
+    [getCurrentTimeSeconds, getDurationSeconds, seekBy, seekTo, surfaceState]
   );
   const seekController = useMemo<FullscreenRowSeekController>(
     () => ({

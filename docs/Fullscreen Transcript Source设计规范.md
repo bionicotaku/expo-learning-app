@@ -20,6 +20,7 @@ fullscreen 资源读取固定为：
 - 再按 `VideoMeta.transcriptUrl` 读 transcript asset
 - video meta query key: `['video-meta', videoId]`
 - transcript asset query key: `['transcript-asset', transcriptUrl]`
+- transcript asset 成功读取后先在 `entities/transcript` 内做 sentence timing normalization，再进入 React Query cache
 - 不使用 `placeholderData` 或 `keepPreviousData`
 - active 切换时不能展示上一条视频的 meta 或 transcript
 - video meta query 失败时触发全局 error toast：`视频数据获取失败`
@@ -52,6 +53,7 @@ useFullscreenVideoResources({
 - active meta error：transcript 不请求，返回 `idle / null`
 - active meta success 且 `transcriptUrl === null`：transcript 为 `idle / null`
 - transcript asset error：只影响字幕，不影响视频播放和 action rail
+- active transcript 的 sentence 时间已经是 prepared 时间；token 时间保持原始词级时间，用于当前 token 高亮
 - meta / transcript asset 的每次实际请求失败都会通过全局红色 toast 给出中文反馈；React Query 主动取消的 transcript 请求除外
 
 ## 4. UI 边界

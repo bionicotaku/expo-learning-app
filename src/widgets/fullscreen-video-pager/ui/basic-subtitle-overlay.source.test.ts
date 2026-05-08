@@ -25,6 +25,9 @@ describe('basic subtitle overlay source', () => {
     expect(source).not.toContain('numberOfLines');
     expect(source).not.toContain('subtitleLineCount');
     expect(source).not.toContain('height: subtitleHeight');
+    expect(source).not.toContain('SENTENCE_START_LEAD_MS');
+    expect(source).not.toContain('SENTENCE_END_TRAIL_MS');
+    expect(source).not.toContain('prepareTranscriptForPlayback');
     expect(source).toContain("fontWeight: '500'");
     expect(source).not.toContain('paddingBottom: 6');
     expect(source).not.toContain('shouldReserveSpace');
@@ -33,5 +36,7 @@ describe('basic subtitle overlay source', () => {
     expect(source).not.toContain('Modal');
     expect(source).not.toContain('usePresent');
     expect(source).not.toContain('usePresentWordDetailDialog');
+    expect(source).not.toContain('seekTo');
+    expect(source).not.toContain('resolveTranscriptSentenceSeekTarget');
   });
 });

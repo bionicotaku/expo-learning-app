@@ -11,7 +11,7 @@ const baseRowRenderProps: FullscreenVideoRowRenderProps = {
   height: 852,
   hudPauseIndicatorVisible: false,
   hudTransientFeedbackKind: null,
-  hudTransientSeekDeltaSeconds: null,
+  hudTransientSeekDirection: null,
   isActive: true,
   playbackRate: 1,
   shouldEnableBackgroundGestures: true,
@@ -77,18 +77,18 @@ describe('fullscreen video render props', () => {
     ).toBe(false);
   });
 
-  it('re-renders the row when seek delta changes', () => {
+  it('re-renders the row when seek direction changes', () => {
     expect(
       areFullscreenVideoRowRenderPropsEqual(
         {
           ...baseRowRenderProps,
           hudTransientFeedbackKind: 'seek',
-          hudTransientSeekDeltaSeconds: -5,
+          hudTransientSeekDirection: 'backward',
         },
         {
           ...baseRowRenderProps,
           hudTransientFeedbackKind: 'seek',
-          hudTransientSeekDeltaSeconds: 5,
+          hudTransientSeekDirection: 'forward',
         }
       )
     ).toBe(false);

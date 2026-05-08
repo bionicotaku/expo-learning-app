@@ -1,7 +1,10 @@
 export type FullscreenActivePlayerSurfaceState = 'loading' | 'ready' | 'error';
 
 export type FullscreenActivePlayerController = {
+  getCurrentTimeSeconds: () => number | null;
+  getDurationSeconds: () => number | null;
   seekBy: (seconds: number) => boolean;
+  seekTo: (seconds: number) => boolean;
   surfaceState: FullscreenActivePlayerSurfaceState;
 };
 

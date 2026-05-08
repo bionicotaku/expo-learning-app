@@ -19,6 +19,8 @@ describe('row playback interaction layer source', () => {
     expect(source).not.toContain('externalGestureBlockers');
     expect(source).not.toContain('onRailGesturesChange');
     expect(source).not.toContain('SeekBarGestureBlockers');
+    expect(source).not.toContain('Transcript');
+    expect(source).not.toContain('resolveTranscriptSentenceSeekTarget');
   });
 
   it('keeps the background region geometrically above the seek bar control lane', () => {

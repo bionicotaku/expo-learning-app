@@ -12,6 +12,8 @@ Current responsibilities:
 - show global error toast feedback when video meta or transcript asset loading fails
 
 Transcript content is no longer read by `videoId`; it is read from the URL returned by video meta.
+Successful transcript asset reads return the `entities/transcript` prepared domain model:
+sentence display timing is normalized before React Query caches the transcript, while token timing remains the original word-level timing.
 
 Failure feedback:
 

@@ -12,11 +12,17 @@
   - 统一映射为前端内部 `camelCase`
 - `model/mappers.ts`
   - DTO -> domain 映射
+- `model/prepare-transcript-for-playback.ts`
+  - transcript playback timing 后处理
+  - 句子 `start` 最多提前 `100ms`，句子 `end` 最多延后 `300ms`
+  - 句子边界按 `1ms` 间隔避免重叠
+  - 只调整 sentence 时间，不调整 token 时间
 - `api/transcript-asset-repository.ts`
   - `fetchTranscriptAsset(transcriptUrl, options?)` 公开读取入口
   - 只按 `VideoMeta.transcriptUrl` 读取 asset JSON
   - 不再按 `videoId` 推导 transcript 资源
   - 透传 React Query `signal`，并使用 shared JSON resource timeout
+  - 返回值已经过 DTO 映射和 playback timing 后处理，React Query 缓存的是 prepared transcript
 
 边界约束：
 
@@ -24,6 +30,7 @@
 - 不放 subtitle overlay 布局
 - 不放播放器时间同步状态
 - 不放 token 点击、解释弹层或字幕交互状态
+- 不根据当前播放时间派生当前句或当前 token
 
 当前这里读取的是 URL-addressed transcript asset。`videoId -> transcriptUrl` 属于 `entities/video-meta`。
 

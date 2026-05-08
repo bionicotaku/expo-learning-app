@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
 import { usePlaybackRate } from '@/features/playback-settings/model/playback-settings-store';
 import {
@@ -34,11 +35,17 @@ import {
   type FullscreenRowPlaybackHudStateByVideoId,
   type FullscreenRowTransientFeedback,
 } from './row-playback-hud-state';
+import {
+  resolveTranscriptSentenceSeekTarget,
+  type TranscriptSentenceSeekDirection,
+} from './transcript-sentence-seek-target';
 
 const transientSeekDurationMs = 700;
 const pauseIndicatorVisibilityDurationMs = 3000;
+const fallbackSeekDeltaSeconds = 5;
 
 type FullscreenPlaybackSessionArgs = {
+  activeTranscript: Transcript | null;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
 };
@@ -52,10 +59,12 @@ type FullscreenRowRenderState = {
 };
 
 export function useFullscreenPlaybackSession({
+  activeTranscript,
   items,
   onActiveVideoChange,
 }: FullscreenPlaybackSessionArgs) {
   const activePlayerControllerRef = useRef<FullscreenActivePlayerController | null>(null);
+  const activeTranscriptRef = useRef<Transcript | null>(activeTranscript);
   const basePausedByUserRef = useRef(false);
   const isMountedRef = useRef(true);
   const nextPlaybackHoldIdRef = useRef(0);
@@ -75,6 +84,7 @@ export function useFullscreenPlaybackSession({
     itemId: null,
   });
   onActiveVideoChangeRef.current = onActiveVideoChange;
+  activeTranscriptRef.current = activeTranscript;
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeVisitToken, setActiveVisitToken] = useState<number | null>(null);
@@ -332,18 +342,46 @@ export function useFullscreenPlaybackSession({
       }
 
       const currentItemId = activeSnapshotRef.current.itemId;
-      if (!currentItemId) {
+      const activePlayerController = activePlayerControllerRef.current;
+      if (!currentItemId || !activePlayerController) {
         return;
       }
 
-      const deltaSeconds = zone === 'left' ? -5 : 5;
-      if (!activePlayerControllerRef.current?.seekBy(deltaSeconds)) {
+      const direction: TranscriptSentenceSeekDirection =
+        zone === 'left' ? 'backward' : 'forward';
+      const currentTimeSeconds = activePlayerController.getCurrentTimeSeconds();
+      const durationSeconds = activePlayerController.getDurationSeconds();
+      const sentenceSeekTarget =
+        currentTimeSeconds === null || durationSeconds === null
+          ? null
+          : resolveTranscriptSentenceSeekTarget({
+              currentTimeMs: currentTimeSeconds * 1000,
+              direction,
+              durationMs: durationSeconds * 1000,
+              sentences: activeTranscriptRef.current?.sentences ?? [],
+            });
+
+      if (sentenceSeekTarget) {
+        if (!activePlayerController.seekTo(sentenceSeekTarget.targetTimeMs / 1000)) {
+          return;
+        }
+
+        setTransientFeedbackForVideo(currentItemId, {
+          kind: 'seek',
+          direction,
+        });
+        return;
+      }
+
+      const deltaSeconds =
+        direction === 'backward' ? -fallbackSeekDeltaSeconds : fallbackSeekDeltaSeconds;
+      if (!activePlayerController.seekBy(deltaSeconds)) {
         return;
       }
 
       setTransientFeedbackForVideo(currentItemId, {
         kind: 'seek',
-        deltaSeconds,
+        direction,
       });
     },
     [setTransientFeedbackForVideo]

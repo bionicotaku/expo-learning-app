@@ -229,13 +229,14 @@ seek bar overlay 之所以不再需要 bridge，不是因为 bridge 被“优化
 
 seek bar overlay 的控制语义固定为：
 
-- 双击仍走 session-level `seekBy(±5)`
+- 背景双击走 session-level sentence seek；字幕不可用时 fallback 到 `seekBy(-5/+5)`
 - seek bar `tap` 与 `drag release` 走 row-local `seekTo(seconds)`
 
 也就是说：
 
-- `seekBy` 是背景手势的相对 seek
-- `seekTo` 是 seek bar overlay 的绝对 seek
+- 背景双击是 transcript-aware playback session seek，不属于 seek bar overlay
+- `seekBy` 只作为背景双击在字幕不可用时的 fallback
+- `seekTo` 是 seek bar overlay 的绝对 seek，也是句子级双击命中字幕时的执行 primitive
 
 两者同属 fullscreen 播放控制，但属于两条不同的语义通道。
 

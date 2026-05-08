@@ -285,9 +285,9 @@ function areFullscreenVideoRowComponentPropsEqual(
     height: previousProps.height,
     hudPauseIndicatorVisible: previousProps.hudState.pauseIndicatorVisible,
     hudTransientFeedbackKind: previousProps.hudState.transientFeedback?.kind ?? null,
-    hudTransientSeekDeltaSeconds:
+    hudTransientSeekDirection:
       previousProps.hudState.transientFeedback?.kind === 'seek'
-        ? previousProps.hudState.transientFeedback.deltaSeconds
+        ? previousProps.hudState.transientFeedback.direction
         : null,
     isActive: previousProps.isActive,
     playbackRate: previousProps.playbackRate,
@@ -302,9 +302,9 @@ function areFullscreenVideoRowComponentPropsEqual(
     height: nextProps.height,
     hudPauseIndicatorVisible: nextProps.hudState.pauseIndicatorVisible,
     hudTransientFeedbackKind: nextProps.hudState.transientFeedback?.kind ?? null,
-    hudTransientSeekDeltaSeconds:
+    hudTransientSeekDirection:
       nextProps.hudState.transientFeedback?.kind === 'seek'
-        ? nextProps.hudState.transientFeedback.deltaSeconds
+        ? nextProps.hudState.transientFeedback.direction
         : null,
     isActive: nextProps.isActive,
     playbackRate: nextProps.playbackRate,

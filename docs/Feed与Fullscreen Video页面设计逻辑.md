@@ -296,7 +296,7 @@ fullscreen 页固定承担：
 - 上下滑动切换视频
 - 系统右滑返回
 - 视频背景区 `single tap` 切 pause/resume
-- 视频背景区 `double tap` 做 `-5s / +5s`
+- 视频背景区 `double tap` 优先做句子级前进/后退，字幕不可用时 fallback `-5s / +5s`
 - 视频背景区 `long press` 做临时 `2x`
 - 底部 seek bar lane 做：
   - rail + thumb 的 `tap-to-seek`
@@ -313,7 +313,7 @@ fullscreen 页固定承担：
 视频背景区只负责：
 
 - pause / resume
-- `±5s`
+- transcript sentence seek；字幕不可用时 fallback `±5s`
 - 临时 `2x`
 
 ### 5.2 底部 control lane 职责
@@ -327,7 +327,7 @@ fullscreen 页固定承担：
 它不属于背景点击区，因此：
 
 - 不触发 pause
-- 不触发背景双击 `±5s`
+- 不触发背景双击句子级 seek 或 fallback `±5s`
 - 不触发背景长按 `2x`
 
 ### 5.3 右侧 action rail 的数据语义

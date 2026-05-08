@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
+import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
 import { usePlaybackSettingsStore } from '@/features/playback-settings/model/playback-settings-store';
 
@@ -47,11 +48,14 @@ type SessionWithViewability = FullscreenPlaybackSession & {
 };
 
 function SessionHarness({
+  activeTranscript = null,
   onActiveVideoChange,
 }: {
+  activeTranscript?: Transcript | null;
   onActiveVideoChange: (itemId: string, index: number) => void;
 }) {
   latestSession = useFullscreenPlaybackSession({
+    activeTranscript,
     items,
     onActiveVideoChange,
   }) as SessionWithViewability;
@@ -60,6 +64,51 @@ function SessionHarness({
 }
 
 let latestSession: SessionWithViewability | null = null;
+
+const activeTranscript: Transcript = {
+  sentences: [
+    {
+      end: 2_000,
+      explanation: 'first',
+      index: 0,
+      start: 1_000,
+      text: 'First sentence.',
+      tokens: [],
+    },
+    {
+      end: 4_000,
+      explanation: 'second',
+      index: 1,
+      start: 3_000,
+      text: 'Second sentence.',
+      tokens: [],
+    },
+    {
+      end: 7_000,
+      explanation: 'third',
+      index: 2,
+      start: 6_000,
+      text: 'Third sentence.',
+      tokens: [],
+    },
+  ],
+};
+
+function createActiveController({
+  currentTimeSeconds,
+  durationSeconds,
+}: {
+  currentTimeSeconds: number | null;
+  durationSeconds: number | null;
+}) {
+  return {
+    getCurrentTimeSeconds: vi.fn(() => currentTimeSeconds),
+    getDurationSeconds: vi.fn(() => durationSeconds),
+    seekBy: vi.fn(() => true),
+    seekTo: vi.fn(() => true),
+    surfaceState: 'ready' as const,
+  };
+}
 
 describe('useFullscreenPlaybackSession runtime', () => {
   beforeEach(() => {
@@ -304,5 +353,129 @@ describe('useFullscreenPlaybackSession runtime', () => {
       latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
         .shouldPlay
     ).toBe(true);
+  });
+
+  it('uses active transcript sentence targets for double-tap seek before falling back to relative seek', () => {
+    const onActiveVideoChange = vi.fn();
+    const activeController = createActiveController({
+      currentTimeSeconds: 3.5,
+      durationSeconds: 10,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness
+          activeTranscript={activeTranscript}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.registerActiveController(activeController);
+      latestSession?.handleDoubleTap('right');
+    });
+
+    expect(activeController.seekTo).toHaveBeenCalledWith(6);
+    expect(activeController.seekBy).not.toHaveBeenCalled();
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).hudState.transientFeedback
+    ).toEqual({
+      kind: 'seek',
+      direction: 'forward',
+    });
+  });
+
+  it('falls back to relative double-tap seek when transcript or duration is unavailable', () => {
+    const onActiveVideoChange = vi.fn();
+    const noTranscriptController = createActiveController({
+      currentTimeSeconds: 3.5,
+      durationSeconds: 10,
+    });
+    const noDurationController = createActiveController({
+      currentTimeSeconds: 3.5,
+      durationSeconds: null,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.registerActiveController(noTranscriptController);
+      latestSession?.handleDoubleTap('right');
+    });
+
+    expect(noTranscriptController.seekBy).toHaveBeenCalledWith(5);
+    expect(noTranscriptController.seekTo).not.toHaveBeenCalled();
+
+    act(() => {
+      latestSession?.registerActiveController(noDurationController);
+      latestSession?.handleDoubleTap('left');
+    });
+
+    expect(noDurationController.seekBy).toHaveBeenCalledWith(-5);
+    expect(noDurationController.seekTo).not.toHaveBeenCalled();
+  });
+
+  it('keeps paused playback paused after sentence double-tap seek', () => {
+    const onActiveVideoChange = vi.fn();
+    const activeController = createActiveController({
+      currentTimeSeconds: 3.5,
+      durationSeconds: 10,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness
+          activeTranscript={activeTranscript}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.handleSingleTap();
+      latestSession?.registerActiveController(activeController);
+      latestSession?.handleDoubleTap('right');
+    });
+
+    expect(activeController.seekTo).toHaveBeenCalledWith(6);
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+  });
+
+  it('does not seek on double tap while another gesture locks playback gestures', () => {
+    const onActiveVideoChange = vi.fn();
+    const activeController = createActiveController({
+      currentTimeSeconds: 3.5,
+      durationSeconds: 10,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness
+          activeTranscript={activeTranscript}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.registerActiveController(activeController);
+      latestSession?.handleHoldStart('right');
+      latestSession?.handleDoubleTap('right');
+    });
+
+    expect(activeController.seekTo).not.toHaveBeenCalled();
+    expect(activeController.seekBy).not.toHaveBeenCalled();
   });
 });

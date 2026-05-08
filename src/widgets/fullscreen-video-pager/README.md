@@ -65,9 +65,11 @@ FullscreenVideoPager
 - `model/current-transcript-sentence.ts`
   - 基础字幕的当前句解析 helper
   - 优先检查上次命中的句子，再检查相邻前后句，最后回退二分搜索
+  - 读取的是 `entities/transcript` 已经 prepared 的 sentence 时间
 - `model/current-transcript-token.ts`
   - 基础字幕的当前 token 解析 helper
   - 在当前句 tokens 内优先检查上次命中的 token，再检查相邻前后 token，最后回退二分搜索
+  - token 时间保持 transcript asset 原始词级时间，不使用 sentence padding
 - `model/transcript-token-display.ts`
   - 基础字幕 token 文本拼接 helper
   - 只处理 token 后置空格与常见前置标点，不承担完整排版引擎职责
@@ -111,6 +113,7 @@ FullscreenVideoPager
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
+  - 当前句显示时间来自 `entities/transcript` 在缓存前完成的 sentence timing normalization；当前 token 高亮仍使用原始 token 时间
   - 点击字幕 token 不 seek、不触发 pause HUD；word detail dialog 打开期间只通过 session playback hold 临时暂停 active row
   - 字幕空白区不拦截背景手势
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
@@ -137,6 +140,7 @@ FullscreenVideoPager
   - 只负责解析当前句、解析当前 token、渲染 token 文本、在 token 被点击时调用 `onTokenPress`
   - 在 `bilingual` 模式下额外渲染当前句 `TranscriptSentence.explanation`；句子 explanation 不可点击，也不参与 token 高亮
   - 当前 token 高亮跟随 row-local playback time；不新增播放器监听或独立 timer
+  - 不在 UI 层做 sentence start/end offset；这类纯 transcript 后处理由 `entities/transcript` 完成
   - 不承担 word detail modal、句子导航、学习状态、收藏状态或 API 请求
 - `ui/row-playback-media-layer.tsx`
   - row 内 player / progress / seek controller 的局部装配层
@@ -223,7 +227,7 @@ type FullscreenRowPlaybackHudState = {
   pauseIndicatorVisible: boolean;
   transientFeedback:
     | null
-    | { kind: 'seek'; deltaSeconds: -5 | 5 }
+    | { kind: 'seek'; direction: 'backward' | 'forward' }
     | { kind: 'rate'; label: '2x' };
 };
 ```
@@ -270,7 +274,7 @@ type FullscreenRowPlaybackHudState = {
 - 本地持有 `VideoPlayer`
 - 同步 `shouldPlay`
 - 同步 `playbackRate`，普通播放使用全局默认倍速，左右长按临时覆盖为 `2x`
-- 暴露最小 active controller `{ seekBy, surfaceState }`
+- 暴露 active controller `{ seekBy, seekTo, getCurrentTimeSeconds, getDurationSeconds, surfaceState }`
 - 向 row 上报 `surfacePresentation`
 - 仅在 active row 存在 progress callback 时开启 `timeUpdate`，向 row 上报 progress snapshot
 
@@ -389,9 +393,10 @@ row 内 HUD 不再靠各组件各自定位，而是走固定 slot：
 ### Double tap
 
 1. `RowPlaybackInteractionLayer` 的 `BackgroundGestureRegion` 识别左右区
-2. session hook 通过当前 active controller 调 `seekBy(±5)`
-3. 成功后只给当前 `videoId` 写入 seek HUD
-4. HUD 跟随所属 row 渲染并自动消失
+2. session hook 读取 active transcript 与播放器当前时间
+3. 有可用字幕时按句子级规则调用 active controller `seekTo(targetSeconds)`；字幕不可用、空字幕或时间不可用时 fallback 到 `seekBy(-5/+5)`
+4. 成功后只给当前 `videoId` 写入方向型 seek HUD
+5. HUD 跟随所属 row 渲染并自动消失
 
 ### Long press
 

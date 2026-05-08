@@ -119,6 +119,7 @@ row 内正式顺序固定为：
 - 它使用比 title 更轻的文字层级，避免和视频标题混淆
 - 它不固定为两行，当前句文本按实际长度自然换行显示
 - 它复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds`，不新增播放器时间监听
+- 当前句显示时间来自 transcript asset 缓存前的 sentence timing normalization；token 高亮仍使用原始 token 时间
 - `BasicSubtitleOverlay` 只负责渲染 token 与发出 `onTokenPress`，不直接 import modal hook
 - 当前播放 token 使用纯色高亮；高亮只改变 `color` 和 `textShadow`，不改变字号、行高、字重、间距或自然换行行为
 - 字幕显示由 `features/playback-settings` 的全局 `subtitleDisplayMode` 控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `TranscriptSentence.explanation`

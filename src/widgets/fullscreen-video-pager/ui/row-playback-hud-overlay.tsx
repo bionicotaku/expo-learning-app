@@ -110,7 +110,7 @@ function RowPlaybackHudOverlayComponent({
         ) : null
       }
       leftCenter={
-        transientFeedback?.kind === 'seek' && transientFeedback.deltaSeconds < 0 ? (
+        transientFeedback?.kind === 'seek' && transientFeedback.direction === 'backward' ? (
         <Animated.View
           key="seek-left"
           entering={hudFadeIn}
@@ -138,7 +138,7 @@ function RowPlaybackHudOverlayComponent({
         ) : null
       }
       rightCenter={
-        transientFeedback?.kind === 'seek' && transientFeedback.deltaSeconds > 0 ? (
+        transientFeedback?.kind === 'seek' && transientFeedback.direction === 'forward' ? (
           <Animated.View
             key="seek-right"
             entering={hudFadeIn}

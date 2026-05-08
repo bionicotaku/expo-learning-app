@@ -1,6 +1,6 @@
 export type FullscreenRowTransientFeedback =
   | {
-      deltaSeconds: -5 | 5;
+      direction: 'backward' | 'forward';
       kind: 'seek';
     }
   | {

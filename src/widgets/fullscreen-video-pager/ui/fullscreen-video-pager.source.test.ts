@@ -23,6 +23,7 @@ describe('fullscreen video pager source', () => {
     );
 
     expect(source).toContain('useFullscreenPlaybackSession');
+    expect(source).toContain('activeTranscript,');
     expect(source).toContain('handleViewableItemsChanged');
     expect(source).toContain('acquirePlaybackHold');
     expect(source).toContain('createExpandableOverlayDescriptionMeasurementCache');

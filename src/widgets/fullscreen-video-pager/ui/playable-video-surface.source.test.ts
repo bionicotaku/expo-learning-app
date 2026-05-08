@@ -18,6 +18,11 @@ describe('playable video surface source', () => {
     expect(source).toContain("useEventListener(player, 'timeUpdate'");
     expect(source).toContain('scheduleProgressResync');
     expect(source).toContain('const seekTo = useCallback');
+    expect(source).toContain('const getCurrentTimeSeconds = useCallback');
+    expect(source).toContain('const getDurationSeconds = useCallback');
+    expect(source).toContain('getCurrentTimeSeconds,');
+    expect(source).toContain('getDurationSeconds,');
+    expect(source).toContain('seekTo,');
     expect(source).toContain('player.currentTime = seconds;');
     expect(source).toContain(
       'previousProps.onActiveProgressSnapshotChange ==='

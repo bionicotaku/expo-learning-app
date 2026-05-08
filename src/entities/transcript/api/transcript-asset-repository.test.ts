@@ -51,13 +51,17 @@ describe('transcript asset repository', () => {
     await expect(fetchTranscriptAsset(transcriptUrl)).resolves.toMatchObject({
       sentences: [
         {
+          end: 55915,
+          start: 55160,
           text: 'Pam!',
           tokens: [
             {
+              end: 55615,
               semanticElement: {
                 baseForm: 'Pam',
                 coarseId: null,
               },
+              start: 55260,
             },
           ],
         },

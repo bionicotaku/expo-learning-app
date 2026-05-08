@@ -3,7 +3,7 @@ export type FullscreenVideoRowRenderProps = {
   height: number;
   hudPauseIndicatorVisible: boolean;
   hudTransientFeedbackKind: 'seek' | 'rate' | null;
-  hudTransientSeekDeltaSeconds: -5 | 5 | null;
+  hudTransientSeekDirection: 'backward' | 'forward' | null;
   isActive: boolean;
   playbackRate: number;
   shouldEnableBackgroundGestures: boolean;
@@ -24,8 +24,8 @@ export function areFullscreenVideoRowRenderPropsEqual(
     previousProps.height === nextProps.height &&
     previousProps.hudPauseIndicatorVisible === nextProps.hudPauseIndicatorVisible &&
     previousProps.hudTransientFeedbackKind === nextProps.hudTransientFeedbackKind &&
-    previousProps.hudTransientSeekDeltaSeconds ===
-      nextProps.hudTransientSeekDeltaSeconds &&
+    previousProps.hudTransientSeekDirection ===
+      nextProps.hudTransientSeekDirection &&
     previousProps.isActive === nextProps.isActive &&
     previousProps.playbackRate === nextProps.playbackRate &&
     previousProps.shouldEnableBackgroundGestures ===

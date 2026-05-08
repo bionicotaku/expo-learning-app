@@ -78,6 +78,7 @@ export function FullscreenVideoPager({
     handleViewableItemsChanged,
     registerActiveController,
   } = useFullscreenPlaybackSession({
+    activeTranscript,
     items,
     onActiveVideoChange,
   });
