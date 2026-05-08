@@ -9,7 +9,7 @@
 - 当前参考稿真正稳定下来的视觉语言是什么
 - 这套视觉语言在 Expo + React Native + 当前轻量 FSD 结构中应该如何抽象
 - 哪些内容属于 `shared/theme` 与 `shared/ui`，哪些应停留在 `features / widgets / pages / app`
-- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> NativeTabs(Feed / Save / Me) -> Fullscreen Video 页`
+- 这套风格如何服务当前产品模型：当前最小运行态是 `登录页 -> NativeTabs(Feed / Word List / Me) -> Fullscreen Video 页`
 
 本文档是实现导向规范，不是设计赏析文档。默认约束如下：
 
@@ -607,5 +607,5 @@ widgets 至少要有以下变体语义：
 - 当前只设计 `light theme`
 - `FullscreenVideoPagerTemplate` 以现有视频播放页能力为基础演进
 - `YouTube-like Feed` 是主首页，不再把首页和沉浸式视频页混为一个模板
-- 当前最小运行态只落地 `Auth + NativeTabs(Feed / Save / Me) + Fullscreen Video`
+- 当前最小运行态只落地 `Auth + NativeTabs(Feed / Word List / Me) + Fullscreen Video`
 - `shared/theme + shared/ui + widgets + features + pages + app` 是正式抽象层次；当前 tabs 也只允许落在 `app` 这一层
