@@ -68,6 +68,7 @@ type FullscreenVideoRowProps = {
   shouldPlay: boolean;
   subtitleDisplayMode: SubtitleDisplayMode;
   video: VideoListItem;
+  videoDetailsVisible: boolean;
   videoMeta: VideoMeta | null;
   width: number;
 };
@@ -97,6 +98,7 @@ function FullscreenVideoRowComponent({
   shouldPlay,
   subtitleDisplayMode,
   videoMeta,
+  videoDetailsVisible,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
@@ -275,6 +277,7 @@ function FullscreenVideoRowComponent({
         seekBarStore={seekBarStore}
         subtitleDisplayMode={subtitleDisplayMode}
         title={video.title}
+        videoDetailsVisible={videoDetailsVisible}
       />
       <RowPlaybackHudOverlay
         hudState={hudState}
@@ -340,7 +343,8 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
     previousProps.onProgressSnapshotForTelemetry ===
       nextProps.onProgressSnapshotForTelemetry &&
-    previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode
+    previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode &&
+    previousProps.videoDetailsVisible === nextProps.videoDetailsVisible
   );
 }
 

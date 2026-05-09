@@ -1,6 +1,6 @@
 import { SymbolView } from 'expo-symbols';
 import type { SFSymbol } from 'expo-symbols';
-import { Pressable, Text, View, type ViewStyle } from 'react-native';
+import { Pressable, Switch, Text, View, type ViewStyle } from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import type { EditorialPaperTokens } from '@/shared/theme/editorial-paper';
@@ -15,6 +15,8 @@ import {
   type PlaybackRate,
   usePlaybackRate,
   useSetPlaybackRate,
+  useSetVideoDetailsVisible,
+  useVideoDetailsVisible,
 } from '../model/playback-settings-store';
 
 type PlaybackSettingsActionItem = {
@@ -117,6 +119,8 @@ export function PlaybackSettingsSheetContent() {
   const { tokens } = useEditorialPaperTheme();
   const playbackRate = usePlaybackRate();
   const setPlaybackRate = useSetPlaybackRate();
+  const videoDetailsVisible = useVideoDetailsVisible();
+  const setVideoDetailsVisible = useSetVideoDetailsVisible();
 
   return (
     <View>
@@ -159,6 +163,50 @@ export function PlaybackSettingsSheetContent() {
               style={{ padding: 4 }}
               tone="softActionSky"
               value={playbackRate}
+            />
+          </View>
+        </View>
+        <PlaybackSettingsRowSeparator tokens={tokens} />
+
+        <View
+          style={createPlaybackSettingsRowStyle(tokens)}
+        >
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 34,
+            }}
+          >
+            <PlaybackSettingsActionSymbol
+              color={tokens.color.inkSoft}
+              fallbackGlyph="T"
+              name="text.alignleft"
+            />
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text
+              style={{
+                color: tokens.color.ink,
+                fontSize: 15,
+                fontWeight: '700',
+                lineHeight: 19,
+              }}
+            >
+              显示视频标题和简介
+            </Text>
+          </View>
+          <View
+            style={{
+              alignItems: 'center',
+              height: 32,
+              justifyContent: 'center',
+            }}
+          >
+            <Switch
+              accessibilityLabel="显示视频标题和简介"
+              value={videoDetailsVisible}
+              onValueChange={setVideoDetailsVisible}
             />
           </View>
         </View>

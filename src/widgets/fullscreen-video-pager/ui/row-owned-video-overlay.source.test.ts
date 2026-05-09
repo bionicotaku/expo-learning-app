@@ -19,12 +19,15 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('measurementCache');
     expect(source).toContain('activeVisitToken');
     expect(source).toContain('activeTranscript');
+    expect(source).toContain('videoDetailsVisible');
     expect(source).toContain('subtitleDisplayMode');
     expect(source).toContain('seekBarStore');
     expect(source).toContain('onSubtitleTokenPress');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain("../model/fullscreen-video-overlay-theme");
     expect(source).toContain('viewState.actionPlacement');
+    expect(source).toContain('videoDetailsVisible &&');
+    expect(source).toContain("descriptionState.viewState.actionPlacement === 'footer'");
     expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionLaneHeight');
     expect(source).toContain('fullscreenVideoOverlayTheme.descriptionActionGap');
     expect(source).toContain('allowFontScaling={false}');
@@ -51,6 +54,11 @@ describe('row owned video overlay source', () => {
     expect(source).toContain('<BasicSubtitleOverlay');
     expect(source).toContain('displayMode={subtitleDisplayMode}');
     expect(source).toContain('transcript={activeTranscript}');
+    expect(source).toContain(') : null}');
+    expect(source).toContain('{videoDetailsVisible ? (');
+    expect(source).toContain('<ExpandableOverlayDescription');
+    expect(source).toContain('{videoDetailsVisible ? (');
+    expect(source).toContain('<ExpandableOverlayDescriptionAction');
     expect(source).toContain(') : null}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('titleDescriptionColumnStyle');

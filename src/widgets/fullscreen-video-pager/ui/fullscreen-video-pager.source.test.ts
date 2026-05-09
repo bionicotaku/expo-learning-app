@@ -37,6 +37,7 @@ describe('fullscreen video pager source', () => {
     expect(source).not.toContain('PlaybackFeedbackOverlay');
     expect(source).toContain('const renderState = useMemo');
     expect(source).toContain('subtitleDisplayMode');
+    expect(source).toContain('videoDetailsVisible');
     expect(source).toContain('activeTranscript');
     expect(source).toContain('videoMetaByVideoId');
     expect(source).toContain('handleProgressSnapshotForTelemetry');
@@ -62,6 +63,7 @@ describe('fullscreen video pager source', () => {
     );
     expect(source).toContain('videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
+    expect(source).toContain('videoDetailsVisible={videoDetailsVisible}');
     expect(source).toContain('measurementCache={descriptionMeasurementCacheRef.current}');
     expect(source).not.toContain('onActionPress?:');
     expect(source).not.toContain('onActionPress={onActionPress}');

@@ -4,6 +4,7 @@ import type { VideoListItem } from '@/entities/video';
 import {
   usePresentPlaybackSettingsSheet,
   useSubtitleDisplayMode,
+  useVideoDetailsVisible,
 } from '@/features/playback-settings';
 import { createTailRequestGate } from '@/features/feed-source';
 import { useFullscreenVideoResources } from '@/features/fullscreen-video-resources';
@@ -35,6 +36,7 @@ export function FullscreenVideoSession({
 }: FullscreenVideoSessionProps) {
   const tailRequestGateRef = useRef(createTailRequestGate());
   const subtitleDisplayMode = useSubtitleDisplayMode();
+  const videoDetailsVisible = useVideoDetailsVisible();
   const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
   const [pagerReportedActive, setPagerReportedActive] =
     useState<FullscreenPagerReportedActive>(null);
@@ -97,6 +99,7 @@ export function FullscreenVideoSession({
       onActiveVideoChange={handleActiveVideoChange}
       onCenterHoldStart={presentPlaybackSettingsSheet}
       subtitleDisplayMode={subtitleDisplayMode}
+      videoDetailsVisible={videoDetailsVisible}
       videoMetaByVideoId={videoMetaByVideoId}
     />
   );

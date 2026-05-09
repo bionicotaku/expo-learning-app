@@ -113,6 +113,9 @@ FullscreenVideoPager
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
   - 字幕显示由 `features/playback-settings` 的 `subtitleDisplayMode` 全局 session 偏好控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `explanation`
   - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存
+  - 视频信息显示由 `features/playback-settings` 的 `videoDetailsVisible` 全局 session 偏好控制
+  - `videoDetailsVisible=false` 时不渲染 title、description 和展开/收起按钮，且不为 description footer action 抬高内容列
+  - 视频信息开关不影响基础字幕、右侧 action rail、HUD 或底部 seek bar
   - 基础字幕使用区别于 title 的轻量视觉层级；不复用 title 的粗字重和强阴影
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器

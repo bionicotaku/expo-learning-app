@@ -17,6 +17,10 @@ describe('basic subtitle overlay source', () => {
     expect(source).toContain('useMemo');
     expect(source).toContain('tokenDisplayParts');
     expect(source).toContain('transcript: Transcript;');
+    expect(source).toContain('fullscreenVideoOverlayTheme.subtitleText.fontSize');
+    expect(source).toContain('fullscreenVideoOverlayTheme.subtitleText.lineHeight');
+    expect(source).toContain('fullscreenVideoOverlayTheme.subtitleExplanationText.fontSize');
+    expect(source).toContain('fullscreenVideoOverlayTheme.subtitleExplanationText.lineHeight');
     expect(source).not.toContain("displayMode === 'off'");
     expect(source).toContain("displayMode === 'bilingual'");
     expect(source).toContain('currentSentenceValue.explanation');

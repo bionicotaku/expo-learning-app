@@ -13,12 +13,14 @@ const {
   presentPlaybackSettingsSheetMock,
   requestMoreMock,
   useSubtitleDisplayModeMock,
+  useVideoDetailsVisibleMock,
   useFullscreenVideoResourcesMock,
 } = vi.hoisted(() => ({
   onLatestActiveVideoIdChangeMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
   requestMoreMock: vi.fn(),
   useSubtitleDisplayModeMock: vi.fn(),
+  useVideoDetailsVisibleMock: vi.fn(),
   useFullscreenVideoResourcesMock: vi.fn(),
 }));
 
@@ -102,6 +104,7 @@ vi.mock('@/features/fullscreen-video-resources', () => ({
 vi.mock('@/features/playback-settings', () => ({
   usePresentPlaybackSettingsSheet: () => presentPlaybackSettingsSheetMock,
   useSubtitleDisplayMode: useSubtitleDisplayModeMock,
+  useVideoDetailsVisible: useVideoDetailsVisibleMock,
 }));
 
 vi.mock('@/widgets/fullscreen-video-pager', async () => {
@@ -126,6 +129,8 @@ describe('fullscreen video session runtime', () => {
     requestMoreMock.mockResolvedValue(undefined);
     useSubtitleDisplayModeMock.mockReset();
     useSubtitleDisplayModeMock.mockReturnValue('english');
+    useVideoDetailsVisibleMock.mockReset();
+    useVideoDetailsVisibleMock.mockReturnValue(true);
     useFullscreenVideoResourcesMock.mockReset();
     useFullscreenVideoResourcesMock.mockReturnValue({
       activeVideoMeta: null,
@@ -239,6 +244,7 @@ describe('fullscreen video session runtime', () => {
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       activeTranscript,
       subtitleDisplayMode: 'english',
+      videoDetailsVisible: true,
       videoMetaByVideoId,
     });
     expect(hoistedState.latestFullscreenVideoPagerProps).not.toHaveProperty(
@@ -264,6 +270,27 @@ describe('fullscreen video session runtime', () => {
 
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       subtitleDisplayMode: 'bilingual',
+    });
+  });
+
+  it('passes the global video details visibility preference through to the pager', () => {
+    useVideoDetailsVisibleMock.mockReturnValue(false);
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      videoDetailsVisible: false,
     });
   });
 

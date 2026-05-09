@@ -35,6 +35,7 @@ export type FullscreenVideoPagerProps = {
   onActiveVideoChange: (itemId: string, index: number) => void;
   onCenterHoldStart?: () => void;
   subtitleDisplayMode: SubtitleDisplayMode;
+  videoDetailsVisible: boolean;
   videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
 };
 
@@ -54,6 +55,7 @@ export function FullscreenVideoPager({
   onActiveVideoChange,
   onCenterHoldStart,
   subtitleDisplayMode,
+  videoDetailsVisible,
   videoMetaByVideoId,
 }: FullscreenVideoPagerProps) {
   const { width, height } = useWindowDimensions();
@@ -202,6 +204,7 @@ export function FullscreenVideoPager({
       getRowRenderState,
       height,
       subtitleDisplayMode,
+      videoDetailsVisible,
       videoMetaByVideoId,
       width,
     }),
@@ -213,6 +216,7 @@ export function FullscreenVideoPager({
       height,
       insets.bottom,
       subtitleDisplayMode,
+      videoDetailsVisible,
       videoMetaByVideoId,
       width,
     ]
@@ -251,6 +255,7 @@ export function FullscreenVideoPager({
           shouldPlay={rowRenderState.effectivePlaybackState.shouldPlay}
           subtitleDisplayMode={subtitleDisplayMode}
           video={item}
+          videoDetailsVisible={videoDetailsVisible}
           videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}
           width={width}
         />
@@ -272,6 +277,7 @@ export function FullscreenVideoPager({
       insets.bottom,
       registerActiveController,
       subtitleDisplayMode,
+      videoDetailsVisible,
       videoMetaByVideoId,
       width,
     ]

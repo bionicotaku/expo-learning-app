@@ -60,6 +60,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('onActiveProgressSnapshotChange={handleActiveProgressSnapshotChange}');
     expect(source).toContain('activeTranscript={activeTranscript}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
+    expect(source).toContain('videoDetailsVisible={videoDetailsVisible}');
     expect(source).toContain('seekBarStore={seekBarStore}');
     expect(source).toContain('onSubtitleTokenPress={handleSubtitleTokenPress}');
     expect(source).not.toContain('player.pause()');
@@ -75,6 +76,7 @@ describe('fullscreen video row source', () => {
     expect(source).not.toContain('previousProps.video.isFavorited === nextProps.video.isFavorited');
     expect(source).toContain('previousProps.activeTranscript === nextProps.activeTranscript');
     expect(source).toContain('previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode');
+    expect(source).toContain('previousProps.videoDetailsVisible === nextProps.videoDetailsVisible');
     expect(source).toContain('previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold');
     expect(source).toContain(
       'previousProps.onProgressSnapshotForTelemetry ===\n      nextProps.onProgressSnapshotForTelemetry'

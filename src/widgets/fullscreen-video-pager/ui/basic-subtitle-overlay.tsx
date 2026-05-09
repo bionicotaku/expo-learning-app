@@ -152,8 +152,8 @@ function BasicSubtitleOverlayComponent({
           selectable={false}
           style={{
             width: maxTextWidth,
-            fontSize: 15,
-            lineHeight: 19,
+            fontSize: fullscreenVideoOverlayTheme.subtitleExplanationText.fontSize,
+            lineHeight: fullscreenVideoOverlayTheme.subtitleExplanationText.lineHeight,
             fontWeight: '400',
             color: 'rgba(232,226,213,0.82)',
             textShadowColor: 'rgba(12,9,7,0.18)',

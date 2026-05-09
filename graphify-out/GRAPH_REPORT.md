@@ -1,12 +1,12 @@
-# Graph Report - .  (2026-05-08)
+# Graph Report - .  (2026-05-09)
 
 ## Corpus Check
-- 322 files · ~85,687 words
+- 322 files · ~86,004 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 892 nodes · 845 edges · 259 communities detected
-- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 98 edges (avg confidence: 0.8)
+- 895 nodes · 849 edges · 259 communities detected
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 99 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -302,40 +302,40 @@
 ## Communities
 
 ### Community 0 - "Community 0"
+Cohesion: 0.04
+Nodes (28): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), AuthCardTitle(), AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton() (+20 more)
+
+### Community 1 - "Community 1"
 Cohesion: 0.07
 Nodes (53): 账户初始化完成, 认证状态, 为什么必须有初始化阶段, 登录、验证与状态维护设计文档, 认证单一真相来源, 活跃媒体, 可点击字幕 Overlay 系统, 句子导航 (+45 more)
 
-### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (24): AuthCardTitle(), AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton(), AuthSocialRow(), useEditorialPaperTheme(), EditorialTitle() (+16 more)
-
 ### Community 2 - "Community 2"
-Cohesion: 0.05
-Nodes (21): getTranscriptAssetQueryKey(), getVideoMetaQueryKey(), createTranscriptAssetQueryOptions(), createVideoMetaQueryOptions(), resolveQueryStatus(), flushQueryWork(), TestResourceConsumer(), waitForAssertion() (+13 more)
+Cohesion: 0.06
+Nodes (33): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, AuthFooter(), Route-Only App Layer, Expo Router (+25 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
-Nodes (35): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model (+27 more)
+Nodes (19): Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model, Overlay Split Rationale, Row-bound Overlay, reportMockVideoWatchProgress(), DefaultIdentityHarness(), InjectedIdentityHarness() (+11 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.08
-Nodes (14): reportMockVideoWatchProgress(), DefaultIdentityHarness(), InjectedIdentityHarness(), ReporterHarness(), useVideoWatchProgressReporter(), reportVideoWatchProgress(), createWatchProgressTelemetryDedupeKey(), createWatchProgressTelemetryItem() (+6 more)
-
-### Community 5 - "Community 5"
 Cohesion: 0.12
 Nodes (30): Editorial Paper 风格系统, Editorial Paper UI 设计规范, Theme Tokens, Feed 与 Fullscreen Video 页面设计逻辑, Feed / Fullscreen 双页面投影, Fullscreen Video Session, Row 内交互边界, Fullscreen Video Seek Bar Overlay 设计规范 (+22 more)
 
-### Community 6 - "Community 6"
+### Community 5 - "Community 5"
 Cohesion: 0.07
 Nodes (0):
 
-### Community 7 - "Community 7"
+### Community 6 - "Community 6"
 Cohesion: 0.08
-Nodes (10): FullscreenVideoSession(), usePlaybackRate(), useSubtitleDisplayMode(), createTailRequestGate(), SessionHarness(), useFullscreenPlaybackSession(), useModalController(), usePresentPlaybackSettingsSheet() (+2 more)
+Nodes (11): FullscreenVideoSession(), usePlaybackRate(), useSubtitleDisplayMode(), useVideoDetailsVisible(), createTailRequestGate(), SessionHarness(), useFullscreenPlaybackSession(), useModalController() (+3 more)
 
-### Community 8 - "Community 8"
+### Community 7 - "Community 7"
 Cohesion: 0.15
 Nodes (21): One-Way Dependency Direction, Legacy Template Directories, Layer Boundaries Clarify Ownership, Target Source Layer Structure, Content-Driven Learning App, Follow Expo Defaults Rationale, Lightweight FSD, Mobile-First Expo Stack (+13 more)
+
+### Community 8 - "Community 8"
+Cohesion: 0.1
+Nodes (9): flushWork(), Harness(), waitForAssertion(), useLearnedWordListSource(), usePagedWordListSource(), flushWork(), Harness(), waitForAssertion() (+1 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.15
@@ -346,20 +346,20 @@ Cohesion: 0.11
 Nodes (8): formatEngagementCount(), resolveEffectiveEngagementCount(), flushWork(), Harness(), waitForAssertion(), useVideoEngagementState(), useVideoRuntimeState(), getEngagementActionCountLabel()
 
 ### Community 11 - "Community 11"
+Cohesion: 0.12
+Nodes (9): getTranscriptAssetQueryKey(), getVideoMetaQueryKey(), createTranscriptAssetQueryOptions(), createVideoMetaQueryOptions(), resolveQueryStatus(), flushQueryWork(), TestResourceConsumer(), waitForAssertion() (+1 more)
+
+### Community 12 - "Community 12"
 Cohesion: 0.2
 Nodes (9): fetchFeed(), createFeedSourceSnapshot(), fetchInitialFeedSourceSnapshot(), getCurrentFeedSourceSnapshot(), getFeedSourceSnapshot(), getSourceVideoIds(), mapFeedItemsToVideoListItems(), mergeFeedSourceItems() (+1 more)
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.23
 Nodes (8): createWordListDetailPayload(), handleOpenDetail(), mixChannel(), mixHexColor(), parseHexColor(), resolvePartOfSpeechLabel(), rgbToHex(), WordSymbol()
 
-### Community 13 - "Community 13"
+### Community 14 - "Community 14"
 Cohesion: 0.17
 Nodes (0):
-
-### Community 14 - "Community 14"
-Cohesion: 0.18
-Nodes (11): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, Mock Business Data With Real Async Flow, MVP Closed Loop, Real Account System, Continuous Video Feed (+3 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.24
@@ -374,32 +374,32 @@ Cohesion: 0.23
 Nodes (8): mapTranscriptDtoToDomain(), mapTranscriptSemanticElementDtoToDomain(), mapTranscriptTokenDtoToDomain(), prepareTranscriptForPlayback(), resolveOptimizedStarts(), fetchTranscriptAsset(), isTranscriptResponseDto(), validateTranscriptAssetResponse()
 
 ### Community 18 - "Community 18"
+Cohesion: 0.18
+Nodes (11): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, Mock Business Data With Real Async Flow, MVP Closed Loop, Real Account System, Continuous Video Feed (+3 more)
+
+### Community 19 - "Community 19"
 Cohesion: 0.2
 Nodes (2): DescriptionStateHarness(), useExpandableOverlayDescriptionState()
 
-### Community 19 - "Community 19"
+### Community 20 - "Community 20"
 Cohesion: 0.33
 Nodes (7): clearFullscreenRowTransientFeedback(), clearFullscreenRowTransientFeedbackByKind(), hideFullscreenRowPauseIndicator(), pruneIfEmpty(), setFullscreenRowTransientFeedback(), showFullscreenRowPauseIndicator(), updateHudState()
 
-### Community 20 - "Community 20"
+### Community 21 - "Community 21"
 Cohesion: 0.29
 Nodes (5): fetchMockLearnedUnitProgressPage(), fetchMockUnlearnedUnitProgressPage(), resolveLearnedPageIndex(), resolvePageIndex(), sleep()
 
-### Community 21 - "Community 21"
+### Community 22 - "Community 22"
 Cohesion: 0.25
 Nodes (2): isGestureLocked(), resolveEffectivePlaybackState()
 
-### Community 22 - "Community 22"
+### Community 23 - "Community 23"
 Cohesion: 0.33
 Nodes (7): mapLearningUnitProgressItemDtoToDomain(), mapLearningUnitProgressPageDtoToDomain(), normalizePartOfSpeech(), fetchLearnedUnitProgressPage(), fetchLearningUnitProgressPage(), fetchUnlearnedUnitProgressPage(), resolveLearningUnitProgressLimit()
 
-### Community 23 - "Community 23"
+### Community 24 - "Community 24"
 Cohesion: 0.25
 Nodes (0):
-
-### Community 24 - "Community 24"
-Cohesion: 0.33
-Nodes (4): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), resolveEditorialPaperGlassSupport()
 
 ### Community 25 - "Community 25"
 Cohesion: 0.29
@@ -458,12 +458,12 @@ Cohesion: 0.83
 Nodes (3): flushTelemetryQueue(), normalizePositiveInteger(), runWithConcurrency()
 
 ### Community 39 - "Community 39"
-Cohesion: 0.5
-Nodes (2): findVideoListItemIndex(), resolveVideoDetailRouteTarget()
-
-### Community 40 - "Community 40"
 Cohesion: 0.83
 Nodes (3): clampRatio(), createFullscreenRowProgressSnapshot(), normalizeSeconds()
+
+### Community 40 - "Community 40"
+Cohesion: 0.5
+Nodes (2): findVideoListItemIndex(), resolveVideoDetailRouteTarget()
 
 ### Community 41 - "Community 41"
 Cohesion: 0.67
@@ -1750,17 +1750,17 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TanStack React Query` connect `Community 2` to `Community 11`, `Community 10`, `Community 3`?**
-  _High betweenness centrality (0.072) - this node is a cross-community bridge._
-- **Why does `useEditorialPaperTheme()` connect `Community 1` to `Community 24`, `Community 3`?**
+- **Why does `TanStack React Query` connect `Community 2` to `Community 8`, `Community 10`, `Community 11`, `Community 12`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `useEditorialPaperTheme()` connect `Community 0` to `Community 2`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **Are the 16 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `AuthSocialRow()` and `AuthField()`) actually correct?**
   _`useEditorialPaperTheme()` has 16 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow` to the rest of the system?**
   _21 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06 - nodes in this community are weakly interconnected._

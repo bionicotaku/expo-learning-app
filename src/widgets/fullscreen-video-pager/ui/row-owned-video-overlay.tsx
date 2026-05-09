@@ -49,6 +49,7 @@ type RowOwnedVideoOverlayProps = {
   seekBarStore: RowPlaybackSeekBarStore;
   subtitleDisplayMode: SubtitleDisplayMode;
   title: string;
+  videoDetailsVisible: boolean;
 };
 
 function RowOwnedVideoOverlayComponent({
@@ -68,6 +69,7 @@ function RowOwnedVideoOverlayComponent({
   seekBarStore,
   subtitleDisplayMode,
   title,
+  videoDetailsVisible,
 }: RowOwnedVideoOverlayProps) {
   const descriptionState = useExpandableOverlayDescriptionState({
     activeVisitToken,
@@ -76,7 +78,7 @@ function RowOwnedVideoOverlayComponent({
     measurementCache,
   });
   const contentBottomLift =
-    descriptionState.viewState.actionPlacement === 'footer'
+    videoDetailsVisible && descriptionState.viewState.actionPlacement === 'footer'
       ? fullscreenVideoOverlayTheme.descriptionActionLaneHeight +
         fullscreenVideoOverlayTheme.descriptionActionGap
       : 0;
@@ -147,39 +149,43 @@ function RowOwnedVideoOverlayComponent({
                 />
               </View>
             ) : null}
-            <View style={titleDescriptionColumnStyle}>
-              <Text
-                allowFontScaling={false}
-                selectable={false}
-                style={{
-                  fontSize: fullscreenVideoOverlayTheme.titleText.fontSize,
-                  lineHeight: fullscreenVideoOverlayTheme.titleText.lineHeight,
-                  letterSpacing: -0.08,
-                  fontWeight: '700',
-                  color: 'rgba(251,247,238,0.97)',
-                  textShadowColor: 'rgba(17,13,10,0.26)',
-                  textShadowOffset: { width: 1, height: 1 },
-                  textShadowRadius: 3,
-                  maxWidth: sharedTextWidth,
-                }}
-                numberOfLines={2}
-              >
-                {title}
-              </Text>
-              <ExpandableOverlayDescription
-                description={description}
-                maxTextWidth={descriptionTextWidth}
-                state={descriptionState}
-              />
-            </View>
+            {videoDetailsVisible ? (
+              <View style={titleDescriptionColumnStyle}>
+                <Text
+                  allowFontScaling={false}
+                  selectable={false}
+                  style={{
+                    fontSize: fullscreenVideoOverlayTheme.titleText.fontSize,
+                    lineHeight: fullscreenVideoOverlayTheme.titleText.lineHeight,
+                    letterSpacing: -0.08,
+                    fontWeight: '700',
+                    color: 'rgba(251,247,238,0.97)',
+                    textShadowColor: 'rgba(17,13,10,0.26)',
+                    textShadowOffset: { width: 1, height: 1 },
+                    textShadowRadius: 3,
+                    maxWidth: sharedTextWidth,
+                  }}
+                  numberOfLines={2}
+                >
+                  {title}
+                </Text>
+                <ExpandableOverlayDescription
+                  description={description}
+                  maxTextWidth={descriptionTextWidth}
+                  state={descriptionState}
+                />
+              </View>
+            ) : null}
           </View>
         </Animated.View>
 
-        <ExpandableOverlayDescriptionAction
-          bottom={bottomInset + contentBottomOffset}
-          left={contentLeftInset + descriptionTextWidth}
-          state={descriptionState}
-        />
+        {videoDetailsVisible ? (
+          <ExpandableOverlayDescriptionAction
+            bottom={bottomInset + contentBottomOffset}
+            left={contentLeftInset + descriptionTextWidth}
+            state={descriptionState}
+          />
+        ) : null}
       </View>
 
       <VideoOverlayActionRail
