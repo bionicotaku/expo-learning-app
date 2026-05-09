@@ -5,7 +5,9 @@
 当前职责：
 
 - 渲染硬编码的 `Editorial Paper` Word List UI 原型
-- 展示 `Learning shelf`、`单词列表`、三段筛选和三张硬编码单词卡
+- 使用 `FlatList` 展示 `Learning shelf`、`单词列表`、三段筛选和硬编码单词行
+- 单词行采用信息密集型列表结构，展示单词、浅色简写词性、单行省略解释、按进度连续渐变的进度条和固定粉色收藏入口，两个单词之间只用虚线分隔线区分
+- 页面组件通过 `showFavoriteAction` 和 `showProgress` 参数控制收藏入口和进度条是否显示
 - 保持 NativeTabs 下的滚动留白、`Editorial Paper` 背景与状态栏风格
 
 边界约束：
@@ -14,4 +16,6 @@
 - 当前不接 `features/video-runtime`
 - 当前 `SegmentedFilterBar` 只改变本地选中态，不过滤列表
 - 当前星标按钮只保留按压反馈和 accessibility role，不执行持久化写入
+- 当前词性字段允许为空字符串；为空时解释行不渲染词性前缀
+- 当前列表已经使用 `FlatList` 的虚拟窗口参数，后续真实数据接入时优先复用当前行渲染和分隔结构
 - 后续真实内容再在这一层向下接入 feature presenter 或业务数据源
