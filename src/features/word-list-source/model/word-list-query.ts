@@ -1,1 +1,4 @@
-export const UNLEARNED_WORD_LIST_QUERY_KEY = ['word-list-source', 'unlearned'] as const;
+export const WORD_LIST_SOURCE_QUERY_KEYS = {
+  learned: ['word-list-source', 'learned'] as const,
+  unlearned: ['word-list-source', 'unlearned'] as const,
+};

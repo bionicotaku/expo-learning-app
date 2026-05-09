@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { toast } from '@/shared/lib/toast';
 
-import { UNLEARNED_WORD_LIST_QUERY_KEY } from './word-list-query';
+import { WORD_LIST_SOURCE_QUERY_KEYS } from './word-list-query';
 import { useUnlearnedWordListSource } from './use-unlearned-word-list-source';
 
 const { fetchMockUnlearnedUnitProgressPageMock } = vi.hoisted(() => ({
@@ -19,6 +19,7 @@ vi.mock('@/entities/learning-unit-progress/api/mock-unit-progress-repository', (
 type UseUnlearnedWordListSourceResult = ReturnType<typeof useUnlearnedWordListSource>;
 
 let latestResult: UseUnlearnedWordListSourceResult | null = null;
+let sourceEnabled = true;
 
 function createPage({
   cursor,
@@ -74,7 +75,7 @@ function createQueryClient() {
 }
 
 function Harness() {
-  latestResult = useUnlearnedWordListSource();
+  latestResult = useUnlearnedWordListSource({ enabled: sourceEnabled });
   return null;
 }
 
@@ -111,6 +112,7 @@ describe('useUnlearnedWordListSource runtime', () => {
     queryClient = createQueryClient();
     renderer = null;
     latestResult = null;
+    sourceEnabled = true;
     fetchMockUnlearnedUnitProgressPageMock.mockReset();
     toast.clear();
     toastSpy = vi.spyOn(toast, 'show');
@@ -244,7 +246,7 @@ describe('useUnlearnedWordListSource runtime', () => {
       await latestResult?.refresh();
     });
 
-    expect(queryClient.getQueryData(UNLEARNED_WORD_LIST_QUERY_KEY)).toMatchObject({
+    expect(queryClient.getQueryData(WORD_LIST_SOURCE_QUERY_KEYS.unlearned)).toMatchObject({
       pages: [
         {
           items: [
@@ -300,7 +302,14 @@ describe('useUnlearnedWordListSource runtime', () => {
   it('shows a toast and keeps existing items when loading another page fails', async () => {
     fetchMockUnlearnedUnitProgressPageMock
       .mockResolvedValueOnce(createPage({ ids: [1], nextCursor: 'mock-unlearned-page:1' }))
-      .mockRejectedValueOnce(new Error('append failed'));
+      .mockRejectedValueOnce(new Error('append failed'))
+      .mockResolvedValueOnce(
+        createPage({
+          cursor: 'mock-unlearned-page:1',
+          ids: [2],
+          nextCursor: 'mock-unlearned-page:2',
+        })
+      );
 
     renderHarness();
 
@@ -316,6 +325,110 @@ describe('useUnlearnedWordListSource runtime', () => {
     expect(toastSpy).toHaveBeenCalledWith({
       kind: 'error',
       title: '加载更多单词失败',
+    });
+
+    await act(async () => {
+      await latestResult?.requestMore();
+    });
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items.map((item) => item.id)).toEqual(['1', '2']);
+    });
+    expect(fetchMockUnlearnedUnitProgressPageMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not load the first page while disabled', async () => {
+    sourceEnabled = false;
+
+    renderHarness();
+
+    await flushWork();
+
+    expect(fetchMockUnlearnedUnitProgressPageMock).not.toHaveBeenCalled();
+    expect(latestResult).toMatchObject({
+      items: [],
+      isInitialLoading: false,
+      isRefreshing: false,
+      isExtending: false,
+    });
+  });
+
+  it('exposes the initial page error without showing a source-layer toast', async () => {
+    const initialError = new Error('initial failed');
+    fetchMockUnlearnedUnitProgressPageMock.mockRejectedValueOnce(initialError);
+
+    renderHarness();
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items).toEqual([]);
+      expect(latestResult?.error).toBe(initialError);
+      expect(latestResult?.isInitialLoading).toBe(false);
+    });
+    expect(toastSpy).not.toHaveBeenCalled();
+  });
+
+  it('refetches the first page from the empty error state and preserves the error when refresh fails', async () => {
+    const initialError = new Error('initial failed');
+    const refreshError = new Error('refresh failed');
+    fetchMockUnlearnedUnitProgressPageMock
+      .mockRejectedValueOnce(initialError)
+      .mockRejectedValueOnce(refreshError);
+
+    renderHarness();
+
+    await waitForAssertion(() => {
+      expect(latestResult?.error).toBe(initialError);
+    });
+
+    await expect(latestResult?.refresh()).rejects.toBe(refreshError);
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items).toEqual([]);
+      expect(latestResult?.error).toBeTruthy();
+      expect(latestResult?.isRefreshing).toBe(false);
+    });
+  });
+
+  it('refetches the first page from the empty error state and clears the error when refresh succeeds', async () => {
+    const initialError = new Error('initial failed');
+    fetchMockUnlearnedUnitProgressPageMock
+      .mockRejectedValueOnce(initialError)
+      .mockResolvedValueOnce(createPage({ ids: [7], nextCursor: 'mock-unlearned-page:1' }));
+
+    renderHarness();
+
+    await waitForAssertion(() => {
+      expect(latestResult?.error).toBe(initialError);
+    });
+
+    await act(async () => {
+      await latestResult?.refresh();
+    });
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items.map((item) => item.id)).toEqual(['7']);
+      expect(latestResult?.error).toBeNull();
+      expect(latestResult?.isRefreshing).toBe(false);
+    });
+  });
+
+  it('keeps existing pages and rejects when refreshing an existing list fails', async () => {
+    const refreshError = new Error('refresh failed');
+    fetchMockUnlearnedUnitProgressPageMock
+      .mockResolvedValueOnce(createPage({ ids: [1], nextCursor: 'mock-unlearned-page:1' }))
+      .mockRejectedValueOnce(refreshError);
+
+    renderHarness();
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items.map((item) => item.id)).toEqual(['1']);
+    });
+
+    await expect(latestResult?.refresh()).rejects.toBe(refreshError);
+
+    await waitForAssertion(() => {
+      expect(latestResult?.items.map((item) => item.id)).toEqual(['1']);
+      expect(latestResult?.isRefreshing).toBe(false);
     });
   });
 });

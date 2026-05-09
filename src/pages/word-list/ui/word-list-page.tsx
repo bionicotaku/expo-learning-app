@@ -1,24 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
 import type { SFSymbol } from 'expo-symbols';
-import { useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
   Pressable,
   RefreshControl,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
 
 import {
+  useEmptyWordListSource,
+  useLearnedWordListSource,
   useUnlearnedWordListSource,
+  type WordListSourceMode,
   type WordListSourceItem,
+  type WordListSourceResult,
 } from '@/features/word-list-source';
 import {
   usePresentWordDetailDialog,
   type WordDetailDialogData,
 } from '@/features/word-detail';
+import { toast } from '@/shared/lib/toast';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
   EditorialTitle,
@@ -28,7 +35,7 @@ import {
 } from '@/shared/ui/editorial-paper';
 import type { SegmentedFilterBarItem } from '@/shared/ui/editorial-paper';
 
-type WordListSegment = 'unlearned' | 'learned' | 'favorites';
+type WordListSegment = WordListSourceMode;
 
 type WordListPageProps = {
   showFavoriteAction?: boolean;
@@ -418,99 +425,273 @@ function WordListFooter({ isExtending }: { isExtending: boolean }) {
   );
 }
 
+type WordListModeCopy = {
+  loadingTitle: string;
+  errorTitle: string;
+  emptyTitle: string;
+};
+
+const wordListModeCopy: Record<WordListSegment, WordListModeCopy> = {
+  favorites: {
+    loadingTitle: 'Loading favorites...',
+    errorTitle: 'Favorites unavailable',
+    emptyTitle: 'No favorites yet',
+  },
+  learned: {
+    loadingTitle: 'Loading learned words...',
+    errorTitle: '加载失败',
+    emptyTitle: 'No learned words yet',
+  },
+  unlearned: {
+    loadingTitle: 'Loading words...',
+    errorTitle: '加载失败',
+    emptyTitle: 'No words yet',
+  },
+};
+
+function WordListModePane({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: ReactNode;
+}) {
+  const opacity = useRef(new Animated.Value(active ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: active ? 1 : 0,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+  }, [active, opacity]);
+
+  return (
+    <Animated.View
+      pointerEvents={active ? 'auto' : 'none'}
+      style={[StyleSheet.absoluteFill, { opacity }]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+function WordListVirtualList({
+  active,
+  copy,
+  mode,
+  onOpenDetail,
+  showFavoriteAction,
+  showProgress,
+  source,
+}: {
+  active: boolean;
+  copy: WordListModeCopy;
+  mode: WordListSegment;
+  onOpenDetail: (item: WordListSourceItem) => void;
+  showFavoriteAction: boolean;
+  showProgress: boolean;
+  source: WordListSourceResult;
+}) {
+  const { tokens } = useEditorialPaperTheme();
+  const lastInitialErrorToastRef = useRef<unknown>(null);
+  const suppressInitialErrorToastRef = useRef(false);
+
+  useEffect(() => {
+    if (!source.error || source.items.length > 0) {
+      lastInitialErrorToastRef.current = null;
+      suppressInitialErrorToastRef.current = false;
+      return;
+    }
+
+    if (!active) {
+      return;
+    }
+
+    if (suppressInitialErrorToastRef.current) {
+      suppressInitialErrorToastRef.current = false;
+      lastInitialErrorToastRef.current = source.error;
+      return;
+    }
+
+    if (lastInitialErrorToastRef.current === source.error) {
+      return;
+    }
+
+    lastInitialErrorToastRef.current = source.error;
+    toast.show({
+      kind: 'error',
+      title: '加载失败',
+    });
+  }, [active, source.error, source.items.length]);
+
+  const handleRefresh = async () => {
+    if (!active) {
+      return;
+    }
+
+    suppressInitialErrorToastRef.current = source.items.length === 0;
+
+    try {
+      await source.refresh();
+      suppressInitialErrorToastRef.current = false;
+    } catch {
+      toast.show({
+        kind: 'error',
+        title: '刷新失败',
+      });
+    }
+  };
+
+  const renderEmptyState = () => {
+    if (source.isInitialLoading) {
+      return <WordListInlineState isLoading title={copy.loadingTitle} />;
+    }
+
+    if (source.error) {
+      return <WordListInlineState title={copy.errorTitle} />;
+    }
+
+    return <WordListInlineState title={copy.emptyTitle} />;
+  };
+
+  return (
+    <FlatList
+      accessibilityLabel={`${mode} word list`}
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
+        paddingBottom: 116,
+        paddingHorizontal: tokens.spacing.pageX,
+      }}
+      data={source.items}
+      initialNumToRender={12}
+      ItemSeparatorComponent={WordRowSeparator}
+      keyExtractor={(item) => item.id}
+      ListEmptyComponent={renderEmptyState}
+      ListFooterComponent={
+        source.isExtending && source.items.length > 0 ? (
+          <WordListFooter isExtending={source.isExtending} />
+        ) : null
+      }
+      maxToRenderPerBatch={12}
+      onEndReached={() => {
+        if (active) {
+          void Promise.resolve(source.requestMore()).catch(() => undefined);
+        }
+      }}
+      onEndReachedThreshold={0.2}
+      refreshControl={
+        <RefreshControl
+          refreshing={active ? source.isRefreshing : false}
+          onRefresh={() => {
+            void handleRefresh();
+          }}
+          tintColor={tokens.color.accent}
+        />
+      }
+      removeClippedSubviews
+      renderItem={({ item }) => (
+        <WordRow
+          item={item}
+          onOpenDetail={onOpenDetail}
+          showFavoriteAction={showFavoriteAction}
+          showProgress={showProgress}
+        />
+      )}
+      showsVerticalScrollIndicator={false}
+      style={{
+        flex: 1,
+        backgroundColor: tokens.color.background,
+      }}
+      windowSize={9}
+    />
+  );
+}
+
 export function WordListPage({
   showFavoriteAction = true,
   showProgress = true,
 }: WordListPageProps = {}) {
   const { tokens } = useEditorialPaperTheme();
   const [segment, setSegment] = useState<WordListSegment>('unlearned');
-  const {
-    error,
-    isExtending,
-    isInitialLoading,
-    isRefreshing,
-    items,
-    refresh,
-    requestMore,
-  } = useUnlearnedWordListSource();
+  const [hasVisitedLearned, setHasVisitedLearned] = useState(false);
+  const unlearnedSource = useUnlearnedWordListSource({ enabled: true });
+  const learnedSource = useLearnedWordListSource({ enabled: hasVisitedLearned });
+  const favoritesSource = useEmptyWordListSource();
   const presentWordDetailDialog = usePresentWordDetailDialog();
 
-  const renderEmptyState = () => {
-    if (isInitialLoading) {
-      return <WordListInlineState isLoading title="Loading words..." />;
+  const handleSegmentChange = (nextSegment: WordListSegment) => {
+    if (nextSegment === 'learned') {
+      setHasVisitedLearned(true);
     }
 
-    if (error) {
-      return (
-        <WordListInlineState
-          actionLabel="Retry"
-          onActionPress={() => {
-            void refresh();
-          }}
-          title="Words unavailable"
-        />
-      );
-    }
+    setSegment(nextSegment);
+  };
 
-    return <WordListInlineState title="No words yet" />;
+  const handleOpenDetail = (wordListItem: WordListSourceItem) => {
+    presentWordDetailDialog(createWordListDetailPayload(wordListItem));
   };
 
   return (
     <>
       <StatusBar style="dark" />
-      <FlatList
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{
-          paddingBottom: 116,
-          paddingHorizontal: tokens.spacing.pageX,
-          paddingTop: tokens.spacing.pageTop,
+      <View
+        style={{
+          backgroundColor: tokens.color.background,
+          flex: 1,
         }}
-        data={items}
-        initialNumToRender={12}
-        ItemSeparatorComponent={WordRowSeparator}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={
+      >
+        <View
+          style={{
+            paddingBottom: tokens.spacing.sm,
+            paddingHorizontal: tokens.spacing.pageX,
+            paddingTop: tokens.spacing.pageTop,
+          }}
+        >
           <WordListHeader
             segment={segment}
-            onSegmentChange={setSegment}
+            onSegmentChange={handleSegmentChange}
           />
-        }
-        ListEmptyComponent={renderEmptyState}
-        ListFooterComponent={
-          isExtending && items.length > 0 ? <WordListFooter isExtending={isExtending} /> : null
-        }
-        maxToRenderPerBatch={12}
-        onEndReached={() => {
-          void requestMore();
-        }}
-        onEndReachedThreshold={0.2}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={() => {
-              void refresh();
-            }}
-            tintColor={tokens.color.accent}
-          />
-        }
-        removeClippedSubviews
-        renderItem={({ item }) => (
-          <WordRow
-            item={item}
-            onOpenDetail={(wordListItem) => {
-              presentWordDetailDialog(createWordListDetailPayload(wordListItem));
-            }}
-            showFavoriteAction={showFavoriteAction}
-            showProgress={showProgress}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-        }}
-        windowSize={9}
-      />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <WordListModePane active={segment === 'unlearned'}>
+            <WordListVirtualList
+              active={segment === 'unlearned'}
+              copy={wordListModeCopy.unlearned}
+              mode="unlearned"
+              onOpenDetail={handleOpenDetail}
+              showFavoriteAction={showFavoriteAction}
+              showProgress={showProgress}
+              source={unlearnedSource}
+            />
+          </WordListModePane>
+
+          <WordListModePane active={segment === 'learned'}>
+            <WordListVirtualList
+              active={segment === 'learned'}
+              copy={wordListModeCopy.learned}
+              mode="learned"
+              onOpenDetail={handleOpenDetail}
+              showFavoriteAction={showFavoriteAction}
+              showProgress={false}
+              source={learnedSource}
+            />
+          </WordListModePane>
+
+          <WordListModePane active={segment === 'favorites'}>
+            <WordListVirtualList
+              active={segment === 'favorites'}
+              copy={wordListModeCopy.favorites}
+              mode="favorites"
+              onOpenDetail={handleOpenDetail}
+              showFavoriteAction={showFavoriteAction}
+              showProgress={showProgress}
+              source={favoritesSource}
+            />
+          </WordListModePane>
+        </View>
+      </View>
     </>
   );
 }

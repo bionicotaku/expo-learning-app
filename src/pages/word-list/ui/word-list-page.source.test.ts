@@ -5,13 +5,18 @@ import { describe, expect, it } from 'vitest';
 const pagePath = new URL('./word-list-page.tsx', import.meta.url).pathname;
 
 describe('word list page source', () => {
-  it('renders the unlearned Word List source as a virtualized dense list without direct fetches', () => {
+  it('renders multi-mode Word List sources as virtualized dense lists without direct fetches', () => {
     expect(existsSync(pagePath)).toBe(true);
 
     const source = readFileSync(pagePath, 'utf8');
 
     expect(source).toContain('useUnlearnedWordListSource');
+    expect(source).toContain('useLearnedWordListSource');
+    expect(source).toContain('useEmptyWordListSource');
     expect(source).toContain('usePresentWordDetailDialog');
+    expect(source).toContain('Animated');
+    expect(source).toContain('WordListModePane');
+    expect(source).toContain('active={segment ===');
     expect(source).toContain('FlatList');
     expect(source).toContain('RefreshControl');
     expect(source).toContain('ActivityIndicator');
@@ -24,7 +29,7 @@ describe('word list page source', () => {
     expect(source).toContain('ListFooterComponent');
     expect(source).toContain('onEndReached');
     expect(source).toContain('onEndReachedThreshold={0.2}');
-    expect(source).toContain('refreshing={isRefreshing}');
+    expect(source).toContain('refreshing={active ? source.isRefreshing : false}');
     expect(source).toContain("borderStyle: 'dashed'");
     expect(source).toContain('type WordListPageProps');
     expect(source).toContain('showFavoriteAction');
@@ -32,6 +37,8 @@ describe('word list page source', () => {
     expect(source).toContain('showFavoriteAction = true');
     expect(source).toContain('showProgress = true');
     expect(source).toContain('SegmentedFilterBar');
+    expect(source).toContain('handleSegmentChange');
+    expect(source).toContain("setHasVisitedLearned(true)");
     expect(source).toContain('WordRow');
     expect(source).toContain('onOpenDetail');
     expect(source).toContain('RaisedSurface');
@@ -87,8 +94,12 @@ describe('word list page source', () => {
     expect(source).toContain('{showFavoriteAction ? (');
     expect(source).toContain('{showProgress ? (');
     expect(source).toContain('Loading words...');
-    expect(source).toContain('Words unavailable');
+    expect(source).toContain('Loading learned words...');
+    expect(source).toContain("title: '加载失败'");
+    expect(source).toContain("title: '刷新失败'");
     expect(source).toContain('No words yet');
+    expect(source).toContain('No learned words yet');
+    expect(source).toContain('No favorites yet');
     expect(source).not.toContain('Switch');
     expect(source).not.toContain('WordListVisibilitySwitch');
     expect(source).not.toContain('显示收藏');
@@ -105,6 +116,7 @@ describe('word list page source', () => {
     expect(source).not.toContain('read the room');
     expect(source).not.toContain('item.meaning');
     expect(source).not.toContain('mock-unit-progress-repository');
+    expect(source).not.toContain('unit-progress-repository');
     expect(source).not.toContain('accentKey');
     expect(source).not.toContain('progress >= 80');
     expect(source).not.toContain('progress >= 50');
@@ -117,5 +129,7 @@ describe('word list page source', () => {
     expect(source).not.toContain('useInfiniteQuery');
     expect(source).not.toContain('signOut');
     expect(source).not.toContain('ScrollView');
+    expect(source).not.toContain('Words unavailable');
+    expect(source).not.toContain('Learned words unavailable');
   });
 });

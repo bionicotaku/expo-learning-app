@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  fetchMockLearnedUnitProgressPage,
   fetchMockUnlearnedUnitProgressPage,
+  resetMockLearnedUnitProgress,
   resetMockUnlearnedUnitProgress,
 } from './mock-unit-progress-repository';
 
 describe('mock unit progress repository', () => {
   beforeEach(() => {
+    resetMockLearnedUnitProgress();
     resetMockUnlearnedUnitProgress();
     vi.useRealTimers();
   });
@@ -103,5 +106,29 @@ describe('mock unit progress repository', () => {
     });
 
     vi.useRealTimers();
+  });
+
+  it('returns learned pages from an independent opaque cursor stream', async () => {
+    const first = await fetchMockLearnedUnitProgressPage({ limit: 3 });
+    const second = await fetchMockLearnedUnitProgressPage({
+      limit: 3,
+      cursor: first.page.nextCursor ?? undefined,
+    });
+
+    expect(first.items).toHaveLength(3);
+    expect(first.items[0]).toMatchObject({
+      coarseUnitId: 10001,
+      label: expect.any(String),
+      progressPercent: 100,
+    });
+    expect(first.page).toEqual({
+      limit: 3,
+      hasMore: true,
+      nextCursor: 'mock-learned-page:1',
+    });
+    expect(second.page.nextCursor).toBe('mock-learned-page:2');
+    expect(new Set([...first.items, ...second.items].map((item) => item.coarseUnitId)).size).toBe(
+      6
+    );
   });
 });
