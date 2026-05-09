@@ -2,8 +2,19 @@ import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
 import type { SFSymbol } from 'expo-symbols';
 import { useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  Text,
+  View,
+} from 'react-native';
 
+import {
+  useUnlearnedWordListSource,
+  type WordListSourceItem,
+} from '@/features/word-list-source';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
   EditorialTitle,
@@ -14,18 +25,10 @@ import {
 import type { SegmentedFilterBarItem } from '@/shared/ui/editorial-paper';
 
 type WordListSegment = 'unlearned' | 'learned' | 'favorites';
-type WordPartOfSpeech = 'noun' | 'verb' | 'adjective' | 'adverb';
 
 type WordListPageProps = {
   showFavoriteAction?: boolean;
   showProgress?: boolean;
-};
-
-type WordListItem = {
-  word: string;
-  partOfSpeech: WordPartOfSpeech | '';
-  meaning: string;
-  progress: number;
 };
 
 const noopAction = () => {};
@@ -34,29 +37,6 @@ const segmentItems: SegmentedFilterBarItem<WordListSegment>[] = [
   { label: '未学习', value: 'unlearned', tone: 'softActionPeach' },
   { label: '已学习', value: 'learned', tone: 'softActionButter' },
   { label: '收藏夹', value: 'favorites', tone: 'softActionRose' },
-];
-
-const wordItems: WordListItem[] = [
-  {
-    word: 'carry weight',
-    partOfSpeech: 'verb',
-    meaning:
-      'to sound meaningful because the speaker or source gives the sentence authority.',
-    progress: 74,
-  },
-  {
-    word: 'land on',
-    partOfSpeech: 'verb',
-    meaning:
-      'to arrive at an answer, phrase, or idea that finally feels right.',
-    progress: 55,
-  },
-  {
-    word: 'read the room',
-    partOfSpeech: 'verb',
-    meaning: 'to understand the atmosphere before you speak.',
-    progress: 41,
-  },
 ];
 
 function WordSymbol({
@@ -144,8 +124,10 @@ function rgbToHex(red: number, green: number, blue: number) {
     .join('')}`;
 }
 
-function resolvePartOfSpeechLabel(partOfSpeech: WordListItem['partOfSpeech']) {
+function resolvePartOfSpeechLabel(partOfSpeech: WordListSourceItem['partOfSpeech']) {
   switch (partOfSpeech) {
+    case null:
+      return '';
     case '':
       return '';
     case 'noun':
@@ -156,6 +138,8 @@ function resolvePartOfSpeechLabel(partOfSpeech: WordListItem['partOfSpeech']) {
       return 'adj.';
     case 'adverb':
       return 'adv.';
+    default:
+      return '';
   }
 }
 
@@ -212,7 +196,7 @@ function WordRow({
   showFavoriteAction,
   showProgress,
 }: {
-  item: WordListItem;
+  item: WordListSourceItem;
   showFavoriteAction: boolean;
   showProgress: boolean;
 }) {
@@ -247,13 +231,13 @@ function WordRow({
             }}
             variant="title"
           >
-            {item.word}
+            {item.label}
           </EditorialTitle>
         </View>
 
         {showFavoriteAction ? (
           <Pressable
-            accessibilityLabel={`${item.word} favorite`}
+            accessibilityLabel={`${item.label} favorite`}
             accessibilityRole="button"
             onPress={noopAction}
             style={({ pressed }) => ({
@@ -300,12 +284,12 @@ function WordRow({
             {partOfSpeechLabel}{'  '}
           </Text>
         ) : null}
-        {item.meaning}
+        {item.chineseLabel}
       </Text>
 
       {showProgress ? (
         <View
-          accessibilityLabel={`${item.word} progress ${item.progress} percent`}
+          accessibilityLabel={`${item.label} progress ${item.progress} percent`}
           style={{
             backgroundColor: 'rgba(28, 26, 23, 0.08)',
             borderRadius: tokens.radius.pill,
@@ -326,12 +310,112 @@ function WordRow({
   );
 }
 
+function WordListInlineState({
+  actionLabel,
+  isLoading = false,
+  onActionPress,
+  title,
+}: {
+  actionLabel?: string;
+  isLoading?: boolean;
+  onActionPress?: () => void;
+  title: string;
+}) {
+  const { tokens } = useEditorialPaperTheme();
+
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        gap: tokens.spacing.sm,
+        justifyContent: 'center',
+        paddingHorizontal: tokens.spacing.lg,
+        paddingVertical: 52,
+      }}
+    >
+      {isLoading ? <ActivityIndicator color={tokens.color.accent} /> : null}
+      <MetaLabel uppercase={false}>{title}</MetaLabel>
+      {actionLabel && onActionPress ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onActionPress}
+          style={({ pressed }) => ({
+            backgroundColor: pressed ? 'rgba(28, 26, 23, 0.86)' : 'rgba(28, 26, 23, 0.94)',
+            borderRadius: tokens.radius.pill,
+            paddingHorizontal: 18,
+            paddingVertical: 10,
+          })}
+        >
+          <Text
+            style={{
+              color: tokens.color.surface,
+              fontSize: 13,
+              fontWeight: '700',
+              lineHeight: 18,
+            }}
+          >
+            {actionLabel}
+          </Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+function WordListFooter({ isExtending }: { isExtending: boolean }) {
+  const { tokens } = useEditorialPaperTheme();
+
+  if (!isExtending) {
+    return null;
+  }
+
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        paddingTop: tokens.spacing.md,
+      }}
+    >
+      <ActivityIndicator color={tokens.color.accent} />
+    </View>
+  );
+}
+
 export function WordListPage({
   showFavoriteAction = true,
   showProgress = true,
 }: WordListPageProps = {}) {
   const { tokens } = useEditorialPaperTheme();
   const [segment, setSegment] = useState<WordListSegment>('unlearned');
+  const {
+    error,
+    isExtending,
+    isInitialLoading,
+    isRefreshing,
+    items,
+    refresh,
+    requestMore,
+  } = useUnlearnedWordListSource();
+
+  const renderEmptyState = () => {
+    if (isInitialLoading) {
+      return <WordListInlineState isLoading title="Loading words..." />;
+    }
+
+    if (error) {
+      return (
+        <WordListInlineState
+          actionLabel="Retry"
+          onActionPress={() => {
+            void refresh();
+          }}
+          title="Words unavailable"
+        />
+      );
+    }
+
+    return <WordListInlineState title="No words yet" />;
+  };
 
   return (
     <>
@@ -343,17 +427,34 @@ export function WordListPage({
           paddingHorizontal: tokens.spacing.pageX,
           paddingTop: tokens.spacing.pageTop,
         }}
-        data={wordItems}
+        data={items}
         initialNumToRender={12}
         ItemSeparatorComponent={WordRowSeparator}
-        keyExtractor={(item) => item.word}
+        keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <WordListHeader
             segment={segment}
             onSegmentChange={setSegment}
           />
         }
+        ListEmptyComponent={renderEmptyState}
+        ListFooterComponent={
+          isExtending && items.length > 0 ? <WordListFooter isExtending={isExtending} /> : null
+        }
         maxToRenderPerBatch={12}
+        onEndReached={() => {
+          void requestMore();
+        }}
+        onEndReachedThreshold={0.2}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              void refresh();
+            }}
+            tintColor={tokens.color.accent}
+          />
+        }
         removeClippedSubviews
         renderItem={({ item }) => (
           <WordRow

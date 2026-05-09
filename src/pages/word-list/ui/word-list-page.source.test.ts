@@ -5,17 +5,25 @@ import { describe, expect, it } from 'vitest';
 const pagePath = new URL('./word-list-page.tsx', import.meta.url).pathname;
 
 describe('word list page source', () => {
-  it('renders the hardcoded Word List UI as a virtualized dense list without live favorite data or runtime calls', () => {
+  it('renders the unlearned Word List source as a virtualized dense list without direct fetches', () => {
     expect(existsSync(pagePath)).toBe(true);
 
     const source = readFileSync(pagePath, 'utf8');
 
+    expect(source).toContain('useUnlearnedWordListSource');
     expect(source).toContain('FlatList');
+    expect(source).toContain('RefreshControl');
+    expect(source).toContain('ActivityIndicator');
     expect(source).toContain('initialNumToRender={12}');
     expect(source).toContain('maxToRenderPerBatch={12}');
     expect(source).toContain('removeClippedSubviews');
     expect(source).toContain('windowSize={9}');
     expect(source).toContain('ItemSeparatorComponent={WordRowSeparator}');
+    expect(source).toContain('ListEmptyComponent={renderEmptyState}');
+    expect(source).toContain('ListFooterComponent');
+    expect(source).toContain('onEndReached');
+    expect(source).toContain('onEndReachedThreshold={0.2}');
+    expect(source).toContain('refreshing={isRefreshing}');
     expect(source).toContain("borderStyle: 'dashed'");
     expect(source).toContain('type WordListPageProps');
     expect(source).toContain('showFavoriteAction');
@@ -34,19 +42,11 @@ describe('word list page source', () => {
     expect(source).toContain('已学习');
     expect(source).toContain('收藏夹');
 
-    expect(source).toContain('carry weight');
-    expect(source).toContain("partOfSpeech: 'verb'");
-    expect(source).toContain(
-      'to sound meaningful because the speaker or source gives the sentence authority.'
-    );
-    expect(source).toContain('land on');
-    expect(source).toContain(
-      'to arrive at an answer, phrase, or idea that finally feels right.'
-    );
-    expect(source).toContain('read the room');
-    expect(source).toContain('to understand the atmosphere before you speak.');
+    expect(source).toContain('item.label');
+    expect(source).toContain('item.chineseLabel');
+    expect(source).toContain('keyExtractor={(item) => item.id}');
     expect(source).toContain('resolvePartOfSpeechLabel');
-    expect(source).toContain("WordPartOfSpeech | ''");
+    expect(source).toContain("case null:");
     expect(source).toContain("case '':");
     expect(source).toContain('partOfSpeechLabel ?');
     expect(source).toContain('resolveProgressColor');
@@ -68,6 +68,9 @@ describe('word list page source', () => {
     expect(source).toContain('tokens.color.inkMute');
     expect(source).toContain('{showFavoriteAction ? (');
     expect(source).toContain('{showProgress ? (');
+    expect(source).toContain('Loading words...');
+    expect(source).toContain('Words unavailable');
+    expect(source).toContain('No words yet');
     expect(source).not.toContain('Switch');
     expect(source).not.toContain('WordListVisibilitySwitch');
     expect(source).not.toContain('显示收藏');
@@ -78,6 +81,12 @@ describe('word list page source', () => {
     expect(source).not.toContain('/ˈkæri weɪt/');
     expect(source).not.toContain('/lænd ɒn/');
     expect(source).not.toContain('/riːd ðə ruːm/');
+    expect(source).not.toContain('const wordItems');
+    expect(source).not.toContain('carry weight');
+    expect(source).not.toContain('land on');
+    expect(source).not.toContain('read the room');
+    expect(source).not.toContain('item.meaning');
+    expect(source).not.toContain('mock-unit-progress-repository');
     expect(source).not.toContain('accentKey');
     expect(source).not.toContain('progress >= 80');
     expect(source).not.toContain('progress >= 50');
@@ -87,6 +96,7 @@ describe('word list page source', () => {
     expect(source).not.toContain('useVideoRuntimeState');
     expect(source).not.toContain('router.');
     expect(source).not.toContain('fetch(');
+    expect(source).not.toContain('useInfiniteQuery');
     expect(source).not.toContain('signOut');
     expect(source).not.toContain('ScrollView');
   });
