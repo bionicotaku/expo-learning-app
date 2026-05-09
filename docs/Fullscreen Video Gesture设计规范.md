@@ -121,7 +121,7 @@ seek bar lane 不属于背景区，因此在该 lane 上：
 当前 sentence seek 规则：
 
 - 右双击：句内或 gap 中跳下一句 `start`；第一字幕前跳第一句 `start`；最后一句内或最后一句后跳视频末尾。
-- 左双击：句内距离句首超过 `1000ms` 回到本句 `start`，否则跳上一句 `start`；gap 中以前一句 `start` 为基准使用同一 `1000ms` 规则；没有上一句时跳视频开头。
+- 左双击：句内距离句首超过 `1500ms` 回到本句 `start`，否则跳上一句 `start`；gap 中以前一句 `start` 为基准使用同一 `1500ms` 规则；没有上一句时跳视频开头。
 - 字幕不可用、字幕为空、当前时间不可用或 duration 不可用时 fallback 到 `-5s / +5s`。
 
 seek bar lane 上不触发 `double tap`。

@@ -21,7 +21,7 @@ export type TranscriptSentenceSeekTarget = {
   targetTimeMs: number;
 };
 
-const defaultRewindThresholdMs = 1_000;
+const defaultRewindThresholdMs = 1_500;
 
 function isValidTime(value: number) {
   return Number.isFinite(value) && value >= 0;

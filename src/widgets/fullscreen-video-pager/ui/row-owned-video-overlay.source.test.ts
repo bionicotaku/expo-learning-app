@@ -44,8 +44,14 @@ describe('row owned video overlay source', () => {
     expect(source).toContain("bottom: '100%'");
     expect(source).toContain('paddingBottom: subtitleTitleGap');
     expect(source).toContain('pointerEvents="box-none"');
+    expect(source).toContain(
+      "const shouldRenderSubtitleOverlay = subtitleDisplayMode !== 'off' && activeTranscript !== null;"
+    );
+    expect(source).toContain('{shouldRenderSubtitleOverlay ? (');
     expect(source).toContain('<BasicSubtitleOverlay');
     expect(source).toContain('displayMode={subtitleDisplayMode}');
+    expect(source).toContain('transcript={activeTranscript}');
+    expect(source).toContain(') : null}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
     expect(source).toContain('titleDescriptionColumnStyle');
     expect(source).not.toContain('useState');

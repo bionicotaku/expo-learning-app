@@ -17,6 +17,7 @@ import {
 
 const defaultThrottleMs = 1_000;
 const defaultCompletedRatio = 0.9;
+const defaultWatchProgressSource: WatchProgressSource = 'web';
 const defaultWatchProgressTelemetryQueue =
   createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
 
@@ -50,6 +51,14 @@ function createDefaultWatchSessionId(): string {
   return `watch-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function getDefaultNowMs(): number {
+  return Date.now();
+}
+
+function getDefaultNowIso(): string {
+  return new Date().toISOString();
+}
+
 function createDefaultTelemetryItemId(): string {
   return `watch-progress-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -75,15 +84,18 @@ function createSessionKey({
   return `${videoId}:${activeVisitToken}`;
 }
 
-export function useVideoWatchProgressReporter({
-  createSessionId = createDefaultWatchSessionId,
-  flushTelemetryQueue,
-  nowIso = () => new Date().toISOString(),
-  nowMs = () => Date.now(),
-  queue = defaultWatchProgressTelemetryQueue,
-  source = 'web',
-  throttleMs = defaultThrottleMs,
-}: UseVideoWatchProgressReporterOptions = {}): UseVideoWatchProgressReporterResult {
+export function useVideoWatchProgressReporter(
+  options: UseVideoWatchProgressReporterOptions = {}
+): UseVideoWatchProgressReporterResult {
+  const {
+    createSessionId = createDefaultWatchSessionId,
+    flushTelemetryQueue,
+    nowIso = getDefaultNowIso,
+    nowMs = getDefaultNowMs,
+    queue = defaultWatchProgressTelemetryQueue,
+    source = defaultWatchProgressSource,
+    throttleMs = defaultThrottleMs,
+  } = options;
   const sessionIdsByKeyRef = useRef(new Map<string, string>());
   const lastAcceptedAtByKeyRef = useRef(new Map<string, number>());
   const completedKeysRef = useRef(new Set<string>());

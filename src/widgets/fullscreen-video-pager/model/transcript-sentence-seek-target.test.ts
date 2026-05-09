@@ -124,6 +124,20 @@ describe('transcript sentence seek target', () => {
     });
   });
 
+  it('uses a 1.5 second default backward threshold', () => {
+    expect(
+      resolveTranscriptSentenceSeekTarget({
+        currentTimeMs: 4_400,
+        direction: 'backward',
+        durationMs: 10_000,
+        sentences,
+      })
+    ).toEqual({
+      direction: 'backward',
+      targetTimeMs: 1_000,
+    });
+  });
+
   it('jumps backward to video start when there is no previous sentence', () => {
     expect(
       resolveTranscriptSentenceSeekTarget({

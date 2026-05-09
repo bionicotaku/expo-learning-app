@@ -64,15 +64,16 @@ export function FullscreenVideoPager({
   );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const watchProgressReporter = useVideoWatchProgressReporter({
-    source: resolveWatchProgressSource(),
+  const watchProgressSource = useMemo(() => resolveWatchProgressSource(), []);
+  const { flush, reportSample } = useVideoWatchProgressReporter({
+    source: watchProgressSource,
   });
   const handleActiveVideoChange = useCallback(
     (itemId: string, index: number) => {
-      void watchProgressReporter.flush();
+      void flush();
       onActiveVideoChange(itemId, index);
     },
-    [onActiveVideoChange, watchProgressReporter]
+    [flush, onActiveVideoChange]
   );
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
@@ -112,14 +113,14 @@ export function FullscreenVideoPager({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      void watchProgressReporter.flush();
+      void flush();
     }, 15_000);
 
     return () => {
       clearInterval(interval);
-      void watchProgressReporter.flush();
+      void flush();
     };
-  }, [watchProgressReporter]);
+  }, [flush]);
 
   useEffect(() => {
     if (!initialPosition.shouldRunPostLoadAlignment) {
@@ -182,14 +183,14 @@ export function FullscreenVideoPager({
         return;
       }
 
-      watchProgressReporter.reportSample({
+      reportSample({
         activeVisitToken,
         currentTimeSeconds: snapshot.currentTimeSeconds,
         durationSeconds: snapshot.durationSeconds,
         videoId,
       });
     },
-    [watchProgressReporter]
+    [reportSample]
   );
 
   const renderState = useMemo(

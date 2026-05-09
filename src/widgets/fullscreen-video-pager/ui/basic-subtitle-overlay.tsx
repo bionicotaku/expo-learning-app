@@ -1,4 +1,4 @@
-import { memo, useRef, useSyncExternalStore } from 'react';
+import { memo, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Text, View, type GestureResponderEvent } from 'react-native';
 
 import type { Transcript, TranscriptToken } from '@/entities/transcript';
@@ -14,7 +14,7 @@ type BasicSubtitleOverlayProps = {
   maxTextWidth: number;
   onTokenPress?: (token: TranscriptToken) => void;
   seekBarStore: RowPlaybackSeekBarStore;
-  transcript: Transcript | null;
+  transcript: Transcript;
 };
 
 const activeSubtitleTokenStyle = {
@@ -46,31 +46,24 @@ function BasicSubtitleOverlayComponent({
     previousTokenIndexRef.current = null;
   }
 
-  if (displayMode === 'off') {
-    return null;
-  }
-
   const currentTimeMs =
     storeSnapshot.progressSnapshot === null
       ? Number.NaN
       : storeSnapshot.progressSnapshot.currentTimeSeconds * 1000;
-  const currentSentence =
-    transcript === null
-      ? null
-      : resolveCurrentTranscriptSentence({
-          currentTimeMs,
-          previousIndex: previousSentenceIndexRef.current,
-          sentences: transcript.sentences,
-        });
+  const currentSentence = resolveCurrentTranscriptSentence({
+    currentTimeMs,
+    previousIndex: previousSentenceIndexRef.current,
+    sentences: transcript.sentences,
+  });
   previousSentenceIndexRef.current = currentSentence?.index ?? null;
 
-  if (currentSentence === null) {
-    return null;
-  }
-  const currentTokens = currentSentence.sentence.tokens;
+  const currentSentenceValue = currentSentence?.sentence ?? null;
+  const currentTokens = currentSentenceValue?.tokens ?? [];
   const shouldRenderTokens = currentTokens.length > 0;
   const shouldRenderExplanation =
-    displayMode === 'bilingual' && currentSentence.sentence.explanation.length > 0;
+    displayMode === 'bilingual' &&
+    currentSentenceValue !== null &&
+    currentSentenceValue.explanation.length > 0;
   const currentToken = shouldRenderTokens
     ? resolveCurrentTranscriptToken({
         currentTimeMs,
@@ -84,6 +77,28 @@ function BasicSubtitleOverlayComponent({
     event.stopPropagation?.();
     onTokenPress?.(token);
   };
+  const canPressToken = !!onTokenPress;
+  const tokenDisplayParts = useMemo(() => {
+    if (currentSentenceValue === null || currentSentenceValue.tokens.length === 0) {
+      return [];
+    }
+
+    return currentSentenceValue.tokens.map((token, index) => {
+      const nextToken = currentSentenceValue.tokens[index + 1] ?? null;
+      const trailingText = getTranscriptTokenTrailingText(token, nextToken);
+
+      return {
+        canPress: canPressToken,
+        key: `${token.index}:${token.start}:${token.end}`,
+        text: `${token.text}${trailingText}`,
+        token,
+      };
+    });
+  }, [canPressToken, currentSentenceValue]);
+
+  if (currentSentence === null) {
+    return null;
+  }
 
   return (
     <View
@@ -110,26 +125,22 @@ function BasicSubtitleOverlayComponent({
         }}
       >
         {shouldRenderTokens
-          ? currentTokens.map((token, index) => {
-              const nextToken = currentTokens[index + 1] ?? null;
-              const trailingText = getTranscriptTokenTrailingText(token, nextToken);
-              const tokenText = `${token.text}${trailingText}`;
-              const canPressToken = !!onTokenPress;
+          ? tokenDisplayParts.map((part, index) => {
               const isActiveToken = currentToken?.index === index;
 
               return (
                 <Text
-                  key={`${token.index}:${token.start}:${token.end}`}
+                  key={part.key}
                   onPress={
-                    canPressToken
+                    part.canPress
                       ? (event) => {
-                          handleTokenPress(token, event);
+                          handleTokenPress(part.token, event);
                         }
                       : undefined
                   }
                   style={isActiveToken ? activeSubtitleTokenStyle : undefined}
                 >
-                  {tokenText}
+                  {part.text}
                 </Text>
               );
             })
@@ -150,7 +161,7 @@ function BasicSubtitleOverlayComponent({
             textShadowRadius: 2,
           }}
         >
-          {currentSentence.sentence.explanation}
+          {currentSentenceValue?.explanation}
         </Text>
       ) : null}
     </View>

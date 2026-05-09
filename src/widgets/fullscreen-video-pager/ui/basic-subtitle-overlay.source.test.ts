@@ -14,9 +14,12 @@ describe('basic subtitle overlay source', () => {
     expect(source).toContain('resolveCurrentTranscriptToken');
     expect(source).toContain('activeSubtitleTokenStyle');
     expect(source).toContain('displayMode');
-    expect(source).toContain("displayMode === 'off'");
+    expect(source).toContain('useMemo');
+    expect(source).toContain('tokenDisplayParts');
+    expect(source).toContain('transcript: Transcript;');
+    expect(source).not.toContain("displayMode === 'off'");
     expect(source).toContain("displayMode === 'bilingual'");
-    expect(source).toContain('currentSentence.sentence.explanation');
+    expect(source).toContain('currentSentenceValue.explanation');
     expect(source).toContain('pointerEvents="box-none"');
     expect(source).toContain('onTokenPress');
     expect(source).toContain('event.stopPropagation?.()');

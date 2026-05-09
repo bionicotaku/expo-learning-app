@@ -81,6 +81,7 @@ function RowOwnedVideoOverlayComponent({
         fullscreenVideoOverlayTheme.descriptionActionGap
       : 0;
   const contentColumnBottomOffset = contentBottomOffset + contentBottomLift;
+  const shouldRenderSubtitleOverlay = subtitleDisplayMode !== 'off' && activeTranscript !== null;
 
   return (
     <View
@@ -126,24 +127,26 @@ function RowOwnedVideoOverlayComponent({
               width: sharedTextWidth,
             }}
           >
-            <View
-              pointerEvents="box-none"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: '100%',
-                paddingBottom: subtitleTitleGap,
-              }}
-            >
-              <BasicSubtitleOverlay
-                displayMode={subtitleDisplayMode}
-                maxTextWidth={sharedTextWidth}
-                onTokenPress={onSubtitleTokenPress}
-                seekBarStore={seekBarStore}
-                transcript={activeTranscript}
-              />
-            </View>
+            {shouldRenderSubtitleOverlay ? (
+              <View
+                pointerEvents="box-none"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: '100%',
+                  paddingBottom: subtitleTitleGap,
+                }}
+              >
+                <BasicSubtitleOverlay
+                  displayMode={subtitleDisplayMode}
+                  maxTextWidth={sharedTextWidth}
+                  onTokenPress={onSubtitleTokenPress}
+                  seekBarStore={seekBarStore}
+                  transcript={activeTranscript}
+                />
+              </View>
+            ) : null}
             <View style={titleDescriptionColumnStyle}>
               <Text
                 allowFontScaling={false}

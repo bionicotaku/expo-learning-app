@@ -60,15 +60,15 @@ function createToken({
   };
 }
 
-function createStoreAtCurrentSentence() {
+function createStoreAtCurrentSecond(currentTimeSeconds = 1.5) {
   const store = createRowPlaybackSeekBarStore();
 
   store.setProgressSnapshot({
     bufferedPositionSeconds: 2,
     bufferedRatio: 0.2,
-    currentTimeSeconds: 1.5,
+    currentTimeSeconds,
     durationSeconds: 10,
-    playedRatio: 0.15,
+    playedRatio: currentTimeSeconds / 10,
   });
 
   return store;
@@ -114,7 +114,7 @@ describe('basic subtitle overlay runtime', () => {
           displayMode="english"
           maxTextWidth={240}
           onTokenPress={onTokenPress}
-          seekBarStore={createStoreAtCurrentSentence()}
+          seekBarStore={createStoreAtCurrentSecond()}
           transcript={transcript}
         />
       );
@@ -178,7 +178,7 @@ describe('basic subtitle overlay runtime', () => {
           displayMode="english"
           maxTextWidth={240}
           onTokenPress={onTokenPress}
-          seekBarStore={createStoreAtCurrentSentence()}
+          seekBarStore={createStoreAtCurrentSecond()}
           transcript={transcript}
         />
       );
@@ -226,7 +226,7 @@ describe('basic subtitle overlay runtime', () => {
           displayMode="english"
           maxTextWidth={240}
           onTokenPress={vi.fn()}
-          seekBarStore={createStoreAtCurrentSentence()}
+          seekBarStore={createStoreAtCurrentSecond()}
           transcript={transcript}
         />
       );
@@ -256,7 +256,7 @@ describe('basic subtitle overlay runtime', () => {
           displayMode="bilingual"
           maxTextWidth={240}
           onTokenPress={vi.fn()}
-          seekBarStore={createStoreAtCurrentSentence()}
+          seekBarStore={createStoreAtCurrentSecond()}
           transcript={transcript}
         />
       );
@@ -267,33 +267,65 @@ describe('basic subtitle overlay runtime', () => {
     expect(findTextNode(renderer!, '这是一句中文解释。')?.props.onPress).toBeUndefined();
   });
 
-  it('renders nothing when subtitle display mode is off', () => {
+  it('updates the active token within the same sentence while reusing token display parts', () => {
+    const firstToken = createToken({
+      coarseId: 108404,
+      end: 1400,
+      index: 0,
+      text: 'Making',
+    });
+    const secondToken = createToken({
+      coarseId: null,
+      end: 1800,
+      index: 1,
+      start: 1400,
+      text: 'Pam',
+    });
     const transcript: Transcript = {
       sentences: [
         {
           end: 2000,
-          explanation: '这是一句中文解释。',
+          explanation: 'sentence explanation',
           index: 0,
           start: 1000,
-          text: 'Plain fallback sentence.',
-          tokens: [],
+          text: 'Making Pam.',
+          tokens: [firstToken, secondToken],
         },
       ],
     };
+    const store = createStoreAtCurrentSecond(1.1);
     let renderer: TestRenderer.ReactTestRenderer;
 
     act(() => {
       renderer = TestRenderer.create(
         <BasicSubtitleOverlay
-          displayMode="off"
+          displayMode="english"
           maxTextWidth={240}
           onTokenPress={vi.fn()}
-          seekBarStore={createStoreAtCurrentSentence()}
+          seekBarStore={store}
           transcript={transcript}
         />
       );
     });
 
-    expect(renderer!.toJSON()).toBeNull();
+    expect(findTextNode(renderer!, 'Making ')?.props.style).toMatchObject({
+      color: 'rgba(255,226,135,0.98)',
+    });
+    expect(findTextNode(renderer!, 'Pam')?.props.style).toBeUndefined();
+
+    act(() => {
+      store.setProgressSnapshot({
+        bufferedPositionSeconds: 2,
+        bufferedRatio: 0.2,
+        currentTimeSeconds: 1.5,
+        durationSeconds: 10,
+        playedRatio: 0.15,
+      });
+    });
+
+    expect(findTextNode(renderer!, 'Making ')?.props.style).toBeUndefined();
+    expect(findTextNode(renderer!, 'Pam')?.props.style).toMatchObject({
+      color: 'rgba(255,226,135,0.98)',
+    });
   });
 });

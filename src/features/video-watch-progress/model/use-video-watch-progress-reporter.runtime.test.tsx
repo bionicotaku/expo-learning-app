@@ -36,6 +36,38 @@ function ReporterHarness({
   return React.createElement('ReporterHarness');
 }
 
+function DefaultIdentityHarness({
+  marker,
+  queue,
+}: {
+  marker: number;
+  queue: TelemetryQueue<WatchProgressTelemetryPayload>;
+}) {
+  latestReporter = useVideoWatchProgressReporter({
+    queue,
+  });
+
+  return React.createElement('DefaultIdentityHarness', { marker });
+}
+
+function InjectedIdentityHarness({
+  nowMs,
+  queue,
+}: {
+  nowMs: () => number;
+  queue: TelemetryQueue<WatchProgressTelemetryPayload>;
+}) {
+  latestReporter = useVideoWatchProgressReporter({
+    createSessionId: () => 'session-1',
+    flushTelemetryQueue: vi.fn(),
+    nowIso: () => '2026-05-08T12:00:00.000Z',
+    nowMs,
+    queue,
+  });
+
+  return React.createElement('InjectedIdentityHarness');
+}
+
 describe('useVideoWatchProgressReporter', () => {
   beforeEach(() => {
     latestReporter = null;
@@ -220,5 +252,61 @@ describe('useVideoWatchProgressReporter', () => {
       'session-1',
       'session-2',
     ]);
+  });
+
+  it('keeps default flush and reportSample references stable across rerenders', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    let renderer: TestRenderer.ReactTestRenderer | null = null;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <DefaultIdentityHarness
+          marker={1}
+          queue={queue}
+        />
+      );
+    });
+    const firstFlush = latestReporter?.flush;
+    const firstReportSample = latestReporter?.reportSample;
+
+    act(() => {
+      renderer?.update(
+        <DefaultIdentityHarness
+          marker={2}
+          queue={queue}
+        />
+      );
+    });
+
+    expect(latestReporter?.flush).toBe(firstFlush);
+    expect(latestReporter?.reportSample).toBe(firstReportSample);
+  });
+
+  it('updates reportSample when an injected clock dependency changes', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    const firstNowMs = () => 1_000;
+    const secondNowMs = () => 2_000;
+    let renderer: TestRenderer.ReactTestRenderer | null = null;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <InjectedIdentityHarness
+          nowMs={firstNowMs}
+          queue={queue}
+        />
+      );
+    });
+    const firstReportSample = latestReporter?.reportSample;
+
+    act(() => {
+      renderer?.update(
+        <InjectedIdentityHarness
+          nowMs={secondNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    expect(latestReporter?.reportSample).not.toBe(firstReportSample);
   });
 });
