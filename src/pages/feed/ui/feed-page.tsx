@@ -23,10 +23,10 @@ import {
   createTailRequestGate,
   useFeedSource,
 } from '@/features/feed-source';
+import { toast } from '@/shared/lib/toast';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import { EditorialTitle, MetaLabel } from '@/shared/ui/editorial-paper';
 import { MediaFeatureCard } from '@/widgets/media-feature-card';
-import { getFeedListLoadingState } from './loading-state';
 import { createVideoMediaFeatureCardProps } from './media-feature-card-props';
 import { buildFeedRestoreScrollParams } from './restore-scroll';
 import { scheduleFeedRestore } from './restore-scheduler';
@@ -44,23 +44,26 @@ function FeedStatePanel({
   title,
   body,
   actionLabel,
+  isLoading = false,
   onActionPress,
 }: {
   title: string;
-  body: string;
+  body?: string;
   actionLabel?: string;
+  isLoading?: boolean;
   onActionPress?: () => void;
 }) {
   return (
     <View
       style={{
-        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 28,
+        paddingVertical: 52,
         gap: 12,
       }}
     >
+      {isLoading ? <ActivityIndicator color="rgba(28,26,23,0.94)" /> : null}
       <EditorialTitle
         style={{
           fontSize: 24,
@@ -71,16 +74,18 @@ function FeedStatePanel({
       >
         {title}
       </EditorialTitle>
-      <Text
-        style={{
-          fontSize: 14,
-          lineHeight: 22,
-          textAlign: 'center',
-          color: 'rgba(28,26,23,0.72)',
-        }}
-      >
-        {body}
-      </Text>
+      {body ? (
+        <Text
+          style={{
+            fontSize: 14,
+            lineHeight: 22,
+            textAlign: 'center',
+            color: 'rgba(28,26,23,0.72)',
+          }}
+        >
+          {body}
+        </Text>
+      ) : null}
       {actionLabel && onActionPress ? (
         <Pressable
           accessibilityRole="button"
@@ -120,6 +125,7 @@ export function FeedPage() {
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 50,
   });
+  const lastInitialErrorToastRef = useRef<unknown>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [restoreTargetVideoId, setRestoreTargetVideoId] = useState<string | null>(null);
   const {
@@ -130,12 +136,23 @@ export function FeedPage() {
     requestMore,
     items,
   } = useFeedSource();
-  const loadingState = getFeedListLoadingState({
-    isPending: isInitialLoading,
-    hasItems: items.length > 0,
-    hasError: Boolean(error),
-    isExtending,
-  });
+
+  useEffect(() => {
+    if (!error || items.length > 0) {
+      lastInitialErrorToastRef.current = null;
+      return;
+    }
+
+    if (lastInitialErrorToastRef.current === error) {
+      return;
+    }
+
+    lastInitialErrorToastRef.current = error;
+    toast.show({
+      kind: 'error',
+      title: '加载失败',
+    });
+  }, [error, items.length]);
 
   useEffect(() => {
     itemsRef.current = items;
@@ -183,6 +200,11 @@ export function FeedPage() {
     setIsRefreshing(true);
     try {
       await refresh();
+    } catch {
+      toast.show({
+        kind: 'error',
+        title: '刷新失败',
+      });
     } finally {
       setIsRefreshing(false);
     }
@@ -194,6 +216,27 @@ export function FeedPage() {
     },
     [router]
   );
+
+  const renderEmptyState = () => {
+    if (isInitialLoading) {
+      return <FeedStatePanel isLoading title="Loading video feed..." />;
+    }
+
+    if (error) {
+      return <FeedStatePanel title="加载失败" />;
+    }
+
+    return (
+      <FeedStatePanel
+        actionLabel="Refresh"
+        body="The feed is empty right now. Pull to refresh or try again."
+        onActionPress={() => {
+          void handleRefresh();
+        }}
+        title="No clips yet"
+      />
+    );
+  };
 
   const requestMoreForTail = useCallback((tailVideoId: string | null) => {
     const tailRequestGate = tailRequestGateRef.current;
@@ -241,56 +284,6 @@ export function FeedPage() {
     }
   );
 
-  if (loadingState.kind === 'initial-loading') {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: tokens.spacing.md,
-        }}
-      >
-        <StatusBar style="dark" />
-        <ActivityIndicator color={tokens.color.accent} />
-        <MetaLabel uppercase={false}>Loading video feed…</MetaLabel>
-      </View>
-    );
-  }
-
-  if (loadingState.kind === 'error') {
-    return (
-      <View style={{ flex: 1, backgroundColor: tokens.color.background }}>
-        <StatusBar style="dark" />
-        <FeedStatePanel
-          actionLabel="Retry"
-          body="The feed snapshot could not be loaded. Try the request again."
-          onActionPress={() => {
-            void refresh();
-          }}
-          title="Feed unavailable"
-        />
-      </View>
-    );
-  }
-
-  if (loadingState.kind === 'empty') {
-    return (
-      <View style={{ flex: 1, backgroundColor: tokens.color.background }}>
-        <StatusBar style="dark" />
-        <FeedStatePanel
-          actionLabel="Refresh"
-          body="The feed is empty right now. Pull to refresh or try again."
-          onActionPress={() => {
-            void refresh();
-          }}
-          title="No clips yet"
-        />
-      </View>
-    );
-  }
-
   return (
     <>
       <StatusBar style="dark" />
@@ -315,8 +308,9 @@ export function FeedPage() {
         }}
         style={{ flex: 1, backgroundColor: tokens.color.background }}
         ListHeaderComponent={<FeedListHeader itemCount={items.length} />}
+        ListEmptyComponent={renderEmptyState}
         ListFooterComponent={
-          loadingState.kind === 'success' && loadingState.showFooterLoader ? (
+          items.length > 0 && isExtending ? (
             <View
               style={{
                 alignItems: 'center',

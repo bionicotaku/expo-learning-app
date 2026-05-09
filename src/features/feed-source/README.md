@@ -24,7 +24,7 @@
 - 不定义 `videoId -> runtime override`
 - 不承担播放器状态
 - 不定义卡片展示文案
-- 不处理首屏全页 error UI；首屏失败仍由页面 loading state 渲染 error 页面
+- 不处理首屏 error UI；首屏失败由 `pages/feed` 渲染页内失败状态并触发全局 toast
 
 这个 feature 的职责是：
 

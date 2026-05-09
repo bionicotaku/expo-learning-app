@@ -57,9 +57,10 @@ describe('me page source', () => {
     expect(source).toContain('Word detail');
     expect(source).toContain('Open word detail');
     expect(source).toContain('usePresentWordDetailDialog');
-    expect(source).toContain("text: 'convinced'");
-    expect(source).toContain("base_form: 'convinced'");
-    expect(source).toContain("coarse_id: 61917");
+    expect(source).toContain("title: 'convinced'");
+    expect(source).toContain("subtitle: 'convinced'");
+    expect(source).toContain("id: 'context'");
+    expect(source).toContain("id: 'dictionary'");
     expect(source).toContain('确信的；这里表示“深信不疑”。');
     expect(source).toContain('形容词，表示某人相信或接受某事为真');
     expect(source).not.toContain('“convinced”在句中作表语形容词');

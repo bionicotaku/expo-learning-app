@@ -22,7 +22,7 @@ describe('use present word detail dialog source', () => {
     expect(source).toContain('const presentResult = modal.present({');
     expect(source).toContain('return presentResult.didPresent;');
     expect(source).toContain('<WordDetailDialogContent payload={payload} />');
-    expect(source).toContain('WordDetailDialogPayload');
+    expect(source).toContain('WordDetailDialogData');
     expect(source).not.toContain("presentation: 'sheet'");
     expect(source).not.toContain('router.');
     expect(source).not.toContain('fetch(');

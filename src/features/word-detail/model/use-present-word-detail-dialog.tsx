@@ -4,7 +4,7 @@ import { useModalController } from '@/shared/lib/modal';
 
 import {
   WordDetailDialogContent,
-  type WordDetailDialogPayload,
+  type WordDetailDialogData,
 } from '../ui/word-detail-dialog-content';
 
 type PresentWordDetailDialogOptions = {
@@ -29,7 +29,7 @@ export function usePresentWordDetailDialog() {
 
   return useCallback(
     (
-      payload: WordDetailDialogPayload,
+      payload: WordDetailDialogData,
       options: PresentWordDetailDialogOptions = {}
     ) => {
       const presentResult = modal.present({

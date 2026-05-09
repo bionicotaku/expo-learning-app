@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 describe('word detail dialog content source', () => {
-  it('renders text, base form, context explanation, and dictionary without showing coarse id or reason', () => {
+  it('renders title, optional subtitle, and caller-provided sections without fixed semantic fields', () => {
     const source = readFileSync(
       resolve(
         process.cwd(),
@@ -13,18 +13,27 @@ describe('word detail dialog content source', () => {
       'utf8'
     );
 
-    expect(source).toContain('WordDetailDialogPayload');
-    expect(source).toContain('semantic_element');
-    expect(source).toContain('base_form');
-    expect(source).toContain('coarse_id');
-    expect(source).toContain('coarse_id: number | null');
-    expect(source).toContain('上下文释义');
-    expect(source).toContain('字典释义');
-    expect(source).toContain('payload.text');
-    expect(source).toContain('payload.semantic_element.base_form');
-    expect(source).toContain('payload.explanation');
-    expect(source).toContain('payload.semantic_element.dictionary');
-    expect(source).not.toContain('payload.semantic_element.coarse_id');
+    expect(source).toContain('WordDetailDialogData');
+    expect(source).toContain('WordDetailDialogSection');
+    expect(source).toContain('title: string');
+    expect(source).toContain('subtitle?: string');
+    expect(source).toContain('sections: WordDetailDialogSection[]');
+    expect(source).toContain('payload.title');
+    expect(source).toContain('payload.subtitle ?');
+    expect(source).toContain('payload.sections.map');
+    expect(source).toContain('section.id');
+    expect(source).toContain('section.title');
+    expect(source).toContain('section.body');
+    expect(source).not.toContain('semantic_element');
+    expect(source).not.toContain('base_form');
+    expect(source).not.toContain('coarse_id');
+    expect(source).not.toContain('display?:');
+    expect(source).not.toContain('showBaseForm');
+    expect(source).not.toContain('explanationTitle');
+    expect(source).not.toContain('payload.explanation');
+    expect(source).not.toContain('payload.semantic_element');
+    expect(source).not.toContain('上下文释义');
+    expect(source).not.toContain('字典释义');
     expect(source).not.toContain('reason');
     expect(source).not.toContain('Pressable');
     expect(source).not.toContain('onDismiss');

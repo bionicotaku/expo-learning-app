@@ -7,9 +7,11 @@ export function mapLearningUnitProgressItemToWordListSourceItem(
 ): WordListSourceItem {
   return {
     id: String(item.coarseUnitId),
+    coarseUnitId: item.coarseUnitId,
     label: item.label,
     partOfSpeech: item.partOfSpeech,
     chineseLabel: item.chineseLabel ?? '',
+    chineseDefinition: item.chineseDefinition ?? '',
     progress: item.progressPercent,
   };
 }

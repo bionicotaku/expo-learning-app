@@ -6,7 +6,13 @@ import type { WordListSourceItem } from '@/features/word-list-source';
 
 import { WordListPage } from './word-list-page';
 
-const { refreshMock, requestMoreMock, useUnlearnedWordListSourceMock } = vi.hoisted(() => ({
+const {
+  presentWordDetailDialogMock,
+  refreshMock,
+  requestMoreMock,
+  useUnlearnedWordListSourceMock,
+} = vi.hoisted(() => ({
+  presentWordDetailDialogMock: vi.fn(),
   refreshMock: vi.fn(),
   requestMoreMock: vi.fn(),
   useUnlearnedWordListSourceMock: vi.fn(),
@@ -18,6 +24,8 @@ const items: WordListSourceItem[] = [
     label: 'abandon',
     partOfSpeech: 'verb',
     chineseLabel: '放弃；抛弃',
+    chineseDefinition: '表示放弃某事物、抛弃某人或中止某计划。',
+    coarseUnitId: 1,
     progress: 64.25,
   },
 ];
@@ -56,6 +64,10 @@ vi.mock('react-native', async () => {
 
 vi.mock('@/features/word-list-source', () => ({
   useUnlearnedWordListSource: useUnlearnedWordListSourceMock,
+}));
+
+vi.mock('@/features/word-detail', () => ({
+  usePresentWordDetailDialog: () => presentWordDetailDialogMock,
 }));
 
 vi.mock('@/shared/theme/editorial-paper', () => ({
@@ -124,6 +136,7 @@ function getFlatList(renderer: TestRenderer.ReactTestRenderer) {
 
 describe('word list page runtime', () => {
   beforeEach(() => {
+    presentWordDetailDialogMock.mockReset();
     refreshMock.mockReset();
     requestMoreMock.mockReset();
     useUnlearnedWordListSourceMock.mockReset();
@@ -194,5 +207,90 @@ describe('word list page runtime', () => {
     const flatList = getFlatList(renderer);
 
     expect(flatList.props.ListFooterComponent).not.toBeNull();
+  });
+
+  it('opens the shared word detail dialog when a word row is pressed', () => {
+    const renderer = renderWordListPage();
+    const flatList = getFlatList(renderer);
+    let rowRenderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      rowRenderer = TestRenderer.create(
+        flatList.props.renderItem({ item: items[0], index: 0 })
+      );
+    });
+
+    const rowPressable = rowRenderer!.root.find(
+      (node) => node.props.accessibilityLabel === 'abandon details'
+    );
+
+    act(() => {
+      rowPressable.props.onPress();
+    });
+
+    expect(presentWordDetailDialogMock).toHaveBeenCalledWith({
+      title: 'abandon',
+      sections: [
+        {
+          id: 'brief-translation',
+          title: '简要翻译',
+          body: 'v. 放弃；抛弃',
+        },
+        {
+          id: 'dictionary',
+          title: '字典释义',
+          body: '表示放弃某事物、抛弃某人或中止某计划。',
+        },
+      ],
+    });
+  });
+
+  it('passes an empty brief translation when the word has no chinese label', () => {
+    useUnlearnedWordListSourceMock.mockReturnValueOnce({
+      error: null,
+      isExtending: false,
+      isInitialLoading: false,
+      isRefreshing: false,
+      items: [
+        {
+          ...items[0],
+          id: '2',
+          label: 'wander',
+          chineseLabel: '',
+          partOfSpeech: 'verb',
+        },
+      ],
+      refresh: refreshMock,
+      requestMore: requestMoreMock,
+    });
+    const renderer = renderWordListPage();
+    const flatList = getFlatList(renderer);
+    let rowRenderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      rowRenderer = TestRenderer.create(
+        flatList.props.renderItem({ item: flatList.props.data[0], index: 0 })
+      );
+    });
+
+    const rowPressable = rowRenderer!.root.find(
+      (node) => node.props.accessibilityLabel === 'wander details'
+    );
+
+    act(() => {
+      rowPressable.props.onPress();
+    });
+
+    expect(presentWordDetailDialogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections: expect.arrayContaining([
+          {
+            id: 'brief-translation',
+            title: '简要翻译',
+            body: '',
+          },
+        ]),
+      })
+    );
   });
 });

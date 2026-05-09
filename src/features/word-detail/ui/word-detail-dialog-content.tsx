@@ -6,18 +6,20 @@ import {
   MetaLabel,
 } from '@/shared/ui/editorial-paper';
 
-export type WordDetailDialogPayload = {
-  text: string;
-  explanation: string;
-  semantic_element: {
-    base_form: string;
-    dictionary: string;
-    coarse_id: number | null;
-  };
+export type WordDetailDialogSection = {
+  id: string;
+  title: string;
+  body: string;
+};
+
+export type WordDetailDialogData = {
+  title: string;
+  subtitle?: string;
+  sections: WordDetailDialogSection[];
 };
 
 type WordDetailDialogContentProps = {
-  payload: WordDetailDialogPayload;
+  payload: WordDetailDialogData;
 };
 
 function WordDetailSection({
@@ -69,19 +71,21 @@ export function WordDetailDialogContent({
           }}
           variant="title"
         >
-          {payload.text}
+          {payload.title}
         </EditorialTitle>
-        <Text
-          selectable
-          style={{
-            color: tokens.color.inkMute,
-            fontSize: 14,
-            fontWeight: '700',
-            lineHeight: 18,
-          }}
-        >
-          {payload.semantic_element.base_form}
-        </Text>
+        {payload.subtitle ? (
+          <Text
+            selectable
+            style={{
+              color: tokens.color.inkMute,
+              fontSize: 14,
+              fontWeight: '700',
+              lineHeight: 18,
+            }}
+          >
+            {payload.subtitle}
+          </Text>
+        ) : null}
       </View>
 
       <ScrollView
@@ -92,11 +96,13 @@ export function WordDetailDialogContent({
           gap: tokens.spacing.md,
         }}
       >
-        <WordDetailSection title="上下文释义" body={payload.explanation} />
-        <WordDetailSection
-          title="字典释义"
-          body={payload.semantic_element.dictionary}
-        />
+        {payload.sections.map((section) => (
+          <WordDetailSection
+            key={section.id}
+            title={section.title}
+            body={section.body}
+          />
+        ))}
       </ScrollView>
     </View>
   );

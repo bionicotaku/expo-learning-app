@@ -146,23 +146,29 @@ describe('useUnlearnedWordListSource runtime', () => {
       expect(latestResult?.items).toEqual([
         {
           id: '1',
+          coarseUnitId: 1,
           label: 'word 1',
           partOfSpeech: 'noun',
           chineseLabel: '意思 1',
+          chineseDefinition: '释义 1',
           progress: 11,
         },
         {
           id: '2',
+          coarseUnitId: 2,
           label: 'word 2',
           partOfSpeech: null,
           chineseLabel: '',
+          chineseDefinition: '释义 2',
           progress: 12,
         },
         {
           id: '3',
+          coarseUnitId: 3,
           label: 'word 3',
           partOfSpeech: 'noun',
           chineseLabel: '',
+          chineseDefinition: '释义 3',
           progress: 13,
         },
       ]);

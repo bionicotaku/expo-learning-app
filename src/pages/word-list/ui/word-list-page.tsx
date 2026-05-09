@@ -15,6 +15,10 @@ import {
   useUnlearnedWordListSource,
   type WordListSourceItem,
 } from '@/features/word-list-source';
+import {
+  usePresentWordDetailDialog,
+  type WordDetailDialogData,
+} from '@/features/word-detail';
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
   EditorialTitle,
@@ -143,6 +147,31 @@ function resolvePartOfSpeechLabel(partOfSpeech: WordListSourceItem['partOfSpeech
   }
 }
 
+function createWordListDetailPayload(
+  item: WordListSourceItem
+): WordDetailDialogData {
+  const partOfSpeechLabel = resolvePartOfSpeechLabel(item.partOfSpeech);
+  const briefTranslation = item.chineseLabel
+    ? [partOfSpeechLabel, item.chineseLabel].filter(Boolean).join(' ')
+    : '';
+
+  return {
+    title: item.label,
+    sections: [
+      {
+        id: 'brief-translation',
+        title: '简要翻译',
+        body: briefTranslation,
+      },
+      {
+        id: 'dictionary',
+        title: '字典释义',
+        body: item.chineseDefinition,
+      },
+    ],
+  };
+}
+
 function WordListHeader({
   segment,
   onSegmentChange,
@@ -193,10 +222,12 @@ function WordRowSeparator() {
 
 function WordRow({
   item,
+  onOpenDetail,
   showFavoriteAction,
   showProgress,
 }: {
   item: WordListSourceItem;
+  onOpenDetail: (item: WordListSourceItem) => void;
   showFavoriteAction: boolean;
   showProgress: boolean;
 }) {
@@ -206,12 +237,18 @@ function WordRow({
   const partOfSpeechLabel = resolvePartOfSpeechLabel(item.partOfSpeech);
 
   return (
-    <View
-      style={{
+    <Pressable
+      accessibilityLabel={`${item.label} details`}
+      accessibilityRole="button"
+      onPress={() => {
+        onOpenDetail(item);
+      }}
+      style={({ pressed }) => ({
         gap: tokens.spacing.xs,
+        opacity: pressed ? 0.72 : 1,
         paddingHorizontal: tokens.spacing.lg,
         paddingVertical: tokens.spacing.md,
-      }}
+      })}
     >
       <View
         style={{
@@ -225,8 +262,8 @@ function WordRow({
           <EditorialTitle
             numberOfLines={1}
             style={{
-              fontSize: 20,
-              lineHeight: 24,
+              fontSize: 18,
+              lineHeight: 22,
               letterSpacing: 0,
             }}
             variant="title"
@@ -306,7 +343,7 @@ function WordRow({
           />
         </View>
       ) : null}
-    </View>
+    </Pressable>
   );
 }
 
@@ -396,6 +433,7 @@ export function WordListPage({
     refresh,
     requestMore,
   } = useUnlearnedWordListSource();
+  const presentWordDetailDialog = usePresentWordDetailDialog();
 
   const renderEmptyState = () => {
     if (isInitialLoading) {
@@ -459,6 +497,9 @@ export function WordListPage({
         renderItem={({ item }) => (
           <WordRow
             item={item}
+            onOpenDetail={(wordListItem) => {
+              presentWordDetailDialog(createWordListDetailPayload(wordListItem));
+            }}
             showFavoriteAction={showFavoriteAction}
             showProgress={showProgress}
           />

@@ -10,7 +10,7 @@ import {
 } from '@/features/playback-settings';
 import { useVideoEngagementState } from '@/features/video-engagement';
 import {
-  createWordDetailDialogPayloadFromTranscriptToken,
+  createWordDetailDialogDataFromTranscriptToken,
   usePresentWordDetailDialog,
 } from '@/features/word-detail';
 import type {
@@ -206,7 +206,7 @@ function FullscreenVideoRowComponent({
     [activeVisitToken, onProgressSnapshotForTelemetry, video.videoId]
   );
   const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
-    const payload = createWordDetailDialogPayloadFromTranscriptToken(token);
+    const payload = createWordDetailDialogDataFromTranscriptToken(token);
     const releasePlaybackHold = acquirePlaybackHold?.();
 
     try {

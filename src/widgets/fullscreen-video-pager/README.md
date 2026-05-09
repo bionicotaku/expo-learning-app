@@ -98,7 +98,7 @@ FullscreenVideoPager
 - `ui/fullscreen-video-row.tsx`
   - 单条 fullscreen row
   - 装配 row-local media layer、interaction layer、content overlay、HUD overlay、surface status overlay
-  - 作为 row 组合层接入 `features/word-detail`，把字幕 token 点击转换成 shared dialog payload
+  - 作为 row 组合层接入 `features/word-detail`，把字幕 token 点击转换成 shared dialog data
   - token word detail dialog 打开期间申请 playback hold；dialog 完全消失后释放
   - 使用 `video.likeCount / favoriteCount` 与 `VideoMeta + video-runtime` 的有效用户态派生 action rail 统计显示值
 - `ui/row-owned-video-overlay.tsx`
@@ -109,7 +109,7 @@ FullscreenVideoPager
   - 基础字幕文本高度变化只向上增长，不重新布局 title / description；description 展开导致内容列上移时，字幕仍跟随锚点上移
   - 基础字幕优先渲染当前 `TranscriptSentence.tokens`；没有 token 时才 fallback 到整句 `TranscriptSentence.text`
   - 当前播放 token 使用纯色高亮；高亮只改变 token 的 `color` 与 `textShadow`，不改变字号、行高、字重、间距或换行模型
-  - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog，payload 中的 `semantic_element.coarse_id` 可以是 `null`
+  - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog；dialog data 只包含 title、subtitle 和展示 sections
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 事件
   - 字幕显示由 `features/playback-settings` 的 `subtitleDisplayMode` 全局 session 偏好控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `explanation`
   - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存

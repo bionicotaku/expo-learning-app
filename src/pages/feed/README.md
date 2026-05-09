@@ -11,7 +11,9 @@
 - 列表末尾 `onEndReached` 也会触发同一套尾部续接逻辑，便于续接失败后用户再次手动触发
 - 尾部续接通过 `createTailRequestGate()` 区分 in-flight 与 fulfilled：失败后释放 gate，成功后同一 tail 不重复请求
 - 在续接读取进行中显示底部 footer loader
-- 处理 `initial loading / error / empty / success` 四态
+- 始终渲染同一个 `FlatList` 壳；`initial loading / error / empty` 都通过 `ListEmptyComponent` 在列表区域展示
+- 首屏读取失败时只在空列表区域显示 `加载失败`，同时触发全局 error toast；失败后只能通过下拉刷新重新拉取
+- 下拉刷新失败时保留当前列表或当前空态，并触发全局 error toast：`刷新失败`
 - 点击卡片后使用 `router.navigate()` 进入 `Fullscreen Video`
 - 页面重新获得 focus 时，根据 `pendingRestoreVideoId` 恢复到目标卡片
 - 恢复调度使用 `requestIdleCallback`

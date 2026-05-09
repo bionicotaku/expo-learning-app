@@ -6,7 +6,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
 import {
   usePresentWordDetailDialog,
-  type WordDetailDialogPayload,
+  type WordDetailDialogData,
 } from '@/features/word-detail';
 import { toast } from '@/shared/lib/toast';
 import type { ToastKind } from '@/shared/lib/toast/types';
@@ -43,15 +43,22 @@ type ToastTriggerItem = {
 const noopAction = () => {};
 const actionIconTone = 'surface';
 
-const hardcodedWordDetail: WordDetailDialogPayload = {
-  text: 'convinced',
-  explanation: '确信的；这里表示“深信不疑”。',
-  semantic_element: {
-    base_form: 'convinced',
-    dictionary:
-      '形容词，表示某人相信或接受某事为真，或已经被说服。常见结构有“be convinced that（确信……）”、“convinced of（相信……）”、“convinced by（被……说服）”，可接从句或介词短语，侧重说明个人的确信/接受的状态，而不是使某人信服的动作。',
-    coarse_id: 61917,
-  },
+const hardcodedWordDetail: WordDetailDialogData = {
+  title: 'convinced',
+  subtitle: 'convinced',
+  sections: [
+    {
+      id: 'context',
+      title: '上下文释义',
+      body: '确信的；这里表示“深信不疑”。',
+    },
+    {
+      id: 'dictionary',
+      title: '字典释义',
+      body:
+        '形容词，表示某人相信或接受某事为真，或已经被说服。常见结构有“be convinced that（确信……）”、“convinced of（相信……）”、“convinced by（被……说服）”，可接从句或介词短语，侧重说明个人的确信/接受的状态，而不是使某人信服的动作。',
+    },
+  ],
 };
 
 const learningActionItems: DeskActionItem[] = [

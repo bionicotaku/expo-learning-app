@@ -11,6 +11,7 @@ describe('word list page source', () => {
     const source = readFileSync(pagePath, 'utf8');
 
     expect(source).toContain('useUnlearnedWordListSource');
+    expect(source).toContain('usePresentWordDetailDialog');
     expect(source).toContain('FlatList');
     expect(source).toContain('RefreshControl');
     expect(source).toContain('ActivityIndicator');
@@ -32,6 +33,7 @@ describe('word list page source', () => {
     expect(source).toContain('showProgress = true');
     expect(source).toContain('SegmentedFilterBar');
     expect(source).toContain('WordRow');
+    expect(source).toContain('onOpenDetail');
     expect(source).toContain('RaisedSurface');
     expect(source).toContain('radius="pill"');
     expect(source).toContain('height: 30');
@@ -44,11 +46,27 @@ describe('word list page source', () => {
 
     expect(source).toContain('item.label');
     expect(source).toContain('item.chineseLabel');
+    expect(source).toContain('item.chineseDefinition');
+    expect(source).toContain('title: item.label');
+    expect(source).toContain("id: 'brief-translation'");
+    expect(source).toContain("title: '简要翻译'");
+    expect(source).toContain("id: 'dictionary'");
+    expect(source).toContain("title: '字典释义'");
+    expect(source).toContain('body: item.chineseDefinition');
+    expect(source).toContain('const briefTranslation = item.chineseLabel');
+    expect(source).toContain("? [partOfSpeechLabel, item.chineseLabel].filter(Boolean).join(' ')");
+    expect(source).toContain("body: briefTranslation");
+    expect(source).not.toContain('coarse_id: item.coarseUnitId');
+    expect(source).not.toContain('showBaseForm: false');
+    expect(source).not.toContain('semantic_element');
+    expect(source).toContain("accessibilityLabel={`${item.label} details`}");
     expect(source).toContain('keyExtractor={(item) => item.id}');
     expect(source).toContain('resolvePartOfSpeechLabel');
     expect(source).toContain("case null:");
     expect(source).toContain("case '':");
     expect(source).toContain('partOfSpeechLabel ?');
+    expect(source).toContain('fontSize: 18');
+    expect(source).toContain('lineHeight: 22');
     expect(source).toContain('resolveProgressColor');
     expect(source).toContain('mixHexColor');
     expect(source).toContain('parseHexColor');

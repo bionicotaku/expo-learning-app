@@ -7,6 +7,7 @@ Current responsibilities:
 - expose `useUnlearnedWordListSource()`
 - use `useInfiniteQuery` for the unlearned word list
 - flatten paged `LearningUnitProgressPage` data into `WordListSourceItem[]`
+- keep `coarseUnitId` and `chineseDefinition` on each source item so page-level interactions can open detail dialogs without going back to the API
 - expose feed-like state: initial loading, pull refresh, tail extension, and request callbacks
 
 Boundary constraints:

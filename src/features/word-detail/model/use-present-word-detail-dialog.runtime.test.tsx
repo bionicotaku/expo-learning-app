@@ -6,7 +6,7 @@ import type {
   ModalDescriptor,
   ModalPresentResult,
 } from '@/shared/lib/modal/types';
-import type { WordDetailDialogPayload } from '../ui/word-detail-dialog-content';
+import type { WordDetailDialogData } from '../ui/word-detail-dialog-content';
 import { usePresentWordDetailDialog } from './use-present-word-detail-dialog';
 
 const hoisted = vi.hoisted(() => ({
@@ -23,18 +23,20 @@ vi.mock('@/shared/lib/modal', () => ({
 }));
 
 vi.mock('../ui/word-detail-dialog-content', () => ({
-  WordDetailDialogContent: ({ payload }: { payload: WordDetailDialogPayload }) =>
+  WordDetailDialogContent: ({ payload }: { payload: WordDetailDialogData }) =>
     React.createElement('WordDetailDialogContent', { payload }),
 }));
 
-const payload: WordDetailDialogPayload = {
-  text: 'test',
-  explanation: 'context',
-  semantic_element: {
-    base_form: 'test',
-    dictionary: 'dictionary',
-    coarse_id: null,
-  },
+const payload: WordDetailDialogData = {
+  title: 'test',
+  subtitle: 'base',
+  sections: [
+    {
+      id: 'context',
+      title: 'Context',
+      body: 'context',
+    },
+  ],
 };
 
 let latestPresentWordDetailDialog: ReturnType<typeof usePresentWordDetailDialog> | null =
