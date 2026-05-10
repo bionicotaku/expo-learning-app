@@ -3,6 +3,10 @@ import { SymbolView } from 'expo-symbols';
 import type { SFSymbol } from 'expo-symbols';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
+import {
+  usePresentChoiceQuestionDialog,
+  type ChoiceQuestionDialogData,
+} from '@/features/choice-question';
 import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
 import {
   usePresentWordDetailDialog,
@@ -60,6 +64,145 @@ const hardcodedWordDetail: WordDetailDialogData = {
     },
   ],
 };
+
+const hardcodedChoiceQuestions: {
+  id: string;
+  buttonLabel: string;
+  accessibilityLabel: string;
+  payload: ChoiceQuestionDialogData;
+}[] = [
+  {
+    id: 'context-meaning',
+    buttonLabel: '语境释义选择题',
+    accessibilityLabel: 'Open context meaning question',
+    payload: {
+      kind: 'context_meaning',
+      title: 'barely',
+      targetText: 'barely',
+      contextText: 'I barely made it to the meeting on time.',
+      prompt: '这里的 “barely” 最接近什么意思？',
+      options: [
+        {
+          id: 'context-meaning-correct',
+          label: '几乎不 / 勉强',
+          isCorrect: true,
+        },
+        {
+          id: 'context-meaning-fast',
+          label: '非常快',
+          isCorrect: false,
+        },
+        {
+          id: 'context-meaning-early',
+          label: '提前',
+          isCorrect: false,
+        },
+        {
+          id: 'context-meaning-deliberately',
+          label: '故意',
+          isCorrect: false,
+        },
+      ],
+    },
+  },
+  {
+    id: 'general-meaning',
+    buttonLabel: '通用释义选择题',
+    accessibilityLabel: 'Open general meaning question',
+    payload: {
+      kind: 'general_meaning',
+      title: 'barely',
+      targetText: 'barely',
+      prompt: '“barely” 通常是什么意思？',
+      options: [
+        {
+          id: 'general-meaning-correct',
+          label: '几乎不 / 勉强',
+          isCorrect: true,
+        },
+        {
+          id: 'general-meaning-often',
+          label: '经常',
+          isCorrect: false,
+        },
+        {
+          id: 'general-meaning-clearly',
+          label: '明显地',
+          isCorrect: false,
+        },
+        {
+          id: 'general-meaning-soon',
+          label: '马上',
+          isCorrect: false,
+        },
+      ],
+    },
+  },
+  {
+    id: 'context-cloze',
+    buttonLabel: '语境填空选择题',
+    accessibilityLabel: 'Open context cloze question',
+    payload: {
+      kind: 'context_cloze',
+      targetText: 'barely',
+      contextText: 'I _____ made it to the meeting on time.',
+      prompt: '根据语境选回被隐去的词。',
+      options: [
+        {
+          id: 'context-cloze-correct',
+          label: 'barely',
+          isCorrect: true,
+        },
+        {
+          id: 'context-cloze-loudly',
+          label: 'loudly',
+          isCorrect: false,
+        },
+        {
+          id: 'context-cloze-deeply',
+          label: 'deeply',
+          isCorrect: false,
+        },
+        {
+          id: 'context-cloze-usually',
+          label: 'usually',
+          isCorrect: false,
+        },
+      ],
+    },
+  },
+  {
+    id: 'reverse-recognition',
+    buttonLabel: '反向识别题',
+    accessibilityLabel: 'Open reverse recognition question',
+    payload: {
+      kind: 'reverse_recognition',
+      prompt: '哪个词最接近“勉强、几乎不”？',
+      options: [
+        {
+          id: 'reverse-recognition-correct',
+          label: 'barely',
+          isCorrect: true,
+        },
+        {
+          id: 'reverse-recognition-almost',
+          label: 'almost',
+          isCorrect: false,
+        },
+        {
+          id: 'reverse-recognition-already',
+          label: 'already',
+          isCorrect: false,
+        },
+        {
+          id: 'reverse-recognition-exactly',
+          label: 'exactly',
+          isCorrect: false,
+        },
+      ],
+    },
+  },
+];
 
 const learningActionItems: DeskActionItem[] = [
   {
@@ -640,6 +783,75 @@ function WordDetailDialogTestCard() {
   );
 }
 
+function ChoiceQuestionDialogTestPanel() {
+  const { tokens } = useEditorialPaperTheme();
+  const presentChoiceQuestionDialog = usePresentChoiceQuestionDialog();
+
+  return (
+    <RaisedSurface
+      radius="cardMd"
+      style={{
+        gap: tokens.spacing.md,
+        padding: tokens.spacing.lg,
+      }}
+    >
+      <View style={{ gap: tokens.spacing.xs }}>
+        <MetaLabel>Dialog test</MetaLabel>
+        <EditorialTitle
+          numberOfLines={1}
+          style={{
+            fontSize: 20,
+            lineHeight: 24,
+          }}
+          variant="title"
+        >
+          Choice questions
+        </EditorialTitle>
+      </View>
+
+      <View style={{ gap: tokens.spacing.sm }}>
+        {hardcodedChoiceQuestions.map((item) => (
+          <Pressable
+            accessibilityLabel={item.accessibilityLabel}
+            accessibilityRole="button"
+            key={item.id}
+            onPress={() => {
+              presentChoiceQuestionDialog(item.payload);
+            }}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.9 : 1,
+            })}
+          >
+            <RaisedSurface
+              radius="pill"
+              tone="softActionPistachio"
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 44,
+                paddingHorizontal: tokens.spacing.lg,
+                paddingVertical: tokens.spacing.sm,
+              }}
+            >
+              <Text
+                numberOfLines={1}
+                style={{
+                  color: tokens.color.ink,
+                  fontSize: 13,
+                  fontWeight: '800',
+                  lineHeight: 17,
+                }}
+              >
+                {item.buttonLabel}
+              </Text>
+            </RaisedSurface>
+          </Pressable>
+        ))}
+      </View>
+    </RaisedSurface>
+  );
+}
+
 function GroupedActionList({
   items,
 }: {
@@ -772,6 +984,7 @@ export function MePage() {
         <ToastTriggerPanel />
         <PlaybackSettingsTestCard />
         <WordDetailDialogTestCard />
+        <ChoiceQuestionDialogTestPanel />
         <GroupedActionList items={learningActionItems} />
         <GroupedActionList items={systemActionItems} />
         <FooterLabel />

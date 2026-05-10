@@ -26,7 +26,10 @@ import {
   type WordDetailDialogData,
 } from '@/features/word-detail';
 import { toast } from '@/shared/lib/toast';
-import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
+import {
+  editorialPaperCjkTitleFontFamily,
+  useEditorialPaperTheme,
+} from '@/shared/theme/editorial-paper';
 import {
   EditorialTitle,
   MetaLabel,
@@ -194,6 +197,7 @@ function WordListHeader({
         <MetaLabel uppercase={false}>Learning shelf</MetaLabel>
         <EditorialTitle
           style={{
+            fontFamily: editorialPaperCjkTitleFontFamily,
             fontSize: 34,
             lineHeight: 38,
           }}
@@ -205,6 +209,9 @@ function WordListHeader({
 
       <SegmentedFilterBar
         items={segmentItems}
+        labelStyle={{
+          fontFamily: editorialPaperCjkTitleFontFamily,
+        }}
         onChange={onSegmentChange}
         value={segment}
       />

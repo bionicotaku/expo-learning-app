@@ -8,6 +8,7 @@ export function createWordDetailDialogDataFromTranscriptToken(
   return {
     title: token.text,
     subtitle: token.semanticElement.baseForm,
+    showLearningFeedbackActions: token.semanticElement.coarseId !== null,
     sections: [
       {
         id: 'context',

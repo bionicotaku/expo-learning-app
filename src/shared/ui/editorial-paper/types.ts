@@ -1,5 +1,12 @@
 import type { ReactNode } from 'react';
-import type { PressableProps, StyleProp, TextProps, ViewProps, ViewStyle } from 'react-native';
+import type {
+  PressableProps,
+  StyleProp,
+  TextProps,
+  TextStyle,
+  ViewProps,
+  ViewStyle,
+} from 'react-native';
 
 export type EditorialPaperTone =
   | 'background'
@@ -71,6 +78,7 @@ export type SegmentedFilterBarProps<T extends string | number> = {
   tone?: EditorialPaperTone;
   selectedTextColor?: string;
   inactiveTextColor?: string;
+  labelStyle?: StyleProp<TextStyle>;
   style?: StyleProp<ViewStyle>;
 };
 

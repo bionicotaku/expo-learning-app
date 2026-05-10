@@ -25,6 +25,7 @@ describe('word detail dialog data', () => {
     expect(createWordDetailDialogDataFromTranscriptToken(createToken(108404))).toEqual({
       title: 'Making',
       subtitle: 'make',
+      showLearningFeedbackActions: true,
       sections: [
         {
           id: 'context',
@@ -40,10 +41,11 @@ describe('word detail dialog data', () => {
     });
   });
 
-  it('does not pass coarse id into display data', () => {
+  it('does not show learning feedback actions when the token has no coarse id', () => {
     expect(createWordDetailDialogDataFromTranscriptToken(createToken(null))).toEqual({
       title: 'Making',
       subtitle: 'make',
+      showLearningFeedbackActions: false,
       sections: [
         {
           id: 'context',

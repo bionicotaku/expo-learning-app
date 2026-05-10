@@ -16,6 +16,7 @@ describe('me page source', () => {
     expect(source).toContain('ToastTriggerPanel');
     expect(source).toContain('PlaybackSettingsTestCard');
     expect(source).toContain('WordDetailDialogTestCard');
+    expect(source).toContain('ChoiceQuestionDialogTestPanel');
     expect(source).toContain('GroupedActionList');
     expect(source).toContain('FooterLabel');
 
@@ -63,6 +64,23 @@ describe('me page source', () => {
     expect(source).toContain("id: 'dictionary'");
     expect(source).toContain('确信的；这里表示“深信不疑”。');
     expect(source).toContain('形容词，表示某人相信或接受某事为真');
+    expect(source).toContain('Choice questions');
+    expect(source).toContain('usePresentChoiceQuestionDialog');
+    expect(source).toContain('hardcodedChoiceQuestions');
+    expect(source).toContain("kind: 'context_meaning'");
+    expect(source).toContain("kind: 'general_meaning'");
+    expect(source).toContain("kind: 'context_cloze'");
+    expect(source).toContain("kind: 'reverse_recognition'");
+    expect(source).toContain('语境释义选择题');
+    expect(source).toContain('通用释义选择题');
+    expect(source).toContain('语境填空选择题');
+    expect(source).toContain('反向识别题');
+    expect(source).toContain('Open context meaning question');
+    expect(source).toContain('Open general meaning question');
+    expect(source).toContain('Open context cloze question');
+    expect(source).toContain('Open reverse recognition question');
+    expect(source).not.toContain("title: 'I _____ made it to the meeting on time.'");
+    expect(source).not.toContain("title: '勉强、几乎不'");
     expect(source).not.toContain('“convinced”在句中作表语形容词');
     expect(source).not.toContain('132 clips');
     expect(source).not.toContain('58 words');

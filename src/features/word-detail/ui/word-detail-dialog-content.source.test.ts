@@ -18,9 +18,18 @@ describe('word detail dialog content source', () => {
     expect(source).toContain('title: string');
     expect(source).toContain('subtitle?: string');
     expect(source).toContain('sections: WordDetailDialogSection[]');
+    expect(source).toContain('showLearningFeedbackActions?: boolean');
     expect(source).toContain('payload.title');
     expect(source).toContain('payload.subtitle ?');
     expect(source).toContain('payload.sections.map');
+    expect(source).toContain('payload.showLearningFeedbackActions ?');
+    expect(source).toContain('WordDetailLearningFeedbackActions');
+    expect(source).toContain('认识');
+    expect(source).toContain('模糊');
+    expect(source).toContain('不认识');
+    expect(source).toContain('textColor');
+    expect(source).toContain('color: item.textColor');
+    expect(source).toContain('disabled');
     expect(source).toContain('section.id');
     expect(source).toContain('section.title');
     expect(source).toContain('section.body');
@@ -35,8 +44,8 @@ describe('word detail dialog content source', () => {
     expect(source).not.toContain('上下文释义');
     expect(source).not.toContain('字典释义');
     expect(source).not.toContain('reason');
-    expect(source).not.toContain('Pressable');
     expect(source).not.toContain('onDismiss');
+    expect(source).not.toContain('onPress');
     expect(source).not.toContain('Close');
     expect(source).not.toContain('Close word detail');
     expect(source).not.toContain('<RaisedSurface');

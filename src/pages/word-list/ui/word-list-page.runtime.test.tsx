@@ -134,6 +134,7 @@ vi.mock('@/features/word-detail', () => ({
 }));
 
 vi.mock('@/shared/theme/editorial-paper', () => ({
+  editorialPaperCjkTitleFontFamily: 'TW-Kai-98_1',
   useEditorialPaperTheme: () => ({
     tokens: {
       color: {
@@ -255,6 +256,17 @@ describe('word list page runtime', () => {
     expect(useLearnedWordListSourceMock).toHaveBeenLastCalledWith({ enabled: false });
     expect(useEmptyWordListSourceMock).toHaveBeenCalled();
     expect(getFlatList(renderer, 'unlearned').props.data).toBe(unlearnedItems);
+  });
+
+  it('uses the CJK title font for the word-list title and mode labels', () => {
+    const renderer = renderWordListPage();
+
+    expect(
+      renderer.root.findByProps({ children: '单词列表' }).props.style
+    ).toEqual(expect.objectContaining({ fontFamily: 'TW-Kai-98_1' }));
+    expect(getSegmentedFilterBar(renderer).props.labelStyle).toEqual({
+      fontFamily: 'TW-Kai-98_1',
+    });
   });
 
   it('routes refresh and tail loading to the active unlearned list only', () => {

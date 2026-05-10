@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
@@ -16,6 +16,7 @@ export type WordDetailDialogData = {
   title: string;
   subtitle?: string;
   sections: WordDetailDialogSection[];
+  showLearningFeedbackActions?: boolean;
 };
 
 type WordDetailDialogContentProps = {
@@ -50,6 +51,75 @@ function WordDetailSection({
       >
         {body}
       </Text>
+    </View>
+  );
+}
+
+const learningFeedbackActions = [
+  {
+    backgroundColor: 'pistachio',
+    borderColor: 'rgba(108,128,77,0.34)',
+    id: 'known',
+    label: '认识',
+    textColor: 'rgba(74,100,43,0.96)',
+  },
+  {
+    backgroundColor: 'butter',
+    borderColor: 'rgba(184,148,84,0.34)',
+    id: 'fuzzy',
+    label: '模糊',
+    textColor: 'rgba(142,107,69,0.98)',
+  },
+  {
+    backgroundColor: 'rose',
+    borderColor: 'rgba(200,90,44,0.28)',
+    id: 'unknown',
+    label: '不认识',
+    textColor: 'rgba(176,68,48,0.96)',
+  },
+] as const;
+
+function WordDetailLearningFeedbackActions() {
+  const { tokens } = useEditorialPaperTheme();
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: tokens.spacing.sm,
+      }}
+    >
+      {learningFeedbackActions.map((item) => (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ disabled: true }}
+          disabled
+          key={item.id}
+          style={{
+            flex: 1,
+            minHeight: 42,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: tokens.radius.pill,
+            borderWidth: 1,
+            borderColor: item.borderColor,
+            backgroundColor: tokens.color.softAction[item.backgroundColor],
+            paddingHorizontal: tokens.spacing.sm,
+          }}
+        >
+          <Text
+            selectable={false}
+            style={{
+              color: item.textColor,
+              fontSize: 14,
+              fontWeight: '700',
+              lineHeight: 18,
+            }}
+          >
+            {item.label}
+          </Text>
+        </Pressable>
+      ))}
     </View>
   );
 }
@@ -104,6 +174,10 @@ export function WordDetailDialogContent({
           />
         ))}
       </ScrollView>
+
+      {payload.showLearningFeedbackActions ? (
+        <WordDetailLearningFeedbackActions />
+      ) : null}
     </View>
   );
 }

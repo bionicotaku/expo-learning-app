@@ -6,6 +6,7 @@
 
 - 渲染 `Editorial Paper` Word List UI
 - 通过 `features/word-list-source` 读取未学习、已学习和收藏夹三种 mode source，并使用 `FlatList` 展示 `Learning shelf`、`单词列表`、三段筛选和单词行
+- `单词列表` 标题和三段筛选文案使用 `TW-Kai-98_1` 字体，字体源来自 `assets/fonts/editorial-paper/TW-Kai-98_1.ttf`
 - 单词行采用信息密集型列表结构，展示单词、浅色简写词性、单行省略解释、按进度连续渐变的进度条和固定粉色收藏入口，两个单词之间只用虚线分隔线区分
 - 已学习列表不展示进度条；未学习列表仍受页面 `showProgress` 参数控制
 - 单词行整体可点击，点击后通过 `features/word-detail` 的 shared dialog modal 展示单词详情；列表入口隐藏 base form，`label` 作为标题，`词性简写 + chineseLabel` 作为 `简要翻译`，`chineseDefinition` 作为字典释义

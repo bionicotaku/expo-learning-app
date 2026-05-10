@@ -9,7 +9,7 @@
   - `EditorialTitle`、`MetaLabel`
   - `SoftActionButton`、`SegmentedFilterBar`、`IconPill`
   - `AdaptiveGlass` 支持默认 paper-tinted 与 `clear` 无色透明两种玻璃外观
-  - `SegmentedFilterBar` 负责共享的滑块 segmented 动画、tone 渐变切换，以及整条拖动后带轻微速度偏置的 spring 吸附切换
+  - `SegmentedFilterBar` 负责共享的滑块 segmented 动画、tone 渐变切换，以及整条拖动后带轻微速度偏置的 spring 吸附切换；调用方可通过 `labelStyle` 做页面级文案字体微调
 - `toast/`
   - `ToastHost`
   - 应用级全局 top toast 视图实现

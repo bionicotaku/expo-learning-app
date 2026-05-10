@@ -125,6 +125,7 @@ row 内正式顺序固定为：
 - 字幕显示由 `features/playback-settings` 的全局 `subtitleDisplayMode` 控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `TranscriptSentence.explanation`
 - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存
 - 所有 token 都可点击；点击经 `FullscreenVideoRow` 转成 `features/word-detail` dialog payload，`semantic_element.coarse_id` 可以是 `null`
+- 字幕入口的 word detail payload 在 `semantic_element.coarse_id !== null` 时开启底部 `认识 / 模糊 / 不认识` 学习反馈按钮；这些按钮当前只做 UI 占位，不绑定动作、不写入状态
 - token word detail dialog 打开期间，`FullscreenVideoRow` 通过 playback session hold 临时让 active row `shouldPlay=false`；dialog 完全消失后释放 hold，并回到原本的用户 pause 状态
 - 字幕空白区不拦截背景手势
 - 点击 token 不 seek、不显示 pause HUD、不做收藏、学习状态或 API 请求

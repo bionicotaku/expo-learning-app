@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, View, type LayoutChangeEvent } from 'react-native';
+import {
+  Pressable,
+  View,
+  type LayoutChangeEvent,
+  type StyleProp,
+  type TextStyle,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
@@ -71,6 +77,7 @@ type SegmentedFilterBarLabelProps = {
   progress: SharedValue<number>;
   selectedTextColor: string;
   inactiveTextColor: string;
+  style?: StyleProp<TextStyle>;
 };
 
 function SegmentedFilterBarLabel({
@@ -80,6 +87,7 @@ function SegmentedFilterBarLabel({
   progress,
   selectedTextColor,
   inactiveTextColor,
+  style,
 }: SegmentedFilterBarLabelProps) {
   const animatedStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
@@ -99,6 +107,7 @@ function SegmentedFilterBarLabel({
           letterSpacing: 0.2,
           opacity: disabled ? 0.45 : 1,
         },
+        style,
         animatedStyle,
       ]}
     >
@@ -114,6 +123,7 @@ export function SegmentedFilterBar<T extends string | number>({
   tone = 'softActionPeach',
   selectedTextColor,
   inactiveTextColor,
+  labelStyle,
   style,
 }: SegmentedFilterBarProps<T>) {
   const { tokens } = useEditorialPaperTheme();
@@ -317,6 +327,7 @@ export function SegmentedFilterBar<T extends string | number>({
                   label={item.label}
                   progress={progress}
                   selectedTextColor={resolvedSelectedTextColor}
+                  style={labelStyle}
                 />
               </Pressable>
             );
