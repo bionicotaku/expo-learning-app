@@ -2,6 +2,7 @@ export { usePresentChoiceQuestionDialog } from './model/use-present-choice-quest
 export {
   ChoiceQuestionDialogContent,
   choiceQuestionKindLabels,
+  type ChoiceQuestionAnswerDetail,
   type ChoiceQuestionDialogData,
   type ChoiceQuestionKind,
   type ChoiceQuestionOption,

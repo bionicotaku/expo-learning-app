@@ -79,6 +79,14 @@ describe('me page source', () => {
     expect(source).toContain('Open general meaning question');
     expect(source).toContain('Open context cloze question');
     expect(source).toContain('Open reverse recognition question');
+    expect(source).toContain('answerDetail');
+    expect(source).toContain("label: 'barely'");
+    expect(source).toContain("pos: 'adv.'");
+    expect(source).toContain("chineseLabel: '几乎不 / 勉强'");
+    expect(source).toContain('这里 barely 表示“勉强、差一点没做到”');
+    expect(source).toContain('barely 通常表示数量、程度或时间上');
+    expect(source).toContain('这句话表达“勉强准时赶到”');
+    expect(source).toContain('almost 更接近“几乎”');
     expect(source).not.toContain("title: 'I _____ made it to the meeting on time.'");
     expect(source).not.toContain("title: '勉强、几乎不'");
     expect(source).not.toContain('“convinced”在句中作表语形容词');

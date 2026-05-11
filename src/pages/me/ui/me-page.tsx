@@ -81,6 +81,13 @@ const hardcodedChoiceQuestions: {
       targetText: 'barely',
       contextText: 'I barely made it to the meeting on time.',
       prompt: '这里的 “barely” 最接近什么意思？',
+      answerDetail: {
+        label: 'barely',
+        pos: 'adv.',
+        chineseLabel: '几乎不 / 勉强',
+        explanation:
+          '这里 barely 表示“勉强、差一点没做到”，强调只是刚好赶上会议。',
+      },
       options: [
         {
           id: 'context-meaning-correct',
@@ -114,6 +121,13 @@ const hardcodedChoiceQuestions: {
       title: 'barely',
       targetText: 'barely',
       prompt: '“barely” 通常是什么意思？',
+      answerDetail: {
+        label: 'barely',
+        pos: 'adv.',
+        chineseLabel: '几乎不 / 勉强',
+        explanation:
+          'barely 通常表示数量、程度或时间上“几乎不、勉强达到”。',
+      },
       options: [
         {
           id: 'general-meaning-correct',
@@ -147,6 +161,13 @@ const hardcodedChoiceQuestions: {
       targetText: 'barely',
       contextText: 'I _____ made it to the meeting on time.',
       prompt: '根据语境选回被隐去的词。',
+      answerDetail: {
+        label: 'barely',
+        pos: 'adv.',
+        chineseLabel: '几乎不 / 勉强',
+        explanation:
+          '这句话表达“勉强准时赶到”，所以空格里需要 barely，而不是表示声音或频率的副词。',
+      },
       options: [
         {
           id: 'context-cloze-correct',
@@ -178,6 +199,13 @@ const hardcodedChoiceQuestions: {
     payload: {
       kind: 'reverse_recognition',
       prompt: '哪个词最接近“勉强、几乎不”？',
+      answerDetail: {
+        label: 'barely',
+        pos: 'adv.',
+        chineseLabel: '几乎不 / 勉强',
+        explanation:
+          '中文义“勉强、几乎不”对应 barely；almost 更接近“几乎”，但不表达“勉强达到”的限制感。',
+      },
       options: [
         {
           id: 'reverse-recognition-correct',

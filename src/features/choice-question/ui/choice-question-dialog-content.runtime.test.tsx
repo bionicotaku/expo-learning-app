@@ -27,9 +27,50 @@ vi.mock('react-native', async () => {
 
   return {
     Pressable: createHostComponent('Pressable'),
-    ScrollView: createHostComponent('ScrollView'),
     Text: createHostComponent('Text'),
     View: createHostComponent('View'),
+  };
+});
+
+vi.mock('react-native-reanimated', async () => {
+  const ReactModule = await import('react');
+
+  function createAnimatedComponent(displayName: string) {
+    const Component = ReactModule.forwardRef<any, any>(
+      ({ children, ...props }, ref) =>
+        ReactModule.createElement(
+          displayName,
+          { ...props, ref },
+          children as React.ReactNode
+        )
+    );
+
+    Component.displayName = displayName;
+
+    return Component;
+  }
+
+  const chainableAnimation = {
+    delay: () => chainableAnimation,
+    duration: () => chainableAnimation,
+    easing: () => chainableAnimation,
+  };
+
+  return {
+    __esModule: true,
+    default: {
+      View: createAnimatedComponent('AnimatedView'),
+    },
+    Easing: {
+      cubic: 'cubic',
+      out: (value: unknown) => value,
+    },
+    FadeIn: chainableAnimation,
+    LinearTransition: chainableAnimation,
+    useAnimatedStyle: (updater: () => Record<string, unknown>) => updater(),
+    useSharedValue: <T,>(value: T) => ({ value }),
+    withDelay: <T,>(_delayMs: number, value: T) => value,
+    withTiming: <T,>(value: T) => value,
   };
 });
 
@@ -77,6 +118,12 @@ const basePayload: ChoiceQuestionDialogData = {
   prompt: '这里的 “barely” 最接近什么意思？',
   contextText: 'I barely made it to the meeting on time.',
   targetText: 'barely',
+  answerDetail: {
+    label: 'barely',
+    pos: 'adv.',
+    chineseLabel: '几乎不 / 勉强',
+    explanation: '在这个句子里，barely 表示勉强赶上，强调差一点没做到。',
+  },
   options: [
     {
       id: 'correct',
@@ -177,6 +224,8 @@ describe('ChoiceQuestionDialogContent runtime', () => {
       disabled: true,
       selected: false,
     });
+    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(0);
+    expect(findNodesWithText(renderer, '在这个句子里，barely 表示勉强赶上，强调差一点没做到。')).toHaveLength(0);
   });
 
   it('marks only the wrong selected option and keeps choices enabled after a wrong selection', () => {
@@ -223,5 +272,23 @@ describe('ChoiceQuestionDialogContent runtime', () => {
     expect(findOption(renderer, 'correct').props.accessibilityLabel).toContain(
       '回答正确'
     );
+  });
+
+  it('shows answer detail only after a wrong attempt is followed by the correct option', () => {
+    const renderer = renderContent(basePayload);
+
+    act(() => {
+      findOption(renderer, 'wrong').props.onPress();
+    });
+    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(0);
+
+    act(() => {
+      findOption(renderer, 'correct').props.onPress();
+    });
+
+    expect(findNodesWithText(renderer, 'barely')).toHaveLength(2);
+    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '几乎不 / 勉强')).toHaveLength(2);
+    expect(findNodesWithText(renderer, '在这个句子里，barely 表示勉强赶上，强调差一点没做到。')).toHaveLength(1);
   });
 });

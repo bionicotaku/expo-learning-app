@@ -1,12 +1,12 @@
-# Graph Report - .  (2026-05-10)
+# Graph Report - .  (2026-05-11)
 
 ## Corpus Check
-- 328 files · ~88,837 words
+- 328 files · ~89,474 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 913 nodes · 863 edges · 265 communities detected
-- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 100 edges (avg confidence: 0.8)
+- 916 nodes · 867 edges · 265 communities detected
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 101 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -277,7 +277,7 @@
 - [[_COMMUNITY_Community 264|Community 264]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `useEditorialPaperTheme()` - 17 edges
+1. `useEditorialPaperTheme()` - 18 edges
 2. `TanStack React Query` - 16 edges
 3. `Video 真值与 Runtime 设计规范` - 14 edges
 4. `Fullscreen Video Overlay 架构设计规范` - 10 edges
@@ -309,31 +309,31 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
-Nodes (27): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), AuthCardTitle(), AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton() (+19 more)
+Nodes (42): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, AuthFooter(), Route-Only App Layer, Expo Router (+34 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.08
-Nodes (48): 账户初始化完成, 认证状态, 为什么必须有初始化阶段, 登录、验证与状态维护设计文档, 认证单一真相来源, Feed API 设计, Feed-centred 到 Video Runtime Membership 难点处理复盘, Feed Source Contract (+40 more)
+Cohesion: 0.05
+Nodes (24): AuthCardTitle(), AuthField(), AuthModeTabs(), AuthPrimaryButton(), AuthProviderButton(), AuthSocialRow(), ChoiceQuestionAnswerDetailBody(), useEditorialPaperTheme() (+16 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.06
-Nodes (34): Feed List Page, Fullscreen Video Page, Pending Restore Video Id, Shared Feed Source, Two Page Consumption Model Rationale, AuthFooter(), Route-Only App Layer, Expo Router (+26 more)
+Cohesion: 0.09
+Nodes (43): Feed API 设计, Feed-centred 到 Video Runtime Membership 难点处理复盘, Feed Source Contract, 不暴露分页语义的原因, 无状态 batch feed API, Active Transcript, L1 内存缓存, Transcript 不进入 video-runtime 的原因 (+35 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
-Nodes (19): Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model, Overlay Split Rationale, Row-bound Overlay, reportMockVideoWatchProgress(), DefaultIdentityHarness(), InjectedIdentityHarness() (+11 more)
+Nodes (16): getTranscriptAssetQueryKey(), getVideoMetaQueryKey(), FullscreenVideoSession(), usePlaybackRate(), useSubtitleDisplayMode(), useVideoDetailsVisible(), createTailRequestGate(), SessionHarness() (+8 more)
 
 ### Community 4 - "Community 4"
+Cohesion: 0.06
+Nodes (19): Active-only Ephemeral Overlay, Active-only Stable Overlay, Fullscreen Video Overlay Model, Overlay Split Rationale, Row-bound Overlay, reportMockVideoWatchProgress(), DefaultIdentityHarness(), InjectedIdentityHarness() (+11 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.12
 Nodes (30): Editorial Paper 风格系统, Editorial Paper UI 设计规范, Theme Tokens, Feed 与 Fullscreen Video 页面设计逻辑, Feed / Fullscreen 双页面投影, Fullscreen Video Session, Row 内交互边界, Fullscreen Video Seek Bar Overlay 设计规范 (+22 more)
 
-### Community 5 - "Community 5"
-Cohesion: 0.07
-Nodes (12): FullscreenVideoSession(), usePlaybackRate(), useSubtitleDisplayMode(), useVideoDetailsVisible(), createTailRequestGate(), SessionHarness(), useFullscreenPlaybackSession(), useModalController() (+4 more)
-
 ### Community 6 - "Community 6"
 Cohesion: 0.07
-Nodes (0):
+Nodes (0): 
 
 ### Community 7 - "Community 7"
 Cohesion: 0.15
@@ -348,68 +348,68 @@ Cohesion: 0.15
 Nodes (15): parseTrailingSequenceNumber(), resolveMockClipAssetBySequenceNumber(), resolveMockClipAssetByVideoId(), assertMockVideoExists(), setMockVideoFavorited(), setMockVideoLiked(), buildUserBoolean(), fetchMockVideoMeta() (+7 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.12
-Nodes (9): getTranscriptAssetQueryKey(), getVideoMetaQueryKey(), createTranscriptAssetQueryOptions(), createVideoMetaQueryOptions(), resolveQueryStatus(), flushQueryWork(), TestResourceConsumer(), waitForAssertion() (+1 more)
-
-### Community 11 - "Community 11"
-Cohesion: 0.11
-Nodes (8): formatEngagementCount(), resolveEffectiveEngagementCount(), flushWork(), Harness(), waitForAssertion(), useVideoEngagementState(), useVideoRuntimeState(), getEngagementActionCountLabel()
-
-### Community 12 - "Community 12"
 Cohesion: 0.2
 Nodes (9): fetchFeed(), createFeedSourceSnapshot(), fetchInitialFeedSourceSnapshot(), getCurrentFeedSourceSnapshot(), getFeedSourceSnapshot(), getSourceVideoIds(), mapFeedItemsToVideoListItems(), mergeFeedSourceItems() (+1 more)
 
-### Community 13 - "Community 13"
+### Community 11 - "Community 11"
 Cohesion: 0.23
 Nodes (8): createWordListDetailPayload(), handleOpenDetail(), mixChannel(), mixHexColor(), parseHexColor(), resolvePartOfSpeechLabel(), rgbToHex(), WordSymbol()
 
-### Community 14 - "Community 14"
+### Community 12 - "Community 12"
 Cohesion: 0.17
-Nodes (0):
+Nodes (0): 
 
-### Community 15 - "Community 15"
+### Community 13 - "Community 13"
 Cohesion: 0.24
 Nodes (8): fetchJsonResource(), parseJsonResponse(), createRequestAbortController(), isAbortError(), buildApiUrl(), isRetryableHttpStatus(), normalizePath(), requestJson()
 
-### Community 16 - "Community 16"
+### Community 14 - "Community 14"
 Cohesion: 0.17
 Nodes (1): AnimatedValue
 
-### Community 17 - "Community 17"
+### Community 15 - "Community 15"
 Cohesion: 0.23
 Nodes (8): mapTranscriptDtoToDomain(), mapTranscriptSemanticElementDtoToDomain(), mapTranscriptTokenDtoToDomain(), prepareTranscriptForPlayback(), resolveOptimizedStarts(), fetchTranscriptAsset(), isTranscriptResponseDto(), validateTranscriptAssetResponse()
 
-### Community 18 - "Community 18"
+### Community 16 - "Community 16"
 Cohesion: 0.18
 Nodes (11): Mock Data Behaves Like Real Async Flow, Persistent Assets Need Authentication, Feed-First Entry Rationale, Learning Retention Space, Mock Business Data With Real Async Flow, MVP Closed Loop, Real Account System, Continuous Video Feed (+3 more)
 
-### Community 19 - "Community 19"
+### Community 17 - "Community 17"
+Cohesion: 0.18
+Nodes (5): useModalController(), usePresentChoiceQuestionDialog(), usePresentPlaybackSettingsSheet(), Harness(), usePresentWordDetailDialog()
+
+### Community 18 - "Community 18"
 Cohesion: 0.2
 Nodes (2): DescriptionStateHarness(), useExpandableOverlayDescriptionState()
 
-### Community 20 - "Community 20"
+### Community 19 - "Community 19"
 Cohesion: 0.33
 Nodes (7): clearFullscreenRowTransientFeedback(), clearFullscreenRowTransientFeedbackByKind(), hideFullscreenRowPauseIndicator(), pruneIfEmpty(), setFullscreenRowTransientFeedback(), showFullscreenRowPauseIndicator(), updateHudState()
 
-### Community 21 - "Community 21"
+### Community 20 - "Community 20"
 Cohesion: 0.29
 Nodes (5): fetchMockLearnedUnitProgressPage(), fetchMockUnlearnedUnitProgressPage(), resolveLearnedPageIndex(), resolvePageIndex(), sleep()
 
-### Community 22 - "Community 22"
+### Community 21 - "Community 21"
 Cohesion: 0.25
 Nodes (2): isGestureLocked(), resolveEffectivePlaybackState()
 
-### Community 23 - "Community 23"
+### Community 22 - "Community 22"
 Cohesion: 0.33
 Nodes (7): mapLearningUnitProgressItemDtoToDomain(), mapLearningUnitProgressPageDtoToDomain(), normalizePartOfSpeech(), fetchLearnedUnitProgressPage(), fetchLearningUnitProgressPage(), fetchUnlearnedUnitProgressPage(), resolveLearningUnitProgressLimit()
 
-### Community 24 - "Community 24"
+### Community 23 - "Community 23"
 Cohesion: 0.25
-Nodes (0):
+Nodes (0): 
+
+### Community 24 - "Community 24"
+Cohesion: 0.33
+Nodes (4): AdaptiveGlass(), resolveAdaptiveGlassAppearance(), resolveVariantPadding(), resolveEditorialPaperGlassSupport()
 
 ### Community 25 - "Community 25"
 Cohesion: 0.29
-Nodes (0):
+Nodes (0): 
 
 ### Community 26 - "Community 26"
 Cohesion: 0.29
@@ -421,27 +421,27 @@ Nodes (6): isValidTime(), resolveBackwardTarget(), resolveBackwardTargetFromBase
 
 ### Community 28 - "Community 28"
 Cohesion: 0.33
-Nodes (0):
+Nodes (0): 
 
 ### Community 29 - "Community 29"
 Cohesion: 0.33
-Nodes (0):
+Nodes (0): 
 
 ### Community 30 - "Community 30"
+Cohesion: 0.33
+Nodes (0): 
+
+### Community 31 - "Community 31"
 Cohesion: 0.4
 Nodes (2): createInMemoryTelemetryQueue(), normalizeQueueSize()
 
-### Community 31 - "Community 31"
+### Community 32 - "Community 32"
 Cohesion: 0.6
 Nodes (5): createVideoMediaFeatureCardProps(), formatDuration(), formatViewCount(), resolveFallbackTone(), resolveStableIndex()
 
-### Community 32 - "Community 32"
-Cohesion: 0.4
-Nodes (0):
-
 ### Community 33 - "Community 33"
 Cohesion: 0.4
-Nodes (0):
+Nodes (0): 
 
 ### Community 34 - "Community 34"
 Cohesion: 0.5
@@ -449,11 +449,11 @@ Nodes (2): createToastRecord(), resolveToastDuration()
 
 ### Community 35 - "Community 35"
 Cohesion: 0.4
-Nodes (0):
+Nodes (0): 
 
 ### Community 36 - "Community 36"
 Cohesion: 0.4
-Nodes (0):
+Nodes (0): 
 
 ### Community 37 - "Community 37"
 Cohesion: 0.7
@@ -464,48 +464,48 @@ Cohesion: 0.7
 Nodes (5): 活跃媒体, 可点击字幕 Overlay 系统, 句子导航, 单活跃媒体模型的取舍, 可点击字幕 Overlay 系统设计与实现文档
 
 ### Community 39 - "Community 39"
-Cohesion: 0.5
-Nodes (0):
+Cohesion: 0.7
+Nodes (5): 账户初始化完成, 认证状态, 为什么必须有初始化阶段, 登录、验证与状态维护设计文档, 认证单一真相来源
 
 ### Community 40 - "Community 40"
 Cohesion: 0.5
-Nodes (1): createTestIdFactory()
+Nodes (0): 
 
 ### Community 41 - "Community 41"
+Cohesion: 0.5
+Nodes (1): createTestIdFactory()
+
+### Community 42 - "Community 42"
 Cohesion: 0.83
 Nodes (3): flushTelemetryQueue(), normalizePositiveInteger(), runWithConcurrency()
 
-### Community 42 - "Community 42"
+### Community 43 - "Community 43"
 Cohesion: 0.5
 Nodes (2): findVideoListItemIndex(), resolveVideoDetailRouteTarget()
 
-### Community 43 - "Community 43"
+### Community 44 - "Community 44"
 Cohesion: 0.83
 Nodes (3): clampRatio(), createFullscreenRowProgressSnapshot(), normalizeSeconds()
 
-### Community 44 - "Community 44"
-Cohesion: 0.67
-Nodes (0):
-
 ### Community 45 - "Community 45"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 46 - "Community 46"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 47 - "Community 47"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 48 - "Community 48"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 49 - "Community 49"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 50 - "Community 50"
 Cohesion: 0.67
@@ -513,19 +513,19 @@ Nodes (1): ApiError
 
 ### Community 51 - "Community 51"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 52 - "Community 52"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 53 - "Community 53"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 54 - "Community 54"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 55 - "Community 55"
 Cohesion: 1.0
@@ -533,7 +533,7 @@ Nodes (2): clampEntryIndex(), resolveInitialFullscreenPagerPosition()
 
 ### Community 56 - "Community 56"
 Cohesion: 0.67
-Nodes (0):
+Nodes (0): 
 
 ### Community 57 - "Community 57"
 Cohesion: 1.0
@@ -549,179 +549,179 @@ Nodes (2): createProgressResponse(), stubProgressFetch()
 
 ### Community 60 - "Community 60"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 61 - "Community 61"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 62 - "Community 62"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 63 - "Community 63"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 64 - "Community 64"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 65 - "Community 65"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 68 - "Community 68"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 69 - "Community 69"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 72 - "Community 72"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 73 - "Community 73"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 74 - "Community 74"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 75 - "Community 75"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 76 - "Community 76"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 77 - "Community 77"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 78 - "Community 78"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 79 - "Community 79"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 80 - "Community 80"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 81 - "Community 81"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 82 - "Community 82"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 83 - "Community 83"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 84 - "Community 84"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 85 - "Community 85"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 86 - "Community 86"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 87 - "Community 87"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 88 - "Community 88"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 89 - "Community 89"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 90 - "Community 90"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 92 - "Community 92"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 93 - "Community 93"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 94 - "Community 94"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 95 - "Community 95"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 96 - "Community 96"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 97 - "Community 97"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 98 - "Community 98"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 99 - "Community 99"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 100 - "Community 100"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 101 - "Community 101"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 102 - "Community 102"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 103 - "Community 103"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 104 - "Community 104"
 Cohesion: 1.0
@@ -729,643 +729,643 @@ Nodes (2): Auth Coupling Stays Inside Auth Layer, Supabase Auth
 
 ### Community 105 - "Community 105"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 106 - "Community 106"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 107 - "Community 107"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 108 - "Community 108"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 109 - "Community 109"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 110 - "Community 110"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 111 - "Community 111"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 112 - "Community 112"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 113 - "Community 113"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 114 - "Community 114"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 115 - "Community 115"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 116 - "Community 116"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 117 - "Community 117"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 118 - "Community 118"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 119 - "Community 119"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 120 - "Community 120"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 121 - "Community 121"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 122 - "Community 122"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 123 - "Community 123"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 124 - "Community 124"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 125 - "Community 125"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 126 - "Community 126"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 127 - "Community 127"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 128 - "Community 128"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 129 - "Community 129"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 130 - "Community 130"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 131 - "Community 131"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 132 - "Community 132"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 133 - "Community 133"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 134 - "Community 134"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 135 - "Community 135"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 136 - "Community 136"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 137 - "Community 137"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 138 - "Community 138"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 139 - "Community 139"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 140 - "Community 140"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 141 - "Community 141"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 142 - "Community 142"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 143 - "Community 143"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 144 - "Community 144"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 145 - "Community 145"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 146 - "Community 146"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 147 - "Community 147"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 148 - "Community 148"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 149 - "Community 149"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 150 - "Community 150"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 151 - "Community 151"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 152 - "Community 152"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 153 - "Community 153"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 154 - "Community 154"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 155 - "Community 155"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 156 - "Community 156"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 157 - "Community 157"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 158 - "Community 158"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 159 - "Community 159"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 160 - "Community 160"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 161 - "Community 161"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 162 - "Community 162"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 163 - "Community 163"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 164 - "Community 164"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 165 - "Community 165"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 166 - "Community 166"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 167 - "Community 167"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 168 - "Community 168"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 169 - "Community 169"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 170 - "Community 170"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 171 - "Community 171"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 172 - "Community 172"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 173 - "Community 173"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 174 - "Community 174"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 175 - "Community 175"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 176 - "Community 176"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 177 - "Community 177"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 178 - "Community 178"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 179 - "Community 179"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 180 - "Community 180"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 181 - "Community 181"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 182 - "Community 182"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 183 - "Community 183"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 184 - "Community 184"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 185 - "Community 185"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 186 - "Community 186"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 187 - "Community 187"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 188 - "Community 188"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 189 - "Community 189"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 190 - "Community 190"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 191 - "Community 191"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 192 - "Community 192"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 193 - "Community 193"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 194 - "Community 194"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 195 - "Community 195"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 196 - "Community 196"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 197 - "Community 197"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 198 - "Community 198"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 199 - "Community 199"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 200 - "Community 200"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 201 - "Community 201"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 202 - "Community 202"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 203 - "Community 203"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 204 - "Community 204"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 205 - "Community 205"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 206 - "Community 206"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 207 - "Community 207"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 208 - "Community 208"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 209 - "Community 209"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 210 - "Community 210"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 211 - "Community 211"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 212 - "Community 212"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 213 - "Community 213"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 214 - "Community 214"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 215 - "Community 215"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 216 - "Community 216"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 217 - "Community 217"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 218 - "Community 218"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 219 - "Community 219"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 220 - "Community 220"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 221 - "Community 221"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 222 - "Community 222"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 223 - "Community 223"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 224 - "Community 224"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 225 - "Community 225"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 226 - "Community 226"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 227 - "Community 227"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 228 - "Community 228"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 229 - "Community 229"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 230 - "Community 230"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 231 - "Community 231"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 232 - "Community 232"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 233 - "Community 233"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 234 - "Community 234"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 235 - "Community 235"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 236 - "Community 236"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 237 - "Community 237"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 238 - "Community 238"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 239 - "Community 239"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 240 - "Community 240"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 241 - "Community 241"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 242 - "Community 242"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 243 - "Community 243"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 244 - "Community 244"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 245 - "Community 245"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 246 - "Community 246"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 247 - "Community 247"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 248 - "Community 248"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 249 - "Community 249"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 250 - "Community 250"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 251 - "Community 251"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 252 - "Community 252"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 253 - "Community 253"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 254 - "Community 254"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 255 - "Community 255"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 256 - "Community 256"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 257 - "Community 257"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 258 - "Community 258"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 259 - "Community 259"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 260 - "Community 260"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 261 - "Community 261"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 262 - "Community 262"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 263 - "Community 263"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ### Community 264 - "Community 264"
 Cohesion: 1.0
-Nodes (0):
+Nodes (0): 
 
 ## Knowledge Gaps
 - **21 isolated node(s):** `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow`, `Layer Boundaries Clarify Ownership`, `Supabase Auth` (+16 more)
@@ -1784,17 +1784,17 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TanStack React Query` connect `Community 2` to `Community 8`, `Community 10`, `Community 11`, `Community 12`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
-- **Why does `useEditorialPaperTheme()` connect `Community 0` to `Community 2`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Are the 16 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `AuthSocialRow()` and `AuthField()`) actually correct?**
-  _`useEditorialPaperTheme()` has 16 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `TanStack React Query` connect `Community 0` to `Community 8`, `Community 10`, `Community 3`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+- **Why does `useEditorialPaperTheme()` connect `Community 1` to `Community 0`, `Community 24`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Are the 17 inferred relationships involving `useEditorialPaperTheme()` (e.g. with `AuthSocialRow()` and `AuthField()`) actually correct?**
+  _`useEditorialPaperTheme()` has 17 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `One-Way Dependency Direction`, `Legacy Template Directories`, `Mock Data Behaves Like Real Async Flow` to the rest of the system?**
   _21 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.04 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
