@@ -138,8 +138,14 @@ describe('basic subtitle overlay runtime', () => {
     });
 
     expect(stopPropagation).toHaveBeenCalledTimes(2);
-    expect(onTokenPress).toHaveBeenCalledWith(clickableToken);
-    expect(onTokenPress).toHaveBeenCalledWith(nullCoarseIdToken);
+    expect(onTokenPress).toHaveBeenCalledWith({
+      sentence: transcript.sentences[0],
+      token: clickableToken,
+    });
+    expect(onTokenPress).toHaveBeenCalledWith({
+      sentence: transcript.sentences[0],
+      token: nullCoarseIdToken,
+    });
   });
 
   it('highlights the current token without changing non-current token styles', () => {
@@ -202,7 +208,10 @@ describe('basic subtitle overlay runtime', () => {
     });
 
     expect(stopPropagation).toHaveBeenCalledTimes(1);
-    expect(onTokenPress).toHaveBeenCalledWith(currentNullCoarseIdToken);
+    expect(onTokenPress).toHaveBeenCalledWith({
+      sentence: transcript.sentences[0],
+      token: currentNullCoarseIdToken,
+    });
   });
 
   it('falls back to the sentence text when a current sentence has no tokens', () => {

@@ -26,6 +26,8 @@ describe('basic subtitle overlay source', () => {
     expect(source).toContain('currentSentenceValue.explanation');
     expect(source).toContain('pointerEvents="box-none"');
     expect(source).toContain('onTokenPress');
+    expect(source).toContain('sentence: currentSentenceValue');
+    expect(source).toContain('token');
     expect(source).toContain('event.stopPropagation?.()');
     expect(source).not.toContain('token.semanticElement.coarseId !== null');
     expect(source).not.toContain("fontWeight: isActive");

@@ -16,6 +16,8 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('RowSurfaceStatusOverlay');
     expect(source).toContain('usePresentWordDetailDialog');
     expect(source).toContain('createWordDetailDialogDataFromTranscriptToken');
+    expect(source).toContain('sentenceAudio');
+    expect(source).toContain('videoUrl: video.videoUrl');
     expect(source).toContain('acquirePlaybackHold?: () => () => void');
     expect(source).toContain('const releasePlaybackHold = acquirePlaybackHold?.();');
     expect(source).toContain('const didPresentWordDetailDialog = presentWordDetailDialog(payload, {');

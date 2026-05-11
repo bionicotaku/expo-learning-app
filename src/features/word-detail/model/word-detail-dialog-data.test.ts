@@ -25,7 +25,6 @@ describe('word detail dialog data', () => {
     expect(createWordDetailDialogDataFromTranscriptToken(createToken(108404))).toEqual({
       title: 'Making',
       subtitle: 'make',
-      showLearningFeedbackActions: true,
       sections: [
         {
           id: 'context',
@@ -41,11 +40,40 @@ describe('word detail dialog data', () => {
     });
   });
 
-  it('does not show learning feedback actions when the token has no coarse id', () => {
+  it('does not expose learning feedback UI state when the token has no coarse id', () => {
     expect(createWordDetailDialogDataFromTranscriptToken(createToken(null))).toEqual({
       title: 'Making',
       subtitle: 'make',
-      showLearningFeedbackActions: false,
+      sections: [
+        {
+          id: 'context',
+          title: '上下文释义',
+          body: '上下文里的 make 表示制作。',
+        },
+        {
+          id: 'dictionary',
+          title: '字典释义',
+          body: '制作；做；使成为。',
+        },
+      ],
+    });
+  });
+
+  it('keeps optional sentence audio metadata when provided by the caller', () => {
+    expect(
+      createWordDetailDialogDataFromTranscriptToken(createToken(108404), {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      })
+    ).toEqual({
+      title: 'Making',
+      subtitle: 'make',
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
       sections: [
         {
           id: 'context',

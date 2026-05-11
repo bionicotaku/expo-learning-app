@@ -1,7 +1,11 @@
 import { memo, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Text, View, type GestureResponderEvent } from 'react-native';
 
-import type { Transcript, TranscriptToken } from '@/entities/transcript';
+import type {
+  Transcript,
+  TranscriptSentence,
+  TranscriptToken,
+} from '@/entities/transcript';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { resolveCurrentTranscriptSentence } from '../model/current-transcript-sentence';
 import { resolveCurrentTranscriptToken } from '../model/current-transcript-token';
@@ -12,9 +16,14 @@ import { getTranscriptTokenTrailingText } from '../model/transcript-token-displa
 type BasicSubtitleOverlayProps = {
   displayMode: SubtitleDisplayMode;
   maxTextWidth: number;
-  onTokenPress?: (token: TranscriptToken) => void;
+  onTokenPress?: (payload: BasicSubtitleTokenPressPayload) => void;
   seekBarStore: RowPlaybackSeekBarStore;
   transcript: Transcript;
+};
+
+export type BasicSubtitleTokenPressPayload = {
+  sentence: TranscriptSentence;
+  token: TranscriptToken;
 };
 
 const activeSubtitleTokenStyle = {
@@ -75,7 +84,15 @@ function BasicSubtitleOverlayComponent({
 
   const handleTokenPress = (token: TranscriptToken, event: GestureResponderEvent) => {
     event.stopPropagation?.();
-    onTokenPress?.(token);
+
+    if (currentSentenceValue === null) {
+      return;
+    }
+
+    onTokenPress?.({
+      sentence: currentSentenceValue,
+      token,
+    });
   };
   const canPressToken = !!onTokenPress;
   const tokenDisplayParts = useMemo(() => {

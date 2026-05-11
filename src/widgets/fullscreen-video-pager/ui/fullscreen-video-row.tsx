@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import type { Transcript, TranscriptToken } from '@/entities/transcript';
+import type { Transcript } from '@/entities/transcript';
 import type { VideoListItem } from '@/entities/video';
 import type { VideoMeta } from '@/entities/video-meta';
 import {
@@ -38,6 +38,7 @@ import { RowPlaybackInteractionLayer } from './row-playback-interaction-layer';
 import { RowPlaybackMediaLayer } from './row-playback-media-layer';
 import { RowOwnedVideoOverlay } from './row-owned-video-overlay';
 import { RowSurfaceStatusOverlay } from './row-surface-status-overlay';
+import type { BasicSubtitleTokenPressPayload } from './basic-subtitle-overlay';
 
 type FullscreenVideoRowProps = {
   accessibilityLabel: string;
@@ -207,8 +208,16 @@ function FullscreenVideoRowComponent({
     },
     [activeVisitToken, onProgressSnapshotForTelemetry, video.videoId]
   );
-  const handleSubtitleTokenPress = useCallback((token: TranscriptToken) => {
-    const payload = createWordDetailDialogDataFromTranscriptToken(token);
+  const handleSubtitleTokenPress = useCallback(({
+    sentence,
+    token,
+  }: BasicSubtitleTokenPressPayload) => {
+    const sentenceAudio = {
+      endMs: sentence.end,
+      startMs: sentence.start,
+      videoUrl: video.videoUrl,
+    };
+    const payload = createWordDetailDialogDataFromTranscriptToken(token, sentenceAudio);
     const releasePlaybackHold = acquirePlaybackHold?.();
 
     try {
@@ -223,7 +232,7 @@ function FullscreenVideoRowComponent({
       releasePlaybackHold?.();
       throw error;
     }
-  }, [acquirePlaybackHold, presentWordDetailDialog]);
+  }, [acquirePlaybackHold, presentWordDetailDialog, video.videoUrl]);
 
   return (
     <View

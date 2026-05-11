@@ -2,13 +2,16 @@ import { memo } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
-import type { Transcript, TranscriptToken } from '@/entities/transcript';
+import type { Transcript } from '@/entities/transcript';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import type { FullscreenVideoOverlayActionItem } from '../model/overlay-data';
 import type { ExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { fullscreenVideoOverlayTheme } from '../model/fullscreen-video-overlay-theme';
 import type { RowPlaybackSeekBarStore } from '../model/row-playback-seek-bar-store';
-import { BasicSubtitleOverlay } from './basic-subtitle-overlay';
+import {
+  BasicSubtitleOverlay,
+  type BasicSubtitleTokenPressPayload,
+} from './basic-subtitle-overlay';
 import {
   ExpandableOverlayDescription,
   ExpandableOverlayDescriptionAction,
@@ -45,7 +48,7 @@ type RowOwnedVideoOverlayProps = {
   likeCount: number;
   measurementCache: ExpandableOverlayDescriptionMeasurementCache;
   onActionPress?: (item: FullscreenVideoOverlayActionItem) => void;
-  onSubtitleTokenPress?: (token: TranscriptToken) => void;
+  onSubtitleTokenPress?: (payload: BasicSubtitleTokenPressPayload) => void;
   seekBarStore: RowPlaybackSeekBarStore;
   subtitleDisplayMode: SubtitleDisplayMode;
   title: string;

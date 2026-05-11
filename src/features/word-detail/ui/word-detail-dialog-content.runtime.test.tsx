@@ -1,11 +1,25 @@
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   WordDetailDialogContent,
   type WordDetailDialogData,
 } from './word-detail-dialog-content';
+
+const mocks = vi.hoisted(() => ({
+  playerPlay: vi.fn(),
+  playerPause: vi.fn(),
+  toastShow: vi.fn(),
+  useEventListener: vi.fn(),
+  useEventStatus: 'readyToPlay',
+  useVideoPlayer: vi.fn(),
+}));
+
+const playerPlay = mocks.playerPlay;
+const playerPause = mocks.playerPause;
+const toastShow = mocks.toastShow;
+const useVideoPlayerMock = mocks.useVideoPlayer;
 
 vi.mock('react-native', async () => {
   const ReactModule = await import('react');
@@ -32,6 +46,33 @@ vi.mock('react-native', async () => {
     View: createHostComponent('View'),
   };
 });
+
+vi.mock('expo', () => ({
+  useEvent: () => ({
+    status: mocks.useEventStatus,
+    error: undefined,
+  }),
+  useEventListener: mocks.useEventListener,
+}));
+
+vi.mock('expo-symbols', async () => {
+  const ReactModule = await import('react');
+
+  return {
+    SymbolView: ({ fallback, ...props }: any) =>
+      ReactModule.createElement('SymbolView', props, fallback),
+  };
+});
+
+vi.mock('expo-video', () => ({
+  useVideoPlayer: (...args: unknown[]) => useVideoPlayerMock(...args),
+}));
+
+vi.mock('@/shared/lib/toast', () => ({
+  toast: {
+    show: mocks.toastShow,
+  },
+}));
 
 vi.mock('@/shared/theme/editorial-paper', () => ({
   useEditorialPaperTheme: () => ({
@@ -99,28 +140,205 @@ function findTextNodes(renderer: TestRenderer.ReactTestRenderer, text: string) {
     .filter((node) => node.props.children === text);
 }
 
+function findSentenceAudioButtons(renderer: TestRenderer.ReactTestRenderer) {
+  return renderer.root
+    .findAllByProps({ accessibilityLabel: '播放本句音频' })
+    .filter((node) => String(node.type) === 'Pressable');
+}
+
+function findFavoriteButtons(renderer: TestRenderer.ReactTestRenderer) {
+  return renderer.root
+    .findAll(
+      (node) =>
+        String(node.type) === 'Pressable' &&
+        (node.props.accessibilityLabel === '收藏单词' ||
+          node.props.accessibilityLabel === '取消收藏单词')
+    );
+}
+
 describe('WordDetailDialogContent runtime', () => {
-  it('does not render learning feedback buttons by default', () => {
+  beforeEach(() => {
+    playerPause.mockReset();
+    playerPlay.mockReset();
+    toastShow.mockReset();
+    mocks.useEventListener.mockReset();
+    mocks.useEventStatus = 'readyToPlay';
+    useVideoPlayerMock.mockReset();
+  });
+
+  it('does not render learning feedback buttons', () => {
     const renderer = renderContent(basePayload);
 
     expect(findTextNodes(renderer, '认识')).toHaveLength(0);
     expect(findTextNodes(renderer, '模糊')).toHaveLength(0);
     expect(findTextNodes(renderer, '不认识')).toHaveLength(0);
+    expect(findSentenceAudioButtons(renderer)).toHaveLength(0);
   });
 
-  it('renders disabled learning feedback buttons when requested', () => {
-    const renderer = renderContent({
-      ...basePayload,
-      showLearningFeedbackActions: true,
+  it('toggles the local favorite button color state only', () => {
+    const renderer = renderContent(basePayload);
+    const [button] = findFavoriteButtons(renderer);
+
+    expect(button?.props.accessibilityLabel).toBe('收藏单词');
+    expect(button?.props.accessibilityState).toEqual({ selected: false });
+
+    act(() => {
+      button!.props.onPress();
     });
 
-    expect(findTextNodes(renderer, '认识')).toHaveLength(1);
-    expect(findTextNodes(renderer, '模糊')).toHaveLength(1);
-    expect(findTextNodes(renderer, '不认识')).toHaveLength(1);
-    expect(
-      renderer.root
-        .findAllByProps({ accessibilityRole: 'button' })
-        .every((node) => node.props.disabled === true)
-    ).toBe(true);
+    const [selectedButton] = findFavoriteButtons(renderer);
+    expect(selectedButton?.props.accessibilityLabel).toBe('取消收藏单词');
+    expect(selectedButton?.props.accessibilityState).toEqual({ selected: true });
+    expect(toastShow).not.toHaveBeenCalled();
+  });
+
+  it('renders an optional sentence audio button beside the subtitle', () => {
+    const renderer = renderContent({
+      ...basePayload,
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
+    });
+
+    expect(findTextNodes(renderer, 'make')).toHaveLength(1);
+    expect(findSentenceAudioButtons(renderer)).toHaveLength(1);
+  });
+
+  it('reuses one headless player and restarts from the sentence start on repeated presses', () => {
+    const player = {
+      currentTime: 0,
+      pause: playerPause,
+      play: playerPlay,
+      status: 'readyToPlay',
+      timeUpdateEventInterval: 0,
+    };
+    useVideoPlayerMock.mockReturnValue(player);
+    const renderer = renderContent({
+      ...basePayload,
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
+    });
+    const [button] = findSentenceAudioButtons(renderer);
+
+    act(() => {
+      button!.props.onPress();
+    });
+    act(() => {
+      button!.props.onPress();
+    });
+
+    expect(useVideoPlayerMock).toHaveBeenCalledWith(
+      {
+        contentType: 'hls',
+        uri: 'https://example.com/video.m3u8',
+      },
+      expect.any(Function)
+    );
+    expect(findSentenceAudioButtons(renderer)).toHaveLength(1);
+    expect(player.currentTime).toBe(1.2);
+    expect(playerPlay).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows an audio load failure toast once for an errored play request', () => {
+    mocks.useEventStatus = 'error';
+    const player = {
+      currentTime: 0,
+      pause: playerPause,
+      play: playerPlay,
+      status: 'error',
+      timeUpdateEventInterval: 0,
+    };
+    useVideoPlayerMock.mockReturnValue(player);
+    const payload: WordDetailDialogData = {
+      ...basePayload,
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
+    };
+    const renderer = renderContent(payload);
+    const [button] = findSentenceAudioButtons(renderer);
+
+    act(() => {
+      button!.props.onPress();
+    });
+    act(() => {
+      renderer.update(<WordDetailDialogContent payload={payload} />);
+    });
+
+    expect(toastShow).toHaveBeenCalledTimes(1);
+    expect(toastShow).toHaveBeenCalledWith({
+      kind: 'error',
+      title: '音频加载失败',
+    });
+  });
+
+  it('shows an audio load failure toast when playback throws', () => {
+    const player = {
+      currentTime: 0,
+      pause: playerPause,
+      play: playerPlay.mockImplementation(() => {
+        throw new Error('play failed');
+      }),
+      status: 'readyToPlay',
+      timeUpdateEventInterval: 0,
+    };
+    useVideoPlayerMock.mockReturnValue(player);
+    const renderer = renderContent({
+      ...basePayload,
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
+    });
+    const [button] = findSentenceAudioButtons(renderer);
+
+    act(() => {
+      button!.props.onPress();
+    });
+
+    expect(toastShow).toHaveBeenCalledTimes(1);
+    expect(toastShow).toHaveBeenCalledWith({
+      kind: 'error',
+      title: '音频加载失败',
+    });
+  });
+
+  it('does not call the headless player after unmounting the sentence audio component', () => {
+    const player = {
+      currentTime: 0,
+      pause: playerPause,
+      play: playerPlay,
+      status: 'readyToPlay',
+      timeUpdateEventInterval: 0,
+    };
+    useVideoPlayerMock.mockReturnValue(player);
+    const renderer = renderContent({
+      ...basePayload,
+      sentenceAudio: {
+        endMs: 2400,
+        startMs: 1200,
+        videoUrl: 'https://example.com/video.m3u8',
+      },
+    });
+    const [button] = findSentenceAudioButtons(renderer);
+
+    act(() => {
+      button!.props.onPress();
+    });
+    playerPause.mockClear();
+
+    act(() => {
+      renderer.unmount();
+    });
+
+    expect(playerPause).not.toHaveBeenCalled();
   });
 });
