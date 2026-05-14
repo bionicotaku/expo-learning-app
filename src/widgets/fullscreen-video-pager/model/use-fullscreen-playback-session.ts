@@ -46,6 +46,7 @@ const fallbackSeekDeltaSeconds = 5;
 
 type FullscreenPlaybackSessionArgs = {
   activeTranscript: Transcript | null;
+  createWatchSessionId?: () => string;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
 };
@@ -55,11 +56,22 @@ type FullscreenRowRenderState = {
   accessibilityLabel: string;
   effectivePlaybackState: ReturnType<typeof resolveEffectivePlaybackState>;
   hudState: FullscreenRowPlaybackHudState;
+  isActive: boolean;
   shouldEnableBackgroundGestures: boolean;
+  watchSessionId: string | null;
 };
+
+function createDefaultWatchSessionId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  return `watch-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 export function useFullscreenPlaybackSession({
   activeTranscript,
+  createWatchSessionId = createDefaultWatchSessionId,
   items,
   onActiveVideoChange,
 }: FullscreenPlaybackSessionArgs) {
@@ -75,6 +87,7 @@ export function useFullscreenPlaybackSession({
     new Map<string, ReturnType<typeof setTimeout>>()
   );
   const onActiveVideoChangeRef = useRef(onActiveVideoChange);
+  const createWatchSessionIdRef = useRef(createWatchSessionId);
   const activeVisitTokenRef = useRef(0);
   const activeSnapshotRef = useRef<{
     index: number | null;
@@ -84,10 +97,12 @@ export function useFullscreenPlaybackSession({
     itemId: null,
   });
   onActiveVideoChangeRef.current = onActiveVideoChange;
+  createWatchSessionIdRef.current = createWatchSessionId;
   activeTranscriptRef.current = activeTranscript;
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeVisitToken, setActiveVisitToken] = useState<number | null>(null);
+  const [watchSessionId, setWatchSessionId] = useState<string | null>(null);
   const [basePausedByUser, setBasePausedByUser] = useState(false);
   const [playbackHoldCount, setPlaybackHoldCount] = useState(0);
   const [transientHoldState, setTransientHoldState] =
@@ -282,8 +297,10 @@ export function useFullscreenPlaybackSession({
         itemId,
       };
       activeVisitTokenRef.current += 1;
+      const nextWatchSessionId = createWatchSessionIdRef.current();
       setActiveIndex(index);
       setActiveVisitToken(activeVisitTokenRef.current);
+      setWatchSessionId(nextWatchSessionId);
       onActiveVideoChangeRef.current(itemId, index);
     },
     [clearTransientFeedbackByKindForVideo]
@@ -438,7 +455,7 @@ export function useFullscreenPlaybackSession({
         itemIndex: index,
         transientHoldState,
       });
-      const isCurrentActiveItem = videoId === activeItemId;
+      const isCurrentActiveItem = index === activeIndex && videoId === activeItemId;
 
       return {
         activeVisitToken: isCurrentActiveItem ? activeVisitToken : null,
@@ -450,8 +467,10 @@ export function useFullscreenPlaybackSession({
           rowPlaybackHudStateByVideoId,
           videoId
         ),
+        isActive: isCurrentActiveItem,
         shouldEnableBackgroundGestures:
           isCurrentActiveItem && activeSurfaceState !== 'error',
+        watchSessionId: isCurrentActiveItem ? watchSessionId : null,
       };
     },
     [
@@ -464,6 +483,7 @@ export function useFullscreenPlaybackSession({
       playbackHoldCount,
       rowPlaybackHudStateByVideoId,
       transientHoldState,
+      watchSessionId,
     ]
   );
 

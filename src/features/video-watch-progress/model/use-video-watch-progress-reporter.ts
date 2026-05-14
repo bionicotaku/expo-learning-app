@@ -1,13 +1,18 @@
 import { useCallback, useMemo, useRef } from 'react';
 
 import {
+  getClientEnvironment,
+  toAnalyticsClientContext,
+  type AnalyticsClientContext,
+} from '@/shared/lib/client-environment';
+import {
   createInMemoryTelemetryQueue,
   flushTelemetryQueue as flushSharedTelemetryQueue,
   type TelemetryQueue,
   type TelemetryFlushResult,
 } from '@/shared/telemetry';
 
-import type { WatchProgressRequestBody, WatchProgressSource } from './types';
+import type { WatchProgressRequestBody, WatchProgressSurface } from './types';
 import {
   createWatchProgressTelemetryItem,
   mergeWatchProgressTelemetryPayload,
@@ -17,24 +22,24 @@ import {
 
 const defaultThrottleMs = 1_000;
 const defaultCompletedRatio = 0.9;
-const defaultWatchProgressSource: WatchProgressSource = 'web';
+const defaultWatchProgressSourceSurface: WatchProgressSurface = 'fullscreen';
 const defaultWatchProgressTelemetryQueue =
   createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
 
 type ProgressSample = {
-  activeVisitToken: number | null;
   currentTimeSeconds: number;
   durationSeconds: number;
   videoId: string;
+  watchSessionId: string | null;
 };
 
 export type UseVideoWatchProgressReporterOptions = {
-  createSessionId?: () => string;
   flushTelemetryQueue?: () => Promise<unknown>;
+  getClientContext?: () => AnalyticsClientContext;
   nowIso?: () => string;
   nowMs?: () => number;
   queue?: TelemetryQueue<WatchProgressTelemetryPayload>;
-  source?: WatchProgressSource;
+  sourceSurface?: WatchProgressSurface;
   throttleMs?: number;
 };
 
@@ -42,14 +47,6 @@ export type UseVideoWatchProgressReporterResult = {
   flush: () => Promise<unknown>;
   reportSample: (sample: ProgressSample) => void;
 };
-
-function createDefaultWatchSessionId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-
-  return `watch-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
 
 function getDefaultNowMs(): number {
   return Date.now();
@@ -63,10 +60,15 @@ function createDefaultTelemetryItemId(): string {
   return `watch-progress-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function getDefaultAnalyticsClientContext(): AnalyticsClientContext {
+  return toAnalyticsClientContext(getClientEnvironment());
+}
+
 function isValidProgressSample(sample: ProgressSample) {
   return (
     sample.videoId.length > 0 &&
-    sample.activeVisitToken !== null &&
+    sample.watchSessionId !== null &&
+    sample.watchSessionId.length > 0 &&
     Number.isFinite(sample.currentTimeSeconds) &&
     Number.isFinite(sample.durationSeconds) &&
     sample.currentTimeSeconds >= 0 &&
@@ -75,28 +77,27 @@ function isValidProgressSample(sample: ProgressSample) {
 }
 
 function createSessionKey({
-  activeVisitToken,
   videoId,
+  watchSessionId,
 }: {
-  activeVisitToken: number;
   videoId: string;
+  watchSessionId: string;
 }) {
-  return `${videoId}:${activeVisitToken}`;
+  return `${videoId}:${watchSessionId}`;
 }
 
 export function useVideoWatchProgressReporter(
   options: UseVideoWatchProgressReporterOptions = {}
 ): UseVideoWatchProgressReporterResult {
   const {
-    createSessionId = createDefaultWatchSessionId,
     flushTelemetryQueue,
+    getClientContext = getDefaultAnalyticsClientContext,
     nowIso = getDefaultNowIso,
     nowMs = getDefaultNowMs,
     queue = defaultWatchProgressTelemetryQueue,
-    source = defaultWatchProgressSource,
+    sourceSurface = defaultWatchProgressSourceSurface,
     throttleMs = defaultThrottleMs,
   } = options;
-  const sessionIdsByKeyRef = useRef(new Map<string, string>());
   const lastAcceptedAtByKeyRef = useRef(new Map<string, number>());
   const completedKeysRef = useRef(new Set<string>());
 
@@ -116,15 +117,15 @@ export function useVideoWatchProgressReporter(
         return;
       }
 
-      const activeVisitToken = sample.activeVisitToken;
-      if (activeVisitToken === null) {
+      const watchSessionId = sample.watchSessionId;
+      if (watchSessionId === null) {
         return;
       }
 
       const currentNowMs = nowMs();
       const sessionKey = createSessionKey({
-        activeVisitToken,
         videoId: sample.videoId,
+        watchSessionId,
       });
       const positionMs = Math.round(sample.currentTimeSeconds * 1_000);
       const durationMs = Math.round(sample.durationSeconds * 1_000);
@@ -143,22 +144,14 @@ export function useVideoWatchProgressReporter(
         return;
       }
 
-      let watchSessionId = sessionIdsByKeyRef.current.get(sessionKey);
-      if (!watchSessionId) {
-        watchSessionId = createSessionId();
-        sessionIdsByKeyRef.current.set(sessionKey, watchSessionId);
-      }
-
       const occurredAt = nowIso();
       const body: WatchProgressRequestBody = {
+        client_context: getClientContext(),
         duration_ms: durationMs,
         is_completed: isCompleted,
-        metadata: {
-          surface: 'fullscreen',
-        },
         occurred_at: occurredAt,
         position_ms: positionMs,
-        source,
+        source_surface: sourceSurface,
         watch_session_id: watchSessionId,
       };
 
@@ -178,7 +171,7 @@ export function useVideoWatchProgressReporter(
         void flush();
       }
     },
-    [createSessionId, flush, nowIso, nowMs, queue, source, throttleMs]
+    [flush, getClientContext, nowIso, nowMs, queue, sourceSurface, throttleMs]
   );
 
   return useMemo(

@@ -3,7 +3,6 @@ import type { FlatList as FlatListType } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
-  Platform,
   Text,
   useWindowDimensions,
   View,
@@ -15,10 +14,7 @@ import type { VideoListItem } from '@/entities/video';
 import type { VideoMeta } from '@/entities/video-meta';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
-import {
-  useVideoWatchProgressReporter,
-  type WatchProgressSource,
-} from '@/features/video-watch-progress';
+import { useVideoWatchProgressReporter } from '@/features/video-watch-progress';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
@@ -39,14 +35,6 @@ export type FullscreenVideoPagerProps = {
   videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
 };
 
-function resolveWatchProgressSource(): WatchProgressSource {
-  if (Platform.OS === 'ios' || Platform.OS === 'android') {
-    return Platform.OS;
-  }
-
-  return 'web';
-}
-
 export function FullscreenVideoPager({
   activeTranscript,
   entryIndex,
@@ -66,10 +54,7 @@ export function FullscreenVideoPager({
   );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const watchProgressSource = useMemo(() => resolveWatchProgressSource(), []);
-  const { flush, reportSample } = useVideoWatchProgressReporter({
-    source: watchProgressSource,
-  });
+  const { flush, reportSample } = useVideoWatchProgressReporter();
   const handleActiveVideoChange = useCallback(
     (itemId: string, index: number) => {
       void flush();
@@ -176,20 +161,24 @@ export function FullscreenVideoPager({
   );
 
   const handleProgressSnapshotForTelemetry = useCallback(
-    (
-      videoId: string,
-      activeVisitToken: number | null,
-      snapshot: FullscreenRowProgressSnapshot | null
-    ) => {
+    ({
+      snapshot,
+      videoId,
+      watchSessionId,
+    }: {
+      snapshot: FullscreenRowProgressSnapshot | null;
+      videoId: string;
+      watchSessionId: string | null;
+    }) => {
       if (!snapshot) {
         return;
       }
 
       reportSample({
-        activeVisitToken,
         currentTimeSeconds: snapshot.currentTimeSeconds,
         durationSeconds: snapshot.durationSeconds,
         videoId,
+        watchSessionId,
       });
     },
     [reportSample]
@@ -225,7 +214,7 @@ export function FullscreenVideoPager({
   const renderItem = useCallback(
     ({ item, index }: { item: VideoListItem; index: number }) => {
       const rowRenderState = getRowRenderState(item.videoId, index);
-      const isCurrentActiveItem = item.videoId === activeItemId;
+      const isCurrentActiveItem = rowRenderState.isActive;
 
       return (
         <FullscreenVideoRow
@@ -257,13 +246,13 @@ export function FullscreenVideoPager({
           video={item}
           videoDetailsVisible={videoDetailsVisible}
           videoMeta={videoMetaByVideoId.get(item.videoId) ?? null}
+          watchSessionId={rowRenderState.watchSessionId}
           width={width}
         />
       );
     },
     [
       activeIndex,
-      activeItemId,
       acquirePlaybackHold,
       activeTranscript,
       getRowRenderState,

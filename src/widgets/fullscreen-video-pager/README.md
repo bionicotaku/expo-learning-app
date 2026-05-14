@@ -47,6 +47,7 @@ FullscreenVideoPager
   - 持有 `activeIndex`、`activeItemId`、`basePausedByUser`、`transientHoldState`
   - 持有 session-scoped playback hold；业务 modal 可临时遮罩 active row 的 `shouldPlay`
   - 持有当前 active row 的 `activePlayerControllerRef`
+  - 持有当前 active video visit 的 `watchSessionId`
   - 持有 `videoId -> rowPlaybackHudState` 的稀疏 HUD store
   - 持有 `FlatList` viewability 的稳定 handler；active 判定读取 session refs，不让 `FlatList` 注册入口跟随 active state 换引用
   - 管理 pause / seek / rate 的生命周期与 timer
@@ -88,7 +89,7 @@ FullscreenVideoPager
   - mount-scoped `entryIndex` 初始定位与 post-load alignment
   - 注册稳定的 viewability handler，并把 active row 切换交给 playback session
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
-  - 持有 fullscreen watch-progress reporter；只接收 active row 的 progress sample
+  - 持有 fullscreen watch-progress reporter；只接收 active row 的 progress sample，并把 active visit `watchSessionId` 一起传给 reporter
   - 每 `15s` 定时 flush watch-progress queue；active video 切换、completed sample 与 pager unmount 也会触发 flush
   - 用户 pause / resume 不触发 watch-progress flush
   - 透传 row action rail 的本地动作
@@ -152,7 +153,8 @@ FullscreenVideoPager
   - row 内 player / progress / seek controller 的局部装配层
   - 持有 row-local `surfacePresentation`
   - 把真实 `progressSnapshot` 与 row-local `seekController` 写入 seek bar store
-  - active row 的 progress snapshot 同时向 pager reporter 回调一份；non-active row 不传 telemetry callback
+  - active row 的 progress snapshot 同时向 pager reporter 回调一份；callback payload 包含 `videoId / watchSessionId / snapshot`
+  - non-active row 不传 telemetry callback，也不会暴露 `watchSessionId`
   - 把 progress 的高频更新限制在 media layer 内
 - `ui/row-playback-interaction-layer.tsx`
   - row 内唯一正式 interaction owner
@@ -189,6 +191,7 @@ FullscreenVideoPager
 - 在 row 内维护 center owner，避免 pause / loading / seek 之间的布局抖动
 - 只为 active row 订阅 progress，并在 row 内局部渲染底部 seek bar
 - 只为 active row 把 progress sample 转给 `features/video-watch-progress` reporter
+- 在 active video visit 层生成 `watchSessionId`，供 watch-progress 和未来学习互动信号关联
 - 只为 active row 接收 session 层传入的 `activeTranscript`，并用 row-local progress 显示基础字幕
 - row 的 like/favorite base 值来自 session 层传入的 `videoMetaByVideoId`
 - 让 description 展开态保持 row-local UI state，不并入 page 或 runtime
@@ -210,6 +213,7 @@ FullscreenVideoPager
 - `activeIndex`
 - `activeItemId`
 - `activeVisitToken`
+- `watchSessionId`
 - `basePausedByUser`
 - `transientHoldState`
 - `playbackHoldCount`
@@ -220,6 +224,9 @@ FullscreenVideoPager
 其中：
 
 - `activeVisitToken` 是当前 active row 的访问轮次；只要真实 active video 发生切换就递增，用来让 row-local description 展开态首帧同步失效
+- `watchSessionId` 是当前 active video visit 的业务关联 ID；首次 active commit 生成，真实 active video 变化时重新生成，同一个 active video 的 pause、resume、seek、弹窗、字幕点击都不会重新生成
+- `getRowRenderState(...)` 只给当前 active row 返回 `watchSessionId`；非 active row 固定返回 `null`
+- `watchSessionId` 不属于 `features/video-watch-progress`。watch-progress 只消费它；未来 lookup、exposure、self_mark_mastered 等学习互动信号也应从 active visit 层读取同一个 ID，再由独立 feature 维护自己的 queue
 - `basePausedByUser` 是正常播/停基态
 - `transientHoldState` 是左右/中间长按期间的临时覆盖态
 - `playbackHoldCount > 0` 是业务 overlay 的临时播放遮罩；它不修改 `basePausedByUser`

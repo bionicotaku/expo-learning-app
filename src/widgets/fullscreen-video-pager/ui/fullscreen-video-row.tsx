@@ -53,11 +53,11 @@ type FullscreenVideoRowProps = {
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
-  onProgressSnapshotForTelemetry?: (
-    videoId: string,
-    activeVisitToken: number | null,
-    snapshot: FullscreenRowProgressSnapshot | null
-  ) => void;
+  onProgressSnapshotForTelemetry?: (payload: {
+    snapshot: FullscreenRowProgressSnapshot | null;
+    videoId: string;
+    watchSessionId: string | null;
+  }) => void;
   onRowUnmount: (videoId: string) => void;
   onSingleTap: () => void;
   playbackRate: number;
@@ -71,6 +71,7 @@ type FullscreenVideoRowProps = {
   video: VideoListItem;
   videoDetailsVisible: boolean;
   videoMeta: VideoMeta | null;
+  watchSessionId: string | null;
   width: number;
 };
 
@@ -100,6 +101,7 @@ function FullscreenVideoRowComponent({
   subtitleDisplayMode,
   videoMeta,
   videoDetailsVisible,
+  watchSessionId,
 }: FullscreenVideoRowProps) {
   const [surfacePresentation, setSurfacePresentation] =
     useState<FullscreenRowSurfacePresentation | null>(null);
@@ -204,9 +206,13 @@ function FullscreenVideoRowComponent({
   ]);
   const handleActiveProgressSnapshotChange = useCallback(
     (snapshot: FullscreenRowProgressSnapshot | null) => {
-      onProgressSnapshotForTelemetry?.(video.videoId, activeVisitToken, snapshot);
+      onProgressSnapshotForTelemetry?.({
+        snapshot,
+        videoId: video.videoId,
+        watchSessionId,
+      });
     },
-    [activeVisitToken, onProgressSnapshotForTelemetry, video.videoId]
+    [onProgressSnapshotForTelemetry, video.videoId, watchSessionId]
   );
   const handleSubtitleTokenPress = useCallback(({
     sentence,
@@ -349,6 +355,7 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.video.likeCount === nextProps.video.likeCount &&
     previousProps.video.favoriteCount === nextProps.video.favoriteCount &&
     previousProps.activeTranscript === nextProps.activeTranscript &&
+    previousProps.watchSessionId === nextProps.watchSessionId &&
     previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
     previousProps.onProgressSnapshotForTelemetry ===
       nextProps.onProgressSnapshotForTelemetry &&

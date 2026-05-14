@@ -9,7 +9,6 @@ export {
 } from './model/use-video-watch-progress-reporter';
 export type {
   WatchProgressRequestBody,
-  WatchProgressSource,
   WatchProgressSurface,
   WatchProgressWriteRequest,
 } from './model/types';

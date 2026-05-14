@@ -24,6 +24,9 @@ describe('fullscreen video pager source', () => {
 
     expect(source).toContain('useFullscreenPlaybackSession');
     expect(source).toContain('const { flush, reportSample } = useVideoWatchProgressReporter');
+    expect(source).not.toContain('Platform');
+    expect(source).not.toContain('WatchProgressSource');
+    expect(source).not.toContain('resolveWatchProgressSource');
     expect(source).toContain('activeTranscript,');
     expect(source).toContain('handleViewableItemsChanged');
     expect(source).toContain('acquirePlaybackHold');
@@ -42,6 +45,8 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('videoMetaByVideoId');
     expect(source).toContain('handleProgressSnapshotForTelemetry');
     expect(source).toContain('reportSample({');
+    expect(source).toContain('const isCurrentActiveItem = rowRenderState.isActive');
+    expect(source).not.toContain('const isCurrentActiveItem = item.videoId === activeItemId');
     expect(source).toContain('setInterval(() => {');
     expect(source).toContain('}, 15_000)');
     expect(source).toContain('void flush();');
@@ -55,6 +60,7 @@ describe('fullscreen video pager source', () => {
       'acquirePlaybackHold={isCurrentActiveItem ? acquirePlaybackHold : undefined}'
     );
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
+    expect(source).toContain('watchSessionId={rowRenderState.watchSessionId}');
     expect(source).toContain(
       'onProgressSnapshotForTelemetry={\n            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined'
     );

@@ -1,16 +1,14 @@
-export type WatchProgressSource = 'android' | 'ios' | 'web';
+import type { AnalyticsClientContext } from '@/shared/lib/client-environment';
 
 export type WatchProgressSurface = 'detail' | 'feed' | 'fullscreen';
 
 export type WatchProgressRequestBody = {
+  client_context: AnalyticsClientContext;
   duration_ms: number;
   is_completed: boolean;
-  metadata?: {
-    surface: WatchProgressSurface;
-  };
   occurred_at: string;
   position_ms: number;
-  source: WatchProgressSource;
+  source_surface: WatchProgressSurface;
   watch_session_id: string;
 };
 

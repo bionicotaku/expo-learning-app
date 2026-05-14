@@ -401,10 +401,13 @@ fullscreen 右侧 action rail 当前固定消费 `effective video item`：
 当前流程固定为：
 
 1. pager 内部 viewability 识别出新的 active row
-2. pager 上报 `onActiveVideoChange(itemId, index)`
-3. session 更新 `pagerReportedActive`
-4. fullscreen resources 自动切到新的 `itemId`
-5. session 继续根据该 `index` 判断是否接近尾部，并触发 `requestMore()`
+2. playback session commit active video visit，并生成新的 `watchSessionId`
+3. pager 上报 `onActiveVideoChange(itemId, index)`
+4. session 更新 `pagerReportedActive`
+5. fullscreen resources 自动切到新的 `itemId`
+6. session 继续根据该 `index` 判断是否接近尾部，并触发 `requestMore()`
+
+`watchSessionId` 的生命周期是 active video visit：首次 active commit 生成，真实 active video 变化时重新生成；pause、resume、seek、弹窗、字幕点击不生成新 ID。它当前供 watch-progress 上报关联同一次观看 visit，未来 lookup / exposure / self_mark_mastered 等学习互动信号也应复用同一个 ID，但学习互动信号应由独立 feature 和独立 queue 维护。
 
 ### 9.3 singular route 下切到另一条视频
 

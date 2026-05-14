@@ -10,24 +10,39 @@ import {
 } from './use-video-watch-progress-reporter';
 import type { WatchProgressTelemetryPayload } from './watch-progress-telemetry';
 
+vi.mock('@/shared/lib/client-environment', () => ({
+  getClientEnvironment: vi.fn(() => ({})),
+  toAnalyticsClientContext: vi.fn(() => ({
+    app_version: null,
+    device_model: null,
+    os_version: null,
+    platform: 'unknown',
+  })),
+}));
+
 let latestReporter: UseVideoWatchProgressReporterResult | null = null;
 
 function ReporterHarness({
-  createSessionId = () => 'session-1',
   flushTelemetryQueue,
+  getClientContext = () => ({
+    app_version: '1.2.3',
+    device_model: 'iPhone16,2',
+    os_version: '18.5',
+    platform: 'ios',
+  }),
   nowMs,
   nowIso,
   queue,
 }: {
-  createSessionId?: () => string;
   flushTelemetryQueue: () => Promise<unknown>;
+  getClientContext?: () => WatchProgressTelemetryPayload['body']['client_context'];
   nowMs: () => number;
   nowIso: () => string;
   queue: TelemetryQueue<WatchProgressTelemetryPayload>;
 }) {
   latestReporter = useVideoWatchProgressReporter({
-    createSessionId,
     flushTelemetryQueue,
+    getClientContext,
     nowIso,
     nowMs,
     queue,
@@ -58,8 +73,13 @@ function InjectedIdentityHarness({
   queue: TelemetryQueue<WatchProgressTelemetryPayload>;
 }) {
   latestReporter = useVideoWatchProgressReporter({
-    createSessionId: () => 'session-1',
     flushTelemetryQueue: vi.fn(),
+    getClientContext: () => ({
+      app_version: '1.2.3',
+      device_model: 'iPhone16,2',
+      os_version: '18.5',
+      platform: 'ios',
+    }),
     nowIso: () => '2026-05-08T12:00:00.000Z',
     nowMs,
     queue,
@@ -89,10 +109,10 @@ describe('useVideoWatchProgressReporter', () => {
 
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 12.34,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
     });
 
@@ -102,12 +122,17 @@ describe('useVideoWatchProgressReporter', () => {
       payload: {
         videoId: 'video-a',
         body: {
+          client_context: {
+            app_version: '1.2.3',
+            device_model: 'iPhone16,2',
+            os_version: '18.5',
+            platform: 'ios',
+          },
           duration_ms: 100_000,
           is_completed: false,
-          metadata: { surface: 'fullscreen' },
           occurred_at: '2026-05-08T12:00:00.000Z',
           position_ms: 12_340,
-          source: expect.any(String),
+          source_surface: 'fullscreen',
           watch_session_id: 'session-1',
         },
       },
@@ -131,19 +156,19 @@ describe('useVideoWatchProgressReporter', () => {
 
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 10,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
     });
     currentNowMs = 1_500;
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 20,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
     });
 
@@ -166,16 +191,22 @@ describe('useVideoWatchProgressReporter', () => {
 
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 10,
         durationSeconds: 0,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: Number.NaN,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+      latestReporter?.reportSample({
+        currentTimeSeconds: 10,
+        durationSeconds: 100,
+        videoId: 'video-a',
+        watchSessionId: null,
       });
     });
 
@@ -199,10 +230,10 @@ describe('useVideoWatchProgressReporter', () => {
 
     await act(async () => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 91,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
     });
 
@@ -210,18 +241,63 @@ describe('useVideoWatchProgressReporter', () => {
     expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
   });
 
-  it('creates a new watch session when the active visit changes', () => {
+  it('flushes only the first completed transition for a watch session', async () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
-    const createSessionId = vi
-      .fn()
-      .mockReturnValueOnce('session-1')
-      .mockReturnValueOnce('session-2');
+    const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
     let currentNowMs = 1_000;
 
     act(() => {
       TestRenderer.create(
         <ReporterHarness
-          createSessionId={createSessionId}
+          flushTelemetryQueue={flushTelemetryQueue}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    await act(async () => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 91,
+        durationSeconds: 100,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 1_500;
+    await act(async () => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 92,
+        durationSeconds: 100,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 2_100;
+    await act(async () => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 93,
+        durationSeconds: 100,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+
+    expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      is_completed: true,
+      position_ms: 93_000,
+    });
+  });
+
+  it('keeps separate pending states for distinct watch sessions', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    let currentNowMs = 1_000;
+
+    act(() => {
+      TestRenderer.create(
+        <ReporterHarness
           flushTelemetryQueue={vi.fn()}
           nowIso={() => new Date(currentNowMs).toISOString()}
           nowMs={() => currentNowMs}
@@ -232,19 +308,19 @@ describe('useVideoWatchProgressReporter', () => {
 
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 1,
         currentTimeSeconds: 10,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-1',
       });
     });
     currentNowMs = 2_100;
     act(() => {
       latestReporter?.reportSample({
-        activeVisitToken: 2,
         currentTimeSeconds: 11,
         durationSeconds: 100,
         videoId: 'video-a',
+        watchSessionId: 'session-2',
       });
     });
 

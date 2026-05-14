@@ -54,11 +54,13 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('likeCount={likeCount}');
     expect(source).toContain('favoriteCount={favoriteCount}');
     expect(source).toContain('activeVisitToken={activeVisitToken}');
+    expect(source).toContain('watchSessionId');
     expect(source).toContain('onProgressSnapshotForTelemetry?:');
     expect(source).toContain('const handleActiveProgressSnapshotChange = useCallback(');
     expect(source).toContain(
-      'onProgressSnapshotForTelemetry?.(video.videoId, activeVisitToken, snapshot);'
+      'onProgressSnapshotForTelemetry?.({'
     );
+    expect(source).toContain('watchSessionId,');
     expect(source).toContain('onActiveProgressSnapshotChange={handleActiveProgressSnapshotChange}');
     expect(source).toContain('activeTranscript={activeTranscript}');
     expect(source).toContain('subtitleDisplayMode={subtitleDisplayMode}');
@@ -70,6 +72,7 @@ describe('fullscreen video row source', () => {
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('activeVisitToken: previousProps.activeVisitToken');
     expect(source).toContain('activeVisitToken: nextProps.activeVisitToken');
+    expect(source).toContain('previousProps.watchSessionId === nextProps.watchSessionId');
     expect(source).toContain('isActive={isActive}');
     expect(source).toContain('previousProps.videoMeta === nextProps.videoMeta');
     expect(source).toContain('previousProps.video.likeCount === nextProps.video.likeCount');

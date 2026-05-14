@@ -49,13 +49,16 @@ type SessionWithViewability = FullscreenPlaybackSession & {
 
 function SessionHarness({
   activeTranscript = null,
+  createWatchSessionId,
   onActiveVideoChange,
 }: {
   activeTranscript?: Transcript | null;
+  createWatchSessionId?: () => string;
   onActiveVideoChange: (itemId: string, index: number) => void;
 }) {
   latestSession = useFullscreenPlaybackSession({
     activeTranscript,
+    createWatchSessionId,
     items,
     onActiveVideoChange,
   }) as SessionWithViewability;
@@ -176,6 +179,57 @@ describe('useFullscreenPlaybackSession runtime', () => {
     expect(onActiveVideoChange).toHaveBeenLastCalledWith('video-b', 1);
     expect(latestSession?.activeIndex).toBe(1);
     expect(latestSession?.handleViewableItemsChanged).toBe(initialHandler);
+  });
+
+  it('creates one watch session per active video visit', () => {
+    const onActiveVideoChange = vi.fn();
+    const createWatchSessionId = vi
+      .fn()
+      .mockReturnValueOnce('watch-session-1')
+      .mockReturnValueOnce('watch-session-2');
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness
+          createWatchSessionId={createWatchSessionId}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    expect(createWatchSessionId).toHaveBeenCalledTimes(1);
+    expect(latestSession?.getRowRenderState('video-a', 0).isActive).toBe(true);
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBe(
+      'watch-session-1'
+    );
+    expect(latestSession?.getRowRenderState('video-a', 1).isActive).toBe(false);
+    expect(latestSession?.getRowRenderState('video-a', 1).watchSessionId).toBeNull();
+    expect(latestSession?.getRowRenderState('video-b', 1).watchSessionId).toBeNull();
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    expect(createWatchSessionId).toHaveBeenCalledTimes(1);
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBe(
+      'watch-session-1'
+    );
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-b', 1);
+    });
+
+    expect(createWatchSessionId).toHaveBeenCalledTimes(2);
+    expect(latestSession?.getRowRenderState('video-b', 1).isActive).toBe(true);
+    expect(latestSession?.getRowRenderState('video-b', 1).watchSessionId).toBe(
+      'watch-session-2'
+    );
+    expect(latestSession?.getRowRenderState('video-a', 0).isActive).toBe(false);
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBeNull();
   });
 
   it('uses the latest active-video callback without changing the viewability handler', () => {

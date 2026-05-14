@@ -21,14 +21,20 @@ vi.mock('../api/watch-progress-repository', () => ({
 describe('watch progress telemetry helpers', () => {
   it('creates a telemetry item with a stable dedupe key for the video session', () => {
     const item = createWatchProgressTelemetryItem({
-      body: {
-        duration_ms: 100_000,
-        is_completed: false,
-        occurred_at: '2026-05-08T12:00:00.000Z',
-        position_ms: 10_000,
-        source: 'ios',
-        watch_session_id: 'session-1',
-      },
+        body: {
+          client_context: {
+            app_version: '1.2.3',
+            device_model: 'iPhone16,2',
+            os_version: '18.5',
+            platform: 'ios',
+          },
+          duration_ms: 100_000,
+          is_completed: false,
+          occurred_at: '2026-05-08T12:00:00.000Z',
+          position_ms: 10_000,
+          source_surface: 'fullscreen',
+          watch_session_id: 'session-1',
+        },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
       videoId: 'video-a',
@@ -55,10 +61,15 @@ describe('watch progress telemetry helpers', () => {
         body: {
           duration_ms: 100_000,
           is_completed: true,
-          metadata: { surface: 'fullscreen' },
+          client_context: {
+            app_version: '1.2.3',
+            device_model: 'iPhone16,2',
+            os_version: '18.5',
+            platform: 'ios',
+          },
           occurred_at: '2026-05-08T12:00:00.000Z',
           position_ms: 91_000,
-          source: 'ios',
+          source_surface: 'fullscreen',
           watch_session_id: 'session-1',
         },
       },
@@ -69,10 +80,15 @@ describe('watch progress telemetry helpers', () => {
         body: {
           duration_ms: 100_000,
           is_completed: false,
-          metadata: { surface: 'fullscreen' },
+          client_context: {
+            app_version: '1.2.4',
+            device_model: 'iPhone16,2',
+            os_version: '18.5',
+            platform: 'ios',
+          },
           occurred_at: '2026-05-08T12:00:01.000Z',
           position_ms: 60_000,
-          source: 'ios',
+          source_surface: 'fullscreen',
           watch_session_id: 'session-1',
         },
       },
@@ -83,10 +99,15 @@ describe('watch progress telemetry helpers', () => {
       body: {
         duration_ms: 100_000,
         is_completed: true,
-        metadata: { surface: 'fullscreen' },
+        client_context: {
+          app_version: '1.2.4',
+          device_model: 'iPhone16,2',
+          os_version: '18.5',
+          platform: 'ios',
+        },
         occurred_at: '2026-05-08T12:00:01.000Z',
         position_ms: 60_000,
-        source: 'ios',
+        source_surface: 'fullscreen',
         watch_session_id: 'session-1',
       },
     });
@@ -95,14 +116,20 @@ describe('watch progress telemetry helpers', () => {
   it('sends telemetry items through the watch-progress API facade', async () => {
     reportVideoWatchProgressMock.mockResolvedValueOnce(undefined);
     const item = createWatchProgressTelemetryItem({
-      body: {
-        duration_ms: 100_000,
-        is_completed: false,
-        occurred_at: '2026-05-08T12:00:00.000Z',
-        position_ms: 10_000,
-        source: 'ios',
-        watch_session_id: 'session-1',
-      },
+        body: {
+          client_context: {
+            app_version: '1.2.3',
+            device_model: 'iPhone16,2',
+            os_version: '18.5',
+            platform: 'ios',
+          },
+          duration_ms: 100_000,
+          is_completed: false,
+          occurred_at: '2026-05-08T12:00:00.000Z',
+          position_ms: 10_000,
+          source_surface: 'fullscreen',
+          watch_session_id: 'session-1',
+        },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
       videoId: 'video-a',
