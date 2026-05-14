@@ -21,20 +21,20 @@ vi.mock('../api/watch-progress-repository', () => ({
 describe('watch progress telemetry helpers', () => {
   it('creates a telemetry item with a stable dedupe key for the video session', () => {
     const item = createWatchProgressTelemetryItem({
-        body: {
-          client_context: {
-            app_version: '1.2.3',
-            device_model: 'iPhone16,2',
-            os_version: '18.5',
-            platform: 'ios',
-          },
-          duration_ms: 100_000,
-          is_completed: false,
-          occurred_at: '2026-05-08T12:00:00.000Z',
-          position_ms: 10_000,
-          source_surface: 'fullscreen',
-          watch_session_id: 'session-1',
+      body: {
+        active_watch_ms: 5_000,
+        client_context: {
+          app_version: '1.2.3',
+          device_model: 'iPhone16,2',
+          os_version: '18.5',
+          platform: 'ios',
         },
+        is_completed: false,
+        occurred_at: '2026-05-08T12:00:00.000Z',
+        position_ms: 10_000,
+        source_surface: 'fullscreen',
+        watch_session_id: 'session-1',
+      },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
       videoId: 'video-a',
@@ -59,7 +59,7 @@ describe('watch progress telemetry helpers', () => {
       payload: {
         videoId: 'video-a',
         body: {
-          duration_ms: 100_000,
+          active_watch_ms: 20_000,
           is_completed: true,
           client_context: {
             app_version: '1.2.3',
@@ -78,7 +78,7 @@ describe('watch progress telemetry helpers', () => {
       payload: {
         videoId: 'video-a',
         body: {
-          duration_ms: 100_000,
+          active_watch_ms: 21_000,
           is_completed: false,
           client_context: {
             app_version: '1.2.4',
@@ -97,7 +97,7 @@ describe('watch progress telemetry helpers', () => {
     expect(mergeWatchProgressTelemetryPayload(current, incoming)).toEqual({
       videoId: 'video-a',
       body: {
-        duration_ms: 100_000,
+        active_watch_ms: 21_000,
         is_completed: true,
         client_context: {
           app_version: '1.2.4',
@@ -116,20 +116,20 @@ describe('watch progress telemetry helpers', () => {
   it('sends telemetry items through the watch-progress API facade', async () => {
     reportVideoWatchProgressMock.mockResolvedValueOnce(undefined);
     const item = createWatchProgressTelemetryItem({
-        body: {
-          client_context: {
-            app_version: '1.2.3',
-            device_model: 'iPhone16,2',
-            os_version: '18.5',
-            platform: 'ios',
-          },
-          duration_ms: 100_000,
-          is_completed: false,
-          occurred_at: '2026-05-08T12:00:00.000Z',
-          position_ms: 10_000,
-          source_surface: 'fullscreen',
-          watch_session_id: 'session-1',
+      body: {
+        active_watch_ms: 5_000,
+        client_context: {
+          app_version: '1.2.3',
+          device_model: 'iPhone16,2',
+          os_version: '18.5',
+          platform: 'ios',
         },
+        is_completed: false,
+        occurred_at: '2026-05-08T12:00:00.000Z',
+        position_ms: 10_000,
+        source_surface: 'fullscreen',
+        watch_session_id: 'session-1',
+      },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
       videoId: 'video-a',

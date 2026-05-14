@@ -22,6 +22,9 @@ import {
 
 const defaultThrottleMs = 1_000;
 const defaultCompletedRatio = 0.9;
+const defaultCompletedActiveWatchThresholdMs = 10_000;
+const defaultMaxActiveWatchSampleGapMs = 2_500;
+const defaultPlaybackProgressDriftRatio = 1.5;
 const defaultWatchProgressSourceSurface: WatchProgressSurface = 'fullscreen';
 const defaultWatchProgressTelemetryQueue =
   createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
@@ -29,8 +32,15 @@ const defaultWatchProgressTelemetryQueue =
 type ProgressSample = {
   currentTimeSeconds: number;
   durationSeconds: number;
+  playbackRate: number;
   videoId: string;
   watchSessionId: string | null;
+};
+
+type WatchProgressSessionStats = {
+  activeWatchMs: number;
+  lastPositionMs: number | null;
+  lastSampleAtMs: number | null;
 };
 
 export type UseVideoWatchProgressReporterOptions = {
@@ -86,6 +96,52 @@ function createSessionKey({
   return `${videoId}:${watchSessionId}`;
 }
 
+function normalizePlaybackRate(playbackRate: number): number {
+  if (!Number.isFinite(playbackRate) || playbackRate <= 0) {
+    return 1;
+  }
+
+  return playbackRate;
+}
+
+function updateWatchProgressSessionStats({
+  currentNowMs,
+  playbackRate,
+  positionMs,
+  stats,
+}: {
+  currentNowMs: number;
+  playbackRate: number;
+  positionMs: number;
+  stats: WatchProgressSessionStats;
+}): number {
+  if (stats.lastSampleAtMs === null || stats.lastPositionMs === null) {
+    stats.lastSampleAtMs = currentNowMs;
+    stats.lastPositionMs = positionMs;
+    return stats.activeWatchMs;
+  }
+
+  const elapsedMs = currentNowMs - stats.lastSampleAtMs;
+  const positionDeltaMs = positionMs - stats.lastPositionMs;
+  const maxExpectedPositionDeltaMs =
+    elapsedMs *
+    normalizePlaybackRate(playbackRate) *
+    defaultPlaybackProgressDriftRatio;
+
+  if (
+    elapsedMs > 0 &&
+    elapsedMs <= defaultMaxActiveWatchSampleGapMs &&
+    positionDeltaMs > 0 &&
+    positionDeltaMs <= maxExpectedPositionDeltaMs
+  ) {
+    stats.activeWatchMs += Math.round(elapsedMs);
+  }
+
+  stats.lastSampleAtMs = currentNowMs;
+  stats.lastPositionMs = positionMs;
+  return stats.activeWatchMs;
+}
+
 export function useVideoWatchProgressReporter(
   options: UseVideoWatchProgressReporterOptions = {}
 ): UseVideoWatchProgressReporterResult {
@@ -100,6 +156,9 @@ export function useVideoWatchProgressReporter(
   } = options;
   const lastAcceptedAtByKeyRef = useRef(new Map<string, number>());
   const completedKeysRef = useRef(new Set<string>());
+  const sessionStatsByKeyRef = useRef(
+    new Map<string, WatchProgressSessionStats>()
+  );
 
   const flush = useCallback(async (): Promise<TelemetryFlushResult | unknown> => {
     if (flushTelemetryQueue) {
@@ -132,8 +191,22 @@ export function useVideoWatchProgressReporter(
       if (!Number.isFinite(positionMs) || !Number.isFinite(durationMs) || durationMs <= 0) {
         return;
       }
+      const sessionStats = sessionStatsByKeyRef.current.get(sessionKey) ?? {
+        activeWatchMs: 0,
+        lastPositionMs: null,
+        lastSampleAtMs: null,
+      };
+      sessionStatsByKeyRef.current.set(sessionKey, sessionStats);
+      const activeWatchMs = updateWatchProgressSessionStats({
+        currentNowMs,
+        playbackRate: sample.playbackRate,
+        positionMs,
+        stats: sessionStats,
+      });
 
-      const isCompleted = positionMs / durationMs >= defaultCompletedRatio;
+      const isCompleted =
+        activeWatchMs > defaultCompletedActiveWatchThresholdMs &&
+        positionMs / durationMs >= defaultCompletedRatio;
       const isFirstCompletedSample = isCompleted && !completedKeysRef.current.has(sessionKey);
       const lastAcceptedAtMs = lastAcceptedAtByKeyRef.current.get(sessionKey);
       if (
@@ -146,8 +219,8 @@ export function useVideoWatchProgressReporter(
 
       const occurredAt = nowIso();
       const body: WatchProgressRequestBody = {
+        active_watch_ms: activeWatchMs,
         client_context: getClientContext(),
-        duration_ms: durationMs,
         is_completed: isCompleted,
         occurred_at: occurredAt,
         position_ms: positionMs,

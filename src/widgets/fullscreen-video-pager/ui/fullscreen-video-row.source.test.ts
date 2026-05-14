@@ -56,10 +56,12 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('activeVisitToken={activeVisitToken}');
     expect(source).toContain('watchSessionId');
     expect(source).toContain('onProgressSnapshotForTelemetry?:');
+    expect(source).toContain('playbackRate: number;');
     expect(source).toContain('const handleActiveProgressSnapshotChange = useCallback(');
     expect(source).toContain(
       'onProgressSnapshotForTelemetry?.({'
     );
+    expect(source).toContain('playbackRate,');
     expect(source).toContain('watchSessionId,');
     expect(source).toContain('onActiveProgressSnapshotChange={handleActiveProgressSnapshotChange}');
     expect(source).toContain('activeTranscript={activeTranscript}');

@@ -54,6 +54,7 @@ type FullscreenVideoRowProps = {
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
   onProgressSnapshotForTelemetry?: (payload: {
+    playbackRate: number;
     snapshot: FullscreenRowProgressSnapshot | null;
     videoId: string;
     watchSessionId: string | null;
@@ -207,12 +208,13 @@ function FullscreenVideoRowComponent({
   const handleActiveProgressSnapshotChange = useCallback(
     (snapshot: FullscreenRowProgressSnapshot | null) => {
       onProgressSnapshotForTelemetry?.({
+        playbackRate,
         snapshot,
         videoId: video.videoId,
         watchSessionId,
       });
     },
-    [onProgressSnapshotForTelemetry, video.videoId, watchSessionId]
+    [onProgressSnapshotForTelemetry, playbackRate, video.videoId, watchSessionId]
   );
   const handleSubtitleTokenPress = useCallback(({
     sentence,

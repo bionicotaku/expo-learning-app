@@ -3,8 +3,8 @@ import type { AnalyticsClientContext } from '@/shared/lib/client-environment';
 export type WatchProgressSurface = 'detail' | 'feed' | 'fullscreen';
 
 export type WatchProgressRequestBody = {
+  active_watch_ms: number;
   client_context: AnalyticsClientContext;
-  duration_ms: number;
   is_completed: boolean;
   occurred_at: string;
   position_ms: number;

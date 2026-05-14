@@ -45,6 +45,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('videoMetaByVideoId');
     expect(source).toContain('handleProgressSnapshotForTelemetry');
     expect(source).toContain('reportSample({');
+    expect(source).toContain('playbackRate,');
     expect(source).toContain('const isCurrentActiveItem = rowRenderState.isActive');
     expect(source).not.toContain('const isCurrentActiveItem = item.videoId === activeItemId');
     expect(source).toContain('setInterval(() => {');

@@ -163,9 +163,11 @@ export function FullscreenVideoPager({
   const handleProgressSnapshotForTelemetry = useCallback(
     ({
       snapshot,
+      playbackRate,
       videoId,
       watchSessionId,
     }: {
+      playbackRate: number;
       snapshot: FullscreenRowProgressSnapshot | null;
       videoId: string;
       watchSessionId: string | null;
@@ -177,6 +179,7 @@ export function FullscreenVideoPager({
       reportSample({
         currentTimeSeconds: snapshot.currentTimeSeconds,
         durationSeconds: snapshot.durationSeconds,
+        playbackRate,
         videoId,
         watchSessionId,
       });

@@ -8,7 +8,7 @@ import type { WatchProgressRequestBody } from '../model/types';
 
 function createBody(): WatchProgressRequestBody {
   return {
-    duration_ms: 120_000,
+    active_watch_ms: 12_000,
     is_completed: false,
     client_context: {
       app_version: '1.2.3',
@@ -38,7 +38,7 @@ describe('watch progress repository', () => {
     const body = createBody();
 
     expect(createWatchProgressRequest('video-1', body).body).toEqual({
-      duration_ms: 120_000,
+      active_watch_ms: 12_000,
       is_completed: false,
       client_context: {
         app_version: '1.2.3',

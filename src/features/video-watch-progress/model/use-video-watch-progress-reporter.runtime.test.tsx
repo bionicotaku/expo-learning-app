@@ -21,6 +21,9 @@ vi.mock('@/shared/lib/client-environment', () => ({
 }));
 
 let latestReporter: UseVideoWatchProgressReporterResult | null = null;
+type ReporterProgressSample = Parameters<
+  UseVideoWatchProgressReporterResult['reportSample']
+>[0];
 
 function ReporterHarness({
   flushTelemetryQueue,
@@ -88,6 +91,17 @@ function InjectedIdentityHarness({
   return React.createElement('InjectedIdentityHarness');
 }
 
+function reportDefaultProgressSample(overrides: Partial<ReporterProgressSample>) {
+  latestReporter?.reportSample({
+    currentTimeSeconds: 10,
+    durationSeconds: 100,
+    playbackRate: 1,
+    videoId: 'video-a',
+    watchSessionId: 'session-1',
+    ...overrides,
+  });
+}
+
 describe('useVideoWatchProgressReporter', () => {
   beforeEach(() => {
     latestReporter = null;
@@ -111,6 +125,7 @@ describe('useVideoWatchProgressReporter', () => {
       latestReporter?.reportSample({
         currentTimeSeconds: 12.34,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
@@ -128,7 +143,7 @@ describe('useVideoWatchProgressReporter', () => {
             os_version: '18.5',
             platform: 'ios',
           },
-          duration_ms: 100_000,
+          active_watch_ms: 0,
           is_completed: false,
           occurred_at: '2026-05-08T12:00:00.000Z',
           position_ms: 12_340,
@@ -137,9 +152,10 @@ describe('useVideoWatchProgressReporter', () => {
         },
       },
     });
+    expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('duration_ms');
   });
 
-  it('throttles non-completed samples within one second', () => {
+  it('updates active watch stats from throttled raw samples before accepting pending state', () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
     let currentNowMs = 1_000;
 
@@ -158,6 +174,7 @@ describe('useVideoWatchProgressReporter', () => {
       latestReporter?.reportSample({
         currentTimeSeconds: 10,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
@@ -165,14 +182,191 @@ describe('useVideoWatchProgressReporter', () => {
     currentNowMs = 1_500;
     act(() => {
       latestReporter?.reportSample({
-        currentTimeSeconds: 20,
+        currentTimeSeconds: 10.5,
         durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 2_100;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 11.1,
+        durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
     });
 
-    expect(queue.getSnapshot().items[0].payload.body.position_ms).toBe(10_000);
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 1_100,
+      position_ms: 11_100,
+    });
+  });
+
+  it('does not count paused, seek, or background gaps as active watch time', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    let currentNowMs = 1_000;
+
+    act(() => {
+      TestRenderer.create(
+        <ReporterHarness
+          flushTelemetryQueue={vi.fn()}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 10,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 2_100;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 11.1,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 3_200;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 11.1,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 4_300;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 50,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 5_400;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 49,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 9_000;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 52.6,
+        durationSeconds: 100,
+        playbackRate: 1,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 1_100,
+      position_ms: 52_600,
+    });
+  });
+
+  it('counts wall-clock watch time for faster playback instead of content delta', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    let currentNowMs = 1_000;
+
+    act(() => {
+      TestRenderer.create(
+        <ReporterHarness
+          flushTelemetryQueue={vi.fn()}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 10,
+        durationSeconds: 100,
+        playbackRate: 2,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 2_100;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 12.2,
+        durationSeconds: 100,
+        playbackRate: 2,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 1_100,
+      position_ms: 12_200,
+    });
+  });
+
+  it('falls back to 1x when playback rate is invalid', () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    let currentNowMs = 1_000;
+
+    act(() => {
+      TestRenderer.create(
+        <ReporterHarness
+          flushTelemetryQueue={vi.fn()}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 10,
+        durationSeconds: 100,
+        playbackRate: Number.NaN,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+    currentNowMs = 2_100;
+    act(() => {
+      latestReporter?.reportSample({
+        currentTimeSeconds: 11.1,
+        durationSeconds: 100,
+        playbackRate: Number.NaN,
+        videoId: 'video-a',
+        watchSessionId: 'session-1',
+      });
+    });
+
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 1_100,
+      position_ms: 11_100,
+    });
   });
 
   it('ignores invalid duration and time samples', () => {
@@ -193,18 +387,21 @@ describe('useVideoWatchProgressReporter', () => {
       latestReporter?.reportSample({
         currentTimeSeconds: 10,
         durationSeconds: 0,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
       latestReporter?.reportSample({
         currentTimeSeconds: Number.NaN,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
       latestReporter?.reportSample({
         currentTimeSeconds: 10,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: null,
       });
@@ -213,31 +410,73 @@ describe('useVideoWatchProgressReporter', () => {
     expect(queue.getSnapshot().items).toEqual([]);
   });
 
-  it('immediately upserts and flushes completed samples', async () => {
+  it('does not complete when progress reaches the completed ratio before active watch exceeds ten seconds', async () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
     const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
+    let currentNowMs = 1_000;
 
     act(() => {
       TestRenderer.create(
         <ReporterHarness
           flushTelemetryQueue={flushTelemetryQueue}
-          nowIso={() => '2026-05-08T12:00:00.000Z'}
-          nowMs={() => 1_000}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
           queue={queue}
         />
       );
     });
 
     await act(async () => {
-      latestReporter?.reportSample({
-        currentTimeSeconds: 91,
-        durationSeconds: 100,
-        videoId: 'video-a',
-        watchSessionId: 'session-1',
-      });
+      reportDefaultProgressSample({ currentTimeSeconds: 90 });
+    });
+    currentNowMs = 2_100;
+    await act(async () => {
+      reportDefaultProgressSample({ currentTimeSeconds: 91.1 });
     });
 
-    expect(queue.getSnapshot().items[0].payload.body.is_completed).toBe(true);
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 1_100,
+      is_completed: false,
+      position_ms: 91_100,
+    });
+    expect(flushTelemetryQueue).not.toHaveBeenCalled();
+  });
+
+  it('immediately upserts and flushes after active watch exceeds ten seconds at the completed ratio', async () => {
+    const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
+    const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
+    let currentNowMs = 1_000;
+
+    act(() => {
+      TestRenderer.create(
+        <ReporterHarness
+          flushTelemetryQueue={flushTelemetryQueue}
+          nowIso={() => new Date(currentNowMs).toISOString()}
+          nowMs={() => currentNowMs}
+          queue={queue}
+        />
+      );
+    });
+
+    for (const [nextNowMs, currentTimeSeconds] of [
+      [1_000, 80],
+      [3_500, 82.5],
+      [6_000, 85],
+      [8_500, 87.5],
+      [11_000, 90],
+      [12_100, 91.1],
+    ] as const) {
+      currentNowMs = nextNowMs;
+      await act(async () => {
+        reportDefaultProgressSample({ currentTimeSeconds });
+      });
+    }
+
+    expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
+      active_watch_ms: 11_100,
+      is_completed: true,
+      position_ms: 91_100,
+    });
     expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
   });
 
@@ -257,31 +496,26 @@ describe('useVideoWatchProgressReporter', () => {
       );
     });
 
-    await act(async () => {
-      latestReporter?.reportSample({
-        currentTimeSeconds: 91,
-        durationSeconds: 100,
-        videoId: 'video-a',
-        watchSessionId: 'session-1',
+    for (const [nextNowMs, currentTimeSeconds] of [
+      [1_000, 80],
+      [3_500, 82.5],
+      [6_000, 85],
+      [8_500, 87.5],
+      [11_000, 90],
+      [12_100, 91.1],
+    ] as const) {
+      currentNowMs = nextNowMs;
+      await act(async () => {
+        reportDefaultProgressSample({ currentTimeSeconds });
       });
+    }
+    currentNowMs = 12_600;
+    await act(async () => {
+      reportDefaultProgressSample({ currentTimeSeconds: 92 });
     });
-    currentNowMs = 1_500;
+    currentNowMs = 13_200;
     await act(async () => {
-      latestReporter?.reportSample({
-        currentTimeSeconds: 92,
-        durationSeconds: 100,
-        videoId: 'video-a',
-        watchSessionId: 'session-1',
-      });
-    });
-    currentNowMs = 2_100;
-    await act(async () => {
-      latestReporter?.reportSample({
-        currentTimeSeconds: 93,
-        durationSeconds: 100,
-        videoId: 'video-a',
-        watchSessionId: 'session-1',
-      });
+      reportDefaultProgressSample({ currentTimeSeconds: 93 });
     });
 
     expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
@@ -310,6 +544,7 @@ describe('useVideoWatchProgressReporter', () => {
       latestReporter?.reportSample({
         currentTimeSeconds: 10,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-1',
       });
@@ -319,6 +554,7 @@ describe('useVideoWatchProgressReporter', () => {
       latestReporter?.reportSample({
         currentTimeSeconds: 11,
         durationSeconds: 100,
+        playbackRate: 1,
         videoId: 'video-a',
         watchSessionId: 'session-2',
       });
