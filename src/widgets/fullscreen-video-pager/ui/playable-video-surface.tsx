@@ -23,6 +23,7 @@ type PlayableVideoSurfaceProps = {
   onActiveProgressSnapshotChange?:
     | ((snapshot: FullscreenRowProgressSnapshot | null) => void)
     | undefined;
+  onPlaybackEnd?: (() => void) | undefined;
   onSurfacePresentationChange?:
     | ((presentation: FullscreenRowSurfacePresentation | null) => void)
     | undefined;
@@ -39,6 +40,7 @@ type PlayableVideoSurfaceProps = {
 
 function PlayableVideoSurfaceComponent({
   onActiveProgressSnapshotChange,
+  onPlaybackEnd,
   onSurfacePresentationChange,
   playbackRate,
   registerActiveController,
@@ -47,7 +49,7 @@ function PlayableVideoSurfaceComponent({
   shouldPlay,
 }: PlayableVideoSurfaceProps) {
   const player = useVideoPlayer(video.videoUrl, (instance) => {
-    instance.loop = true;
+    instance.loop = false;
     instance.muted = false;
   });
 
@@ -216,6 +218,10 @@ function PlayableVideoSurfaceComponent({
     );
   });
 
+  useEventListener(player, 'playToEnd', () => {
+    onPlaybackEnd?.();
+  });
+
   const retry = useCallback(() => {
     void player.replaceAsync(video.videoUrl);
   }, [player, video.videoUrl]);
@@ -276,6 +282,7 @@ function arePlayableVideoSurfaceComponentPropsEqual(
     previousProps.video.videoUrl === nextProps.video.videoUrl &&
     previousProps.onActiveProgressSnapshotChange ===
       nextProps.onActiveProgressSnapshotChange &&
+    previousProps.onPlaybackEnd === nextProps.onPlaybackEnd &&
     previousProps.onSurfacePresentationChange === nextProps.onSurfacePresentationChange &&
     previousProps.registerActiveController === nextProps.registerActiveController &&
     previousProps.registerSeekController === nextProps.registerSeekController

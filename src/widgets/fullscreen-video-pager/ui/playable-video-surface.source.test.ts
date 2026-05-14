@@ -14,8 +14,11 @@ describe('playable video surface source', () => {
     expect(source).toContain('registerSeekController');
     expect(source).toContain('surfaceState:');
     expect(source).toContain('onActiveProgressSnapshotChange');
+    expect(source).toContain('onPlaybackEnd');
+    expect(source).toContain('instance.loop = false;');
     expect(source).toContain('timeUpdateEventInterval = onActiveProgressSnapshotChange ? 0.1 : 0');
     expect(source).toContain("useEventListener(player, 'timeUpdate'");
+    expect(source).toContain("useEventListener(player, 'playToEnd'");
     expect(source).toContain('scheduleProgressResync');
     expect(source).toContain('const seekTo = useCallback');
     expect(source).toContain('const getCurrentTimeSeconds = useCallback');
@@ -30,6 +33,7 @@ describe('playable video surface source', () => {
     expect(source).toContain(
       'previousProps.registerActiveController === nextProps.registerActiveController'
     );
+    expect(source).toContain('previousProps.onPlaybackEnd === nextProps.onPlaybackEnd');
     expect(source).not.toContain('video-watch-progress');
     expect(source).not.toContain('shared/telemetry');
     expect(source).not.toContain('requestJson');

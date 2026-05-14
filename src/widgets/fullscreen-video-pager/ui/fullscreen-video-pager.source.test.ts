@@ -44,6 +44,10 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('activeTranscript');
     expect(source).toContain('videoMetaByVideoId');
     expect(source).toContain('handleProgressSnapshotForTelemetry');
+    expect(source).toContain('handlePlaybackEnd');
+    expect(source).toContain('resolveNextFullscreenVideoIndex');
+    expect(source).toContain('listRef.current?.scrollToIndex({');
+    expect(source).toContain('animated: true');
     expect(source).toContain('reportSample({');
     expect(source).toContain('playbackRate,');
     expect(source).toContain('const isCurrentActiveItem = rowRenderState.isActive');
@@ -62,6 +66,7 @@ describe('fullscreen video pager source', () => {
     );
     expect(source).toContain('activeVisitToken={rowRenderState.activeVisitToken}');
     expect(source).toContain('watchSessionId={rowRenderState.watchSessionId}');
+    expect(source).toContain('onPlaybackEnd={isCurrentActiveItem ? handlePlaybackEnd : undefined}');
     expect(source).toContain(
       'onProgressSnapshotForTelemetry={\n            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined'
     );

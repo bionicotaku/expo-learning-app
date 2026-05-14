@@ -92,6 +92,7 @@ FullscreenVideoPager
   - 持有 fullscreen watch-progress reporter；只接收 active row 的 progress sample，并把 active visit `watchSessionId` 和当前 `playbackRate` 一起传给 reporter
   - 每 `10s` 定时 flush watch-progress queue；active video 切换、completed sample 与 pager unmount 也会触发 flush
   - 用户 pause / resume 不触发 watch-progress flush
+  - 接收 active row 的 playback end 事件；如果当前列表中已有下一条视频，则滚动到下一条，否则保持当前 row 不动
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
   - cache 是有上限的 session-scoped 插入序缓存
@@ -289,6 +290,7 @@ type FullscreenRowPlaybackHudState = {
 - 本地持有 `VideoPlayer`
 - 同步 `shouldPlay`
 - 同步 `playbackRate`，普通播放使用全局默认倍速，左右长按临时覆盖为 `2x`
+- 播放结束时不 loop；通过 `playToEnd` 向 row/pager 上报结束事件
 - 暴露 active controller `{ seekBy, seekTo, getCurrentTimeSeconds, getDurationSeconds, surfaceState }`
 - 向 row 上报 `surfacePresentation`
 - 仅在 active row 存在 progress callback 时开启 `timeUpdate`，向 row 上报 progress snapshot
@@ -421,6 +423,14 @@ row 内 HUD 不再靠各组件各自定位，而是走固定 slot：
 3. 页面装配层用该回调打开 playback settings sheet
 4. session hook 写入 `transientHoldState`
 5. 左右区写入 `rate` HUD，row 内持续显示 `2x` HUD，直到 `hold end`
+
+### Playback end
+
+1. `PlayableVideoSurface` 设置 `player.loop = false`
+2. `playToEnd` 事件只从 active row 向上冒泡
+3. `FullscreenVideoPager` 校验事件来源仍是当前 active video
+4. 如果 `items` 中已经存在 `activeIndex + 1`，调用 `scrollToIndex({ animated: true, index: activeIndex + 1 })`
+5. 如果当前 active row 已在已加载列表底部，不自动重播，也不滚动
 
 ### Active row 切换
 

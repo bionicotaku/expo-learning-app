@@ -16,6 +16,7 @@ import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
 import { useVideoWatchProgressReporter } from '@/features/video-watch-progress';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
+import { resolveNextFullscreenVideoIndex } from '../model/auto-advance';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
 import { getFullscreenVideoLoadingState } from '../model/loading-state';
 import type { FullscreenRowProgressSnapshot } from '../model/row-progress-snapshot';
@@ -160,6 +161,21 @@ export function FullscreenVideoPager({
     [handleHoldStart, onCenterHoldStart]
   );
 
+  const handlePlaybackEnd = useCallback((videoId: string) => {
+    const nextIndex = resolveNextFullscreenVideoIndex({
+      activeIndex,
+      itemCount: items.length,
+    });
+    if (nextIndex === null || items[activeIndex ?? -1]?.videoId !== videoId) {
+      return;
+    }
+
+    listRef.current?.scrollToIndex({
+      animated: true,
+      index: nextIndex,
+    });
+  }, [activeIndex, items]);
+
   const handleProgressSnapshotForTelemetry = useCallback(
     ({
       snapshot,
@@ -233,6 +249,7 @@ export function FullscreenVideoPager({
           onDoubleTap={handleDoubleTap}
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleRowHoldStart}
+          onPlaybackEnd={isCurrentActiveItem ? handlePlaybackEnd : undefined}
           onProgressSnapshotForTelemetry={
             isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined
           }
@@ -262,6 +279,7 @@ export function FullscreenVideoPager({
       handleDoubleTap,
       handleHoldEnd,
       handleRowHoldStart,
+      handlePlaybackEnd,
       handleProgressSnapshotForTelemetry,
       handleRowUnmount,
       handleSingleTap,

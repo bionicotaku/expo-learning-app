@@ -12,9 +12,11 @@ describe('row playback media layer source', () => {
     expect(source).toContain('PlayableVideoSurface');
     expect(source).toContain('seekBarStore');
     expect(source).toContain('registerSeekController');
+    expect(source).toContain('onPlaybackEnd');
     expect(source).not.toContain('RowPlaybackProgressOverlay');
     expect(source).not.toContain('const [progressSnapshot, setProgressSnapshot]');
     expect(source).toContain('onActiveProgressSnapshotChange={isActive ? setProgressSnapshot : undefined}');
+    expect(source).toContain('onPlaybackEnd={isActive ? onPlaybackEnd : undefined}');
     expect(source).toContain('seekBarStore.setProgressSnapshot');
     expect(source).toContain('onActiveProgressSnapshotChange?.(snapshot)');
     expect(source).toContain('seekBarStore.setSeekController');

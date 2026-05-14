@@ -53,6 +53,7 @@ type FullscreenVideoRowProps = {
   onDoubleTap: (zone: FullscreenTapZone) => void;
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
+  onPlaybackEnd?: (videoId: string) => void;
   onProgressSnapshotForTelemetry?: (payload: {
     playbackRate: number;
     snapshot: FullscreenRowProgressSnapshot | null;
@@ -91,6 +92,7 @@ function FullscreenVideoRowComponent({
   onDoubleTap,
   onHoldEnd,
   onHoldStart,
+  onPlaybackEnd,
   onProgressSnapshotForTelemetry,
   onRowUnmount,
   onSingleTap,
@@ -216,6 +218,9 @@ function FullscreenVideoRowComponent({
     },
     [onProgressSnapshotForTelemetry, playbackRate, video.videoId, watchSessionId]
   );
+  const handlePlaybackEnd = useCallback(() => {
+    onPlaybackEnd?.(video.videoId);
+  }, [onPlaybackEnd, video.videoId]);
   const handleSubtitleTokenPress = useCallback(({
     sentence,
     token,
@@ -253,6 +258,7 @@ function FullscreenVideoRowComponent({
       <RowPlaybackMediaLayer
         isActive={isActive}
         onActiveProgressSnapshotChange={handleActiveProgressSnapshotChange}
+        onPlaybackEnd={handlePlaybackEnd}
         onSurfacePresentationChange={setSurfacePresentation}
         playbackRate={playbackRate}
         registerActiveController={registerActiveController}
@@ -361,6 +367,7 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
     previousProps.onProgressSnapshotForTelemetry ===
       nextProps.onProgressSnapshotForTelemetry &&
+    previousProps.onPlaybackEnd === nextProps.onPlaybackEnd &&
     previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode &&
     previousProps.videoDetailsVisible === nextProps.videoDetailsVisible
   );

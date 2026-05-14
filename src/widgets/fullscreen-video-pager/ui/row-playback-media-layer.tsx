@@ -17,6 +17,7 @@ type RowPlaybackMediaLayerProps = {
   onActiveProgressSnapshotChange?: (
     snapshot: FullscreenRowProgressSnapshot | null
   ) => void;
+  onPlaybackEnd?: (() => void) | undefined;
   onSurfacePresentationChange: (presentation: FullscreenRowSurfacePresentation | null) => void;
   playbackRate: number;
   registerActiveController?:
@@ -31,6 +32,7 @@ type RowPlaybackMediaLayerProps = {
 function RowPlaybackMediaLayerComponent({
   isActive,
   onActiveProgressSnapshotChange,
+  onPlaybackEnd,
   onSurfacePresentationChange,
   playbackRate,
   registerActiveController,
@@ -88,6 +90,7 @@ function RowPlaybackMediaLayerComponent({
       {shouldUsePlayer ? (
         <PlayableVideoSurface
           onActiveProgressSnapshotChange={isActive ? setProgressSnapshot : undefined}
+          onPlaybackEnd={isActive ? onPlaybackEnd : undefined}
           onSurfacePresentationChange={isActive ? setSurfacePresentation : undefined}
           playbackRate={playbackRate}
           registerActiveController={registerActiveController}
