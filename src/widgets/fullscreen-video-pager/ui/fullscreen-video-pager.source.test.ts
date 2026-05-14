@@ -48,7 +48,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('const isCurrentActiveItem = rowRenderState.isActive');
     expect(source).not.toContain('const isCurrentActiveItem = item.videoId === activeItemId');
     expect(source).toContain('setInterval(() => {');
-    expect(source).toContain('}, 15_000)');
+    expect(source).toContain('}, 10_000)');
     expect(source).toContain('void flush();');
     expect(source).toContain('}, [flush])');
     expect(source).not.toContain('shouldReserveSubtitleSpace');

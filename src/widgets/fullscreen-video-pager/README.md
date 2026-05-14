@@ -90,7 +90,7 @@ FullscreenVideoPager
   - 注册稳定的 viewability handler，并把 active row 切换交给 playback session
   - 通过 `onActiveVideoChange(itemId, index)` 向 session 层报告当前 active video
   - 持有 fullscreen watch-progress reporter；只接收 active row 的 progress sample，并把 active visit `watchSessionId` 一起传给 reporter
-  - 每 `15s` 定时 flush watch-progress queue；active video 切换、completed sample 与 pager unmount 也会触发 flush
+  - 每 `10s` 定时 flush watch-progress queue；active video 切换、completed sample 与 pager unmount 也会触发 flush
   - 用户 pause / resume 不触发 watch-progress flush
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局

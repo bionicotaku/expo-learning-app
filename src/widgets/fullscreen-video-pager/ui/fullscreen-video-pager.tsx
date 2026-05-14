@@ -101,7 +101,7 @@ export function FullscreenVideoPager({
   useEffect(() => {
     const interval = setInterval(() => {
       void flush();
-    }, 15_000);
+    }, 10_000);
 
     return () => {
       clearInterval(interval);
