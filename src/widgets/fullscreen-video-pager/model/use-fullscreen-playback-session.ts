@@ -47,6 +47,7 @@ const fallbackSeekDeltaSeconds = 5;
 type FullscreenPlaybackSessionArgs = {
   activeTranscript: Transcript | null;
   createWatchSessionId?: () => string;
+  isScreenFocused: boolean;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
 };
@@ -72,6 +73,7 @@ function createDefaultWatchSessionId(): string {
 export function useFullscreenPlaybackSession({
   activeTranscript,
   createWatchSessionId = createDefaultWatchSessionId,
+  isScreenFocused,
   items,
   onActiveVideoChange,
 }: FullscreenPlaybackSessionArgs) {
@@ -451,7 +453,7 @@ export function useFullscreenPlaybackSession({
         activeIndex,
         basePausedByUser,
         defaultPlaybackRate,
-        isPlaybackHeld: playbackHoldCount > 0,
+        isPlaybackHeld: playbackHoldCount > 0 || !isScreenFocused,
         itemIndex: index,
         transientHoldState,
       });
@@ -469,7 +471,7 @@ export function useFullscreenPlaybackSession({
         ),
         isActive: isCurrentActiveItem,
         shouldEnableBackgroundGestures:
-          isCurrentActiveItem && activeSurfaceState !== 'error',
+          isScreenFocused && isCurrentActiveItem && activeSurfaceState !== 'error',
         watchSessionId: isCurrentActiveItem ? watchSessionId : null,
       };
     },
@@ -480,6 +482,7 @@ export function useFullscreenPlaybackSession({
       activeSurfaceState,
       basePausedByUser,
       defaultPlaybackRate,
+      isScreenFocused,
       playbackHoldCount,
       rowPlaybackHudStateByVideoId,
       transientHoldState,

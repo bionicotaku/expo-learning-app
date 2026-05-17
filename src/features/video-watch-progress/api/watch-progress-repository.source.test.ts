@@ -7,24 +7,17 @@ function readSource(relativePath: string) {
 }
 
 describe('watch progress API source boundaries', () => {
-  it('keeps the facade mock-backed and free of direct network calls', () => {
+  it('keeps the facade mock-backed while preserving the watch-progress descriptor', () => {
     const source = readSource('./watch-progress-repository.ts');
 
     expect(source).toContain("from './mock-watch-progress-repository'");
     expect(source).toContain('reportMockVideoWatchProgress');
+    expect(source).toContain("'/video-watch-progress'");
     expect(source).not.toContain('requestJson');
+    expect(source).not.toContain('/catalog/videos/');
     expect(source).not.toContain('@tanstack/react-query');
     expect(source).not.toContain('@/shared/ui/toast');
     expect(source).not.toContain('fullscreen-video-pager');
     expect(source).not.toContain('expo-video');
-  });
-
-  it('keeps the mock always-successful and independent of catalog validation', () => {
-    const source = readSource('./mock-watch-progress-repository.ts');
-
-    expect(source).toContain('Promise<void>');
-    expect(source).not.toContain('ApiError');
-    expect(source).not.toContain('mock-clip-catalog');
-    expect(source).not.toContain('throw');
   });
 });

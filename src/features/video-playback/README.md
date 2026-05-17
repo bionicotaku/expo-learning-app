@@ -11,6 +11,7 @@
   - `basePausedByUser` 的 toggle 规则
   - active row 变化时的 pause / hold reset 规则
   - `activeIndex + basePausedByUser + transientHoldState + defaultPlaybackRate -> shouldPlay / playbackRate / gestureLock` 的派生规则
+  - 上层 fullscreen session 可把 screen unfocused 映射为 `isPlaybackHeld=true`，从而暂停 active row 但不修改 `basePausedByUser`
 
 边界约束：
 

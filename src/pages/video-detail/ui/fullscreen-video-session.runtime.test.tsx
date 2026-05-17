@@ -9,15 +9,19 @@ import type { Transcript } from '@/entities/transcript';
 import { FullscreenVideoSession } from './fullscreen-video-session';
 
 const {
+  flushWatchProgressMock,
   onLatestActiveVideoIdChangeMock,
   presentPlaybackSettingsSheetMock,
+  reportWatchProgressSampleMock,
   requestMoreMock,
   useSubtitleDisplayModeMock,
   useVideoDetailsVisibleMock,
   useFullscreenVideoResourcesMock,
 } = vi.hoisted(() => ({
+  flushWatchProgressMock: vi.fn(),
   onLatestActiveVideoIdChangeMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
+  reportWatchProgressSampleMock: vi.fn(),
   requestMoreMock: vi.fn(),
   useSubtitleDisplayModeMock: vi.fn(),
   useVideoDetailsVisibleMock: vi.fn(),
@@ -94,7 +98,21 @@ function createHandledRejectedRequest() {
 }
 
 const hoistedState = vi.hoisted(() => ({
+  isScreenFocused: true,
+  latestFocusCleanup: null as null | (() => void),
   latestFullscreenVideoPagerProps: null as React.ComponentProps<any> | null,
+}));
+
+vi.mock('expo-router', () => ({
+  useFocusEffect: (callback: () => void | (() => void)) => {
+    if (!hoistedState.isScreenFocused) {
+      hoistedState.latestFocusCleanup = null;
+      return;
+    }
+
+    hoistedState.latestFocusCleanup = callback() ?? null;
+  },
+  useIsFocused: () => hoistedState.isScreenFocused,
 }));
 
 vi.mock('@/features/fullscreen-video-resources', () => ({
@@ -105,6 +123,13 @@ vi.mock('@/features/playback-settings', () => ({
   usePresentPlaybackSettingsSheet: () => presentPlaybackSettingsSheetMock,
   useSubtitleDisplayMode: useSubtitleDisplayModeMock,
   useVideoDetailsVisible: useVideoDetailsVisibleMock,
+}));
+
+vi.mock('@/features/video-watch-progress', () => ({
+  useVideoWatchProgressReporter: () => ({
+    flush: flushWatchProgressMock,
+    reportSample: reportWatchProgressSampleMock,
+  }),
 }));
 
 vi.mock('@/widgets/fullscreen-video-pager', async () => {
@@ -122,9 +147,14 @@ vi.mock('@/widgets/fullscreen-video-pager', async () => {
 
 describe('fullscreen video session runtime', () => {
   beforeEach(() => {
+    flushWatchProgressMock.mockReset();
+    flushWatchProgressMock.mockResolvedValue(undefined);
+    hoistedState.isScreenFocused = true;
+    hoistedState.latestFocusCleanup = null;
     hoistedState.latestFullscreenVideoPagerProps = null;
     onLatestActiveVideoIdChangeMock.mockReset();
     presentPlaybackSettingsSheetMock.mockReset();
+    reportWatchProgressSampleMock.mockReset();
     requestMoreMock.mockReset();
     requestMoreMock.mockResolvedValue(undefined);
     useSubtitleDisplayModeMock.mockReset();
@@ -163,8 +193,30 @@ describe('fullscreen video session runtime', () => {
     });
     expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
       entryIndex: 1,
+      isScreenFocused: true,
       isInitialLoading: false,
       items,
+    });
+  });
+
+  it('passes the current screen focus state through to the pager', () => {
+    hoistedState.isScreenFocused = false;
+
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={1}
+          entryVideoId="video-b"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      isScreenFocused: false,
     });
   });
 
@@ -195,6 +247,154 @@ describe('fullscreen video session runtime', () => {
       items,
     });
     expect(onLatestActiveVideoIdChangeMock).toHaveBeenLastCalledWith('video-c');
+  });
+
+  it('flushes pending watch progress before applying an active video change', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-c',
+        2
+      );
+    });
+
+    expect(flushWatchProgressMock).toHaveBeenCalledTimes(1);
+    expect(flushWatchProgressMock.mock.invocationCallOrder[0]).toBeLessThan(
+      onLatestActiveVideoIdChangeMock.mock.invocationCallOrder[0]
+    );
+  });
+
+  it('flushes pending watch progress when the video screen loses focus', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFocusCleanup?.();
+    });
+
+    expect(flushWatchProgressMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('flushes pending watch progress every ten seconds while the video screen is focused', () => {
+    vi.useFakeTimers();
+
+    try {
+      act(() => {
+        TestRenderer.create(
+          <FullscreenVideoSession
+            entryIndex={0}
+            entryVideoId="video-a"
+            isInitialLoading={false}
+            items={items}
+            onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+            requestMore={requestMoreMock}
+          />
+        );
+      });
+
+      expect(flushWatchProgressMock).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+
+      expect(flushWatchProgressMock).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stops the watch progress timer after the video screen loses focus', () => {
+    vi.useFakeTimers();
+
+    try {
+      act(() => {
+        TestRenderer.create(
+          <FullscreenVideoSession
+            entryIndex={0}
+            entryVideoId="video-a"
+            isInitialLoading={false}
+            items={items}
+            onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+            requestMore={requestMoreMock}
+          />
+        );
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(flushWatchProgressMock).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        hoistedState.latestFocusCleanup?.();
+      });
+      expect(flushWatchProgressMock).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(flushWatchProgressMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('reports pager watch progress samples through the session-owned reporter', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onWatchProgressSample({
+        playbackRate: 1.25,
+        snapshot: {
+          currentTimeSeconds: 12.5,
+          durationSeconds: 20,
+        },
+        videoId: 'video-a',
+        watchSessionId: 'watch-session-1',
+      });
+    });
+
+    expect(reportWatchProgressSampleMock).toHaveBeenCalledWith({
+      currentTimeSeconds: 12.5,
+      durationSeconds: 20,
+      playbackRate: 1.25,
+      videoId: 'video-a',
+      watchSessionId: 'watch-session-1',
+    });
   });
 
   it('passes the playback settings sheet presenter to center hold gestures', () => {

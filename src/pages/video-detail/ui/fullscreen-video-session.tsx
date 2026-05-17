@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { useFocusEffect, useIsFocused } from 'expo-router';
 
 import type { VideoListItem } from '@/entities/video';
 import {
@@ -8,7 +9,11 @@ import {
 } from '@/features/playback-settings';
 import { createTailRequestGate } from '@/features/feed-source';
 import { useFullscreenVideoResources } from '@/features/fullscreen-video-resources';
-import { FullscreenVideoPager } from '@/widgets/fullscreen-video-pager';
+import { useVideoWatchProgressReporter } from '@/features/video-watch-progress';
+import {
+  FullscreenVideoPager,
+  type FullscreenWatchProgressSample,
+} from '@/widgets/fullscreen-video-pager';
 
 const trailingRequestThreshold = 3;
 
@@ -38,6 +43,8 @@ export function FullscreenVideoSession({
   const subtitleDisplayMode = useSubtitleDisplayMode();
   const videoDetailsVisible = useVideoDetailsVisible();
   const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
+  const { flush, reportSample } = useVideoWatchProgressReporter();
+  const isScreenFocused = useIsFocused();
   const [pagerReportedActive, setPagerReportedActive] =
     useState<FullscreenPagerReportedActive>(null);
   const activeResourceVideoId = pagerReportedActive?.itemId ?? entryVideoId;
@@ -49,6 +56,19 @@ export function FullscreenVideoSession({
     activeVideoId: activeResourceVideoId,
     items,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      const interval = setInterval(() => {
+        void flush();
+      }, 10_000);
+
+      return () => {
+        clearInterval(interval);
+        void flush();
+      };
+    }, [flush])
+  );
 
   const requestMoreForTail = useCallback((tailVideoId: string | null) => {
     const tailRequestGate = tailRequestGateRef.current;
@@ -70,6 +90,7 @@ export function FullscreenVideoSession({
 
   const handleActiveVideoChange = useCallback(
     (itemId: string, index: number) => {
+      void flush();
       setPagerReportedActive({
         itemId,
         index,
@@ -87,7 +108,25 @@ export function FullscreenVideoSession({
 
       requestMoreForTail(tailVideoId);
     },
-    [items, onLatestActiveVideoIdChange, requestMoreForTail]
+    [flush, items, onLatestActiveVideoIdChange, requestMoreForTail]
+  );
+
+  const handleWatchProgressSample = useCallback(
+    ({
+      playbackRate,
+      snapshot,
+      videoId,
+      watchSessionId,
+    }: FullscreenWatchProgressSample) => {
+      reportSample({
+        currentTimeSeconds: snapshot.currentTimeSeconds,
+        durationSeconds: snapshot.durationSeconds,
+        playbackRate,
+        videoId,
+        watchSessionId,
+      });
+    },
+    [reportSample]
   );
 
   return (
@@ -95,9 +134,11 @@ export function FullscreenVideoSession({
       activeTranscript={activeTranscript}
       entryIndex={entryIndex}
       isInitialLoading={isInitialLoading}
+      isScreenFocused={isScreenFocused}
       items={items}
       onActiveVideoChange={handleActiveVideoChange}
       onCenterHoldStart={presentPlaybackSettingsSheet}
+      onWatchProgressSample={handleWatchProgressSample}
       subtitleDisplayMode={subtitleDisplayMode}
       videoDetailsVisible={videoDetailsVisible}
       videoMetaByVideoId={videoMetaByVideoId}

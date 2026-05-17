@@ -27,6 +27,7 @@
 VideoDetailPage
 └── FullscreenVideoSession
     ├── useFullscreenVideoResources(...)
+    ├── useVideoWatchProgressReporter(...)
     └── FullscreenVideoPager
 ```
 
@@ -36,6 +37,10 @@ VideoDetailPage
 - 用 `pagerReportedActive ?? entryTarget` 派生 fullscreen resources 输入
 - 接收 `features/fullscreen-video-resources` 返回的 active transcript 与 video meta map，并把结果传给 `FullscreenVideoPager`
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
+- 持有 `features/video-watch-progress` reporter，并把 pager 转发的 active row progress sample 交给 reporter
+- 读取 video screen focus 状态，并把 `isScreenFocused` 传给 `FullscreenVideoPager`
+- 负责 watch-progress focused `10s` 定时 flush、active video switch flush 和 video screen blur / unfocus flush
+- 在 video screen blur / unfocus 时停止定时 flush；pager 同步暂停 active row 播放、停止 progress sample 转发并关闭背景手势
 - 当 active video 进入当前已加载序列的最后 3 条时请求下一批
 - near-tail 续接通过 `createTailRequestGate()` 区分 in-flight 与 fulfilled：失败后允许用户再次进入尾部区域手动触发，成功后同一 tail 不重复请求
 - 通过 `usePresentPlaybackSettingsSheet()` 把 fullscreen 中间长按接到播放设置 sheet
@@ -50,6 +55,8 @@ VideoDetailPage
 - page 不直接实现播放器窗口策略
 - page 不直接定义 feed repository
 - page 不直接实现 video meta 或 transcript asset query cache；这层属于 `features/fullscreen-video-resources`，由 session 组件消费
+- page 不直接持有 watch-progress reporter；这层属于 `FullscreenVideoSession`
+- page 不直接处理 video screen focus gate；这层属于 `FullscreenVideoSession`
 - page 不直接消费或渲染 transcript 内容；基础字幕展示由 session 把 active transcript 下传给 fullscreen pager/row 后完成
 - 字幕显示模式由 `features/playback-settings` 提供，session 只把当前全局 `subtitleDisplayMode` 传给 pager；关闭字幕不影响 fullscreen resources 读取
 - page 不直接定义 runtime store 结构

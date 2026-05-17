@@ -135,7 +135,6 @@ describe('useVideoWatchProgressReporter', () => {
     expect(queue.getSnapshot().items[0]).toMatchObject({
       dedupeKey: 'video.watch_progress:video-a:session-1',
       payload: {
-        videoId: 'video-a',
         body: {
           client_context: {
             app_version: '1.2.3',
@@ -144,15 +143,16 @@ describe('useVideoWatchProgressReporter', () => {
             platform: 'ios',
           },
           active_watch_ms: 0,
-          is_completed: false,
           occurred_at: '2026-05-08T12:00:00.000Z',
           position_ms: 12_340,
           source_surface: 'fullscreen',
+          video_id: 'video-a',
           watch_session_id: 'session-1',
         },
       },
     });
     expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('duration_ms');
+    expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('is_completed');
   });
 
   it('updates active watch stats from throttled raw samples before accepting pending state', () => {
@@ -410,7 +410,7 @@ describe('useVideoWatchProgressReporter', () => {
     expect(queue.getSnapshot().items).toEqual([]);
   });
 
-  it('does not complete when progress reaches the completed ratio before active watch exceeds ten seconds', async () => {
+  it('does not trigger near-completion flush before active watch exceeds ten seconds', async () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
     const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
     let currentNowMs = 1_000;
@@ -436,13 +436,14 @@ describe('useVideoWatchProgressReporter', () => {
 
     expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
       active_watch_ms: 1_100,
-      is_completed: false,
       position_ms: 91_100,
+      video_id: 'video-a',
     });
+    expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('is_completed');
     expect(flushTelemetryQueue).not.toHaveBeenCalled();
   });
 
-  it('immediately upserts and flushes after active watch exceeds ten seconds at the completed ratio', async () => {
+  it('immediately upserts and flushes after near-completion threshold is reached', async () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
     const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
     let currentNowMs = 1_000;
@@ -474,13 +475,14 @@ describe('useVideoWatchProgressReporter', () => {
 
     expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
       active_watch_ms: 11_100,
-      is_completed: true,
       position_ms: 91_100,
+      video_id: 'video-a',
     });
+    expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('is_completed');
     expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
   });
 
-  it('flushes only the first completed transition for a watch session', async () => {
+  it('flushes only the first near-completion transition for a watch session', async () => {
     const queue = createInMemoryTelemetryQueue<WatchProgressTelemetryPayload>();
     const flushTelemetryQueue = vi.fn().mockResolvedValue(undefined);
     let currentNowMs = 1_000;
@@ -520,9 +522,10 @@ describe('useVideoWatchProgressReporter', () => {
 
     expect(flushTelemetryQueue).toHaveBeenCalledTimes(1);
     expect(queue.getSnapshot().items[0].payload.body).toMatchObject({
-      is_completed: true,
       position_ms: 93_000,
+      video_id: 'video-a',
     });
+    expect(queue.getSnapshot().items[0].payload.body).not.toHaveProperty('is_completed');
   });
 
   it('keeps separate pending states for distinct watch sessions', () => {

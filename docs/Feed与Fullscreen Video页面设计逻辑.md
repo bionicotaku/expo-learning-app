@@ -128,12 +128,18 @@ VideoDetailPage
 - 派生 fullscreen resources 输入
 - 接收 pager active change
 - 收口 near-tail `requestMore()` 触发
+- 持有 fullscreen watch-progress reporter
+- 管理 video screen focus gate：focused 时启动 `10s` 定时 flush，blur / unfocus 时清理定时器并 flush
+- 把 `isScreenFocused` 传给 pager，用于暂停 active row 播放、停止 progress sample 转发和关闭背景手势
+- 管理 active video switch flush
 - 渲染 `FullscreenVideoPager`
 
 它是：
 
 - route target 与 pager active 的对齐层
 - fullscreen video resources 的正式 owner
+- fullscreen watch-progress flush lifecycle 的正式 owner
+- fullscreen video screen focus lifecycle 的正式 owner
 
 ### 4.3 `FullscreenVideoPager`
 
@@ -143,12 +149,14 @@ pager 继续承担 widget-lifetime 职责：
 - row 分页
 - viewability -> active row change
 - row / overlay / playback session 装配
+- active row watch-progress sample 转发
 
 它不再承担：
 
 - route retarget
 - page-level session reset
 - video meta / transcript asset read/cache
+- watch-progress reporter lifecycle
 
 其中：
 

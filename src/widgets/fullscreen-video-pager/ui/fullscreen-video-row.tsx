@@ -54,7 +54,7 @@ type FullscreenVideoRowProps = {
   onHoldEnd: () => void;
   onHoldStart: (zone: FullscreenHoldZone) => void;
   onPlaybackEnd?: (videoId: string) => void;
-  onProgressSnapshotForTelemetry?: (payload: {
+  onWatchProgressSample?: (payload: {
     playbackRate: number;
     snapshot: FullscreenRowProgressSnapshot | null;
     videoId: string;
@@ -93,7 +93,7 @@ function FullscreenVideoRowComponent({
   onHoldEnd,
   onHoldStart,
   onPlaybackEnd,
-  onProgressSnapshotForTelemetry,
+  onWatchProgressSample,
   onRowUnmount,
   onSingleTap,
   playbackRate,
@@ -209,14 +209,14 @@ function FullscreenVideoRowComponent({
   ]);
   const handleActiveProgressSnapshotChange = useCallback(
     (snapshot: FullscreenRowProgressSnapshot | null) => {
-      onProgressSnapshotForTelemetry?.({
+      onWatchProgressSample?.({
         playbackRate,
         snapshot,
         videoId: video.videoId,
         watchSessionId,
       });
     },
-    [onProgressSnapshotForTelemetry, playbackRate, video.videoId, watchSessionId]
+    [onWatchProgressSample, playbackRate, video.videoId, watchSessionId]
   );
   const handlePlaybackEnd = useCallback(() => {
     onPlaybackEnd?.(video.videoId);
@@ -365,8 +365,7 @@ function areFullscreenVideoRowComponentPropsEqual(
     previousProps.activeTranscript === nextProps.activeTranscript &&
     previousProps.watchSessionId === nextProps.watchSessionId &&
     previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold &&
-    previousProps.onProgressSnapshotForTelemetry ===
-      nextProps.onProgressSnapshotForTelemetry &&
+    previousProps.onWatchProgressSample === nextProps.onWatchProgressSample &&
     previousProps.onPlaybackEnd === nextProps.onPlaybackEnd &&
     previousProps.subtitleDisplayMode === nextProps.subtitleDisplayMode &&
     previousProps.videoDetailsVisible === nextProps.videoDetailsVisible

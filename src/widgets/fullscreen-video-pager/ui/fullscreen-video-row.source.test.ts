@@ -55,13 +55,14 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('favoriteCount={favoriteCount}');
     expect(source).toContain('activeVisitToken={activeVisitToken}');
     expect(source).toContain('watchSessionId');
-    expect(source).toContain('onProgressSnapshotForTelemetry?:');
+    expect(source).toContain('onWatchProgressSample?:');
     expect(source).toContain('onPlaybackEnd?: (videoId: string) => void;');
     expect(source).toContain('playbackRate: number;');
     expect(source).toContain('const handleActiveProgressSnapshotChange = useCallback(');
     expect(source).toContain(
-      'onProgressSnapshotForTelemetry?.({'
+      'onWatchProgressSample?.({'
     );
+    expect(source).not.toContain('onProgressSnapshotForTelemetry');
     expect(source).toContain('playbackRate,');
     expect(source).toContain('watchSessionId,');
     expect(source).toContain('const handlePlaybackEnd = useCallback(() => {');
@@ -90,7 +91,7 @@ describe('fullscreen video row source', () => {
     expect(source).toContain('previousProps.videoDetailsVisible === nextProps.videoDetailsVisible');
     expect(source).toContain('previousProps.acquirePlaybackHold === nextProps.acquirePlaybackHold');
     expect(source).toContain(
-      'previousProps.onProgressSnapshotForTelemetry ===\n      nextProps.onProgressSnapshotForTelemetry'
+      'previousProps.onWatchProgressSample === nextProps.onWatchProgressSample'
     );
     expect(source).toContain('previousProps.onPlaybackEnd === nextProps.onPlaybackEnd');
     expect(source).toContain('showCenteredPause={showCenteredPause}');

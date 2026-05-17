@@ -50,15 +50,18 @@ type SessionWithViewability = FullscreenPlaybackSession & {
 function SessionHarness({
   activeTranscript = null,
   createWatchSessionId,
+  isScreenFocused = true,
   onActiveVideoChange,
 }: {
   activeTranscript?: Transcript | null;
   createWatchSessionId?: () => string;
+  isScreenFocused?: boolean;
   onActiveVideoChange: (itemId: string, index: number) => void;
 }) {
   latestSession = useFullscreenPlaybackSession({
     activeTranscript,
     createWatchSessionId,
+    isScreenFocused,
     items,
     onActiveVideoChange,
   }) as SessionWithViewability;
@@ -328,6 +331,126 @@ describe('useFullscreenPlaybackSession runtime', () => {
       latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
         .shouldPlay
     ).toBe(true);
+  });
+
+  it('pauses active playback and disables gestures while the screen is unfocused without changing the watch session', () => {
+    const onActiveVideoChange = vi.fn();
+    const createWatchSessionId = vi.fn(() => 'watch-session-1');
+    let renderer: TestRenderer.ReactTestRenderer | null = null;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <SessionHarness
+          createWatchSessionId={createWatchSessionId}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(true);
+    expect(latestSession?.getRowRenderState('video-a', 0).shouldEnableBackgroundGestures).toBe(
+      true
+    );
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBe(
+      'watch-session-1'
+    );
+
+    act(() => {
+      renderer?.update(
+        <SessionHarness
+          createWatchSessionId={createWatchSessionId}
+          isScreenFocused={false}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+    expect(latestSession?.getRowRenderState('video-a', 0).shouldEnableBackgroundGestures).toBe(
+      false
+    );
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBe(
+      'watch-session-1'
+    );
+    expect(createWatchSessionId).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      renderer?.update(
+        <SessionHarness
+          createWatchSessionId={createWatchSessionId}
+          isScreenFocused
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(true);
+    expect(latestSession?.getRowRenderState('video-a', 0).watchSessionId).toBe(
+      'watch-session-1'
+    );
+    expect(createWatchSessionId).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps user-paused playback paused after screen focus is restored', () => {
+    const onActiveVideoChange = vi.fn();
+    let renderer: TestRenderer.ReactTestRenderer | null = null;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.handleSingleTap();
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      renderer?.update(
+        <SessionHarness
+          isScreenFocused={false}
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
+
+    act(() => {
+      renderer?.update(
+        <SessionHarness
+          isScreenFocused
+          onActiveVideoChange={onActiveVideoChange}
+        />
+      );
+    });
+
+    expect(
+      latestSession?.getRowRenderState('video-a', 0).effectivePlaybackState
+        .shouldPlay
+    ).toBe(false);
   });
 
   it('does not resume playback after releasing a hold when the user had paused', () => {

@@ -1,8 +1,10 @@
-import type { WatchProgressRequestBody } from '../model/types';
+import type {
+  WatchProgressRequestBody,
+  WatchProgressWriteResponse,
+} from '../model/types';
 
 export async function reportMockVideoWatchProgress(
-  _videoId: string,
   _body: WatchProgressRequestBody
-): Promise<void> {
-  return undefined;
+): Promise<WatchProgressWriteResponse> {
+  return { accepted: true };
 }

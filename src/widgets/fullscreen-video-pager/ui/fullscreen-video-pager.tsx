@@ -14,7 +14,6 @@ import type { VideoListItem } from '@/entities/video';
 import type { VideoMeta } from '@/entities/video-meta';
 import type { SubtitleDisplayMode } from '@/features/playback-settings';
 import { shouldMountPlayer, type FullscreenHoldZone } from '@/features/video-playback';
-import { useVideoWatchProgressReporter } from '@/features/video-watch-progress';
 import { createExpandableOverlayDescriptionMeasurementCache } from '../model/expandable-overlay-description';
 import { resolveNextFullscreenVideoIndex } from '../model/auto-advance';
 import { resolveInitialFullscreenPagerPosition } from '../model/initial-positioning';
@@ -24,13 +23,22 @@ import { useFullscreenPlaybackSession } from '../model/use-fullscreen-playback-s
 import { FullscreenVideoRow } from './fullscreen-video-row';
 import { TopChromeOverlay } from './top-chrome-overlay';
 
+export type FullscreenWatchProgressSample = {
+  playbackRate: number;
+  snapshot: FullscreenRowProgressSnapshot;
+  videoId: string;
+  watchSessionId: string | null;
+};
+
 export type FullscreenVideoPagerProps = {
   activeTranscript: Transcript | null;
   entryIndex: number;
   isInitialLoading: boolean;
+  isScreenFocused: boolean;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
   onCenterHoldStart?: () => void;
+  onWatchProgressSample: (sample: FullscreenWatchProgressSample) => void;
   subtitleDisplayMode: SubtitleDisplayMode;
   videoDetailsVisible: boolean;
   videoMetaByVideoId: ReadonlyMap<string, VideoMeta>;
@@ -40,9 +48,11 @@ export function FullscreenVideoPager({
   activeTranscript,
   entryIndex,
   isInitialLoading,
+  isScreenFocused,
   items,
   onActiveVideoChange,
   onCenterHoldStart,
+  onWatchProgressSample,
   subtitleDisplayMode,
   videoDetailsVisible,
   videoMetaByVideoId,
@@ -55,14 +65,6 @@ export function FullscreenVideoPager({
   );
   const mountedWithItemsRef = useRef(items.length > 0);
   const hasCompletedPostLoadAlignmentRef = useRef(false);
-  const { flush, reportSample } = useVideoWatchProgressReporter();
-  const handleActiveVideoChange = useCallback(
-    (itemId: string, index: number) => {
-      void flush();
-      onActiveVideoChange(itemId, index);
-    },
-    [flush, onActiveVideoChange]
-  );
   const loadingState = getFullscreenVideoLoadingState({
     itemCount: items.length,
     isInitialLoading,
@@ -92,23 +94,13 @@ export function FullscreenVideoPager({
     registerActiveController,
   } = useFullscreenPlaybackSession({
     activeTranscript,
+    isScreenFocused,
     items,
-    onActiveVideoChange: handleActiveVideoChange,
+    onActiveVideoChange,
   });
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      void flush();
-    }, 10_000);
-
-    return () => {
-      clearInterval(interval);
-      void flush();
-    };
-  }, [flush]);
 
   useEffect(() => {
     if (!initialPosition.shouldRunPostLoadAlignment) {
@@ -176,7 +168,7 @@ export function FullscreenVideoPager({
     });
   }, [activeIndex, items]);
 
-  const handleProgressSnapshotForTelemetry = useCallback(
+  const handleWatchProgressSample = useCallback(
     ({
       snapshot,
       playbackRate,
@@ -192,15 +184,14 @@ export function FullscreenVideoPager({
         return;
       }
 
-      reportSample({
-        currentTimeSeconds: snapshot.currentTimeSeconds,
-        durationSeconds: snapshot.durationSeconds,
+      onWatchProgressSample({
         playbackRate,
+        snapshot,
         videoId,
         watchSessionId,
       });
     },
-    [reportSample]
+    [onWatchProgressSample]
   );
 
   const renderState = useMemo(
@@ -211,6 +202,7 @@ export function FullscreenVideoPager({
       bottomInset: insets.bottom,
       getRowRenderState,
       height,
+      isScreenFocused,
       subtitleDisplayMode,
       videoDetailsVisible,
       videoMetaByVideoId,
@@ -223,6 +215,7 @@ export function FullscreenVideoPager({
       getRowRenderState,
       height,
       insets.bottom,
+      isScreenFocused,
       subtitleDisplayMode,
       videoDetailsVisible,
       videoMetaByVideoId,
@@ -250,8 +243,8 @@ export function FullscreenVideoPager({
           onHoldEnd={handleHoldEnd}
           onHoldStart={handleRowHoldStart}
           onPlaybackEnd={isCurrentActiveItem ? handlePlaybackEnd : undefined}
-          onProgressSnapshotForTelemetry={
-            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined
+          onWatchProgressSample={
+            isCurrentActiveItem && isScreenFocused ? handleWatchProgressSample : undefined
           }
           onRowUnmount={handleRowUnmount}
           onSingleTap={handleSingleTap}
@@ -280,11 +273,12 @@ export function FullscreenVideoPager({
       handleHoldEnd,
       handleRowHoldStart,
       handlePlaybackEnd,
-      handleProgressSnapshotForTelemetry,
+      handleWatchProgressSample,
       handleRowUnmount,
       handleSingleTap,
       height,
       insets.bottom,
+      isScreenFocused,
       registerActiveController,
       subtitleDisplayMode,
       videoDetailsVisible,

@@ -1,1 +1,4 @@
-export { FullscreenVideoPager } from './ui/fullscreen-video-pager';
+export {
+  FullscreenVideoPager,
+  type FullscreenWatchProgressSample,
+} from './ui/fullscreen-video-pager';

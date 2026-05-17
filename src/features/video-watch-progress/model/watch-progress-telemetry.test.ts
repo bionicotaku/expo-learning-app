@@ -29,15 +29,14 @@ describe('watch progress telemetry helpers', () => {
           os_version: '18.5',
           platform: 'ios',
         },
-        is_completed: false,
         occurred_at: '2026-05-08T12:00:00.000Z',
         position_ms: 10_000,
         source_surface: 'fullscreen',
+        video_id: 'video-a',
         watch_session_id: 'session-1',
       },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
-      videoId: 'video-a',
     });
 
     expect(item).toMatchObject({
@@ -45,22 +44,20 @@ describe('watch progress telemetry helpers', () => {
       id: 'item-1',
       kind: watchProgressTelemetryKind,
       payload: {
-        videoId: 'video-a',
         body: {
           position_ms: 10_000,
+          video_id: 'video-a',
           watch_session_id: 'session-1',
         },
       },
     });
   });
 
-  it('merges latest progress while preserving completed=true', () => {
+  it('merges latest progress without preserving client-side completion state', () => {
     const current = {
       payload: {
-        videoId: 'video-a',
         body: {
           active_watch_ms: 20_000,
-          is_completed: true,
           client_context: {
             app_version: '1.2.3',
             device_model: 'iPhone16,2',
@@ -70,16 +67,15 @@ describe('watch progress telemetry helpers', () => {
           occurred_at: '2026-05-08T12:00:00.000Z',
           position_ms: 91_000,
           source_surface: 'fullscreen',
+          video_id: 'video-a',
           watch_session_id: 'session-1',
         },
       },
     } as TelemetryQueueItem<WatchProgressTelemetryPayload>;
     const incoming = {
       payload: {
-        videoId: 'video-a',
         body: {
           active_watch_ms: 21_000,
-          is_completed: false,
           client_context: {
             app_version: '1.2.4',
             device_model: 'iPhone16,2',
@@ -89,16 +85,15 @@ describe('watch progress telemetry helpers', () => {
           occurred_at: '2026-05-08T12:00:01.000Z',
           position_ms: 60_000,
           source_surface: 'fullscreen',
+          video_id: 'video-a',
           watch_session_id: 'session-1',
         },
       },
     } as TelemetryQueueItem<WatchProgressTelemetryPayload>;
 
     expect(mergeWatchProgressTelemetryPayload(current, incoming)).toEqual({
-      videoId: 'video-a',
       body: {
         active_watch_ms: 21_000,
-        is_completed: true,
         client_context: {
           app_version: '1.2.4',
           device_model: 'iPhone16,2',
@@ -108,6 +103,7 @@ describe('watch progress telemetry helpers', () => {
         occurred_at: '2026-05-08T12:00:01.000Z',
         position_ms: 60_000,
         source_surface: 'fullscreen',
+        video_id: 'video-a',
         watch_session_id: 'session-1',
       },
     });
@@ -124,22 +120,18 @@ describe('watch progress telemetry helpers', () => {
           os_version: '18.5',
           platform: 'ios',
         },
-        is_completed: false,
         occurred_at: '2026-05-08T12:00:00.000Z',
         position_ms: 10_000,
         source_surface: 'fullscreen',
+        video_id: 'video-a',
         watch_session_id: 'session-1',
       },
       createdAt: '2026-05-08T12:00:00.000Z',
       id: 'item-1',
-      videoId: 'video-a',
     });
 
     await sendWatchProgressTelemetryItem(item);
 
-    expect(reportVideoWatchProgressMock).toHaveBeenCalledWith(
-      'video-a',
-      item.payload.body
-    );
+    expect(reportVideoWatchProgressMock).toHaveBeenCalledWith(item.payload.body);
   });
 });

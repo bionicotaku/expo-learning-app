@@ -23,7 +23,7 @@ describe('fullscreen video pager source', () => {
     );
 
     expect(source).toContain('useFullscreenPlaybackSession');
-    expect(source).toContain('const { flush, reportSample } = useVideoWatchProgressReporter');
+    expect(source).not.toContain('useVideoWatchProgressReporter');
     expect(source).not.toContain('Platform');
     expect(source).not.toContain('WatchProgressSource');
     expect(source).not.toContain('resolveWatchProgressSource');
@@ -43,19 +43,24 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('videoDetailsVisible');
     expect(source).toContain('activeTranscript');
     expect(source).toContain('videoMetaByVideoId');
-    expect(source).toContain('handleProgressSnapshotForTelemetry');
+    expect(source).toContain('isScreenFocused: boolean');
+    expect(source).toContain('isScreenFocused,');
+    expect(source).toContain('handleWatchProgressSample');
     expect(source).toContain('handlePlaybackEnd');
     expect(source).toContain('resolveNextFullscreenVideoIndex');
     expect(source).toContain('listRef.current?.scrollToIndex({');
     expect(source).toContain('animated: true');
-    expect(source).toContain('reportSample({');
+    expect(source).toContain('onWatchProgressSample({');
     expect(source).toContain('playbackRate,');
+    expect(source).toContain('if (!snapshot) {');
     expect(source).toContain('const isCurrentActiveItem = rowRenderState.isActive');
     expect(source).not.toContain('const isCurrentActiveItem = item.videoId === activeItemId');
-    expect(source).toContain('setInterval(() => {');
-    expect(source).toContain('}, 10_000)');
-    expect(source).toContain('void flush();');
-    expect(source).toContain('}, [flush])');
+    expect(source).not.toContain('handleProgressSnapshotForTelemetry');
+    expect(source).not.toContain('onProgressSnapshotForTelemetry');
+    expect(source).not.toContain('setInterval(() => {');
+    expect(source).not.toContain('}, 10_000)');
+    expect(source).not.toContain('void flush();');
+    expect(source).not.toContain('}, [flush])');
     expect(source).not.toContain('shouldReserveSubtitleSpace');
     expect(source).toContain('extraData={renderState}');
     expect(source).toContain(
@@ -68,7 +73,7 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('watchSessionId={rowRenderState.watchSessionId}');
     expect(source).toContain('onPlaybackEnd={isCurrentActiveItem ? handlePlaybackEnd : undefined}');
     expect(source).toContain(
-      'onProgressSnapshotForTelemetry={\n            isCurrentActiveItem ? handleProgressSnapshotForTelemetry : undefined'
+      'onWatchProgressSample={\n            isCurrentActiveItem && isScreenFocused ? handleWatchProgressSample : undefined'
     );
     expect(source).toContain(
       'activeTranscript={isCurrentActiveItem ? activeTranscript : null}'

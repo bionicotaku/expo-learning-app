@@ -11,4 +11,5 @@ export type {
   WatchProgressRequestBody,
   WatchProgressSurface,
   WatchProgressWriteRequest,
+  WatchProgressWriteResponse,
 } from './model/types';

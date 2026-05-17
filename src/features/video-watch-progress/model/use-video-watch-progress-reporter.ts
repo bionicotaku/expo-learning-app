@@ -155,7 +155,7 @@ export function useVideoWatchProgressReporter(
     throttleMs = defaultThrottleMs,
   } = options;
   const lastAcceptedAtByKeyRef = useRef(new Map<string, number>());
-  const completedKeysRef = useRef(new Set<string>());
+  const nearCompletionFlushKeysRef = useRef(new Set<string>());
   const sessionStatsByKeyRef = useRef(
     new Map<string, WatchProgressSessionStats>()
   );
@@ -204,13 +204,15 @@ export function useVideoWatchProgressReporter(
         stats: sessionStats,
       });
 
-      const isCompleted =
+      const shouldFlushNearCompletion =
         activeWatchMs > defaultCompletedActiveWatchThresholdMs &&
         positionMs / durationMs >= defaultCompletedRatio;
-      const isFirstCompletedSample = isCompleted && !completedKeysRef.current.has(sessionKey);
+      const isFirstNearCompletionSample =
+        shouldFlushNearCompletion &&
+        !nearCompletionFlushKeysRef.current.has(sessionKey);
       const lastAcceptedAtMs = lastAcceptedAtByKeyRef.current.get(sessionKey);
       if (
-        !isFirstCompletedSample &&
+        !isFirstNearCompletionSample &&
         lastAcceptedAtMs !== undefined &&
         currentNowMs - lastAcceptedAtMs < throttleMs
       ) {
@@ -221,10 +223,10 @@ export function useVideoWatchProgressReporter(
       const body: WatchProgressRequestBody = {
         active_watch_ms: activeWatchMs,
         client_context: getClientContext(),
-        is_completed: isCompleted,
         occurred_at: occurredAt,
         position_ms: positionMs,
         source_surface: sourceSurface,
+        video_id: sample.videoId,
         watch_session_id: watchSessionId,
       };
 
@@ -233,14 +235,13 @@ export function useVideoWatchProgressReporter(
           body,
           createdAt: occurredAt,
           id: createDefaultTelemetryItemId(),
-          videoId: sample.videoId,
         }),
         mergeWatchProgressTelemetryPayload
       );
       lastAcceptedAtByKeyRef.current.set(sessionKey, currentNowMs);
 
-      if (isFirstCompletedSample) {
-        completedKeysRef.current.add(sessionKey);
+      if (isFirstNearCompletionSample) {
+        nearCompletionFlushKeysRef.current.add(sessionKey);
         void flush();
       }
     },
