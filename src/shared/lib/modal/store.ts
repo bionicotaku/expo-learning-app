@@ -24,6 +24,7 @@ function createModalRecord(
     debugLabel: descriptor.debugLabel,
     presentation: descriptor.presentation,
     dismissOnBackdropPress: descriptor.dismissOnBackdropPress ?? true,
+    onDidDismiss: descriptor.onDidDismiss,
     render: descriptor.render,
     phase: 'entering',
     dismissReason: undefined,
@@ -136,7 +137,15 @@ export function createModalStore({
 
     remove(id) {
       if (current?.id === id) {
+        const dismissed = current;
+        const onDidDismiss = dismissed.onDidDismiss;
+        const dismissContext = {
+          id: dismissed.id,
+          reason: dismissed.dismissReason ?? 'imperative',
+        };
+
         commit(null);
+        onDidDismiss?.(dismissContext);
       }
     },
 

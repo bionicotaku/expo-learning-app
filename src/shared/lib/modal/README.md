@@ -7,6 +7,7 @@
 - 维护模块级 singleton current modal
 - 暴露 `present / dismiss / dismissTop / clear`
 - 定义 modal 的内部类型、phase 和 dismiss reason
+- 在 modal exit 动画完成并被 `remove` 时触发可选 `onDidDismiss`
 
 它不负责：
 
@@ -35,3 +36,4 @@
 - 业务层只从 `@/shared/lib/modal` 读取 `useModalController`
 - `ModalHost` 与具体视觉壳属于 `shared/ui/modal`
 - `shared/lib/modal` 不做业务 modal name registry
+- `onDidDismiss` 只表达 shared modal 生命周期完成，不承载业务结果协议

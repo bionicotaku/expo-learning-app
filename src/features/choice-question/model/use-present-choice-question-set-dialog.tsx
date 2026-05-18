@@ -24,3 +24,29 @@ export function usePresentChoiceQuestionSetDialog() {
     [modal]
   );
 }
+
+export function usePresentChoiceQuestionSetDialogAndWait() {
+  const modal = useModalController();
+
+  return useCallback(
+    (payload: ChoiceQuestionSetDialogData) =>
+      new Promise<boolean>((resolve) => {
+        const presentResult = modal.present({
+          debugLabel: 'choice-question-set',
+          dismissOnBackdropPress: false,
+          presentation: 'dialog',
+          onDidDismiss: () => {
+            resolve(true);
+          },
+          render: ({ dismiss }) => (
+            <ChoiceQuestionSetDialogContent onDismiss={dismiss} payload={payload} />
+          ),
+        });
+
+        if (!presentResult.didPresent) {
+          resolve(false);
+        }
+      }),
+    [modal]
+  );
+}

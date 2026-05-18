@@ -1,16 +1,27 @@
-import { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  type LayoutChangeEvent,
+  View,
+} from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
+import { useModalContentLayout } from '@/shared/ui/modal/modal-content-layout';
 
 import type {
   ChoiceQuestionData,
   ChoiceQuestionOption,
   ChoiceQuestionSetDialogData,
 } from '../model/types';
-import { AnimatedQuestionViewport } from './animated-question-viewport';
+import { createChoiceQuestionDisplayQuestions } from '../model/choice-question-option-randomization';
+import { ChoiceQuestionBodyViewport } from './choice-question-body-viewport';
 import {
   ChoiceQuestionBody,
+  ChoiceQuestionBodyFooter,
   ChoiceQuestionDialogChrome,
 } from './choice-question-dialog-content';
 import { QuestionContentTransition } from './question-content-transition';
@@ -49,8 +60,13 @@ export function ChoiceQuestionSetDialogContent({
   payload,
 }: ChoiceQuestionSetDialogContentProps) {
   const { tokens } = useEditorialPaperTheme();
-  const questions = payload.questions;
+  const { contentMaxHeight } = useModalContentLayout();
+  const questions = useMemo(
+    () => createChoiceQuestionDisplayQuestions(payload.questions),
+    [payload.questions]
+  );
   const questionCount = questions.length;
+  const [chromeHeight, setChromeHeight] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedCorrectOptionId, setSelectedCorrectOptionId] = useState<
     string | null
@@ -64,6 +80,10 @@ export function ChoiceQuestionSetDialogContent({
   const currentQuestion = questions[currentQuestionIndex];
   const hasAnsweredCorrectly = selectedCorrectOptionId !== null;
   const hadWrongAttempt = wrongOptionIds.length > 0;
+  const shouldShowAnswerDetailAction =
+    selectedCorrectOptionId !== null &&
+    wrongOptionIds.length > 0 &&
+    currentQuestion?.answerDetail;
   const shouldShowProgress = payload.showProgress ?? questionCount > 1;
   const progressLabel =
     shouldShowProgress && questionCount > 0
@@ -158,16 +178,27 @@ export function ChoiceQuestionSetDialogContent({
     return null;
   }
 
+  function handleChromeLayout(event: LayoutChangeEvent) {
+    const nextHeight = event.nativeEvent.layout.height;
+
+    if (nextHeight <= 0 || nextHeight === chromeHeight) {
+      return;
+    }
+
+    setChromeHeight(nextHeight);
+  }
+
   function handleOutgoingOptionSelect(_option: ChoiceQuestionOption) {
     return undefined;
   }
 
+  const bodyMaxHeight = Number.isFinite(contentMaxHeight)
+    ? Math.max(0, contentMaxHeight - chromeHeight - tokens.spacing.md)
+    : Number.POSITIVE_INFINITY;
+
   const outgoingContent = outgoingQuestionSnapshot ? (
     <ChoiceQuestionBody
       activeWrongOptionId={outgoingQuestionSnapshot.activeWrongOptionId}
-      answerDetailActionLabel={
-        outgoingQuestionSnapshot.answerDetailActionLabel
-      }
       onSelectOption={handleOutgoingOptionSelect}
       question={outgoingQuestionSnapshot.question}
       selectedCorrectOptionId={
@@ -179,8 +210,6 @@ export function ChoiceQuestionSetDialogContent({
   const incomingContent = (
     <ChoiceQuestionBody
       activeWrongOptionId={activeWrongOptionId}
-      answerDetailActionLabel={answerDetailActionLabel}
-      onAnswerDetailActionPress={advanceOrDismiss}
       onSelectOption={handleSelectOption}
       question={currentQuestion}
       selectedCorrectOptionId={selectedCorrectOptionId}
@@ -190,14 +219,33 @@ export function ChoiceQuestionSetDialogContent({
 
   return (
     <View style={{ gap: tokens.spacing.md }}>
-      <ChoiceQuestionDialogChrome
-        onDismiss={onDismiss}
-        progressLabel={progressLabel}
-      />
-      <AnimatedQuestionViewport
+      <View
+        onLayout={handleChromeLayout}
+        testID="choice-question-dialog-chrome-slot"
+      >
+        <ChoiceQuestionDialogChrome
+          onDismiss={onDismiss}
+          progressLabel={progressLabel}
+        />
+      </View>
+      <ChoiceQuestionBodyViewport
+        contentMaxHeight={bodyMaxHeight}
+        footer={
+          shouldShowAnswerDetailAction ? (
+            <ChoiceQuestionBodyFooter
+              answerDetailActionLabel={answerDetailActionLabel}
+              onAnswerDetailActionPress={advanceOrDismiss}
+              question={currentQuestion}
+              selectedCorrectOptionId={selectedCorrectOptionId}
+              wrongOptionIds={wrongOptionIds}
+            />
+          ) : null
+        }
+        footerGap={tokens.spacing.md}
         heightAnimationProfile={
           outgoingQuestionSnapshot ? 'questionSwitch' : 'answerReveal'
         }
+        transitionKey={currentQuestion.id}
       >
         <QuestionContentTransition
           incomingContent={incomingContent}
@@ -207,7 +255,7 @@ export function ChoiceQuestionSetDialogContent({
           outgoingContent={outgoingContent}
           transitionKey={currentQuestion.id}
         />
-      </AnimatedQuestionViewport>
+      </ChoiceQuestionBodyViewport>
     </View>
   );
 }

@@ -11,12 +11,13 @@ import type {
   ChoiceQuestionKind,
   ChoiceQuestionOption,
 } from '../model/types';
-import { ChoiceQuestionAnswerDetailPanel } from './choice-question-answer-detail-panel';
+import {
+  ChoiceQuestionAnswerDetailAction,
+  ChoiceQuestionAnswerDetailPanel,
+} from './choice-question-answer-detail-panel';
 
 type ChoiceQuestionBodyProps = {
   activeWrongOptionId: string | null;
-  answerDetailActionLabel: string;
-  onAnswerDetailActionPress?: () => void;
   onSelectOption: (option: ChoiceQuestionOption) => void;
   question: ChoiceQuestionData;
   selectedCorrectOptionId: string | null;
@@ -169,8 +170,6 @@ export function ChoiceQuestionDialogChrome({
 
 export function ChoiceQuestionBody({
   activeWrongOptionId,
-  answerDetailActionLabel,
-  onAnswerDetailActionPress,
   onSelectOption,
   question,
   selectedCorrectOptionId,
@@ -357,13 +356,39 @@ export function ChoiceQuestionBody({
         </View>
 
         {answerDetailToShow ? (
-          <ChoiceQuestionAnswerDetailPanel
-            answerDetail={answerDetailToShow}
-            answerDetailActionLabel={answerDetailActionLabel}
-            onAnswerDetailActionPress={onAnswerDetailActionPress}
-          />
+          <ChoiceQuestionAnswerDetailPanel answerDetail={answerDetailToShow} />
         ) : null}
       </View>
     </View>
+  );
+}
+
+export function ChoiceQuestionBodyFooter({
+  answerDetailActionLabel,
+  onAnswerDetailActionPress,
+  question,
+  selectedCorrectOptionId,
+  wrongOptionIds,
+}: {
+  answerDetailActionLabel: string;
+  onAnswerDetailActionPress?: () => void;
+  question: ChoiceQuestionData;
+  selectedCorrectOptionId: string | null;
+  wrongOptionIds: string[];
+}) {
+  const shouldShowAnswerDetailAction =
+    selectedCorrectOptionId !== null &&
+    wrongOptionIds.length > 0 &&
+    question.answerDetail;
+
+  if (!shouldShowAnswerDetailAction) {
+    return null;
+  }
+
+  return (
+    <ChoiceQuestionAnswerDetailAction
+      answerDetailActionLabel={answerDetailActionLabel}
+      onAnswerDetailActionPress={onAnswerDetailActionPress}
+    />
   );
 }

@@ -265,6 +265,19 @@ export function useFullscreenPlaybackSession({
     []
   );
 
+  const resetActiveVideoToStart = useCallback((videoId: string): boolean => {
+    if (activeSnapshotRef.current.itemId !== videoId) {
+      return false;
+    }
+
+    const activePlayerController = activePlayerControllerRef.current;
+    if (!activePlayerController) {
+      return false;
+    }
+
+    return activePlayerController.seekTo(0);
+  }, []);
+
   const commitActiveVideo = useCallback(
     (itemId: string, index: number) => {
       const currentSnapshot = activeSnapshotRef.current;
@@ -505,5 +518,6 @@ export function useFullscreenPlaybackSession({
     handleSingleTap,
     handleViewableItemsChanged,
     registerActiveController,
+    resetActiveVideoToStart,
   };
 }

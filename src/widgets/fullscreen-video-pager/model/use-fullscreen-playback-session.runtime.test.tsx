@@ -631,6 +631,37 @@ describe('useFullscreenPlaybackSession runtime', () => {
     ).toBe(false);
   });
 
+  it('resets only the current active video to the start through the active controller', () => {
+    const onActiveVideoChange = vi.fn();
+    const activeController = createActiveController({
+      currentTimeSeconds: 10,
+      durationSeconds: 20,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <SessionHarness onActiveVideoChange={onActiveVideoChange} />
+      );
+    });
+
+    act(() => {
+      latestSession?.commitActiveVideo('video-a', 0);
+      latestSession?.registerActiveController(activeController);
+    });
+
+    expect(latestSession?.resetActiveVideoToStart('video-b')).toBe(false);
+    expect(activeController.seekTo).not.toHaveBeenCalled();
+
+    expect(latestSession?.resetActiveVideoToStart('video-a')).toBe(true);
+    expect(activeController.seekTo).toHaveBeenCalledWith(0);
+
+    act(() => {
+      latestSession?.registerActiveController(null);
+    });
+
+    expect(latestSession?.resetActiveVideoToStart('video-a')).toBe(false);
+  });
+
   it('does not seek on double tap while another gesture locks playback gestures', () => {
     const onActiveVideoChange = vi.fn();
     const activeController = createActiveController({

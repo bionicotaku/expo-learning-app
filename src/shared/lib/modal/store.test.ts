@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createModalStore } from './store';
 import type { ModalDescriptor, ModalId } from './types';
@@ -164,6 +164,43 @@ describe('modal store', () => {
     expect(store.present(createModalDescriptor())).toEqual({
       id: 'modal-2',
       didPresent: true,
+    });
+  });
+
+  it('calls onDidDismiss only after the exiting modal is removed', () => {
+    const store = createModalStore({
+      createId: createTestIdFactory(),
+    });
+    let snapshotDuringCallback = store.getSnapshot();
+    let presentResultDuringCallback: ReturnType<typeof store.present> | null =
+      null;
+    const onDidDismiss = vi.fn(() => {
+      snapshotDuringCallback = store.getSnapshot();
+      presentResultDuringCallback = store.present(
+        createModalDescriptor({ debugLabel: 'next' })
+      );
+    });
+
+    store.present(createModalDescriptor({ onDidDismiss }));
+    store.dismiss('modal-1', 'imperative');
+
+    expect(onDidDismiss).not.toHaveBeenCalled();
+
+    store.remove('modal-1');
+
+    expect(onDidDismiss).toHaveBeenCalledTimes(1);
+    expect(onDidDismiss).toHaveBeenCalledWith({
+      id: 'modal-1',
+      reason: 'imperative',
+    });
+    expect(snapshotDuringCallback).toBeNull();
+    expect(presentResultDuringCallback).toEqual({
+      id: 'modal-2',
+      didPresent: true,
+    });
+    expect(store.getSnapshot()).toMatchObject({
+      id: 'modal-2',
+      debugLabel: 'next',
     });
   });
 });

@@ -14,6 +14,11 @@ export type ModalRenderContext = {
   clear: () => void;
 };
 
+export type ModalDismissContext = {
+  id: ModalId;
+  reason: ModalDismissReason;
+};
+
 export type ModalPresentResult = {
   readonly id: ModalId | null;
   readonly didPresent: boolean;
@@ -24,6 +29,7 @@ export type ModalDescriptor = {
   readonly debugLabel?: string;
   readonly presentation: ModalPresentation;
   readonly dismissOnBackdropPress?: boolean;
+  readonly onDidDismiss?: (context: ModalDismissContext) => void;
   readonly render: (context: ModalRenderContext) => ReactNode;
 };
 
@@ -32,6 +38,7 @@ export type ModalRecord = {
   readonly debugLabel?: string;
   readonly presentation: ModalPresentation;
   readonly dismissOnBackdropPress: boolean;
+  readonly onDidDismiss?: ModalDescriptor['onDidDismiss'];
   readonly render: ModalDescriptor['render'];
   readonly phase: ModalPhase;
   readonly dismissReason?: ModalDismissReason;

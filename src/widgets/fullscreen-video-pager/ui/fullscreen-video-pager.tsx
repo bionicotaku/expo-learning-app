@@ -37,6 +37,7 @@ export type FullscreenVideoPagerProps = {
   isScreenFocused: boolean;
   items: VideoListItem[];
   onActiveVideoChange: (itemId: string, index: number) => void;
+  onBeforeAdvanceFromVideoEnd?: (item: VideoListItem) => Promise<void>;
   onCenterHoldStart?: () => void;
   onWatchProgressSample: (sample: FullscreenWatchProgressSample) => void;
   subtitleDisplayMode: SubtitleDisplayMode;
@@ -51,6 +52,7 @@ export function FullscreenVideoPager({
   isScreenFocused,
   items,
   onActiveVideoChange,
+  onBeforeAdvanceFromVideoEnd,
   onCenterHoldStart,
   onWatchProgressSample,
   subtitleDisplayMode,
@@ -60,6 +62,8 @@ export function FullscreenVideoPager({
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatListType<VideoListItem>>(null);
+  const pendingEndVideoIdRef = useRef<string | null>(null);
+  const activeVideoIdRef = useRef<string | null>(null);
   const descriptionMeasurementCacheRef = useRef(
     createExpandableOverlayDescriptionMeasurementCache()
   );
@@ -92,12 +96,14 @@ export function FullscreenVideoPager({
     handleSingleTap,
     handleViewableItemsChanged,
     registerActiveController,
+    resetActiveVideoToStart,
   } = useFullscreenPlaybackSession({
     activeTranscript,
     isScreenFocused,
     items,
     onActiveVideoChange,
   });
+  activeVideoIdRef.current = activeItemId;
   const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 80,
   });
@@ -158,15 +164,41 @@ export function FullscreenVideoPager({
       activeIndex,
       itemCount: items.length,
     });
-    if (nextIndex === null || items[activeIndex ?? -1]?.videoId !== videoId) {
+    const currentItem = items[activeIndex ?? -1];
+    if (nextIndex === null || currentItem?.videoId !== videoId) {
       return;
     }
 
-    listRef.current?.scrollToIndex({
-      animated: true,
-      index: nextIndex,
-    });
-  }, [activeIndex, items]);
+    if (pendingEndVideoIdRef.current === videoId) {
+      return;
+    }
+
+    pendingEndVideoIdRef.current = videoId;
+
+    void (async () => {
+      try {
+        await onBeforeAdvanceFromVideoEnd?.(currentItem);
+
+        if (items[activeIndex ?? -1]?.videoId !== videoId) {
+          return;
+        }
+
+        if (activeVideoIdRef.current !== videoId) {
+          return;
+        }
+
+        resetActiveVideoToStart(videoId);
+        listRef.current?.scrollToIndex({
+          animated: true,
+          index: nextIndex,
+        });
+      } finally {
+        if (pendingEndVideoIdRef.current === videoId) {
+          pendingEndVideoIdRef.current = null;
+        }
+      }
+    })();
+  }, [activeIndex, items, onBeforeAdvanceFromVideoEnd, resetActiveVideoToStart]);
 
   const handleWatchProgressSample = useCallback(
     ({

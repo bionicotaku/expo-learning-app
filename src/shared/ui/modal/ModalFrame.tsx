@@ -10,6 +10,7 @@ import {
   MODAL_SHEET_HANDLE_OPACITY,
   MODAL_SHEET_HANDLE_WIDTH,
 } from './modal-design';
+import { ModalContentLayoutProvider } from './modal-content-layout';
 
 type ModalFrameProps = {
   presentation: ModalPresentation;
@@ -27,6 +28,19 @@ export function ModalFrame({
   children,
 }: ModalFrameProps) {
   const { tokens } = useEditorialPaperTheme();
+  const dialogContentMaxHeight = Math.max(
+    0,
+    maxHeight - tokens.spacing.xxl * 2
+  );
+  const sheetHandleBlockHeight =
+    tokens.spacing.sm + MODAL_SHEET_HANDLE_HEIGHT + tokens.spacing.xs;
+  const sheetContentMaxHeight = Math.max(
+    0,
+    maxHeight -
+      sheetHandleBlockHeight -
+      tokens.spacing.xl -
+      Math.max(bottomInset, tokens.spacing.xl)
+  );
 
   if (presentation === 'sheet') {
     return (
@@ -61,16 +75,20 @@ export function ModalFrame({
           />
         </View>
 
-        <View
-          style={{
-            paddingTop: tokens.spacing.xl,
-            paddingRight: tokens.spacing.xl,
-            paddingBottom: Math.max(bottomInset, tokens.spacing.xl),
-            paddingLeft: tokens.spacing.xl,
-          }}
+        <ModalContentLayoutProvider
+          contentMaxHeight={sheetContentMaxHeight}
         >
-          {children}
-        </View>
+          <View
+            style={{
+              paddingTop: tokens.spacing.xl,
+              paddingRight: tokens.spacing.xl,
+              paddingBottom: Math.max(bottomInset, tokens.spacing.xl),
+              paddingLeft: tokens.spacing.xl,
+            }}
+          >
+            {children}
+          </View>
+        </ModalContentLayoutProvider>
       </AdaptiveGlass>
     );
   }
@@ -85,7 +103,11 @@ export function ModalFrame({
         padding: tokens.spacing.xxl,
       }}
     >
-      {children}
+      <ModalContentLayoutProvider
+        contentMaxHeight={dialogContentMaxHeight}
+      >
+        {children}
+      </ModalContentLayoutProvider>
     </AdaptiveGlass>
   );
 }

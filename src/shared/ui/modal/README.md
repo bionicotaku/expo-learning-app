@@ -9,6 +9,7 @@
 - 渲染 `dialog` / `sheet` 两种 frame
 - 执行 enter / exit 动画
 - 执行 V1 的 sheet 下滑关闭
+- 向内容层提供当前 frame 内部可用高度预算
 
 它不负责：
 
@@ -26,6 +27,8 @@
   - 单一共享 backdrop
 - `ModalFrame.tsx`
   - `dialog` / `sheet` 视觉壳
+- `modal-content-layout.tsx`
+  - 向 modal 内容提供 `contentMaxHeight`，供业务内容决定自身滚动边界
 - `ModalItem.tsx`
   - 单条 modal 的动画和手势封装
 - `modal-design.ts`
@@ -35,10 +38,11 @@
 - `modal-layout.ts`
   - dialog / sheet 布局逻辑
 - `index.ts`
-  - 仅导出 `ModalHost`
+  - 导出 `ModalHost` 和内容高度预算 hook
 
 边界约束：
 
 - `ModalHost` 只挂在 `src/app/_layout.tsx`
 - 业务层不要直接 import `ModalFrame` 或 `ModalItem`
+- 业务层可以读取 `useModalContentLayout()` 提供的高度预算，但滚动策略仍由业务内容自行决定
 - web 当前不挂载 `ModalHost`

@@ -95,7 +95,8 @@ FullscreenVideoPager
   - 不计算 watch-progress stats，不拼 watch-progress API body，不判断服务端完成状态
   - 不持有 watch-progress reporter，不管理 watch-progress flush lifecycle
   - 用户 pause / resume 不触发 watch-progress flush
-  - 接收 active row 的 playback end 事件；如果当前列表中已有下一条视频，则滚动到下一条，否则保持当前 row 不动
+  - 接收 active row 的 playback end 事件；如果当前列表中已有下一条视频，先等待可选 `onBeforeAdvanceFromVideoEnd(currentItem)`，确认 active row 未变化后把当前视频 `seekTo(0)`，再滚动到下一条，否则保持当前 row 不动
+  - 使用 session-scoped pending end guard 防止同一视频重复 end event 造成重复弹窗或重复切换
   - 透传 row action rail 的本地动作
   - 持有 description measurement cache；cache 跟随当前 pager/session 生命周期，而不是挂在模块全局
   - cache 是有上限的 session-scoped 插入序缓存
@@ -210,6 +211,7 @@ FullscreenVideoPager
 - 多 row 的播放器实例管理策略以外的业务逻辑
 - runtime store 本身的定义
 - 跨视频记忆 description 展开态
+- End Quiz API、题目缓存或 choice-question 映射；这些属于 `features/video-end-quiz`
 
 ## 播放会话模型
 

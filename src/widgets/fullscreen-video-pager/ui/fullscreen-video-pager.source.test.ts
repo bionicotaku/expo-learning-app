@@ -44,11 +44,20 @@ describe('fullscreen video pager source', () => {
     expect(source).toContain('activeTranscript');
     expect(source).toContain('videoMetaByVideoId');
     expect(source).toContain('isScreenFocused: boolean');
+    expect(source).toContain('onBeforeAdvanceFromVideoEnd?: (item: VideoListItem) => Promise<void>');
     expect(source).toContain('isScreenFocused,');
     expect(source).toContain('handleWatchProgressSample');
     expect(source).toContain('handlePlaybackEnd');
     expect(source).toContain('resolveNextFullscreenVideoIndex');
+    expect(source).toContain('pendingEndVideoIdRef');
+    expect(source).toContain('await onBeforeAdvanceFromVideoEnd?.(currentItem)');
+    expect(source).toContain('if (items[activeIndex ?? -1]?.videoId !== videoId)');
+    expect(source).toContain('resetActiveVideoToStart(videoId);');
     expect(source).toContain('listRef.current?.scrollToIndex({');
+    const playbackEndSource = source.slice(source.indexOf('const handlePlaybackEnd'));
+    expect(playbackEndSource.indexOf('resetActiveVideoToStart(videoId);')).toBeLessThan(
+      playbackEndSource.indexOf('listRef.current?.scrollToIndex({')
+    );
     expect(source).toContain('animated: true');
     expect(source).toContain('onWatchProgressSample({');
     expect(source).toContain('playbackRate,');

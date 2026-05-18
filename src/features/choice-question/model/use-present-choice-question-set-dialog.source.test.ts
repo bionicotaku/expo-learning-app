@@ -23,6 +23,11 @@ describe('use present choice question set dialog source', () => {
     expect(source).toContain('return presentResult.didPresent;');
     expect(source).toContain('render: ({ dismiss }) => (');
     expect(source).toContain('<ChoiceQuestionSetDialogContent onDismiss={dismiss} payload={payload} />');
+    expect(source).toContain('usePresentChoiceQuestionSetDialogAndWait');
+    expect(source).toContain('new Promise<boolean>');
+    expect(source).toContain('onDidDismiss');
+    expect(source).toContain('resolve(true)');
+    expect(source).toContain('resolve(false)');
     expect(source).not.toContain("presentation: 'sheet'");
     expect(source).not.toContain('usePresentChoiceQuestionDialog');
     expect(source).not.toContain('router.');

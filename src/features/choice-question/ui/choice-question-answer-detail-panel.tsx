@@ -21,12 +21,8 @@ const answerRevealEasing = Easing.out(Easing.cubic);
 
 function ChoiceQuestionAnswerDetailBody({
   answerDetail,
-  answerDetailActionLabel,
-  onAnswerDetailActionPress,
 }: {
   answerDetail: ChoiceQuestionAnswerDetail;
-  answerDetailActionLabel: string;
-  onAnswerDetailActionPress?: () => void;
 }) {
   const { tokens } = useEditorialPaperTheme();
 
@@ -107,47 +103,14 @@ function ChoiceQuestionAnswerDetailBody({
           {answerDetail.explanation}
         </Text>
       </View>
-
-      <Pressable
-        accessibilityLabel={answerDetailActionLabel}
-        accessibilityRole="button"
-        onPress={onAnswerDetailActionPress}
-        style={{
-          alignItems: 'center',
-          alignSelf: 'stretch',
-          borderRadius: tokens.radius.control,
-          borderCurve: 'continuous',
-          backgroundColor: tokens.color.ink,
-          minHeight: 46,
-          justifyContent: 'center',
-          paddingHorizontal: tokens.spacing.md,
-          paddingVertical: tokens.spacing.sm,
-        }}
-      >
-        <Text
-          selectable={false}
-          style={{
-            color: tokens.color.surface,
-            fontSize: 14,
-            fontWeight: '800',
-            lineHeight: 18,
-          }}
-        >
-          {answerDetailActionLabel}
-        </Text>
-      </Pressable>
     </View>
   );
 }
 
 export function ChoiceQuestionAnswerDetailPanel({
   answerDetail,
-  answerDetailActionLabel,
-  onAnswerDetailActionPress,
 }: {
   answerDetail: ChoiceQuestionAnswerDetail;
-  answerDetailActionLabel: string;
-  onAnswerDetailActionPress?: () => void;
 }) {
   const answerDetailOpacity = useSharedValue(0);
 
@@ -165,11 +128,49 @@ export function ChoiceQuestionAnswerDetailPanel({
 
   return (
     <Animated.View style={answerDetailContentAnimatedStyle}>
-      <ChoiceQuestionAnswerDetailBody
-        answerDetail={answerDetail}
-        answerDetailActionLabel={answerDetailActionLabel}
-        onAnswerDetailActionPress={onAnswerDetailActionPress}
-      />
+      <ChoiceQuestionAnswerDetailBody answerDetail={answerDetail} />
     </Animated.View>
+  );
+}
+
+export function ChoiceQuestionAnswerDetailAction({
+  answerDetailActionLabel,
+  onAnswerDetailActionPress,
+}: {
+  answerDetailActionLabel: string;
+  onAnswerDetailActionPress?: () => void;
+}) {
+  const { tokens } = useEditorialPaperTheme();
+
+  return (
+    <Pressable
+      accessibilityLabel={answerDetailActionLabel}
+      accessibilityRole="button"
+      onPress={onAnswerDetailActionPress}
+      style={{
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        borderRadius: tokens.radius.control,
+        borderCurve: 'continuous',
+        backgroundColor: tokens.color.ink,
+        minHeight: 46,
+        justifyContent: 'center',
+        paddingHorizontal: tokens.spacing.md,
+        paddingVertical: tokens.spacing.sm,
+      }}
+      testID="choice-question-answer-detail-action"
+    >
+      <Text
+        selectable={false}
+        style={{
+          color: tokens.color.surface,
+          fontSize: 14,
+          fontWeight: '800',
+          lineHeight: 18,
+        }}
+      >
+        {answerDetailActionLabel}
+      </Text>
+    </Pressable>
   );
 }

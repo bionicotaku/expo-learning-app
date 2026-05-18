@@ -11,6 +11,8 @@ import { FullscreenVideoSession } from './fullscreen-video-session';
 const {
   flushWatchProgressMock,
   onLatestActiveVideoIdChangeMock,
+  prefetchEndQuizForVideoMock,
+  presentEndQuizBeforeAdvanceMock,
   presentPlaybackSettingsSheetMock,
   reportWatchProgressSampleMock,
   requestMoreMock,
@@ -20,6 +22,8 @@ const {
 } = vi.hoisted(() => ({
   flushWatchProgressMock: vi.fn(),
   onLatestActiveVideoIdChangeMock: vi.fn(),
+  prefetchEndQuizForVideoMock: vi.fn(),
+  presentEndQuizBeforeAdvanceMock: vi.fn(),
   presentPlaybackSettingsSheetMock: vi.fn(),
   reportWatchProgressSampleMock: vi.fn(),
   requestMoreMock: vi.fn(),
@@ -135,6 +139,13 @@ vi.mock('@/features/video-watch-progress', () => ({
   }),
 }));
 
+vi.mock('@/features/video-end-quiz', () => ({
+  useVideoEndQuiz: () => ({
+    prefetchEndQuizForVideo: prefetchEndQuizForVideoMock,
+    presentEndQuizBeforeAdvance: presentEndQuizBeforeAdvanceMock,
+  }),
+}));
+
 vi.mock('@/widgets/fullscreen-video-pager', async () => {
   const ReactModule = await import('react');
 
@@ -156,6 +167,10 @@ describe('fullscreen video session runtime', () => {
     hoistedState.latestFocusCleanup = null;
     hoistedState.latestFullscreenVideoPagerProps = null;
     onLatestActiveVideoIdChangeMock.mockReset();
+    prefetchEndQuizForVideoMock.mockReset();
+    prefetchEndQuizForVideoMock.mockResolvedValue(undefined);
+    presentEndQuizBeforeAdvanceMock.mockReset();
+    presentEndQuizBeforeAdvanceMock.mockResolvedValue(undefined);
     presentPlaybackSettingsSheetMock.mockReset();
     reportWatchProgressSampleMock.mockReset();
     requestMoreMock.mockReset();
@@ -200,6 +215,28 @@ describe('fullscreen video session runtime', () => {
       isInitialLoading: false,
       items,
     });
+  });
+
+  it('prefetches end quiz for the entry video when the session mounts', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={1}
+          entryVideoId="video-b"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(prefetchEndQuizForVideoMock).toHaveBeenCalledWith(items[1], {
+      shouldToastFailure: expect.any(Function),
+    });
+
+    const options = prefetchEndQuizForVideoMock.mock.calls.at(-1)?.[1];
+    expect(options.shouldToastFailure()).toBe(true);
   });
 
   it('passes the current screen focus state through to the pager', () => {
@@ -250,6 +287,71 @@ describe('fullscreen video session runtime', () => {
       items,
     });
     expect(onLatestActiveVideoIdChangeMock).toHaveBeenLastCalledWith('video-c');
+  });
+
+  it('prefetches end quiz for the newly active video and suppresses stale active failures', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      onBeforeAdvanceFromVideoEnd: presentEndQuizBeforeAdvanceMock,
+    });
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-b',
+        1
+      );
+    });
+
+    const videoBOptions = prefetchEndQuizForVideoMock.mock.calls.at(-1)?.[1];
+    expect(prefetchEndQuizForVideoMock).toHaveBeenLastCalledWith(items[1], {
+      shouldToastFailure: expect.any(Function),
+    });
+    expect(videoBOptions.shouldToastFailure()).toBe(true);
+
+    act(() => {
+      hoistedState.latestFullscreenVideoPagerProps!.onActiveVideoChange(
+        'video-c',
+        2
+      );
+    });
+
+    const videoCOptions = prefetchEndQuizForVideoMock.mock.calls.at(-1)?.[1];
+    expect(prefetchEndQuizForVideoMock).toHaveBeenLastCalledWith(items[2], {
+      shouldToastFailure: expect.any(Function),
+    });
+    expect(videoBOptions.shouldToastFailure()).toBe(false);
+    expect(videoCOptions.shouldToastFailure()).toBe(true);
+  });
+
+  it('passes the end quiz presenter to the pager', () => {
+    act(() => {
+      TestRenderer.create(
+        <FullscreenVideoSession
+          entryIndex={0}
+          entryVideoId="video-a"
+          isInitialLoading={false}
+          items={items}
+          onLatestActiveVideoIdChange={onLatestActiveVideoIdChangeMock}
+          requestMore={requestMoreMock}
+        />
+      );
+    });
+
+    expect(hoistedState.latestFullscreenVideoPagerProps).toMatchObject({
+      onBeforeAdvanceFromVideoEnd: presentEndQuizBeforeAdvanceMock,
+    });
   });
 
   it('flushes pending watch progress before applying an active video change', () => {

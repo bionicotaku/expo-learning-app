@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useIsFocused } from 'expo-router';
 
 import type { VideoListItem } from '@/entities/video';
@@ -9,6 +9,7 @@ import {
 } from '@/features/playback-settings';
 import { createTailRequestGate } from '@/features/feed-source';
 import { useFullscreenVideoResources } from '@/features/fullscreen-video-resources';
+import { useVideoEndQuiz } from '@/features/video-end-quiz';
 import { useVideoWatchProgressReporter } from '@/features/video-watch-progress';
 import {
   FullscreenVideoPager,
@@ -43,8 +44,11 @@ export function FullscreenVideoSession({
   const subtitleDisplayMode = useSubtitleDisplayMode();
   const videoDetailsVisible = useVideoDetailsVisible();
   const presentPlaybackSettingsSheet = usePresentPlaybackSettingsSheet();
+  const { prefetchEndQuizForVideo, presentEndQuizBeforeAdvance } =
+    useVideoEndQuiz();
   const { flush, reportSample } = useVideoWatchProgressReporter();
   const isScreenFocused = useIsFocused();
+  const latestEndQuizActiveVideoIdRef = useRef<string | null>(entryVideoId);
   const [pagerReportedActive, setPagerReportedActive] =
     useState<FullscreenPagerReportedActive>(null);
   const activeResourceVideoId = pagerReportedActive?.itemId ?? entryVideoId;
@@ -56,6 +60,33 @@ export function FullscreenVideoSession({
     activeVideoId: activeResourceVideoId,
     items,
   });
+
+  useEffect(() => {
+    if (entryVideoId === null || pagerReportedActive !== null) {
+      return;
+    }
+
+    const entryItem =
+      items[entryIndex]?.videoId === entryVideoId
+        ? items[entryIndex]
+        : items.find((item) => item.videoId === entryVideoId);
+
+    if (!entryItem) {
+      return;
+    }
+
+    latestEndQuizActiveVideoIdRef.current = entryItem.videoId;
+    void prefetchEndQuizForVideo(entryItem, {
+      shouldToastFailure: () =>
+        latestEndQuizActiveVideoIdRef.current === entryItem.videoId,
+    });
+  }, [
+    entryIndex,
+    entryVideoId,
+    items,
+    pagerReportedActive,
+    prefetchEndQuizForVideo,
+  ]);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,6 +128,15 @@ export function FullscreenVideoSession({
       });
       onLatestActiveVideoIdChange(itemId);
 
+      const activeItem = items[index];
+      if (activeItem) {
+        latestEndQuizActiveVideoIdRef.current = activeItem.videoId;
+        void prefetchEndQuizForVideo(activeItem, {
+          shouldToastFailure: () =>
+            latestEndQuizActiveVideoIdRef.current === activeItem.videoId,
+        });
+      }
+
       const tailVideoId = items[items.length - 1]?.videoId ?? null;
       if (!tailVideoId) {
         return;
@@ -108,7 +148,13 @@ export function FullscreenVideoSession({
 
       requestMoreForTail(tailVideoId);
     },
-    [flush, items, onLatestActiveVideoIdChange, requestMoreForTail]
+    [
+      flush,
+      items,
+      onLatestActiveVideoIdChange,
+      prefetchEndQuizForVideo,
+      requestMoreForTail,
+    ]
   );
 
   const handleWatchProgressSample = useCallback(
@@ -137,6 +183,7 @@ export function FullscreenVideoSession({
       isScreenFocused={isScreenFocused}
       items={items}
       onActiveVideoChange={handleActiveVideoChange}
+      onBeforeAdvanceFromVideoEnd={presentEndQuizBeforeAdvance}
       onCenterHoldStart={presentPlaybackSettingsSheet}
       onWatchProgressSample={handleWatchProgressSample}
       subtitleDisplayMode={subtitleDisplayMode}

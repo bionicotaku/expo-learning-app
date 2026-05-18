@@ -2,6 +2,8 @@ import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ModalContentLayoutProvider } from '@/shared/ui/modal/modal-content-layout';
+
 import type { ChoiceQuestionData } from '../model/types';
 import { ChoiceQuestionSetDialogContent } from './choice-question-set-dialog-content';
 
@@ -25,6 +27,7 @@ vi.mock('react-native', async () => {
 
   return {
     Pressable: createHostComponent('Pressable'),
+    ScrollView: createHostComponent('ScrollView'),
     Text: createHostComponent('Text'),
     View: createHostComponent('View'),
   };
@@ -58,9 +61,9 @@ vi.mock('react-native-reanimated', async () => {
       out: (value: unknown) => value,
     },
     useAnimatedStyle: (updater: () => Record<string, unknown>) => updater(),
-    useSharedValue: <T,>(value: T) => ({ value }),
-    withDelay: <T,>(_delayMs: number, value: T) => value,
-    withTiming: <T,>(value: T) => value,
+    useSharedValue: (value: unknown) => ({ value }),
+    withDelay: (_delayMs: number, value: unknown) => value,
+    withTiming: (value: unknown) => value,
   };
 });
 
@@ -161,13 +164,31 @@ function renderSet(
     questions: ChoiceQuestionData[];
     showProgress?: boolean;
   },
-  props: { onDismiss?: () => void } = {}
+  props: {
+    contentMaxHeight?: number;
+    onDismiss?: () => void;
+  } = {}
 ) {
   let renderer: TestRenderer.ReactTestRenderer;
 
+  const content = (
+    <ChoiceQuestionSetDialogContent
+      onDismiss={props.onDismiss}
+      payload={payload}
+    />
+  );
+
   act(() => {
     renderer = TestRenderer.create(
-      <ChoiceQuestionSetDialogContent payload={payload} {...props} />
+      props.contentMaxHeight === undefined ? (
+        content
+      ) : (
+        <ModalContentLayoutProvider
+          contentMaxHeight={props.contentMaxHeight}
+        >
+          {content}
+        </ModalContentLayoutProvider>
+      )
     );
   });
 
@@ -203,12 +224,31 @@ function findAllByTestID(
     .filter((node) => typeof node.type === 'string');
 }
 
+function findByTestID(
+  renderer: TestRenderer.ReactTestRenderer,
+  testID: string
+) {
+  return renderer.root.findByProps({ testID });
+}
+
+function findCurrentOptionTestIDs(renderer: TestRenderer.ReactTestRenderer) {
+  return renderer.root
+    .findAll(
+      (node) =>
+        typeof node.type === 'string' &&
+        typeof node.props.testID === 'string' &&
+        node.props.testID.startsWith('choice-option-')
+    )
+    .map((node) => node.props.testID);
+}
+
 describe('ChoiceQuestionSetDialogContent runtime', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.clearAllTimers();
     vi.useRealTimers();
   });
@@ -243,6 +283,141 @@ describe('ChoiceQuestionSetDialogContent runtime', () => {
     });
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('randomizes option display order once per modal session and keeps it stable while answering', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    const renderer = renderSet({ questions: [questions[0]], showProgress: false });
+
+    expect(questions[0].options.map((option) => option.id)).toEqual([
+      'q1-correct',
+      'q1-wrong',
+    ]);
+    expect(findCurrentOptionTestIDs(renderer)).toEqual([
+      'choice-option-q1-wrong',
+      'choice-option-q1-correct',
+    ]);
+
+    act(() => {
+      findOption(renderer, 'q1-wrong').props.onPress();
+    });
+
+    expect(findCurrentOptionTestIDs(renderer)).toEqual([
+      'choice-option-q1-wrong',
+      'choice-option-q1-correct',
+    ]);
+
+    act(() => {
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+
+    expect(findCurrentOptionTestIDs(renderer)).toEqual([
+      'choice-option-q1-wrong',
+      'choice-option-q1-correct',
+    ]);
+  });
+
+  it('keeps chrome fixed and scrolls only the body when content exceeds the modal budget', () => {
+    const renderer = renderSet(
+      { questions, showProgress: true },
+      { contentMaxHeight: 180 }
+    );
+
+    act(() => {
+      findByTestID(renderer, 'choice-question-dialog-chrome-slot')
+        .props.onLayout({
+          nativeEvent: {
+            layout: {
+              height: 40,
+            },
+          },
+        });
+    });
+    act(() => {
+      findByTestID(renderer, 'choice-question-body-content').props.onLayout({
+        nativeEvent: {
+          layout: {
+            height: 320,
+          },
+        },
+      });
+    });
+
+    const chromeSlot = findAllByTestID(
+      renderer,
+      'choice-question-dialog-chrome-slot'
+    );
+    const bodyScroll = findByTestID(renderer, 'choice-question-body-scroll');
+
+    expect(chromeSlot).toHaveLength(1);
+    expect(bodyScroll.props.scrollEnabled).toBe(true);
+    expect(bodyScroll.props.showsVerticalScrollIndicator).toBe(false);
+    expect(bodyScroll.props.style).toMatchObject({
+      maxHeight: 124,
+    });
+  });
+
+  it('keeps the answer detail action fixed outside the scrollable body', () => {
+    const renderer = renderSet(
+      { questions, showProgress: true },
+      { contentMaxHeight: 210 }
+    );
+
+    act(() => {
+      findByTestID(renderer, 'choice-question-dialog-chrome-slot')
+        .props.onLayout({
+          nativeEvent: {
+            layout: {
+              height: 40,
+            },
+          },
+        });
+    });
+    act(() => {
+      findOption(renderer, 'q1-wrong').props.onPress();
+    });
+    act(() => {
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+    act(() => {
+      findByTestID(renderer, 'choice-question-body-content').props.onLayout({
+        nativeEvent: {
+          layout: {
+            height: 320,
+          },
+        },
+      });
+    });
+    act(() => {
+      findByTestID(renderer, 'choice-question-body-footer').props.onLayout({
+        nativeEvent: {
+          layout: {
+            height: 46,
+          },
+        },
+      });
+    });
+
+    const bodyScroll = findByTestID(renderer, 'choice-question-body-scroll');
+    const footer = findByTestID(renderer, 'choice-question-body-footer');
+    const footerAction = findByTestID(renderer, 'choice-question-answer-detail-action');
+
+    expect(bodyScroll.props.scrollEnabled).toBe(true);
+    expect(bodyScroll.props.style).toMatchObject({
+      maxHeight: 92,
+    });
+    expect(
+      footer
+        .findAllByProps({ testID: 'choice-question-answer-detail-action' })
+        .filter((node) => typeof node.type === 'string')
+    ).toHaveLength(1);
+    expect(
+      bodyScroll
+        .findAllByProps({ testID: 'choice-question-answer-detail-action' })
+        .filter((node) => typeof node.type === 'string')
+    ).toHaveLength(0);
+    expect(footerAction.props.accessibilityLabel).toBe('下一个');
   });
 
   it('auto-advances after a first-try correct answer', () => {
@@ -368,6 +543,7 @@ describe('ChoiceQuestionSetDialogContent runtime', () => {
     expect(findNodesWithText(renderer, '这里的 “barely” 最接近什么意思？')).toHaveLength(1);
     expect(findNodesWithText(renderer, '根据语境选回被隐去的词。')).toHaveLength(1);
     expect(findAllByTestID(renderer, 'question-content-previous')).toHaveLength(1);
+    expect(findByTestID(renderer, 'choice-question-body-scroll').props.scrollEventThrottle).toBe(16);
 
     act(() => {
       vi.advanceTimersByTime(260);

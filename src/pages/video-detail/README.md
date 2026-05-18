@@ -27,6 +27,7 @@
 VideoDetailPage
 └── FullscreenVideoSession
     ├── useFullscreenVideoResources(...)
+    ├── useVideoEndQuiz(...)
     ├── useVideoWatchProgressReporter(...)
     └── FullscreenVideoPager
 ```
@@ -38,6 +39,8 @@ VideoDetailPage
 - 接收 `features/fullscreen-video-resources` 返回的 active transcript 与 video meta map，并把结果传给 `FullscreenVideoPager`
 - 通过 `onActiveVideoChange(itemId, index)` 接收 pager 当前 active video 的变化
 - 持有 `features/video-watch-progress` reporter，并把 pager 转发的 active row progress sample 交给 reporter
+- 持有 `features/video-end-quiz` controller，在 entry video 和 active video change 时预取视频末尾题目
+- 把 end quiz 的 `presentEndQuizBeforeAdvance` 传给 pager，让视频结束时可先展示题组再切下一条
 - 读取 video screen focus 状态，并把 `isScreenFocused` 传给 `FullscreenVideoPager`
 - 负责 watch-progress focused `10s` 定时 flush、active video switch flush 和 video screen blur / unfocus flush
 - 在 video screen blur / unfocus 时停止定时 flush；pager 同步暂停 active row 播放、停止 progress sample 转发并关闭背景手势
@@ -56,6 +59,7 @@ VideoDetailPage
 - page 不直接定义 feed repository
 - page 不直接实现 video meta 或 transcript asset query cache；这层属于 `features/fullscreen-video-resources`，由 session 组件消费
 - page 不直接持有 watch-progress reporter；这层属于 `FullscreenVideoSession`
+- page 不直接取 End Quiz 题目；这层属于 `FullscreenVideoSession` 消费的 `features/video-end-quiz`
 - page 不直接处理 video screen focus gate；这层属于 `FullscreenVideoSession`
 - page 不直接消费或渲染 transcript 内容；基础字幕展示由 session 把 active transcript 下传给 fullscreen pager/row 后完成
 - 字幕显示模式由 `features/playback-settings` 提供，session 只把当前全局 `subtitleDisplayMode` 传给 pager；关闭字幕不影响 fullscreen resources 读取

@@ -1,4 +1,7 @@
-export { usePresentChoiceQuestionSetDialog } from './model/use-present-choice-question-set-dialog';
+export {
+  usePresentChoiceQuestionSetDialog,
+  usePresentChoiceQuestionSetDialogAndWait,
+} from './model/use-present-choice-question-set-dialog';
 export type {
   ChoiceQuestionAnswerDetail,
   ChoiceQuestionData,
