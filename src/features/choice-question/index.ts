@@ -1,9 +1,14 @@
-export { usePresentChoiceQuestionDialog } from './model/use-present-choice-question-dialog';
+export { usePresentChoiceQuestionSetDialog } from './model/use-present-choice-question-set-dialog';
+export type {
+  ChoiceQuestionAnswerDetail,
+  ChoiceQuestionData,
+  ChoiceQuestionKind,
+  ChoiceQuestionOption,
+  ChoiceQuestionSetDialogData,
+} from './model/types';
 export {
-  ChoiceQuestionDialogContent,
+  ChoiceQuestionBody,
+  ChoiceQuestionDialogChrome,
   choiceQuestionKindLabels,
-  type ChoiceQuestionAnswerDetail,
-  type ChoiceQuestionDialogData,
-  type ChoiceQuestionKind,
-  type ChoiceQuestionOption,
 } from './ui/choice-question-dialog-content';
+export { ChoiceQuestionSetDialogContent } from './ui/choice-question-set-dialog-content';

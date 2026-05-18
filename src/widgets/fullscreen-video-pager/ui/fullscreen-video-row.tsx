@@ -225,12 +225,18 @@ function FullscreenVideoRowComponent({
     sentence,
     token,
   }: BasicSubtitleTokenPressPayload) => {
-    const sentenceAudio = {
-      endMs: sentence.end,
-      startMs: sentence.start,
+    const audio = {
       videoUrl: video.videoUrl,
+      word: {
+        endMs: token.end,
+        startMs: token.start,
+      },
+      sentence: {
+        endMs: sentence.end,
+        startMs: sentence.start,
+      },
     };
-    const payload = createWordDetailDialogDataFromTranscriptToken(token, sentenceAudio);
+    const payload = createWordDetailDialogDataFromTranscriptToken(token, audio);
     const releasePlaybackHold = acquirePlaybackHold?.();
 
     try {

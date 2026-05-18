@@ -1,17 +1,4 @@
-import { useEffect, useState } from 'react';
-import {
-  type LayoutChangeEvent,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
-} from 'react-native-reanimated';
+import { Pressable, Text, View } from 'react-native';
 
 import { useEditorialPaperTheme } from '@/shared/theme/editorial-paper';
 import {
@@ -19,37 +6,26 @@ import {
   MetaLabel,
 } from '@/shared/ui/editorial-paper';
 
-export type ChoiceQuestionKind =
-  | 'context_meaning'
-  | 'general_meaning'
-  | 'context_cloze'
-  | 'reverse_recognition';
+import type {
+  ChoiceQuestionData,
+  ChoiceQuestionKind,
+  ChoiceQuestionOption,
+} from '../model/types';
+import { ChoiceQuestionAnswerDetailPanel } from './choice-question-answer-detail-panel';
 
-export type ChoiceQuestionOption = {
-  id: string;
-  label: string;
-  isCorrect: boolean;
+type ChoiceQuestionBodyProps = {
+  activeWrongOptionId: string | null;
+  answerDetailActionLabel: string;
+  onAnswerDetailActionPress?: () => void;
+  onSelectOption: (option: ChoiceQuestionOption) => void;
+  question: ChoiceQuestionData;
+  selectedCorrectOptionId: string | null;
+  wrongOptionIds: string[];
 };
 
-export type ChoiceQuestionAnswerDetail = {
-  label: string;
-  pos: string;
-  chineseLabel: string;
-  explanation: string;
-};
-
-export type ChoiceQuestionDialogData = {
-  kind: ChoiceQuestionKind;
-  title?: string;
-  prompt: string;
-  contextText?: string;
-  targetText?: string;
-  answerDetail?: ChoiceQuestionAnswerDetail;
-  options: ChoiceQuestionOption[];
-};
-
-type ChoiceQuestionDialogContentProps = {
-  payload: ChoiceQuestionDialogData;
+type ChoiceQuestionDialogChromeProps = {
+  onDismiss?: () => void;
+  progressLabel?: string;
 };
 
 export const choiceQuestionKindLabels: Record<ChoiceQuestionKind, string> = {
@@ -59,10 +35,7 @@ export const choiceQuestionKindLabels: Record<ChoiceQuestionKind, string> = {
   reverse_recognition: '反向识别题',
 };
 
-const ANSWER_REVEAL_HEIGHT_DURATION_MS = 440;
-const ANSWER_DETAIL_FADE_DELAY_MS = 320;
-const ANSWER_DETAIL_FADE_DURATION_MS = 180;
-const answerRevealEasing = Easing.out(Easing.cubic);
+const CHOICE_QUESTION_HEADER_ACTION_SIZE = 24;
 
 function resolveOptionTone({
   hasAnsweredCorrectly,
@@ -112,196 +85,107 @@ function resolveOptionAccessibilitySuffix({
   return '未选择';
 }
 
-function ChoiceQuestionAnswerDetailBody({
-  answerDetail,
-}: {
-  answerDetail: ChoiceQuestionAnswerDetail;
-}) {
+export function ChoiceQuestionDialogChrome({
+  onDismiss,
+  progressLabel,
+}: ChoiceQuestionDialogChromeProps) {
   const { tokens } = useEditorialPaperTheme();
 
   return (
     <View
       style={{
-        gap: tokens.spacing.md,
-        paddingTop: tokens.spacing.xs,
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        gap: tokens.spacing.sm,
+        justifyContent: 'flex-end',
       }}
+      testID="choice-question-dialog-chrome"
     >
       <View
         style={{
+          alignItems: 'center',
+          flexDirection: 'row',
           gap: tokens.spacing.xs,
-          paddingVertical: tokens.spacing.xs,
         }}
       >
-        <MetaLabel>答案解析</MetaLabel>
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'baseline',
-            gap: tokens.spacing.xs,
-          }}
-        >
-          <Text
-            selectable
+        {progressLabel ? (
+          <View
+            accessibilityLabel={`第 ${progressLabel} 题`}
             style={{
-              color: tokens.color.ink,
-              fontSize: 18,
-              fontWeight: '800',
-              lineHeight: 24,
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: CHOICE_QUESTION_HEADER_ACTION_SIZE,
+              borderRadius: tokens.radius.pill,
+              borderCurve: 'continuous',
+              backgroundColor: tokens.color.surface,
+              paddingHorizontal: tokens.spacing.sm,
             }}
           >
-            {answerDetail.label}
-          </Text>
+            <Text
+              selectable={false}
+              style={{
+                color: tokens.color.inkMute,
+                fontSize: 11,
+                fontWeight: '800',
+                lineHeight: 14,
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {progressLabel}
+            </Text>
+          </View>
+        ) : null}
+        <Pressable
+          accessibilityLabel="关闭题目弹窗"
+          accessibilityRole="button"
+          onPress={onDismiss}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: CHOICE_QUESTION_HEADER_ACTION_SIZE,
+            height: CHOICE_QUESTION_HEADER_ACTION_SIZE,
+            borderRadius: tokens.radius.pill,
+            borderCurve: 'continuous',
+            backgroundColor: tokens.color.surface,
+          }}
+          testID="choice-question-close"
+        >
           <Text
-            selectable
+            selectable={false}
             style={{
               color: tokens.color.inkMute,
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: '800',
               lineHeight: 18,
             }}
           >
-            {answerDetail.pos}
+            ×
           </Text>
-          <Text
-            selectable
-            style={{
-              color: tokens.color.inkSoft,
-              fontSize: 14,
-              fontWeight: '700',
-              lineHeight: 20,
-            }}
-          >
-            {answerDetail.chineseLabel}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={{
-          gap: tokens.spacing.xs,
-          paddingVertical: tokens.spacing.xs,
-        }}
-      >
-        <MetaLabel>解释</MetaLabel>
-        <Text
-          selectable
-          style={{
-            color: tokens.color.inkSoft,
-            fontSize: 14,
-            fontWeight: '600',
-            lineHeight: 23,
-          }}
-        >
-          {answerDetail.explanation}
-        </Text>
+        </Pressable>
       </View>
     </View>
   );
 }
 
-function ChoiceQuestionAnswerDetailReveal({
-  answerDetail,
-}: {
-  answerDetail: ChoiceQuestionAnswerDetail;
-}) {
-  const [answerDetailHeight, setAnswerDetailHeight] = useState(0);
-  const answerRevealProgress = useSharedValue(0);
-  const answerDetailOpacity = useSharedValue(0);
-
-  useEffect(() => {
-    if (answerDetailHeight <= 0) {
-      return;
-    }
-
-    answerRevealProgress.value = 0;
-    answerDetailOpacity.value = 0;
-    answerRevealProgress.value = withTiming(1, {
-      duration: ANSWER_REVEAL_HEIGHT_DURATION_MS,
-      easing: answerRevealEasing,
-    });
-    answerDetailOpacity.value = withDelay(
-      ANSWER_DETAIL_FADE_DELAY_MS,
-      withTiming(1, {
-        duration: ANSWER_DETAIL_FADE_DURATION_MS,
-        easing: answerRevealEasing,
-      })
-    );
-  }, [answerDetailHeight, answerDetailOpacity, answerRevealProgress]);
-
-  const answerRevealLayout = useAnimatedStyle(() => ({
-    height: answerDetailHeight * answerRevealProgress.value,
-  }));
-  const answerDetailContentAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: answerDetailOpacity.value,
-  }));
-
-  function handleAnswerDetailLayout(event: LayoutChangeEvent) {
-    const nextHeight = event.nativeEvent.layout.height;
-
-    if (nextHeight <= 0 || nextHeight === answerDetailHeight) {
-      return;
-    }
-
-    setAnswerDetailHeight(nextHeight);
-  }
-
-  return (
-    <View style={{ position: 'relative' }}>
-      {answerDetailHeight === 0 ? (
-        <View
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-          onLayout={handleAnswerDetailLayout}
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            opacity: 0,
-          }}
-        >
-          <ChoiceQuestionAnswerDetailBody answerDetail={answerDetail} />
-        </View>
-      ) : null}
-
-      <Animated.View
-        style={[
-          {
-            overflow: 'hidden',
-          },
-          answerRevealLayout,
-        ]}
-      >
-        {answerDetailHeight > 0 ? (
-          <Animated.View style={answerDetailContentAnimatedStyle}>
-            <ChoiceQuestionAnswerDetailBody answerDetail={answerDetail} />
-          </Animated.View>
-        ) : null}
-      </Animated.View>
-    </View>
-  );
-}
-
-export function ChoiceQuestionDialogContent({
-  payload,
-}: ChoiceQuestionDialogContentProps) {
+export function ChoiceQuestionBody({
+  activeWrongOptionId,
+  answerDetailActionLabel,
+  onAnswerDetailActionPress,
+  onSelectOption,
+  question,
+  selectedCorrectOptionId,
+  wrongOptionIds,
+}: ChoiceQuestionBodyProps) {
   const { tokens } = useEditorialPaperTheme();
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [activeWrongOptionId, setActiveWrongOptionId] = useState<string | null>(
-    null
-  );
-  const [wrongOptionIds, setWrongOptionIds] = useState<string[]>([]);
-  const hasAnsweredCorrectly = selectedOptionId !== null;
-  const answerDetail = payload.answerDetail;
+  const hasAnsweredCorrectly = selectedCorrectOptionId !== null;
   const answerDetailToShow =
-    hasAnsweredCorrectly && wrongOptionIds.length > 0 && answerDetail;
+    hasAnsweredCorrectly && wrongOptionIds.length > 0 && question.answerDetail;
 
   return (
     <View style={{ gap: tokens.spacing.lg }}>
       <View style={{ gap: tokens.spacing.xs }}>
-        <MetaLabel>{choiceQuestionKindLabels[payload.kind]}</MetaLabel>
-        {payload.title ? (
+        <MetaLabel>{choiceQuestionKindLabels[question.kind]}</MetaLabel>
+        {question.title ? (
           <EditorialTitle
             selectable
             style={{
@@ -311,13 +195,13 @@ export function ChoiceQuestionDialogContent({
             }}
             variant="title"
           >
-            {payload.title}
+            {question.title}
           </EditorialTitle>
         ) : null}
       </View>
 
       <View style={{ gap: tokens.spacing.md }}>
-        {payload.contextText ? (
+        {question.contextText ? (
           <View
             style={{
               gap: tokens.spacing.xs,
@@ -334,7 +218,7 @@ export function ChoiceQuestionDialogContent({
                 lineHeight: 23,
               }}
             >
-              {payload.contextText}
+              {question.contextText}
             </Text>
           </View>
         ) : null}
@@ -355,14 +239,14 @@ export function ChoiceQuestionDialogContent({
               lineHeight: 24,
             }}
           >
-            {payload.prompt}
+            {question.prompt}
           </Text>
         </View>
 
         <View style={{ gap: tokens.spacing.sm }}>
-          {payload.options.map((option, index) => {
+          {question.options.map((option, index) => {
             const optionNumber = String(index + 1);
-            const isSelectedCorrect = selectedOptionId === option.id;
+            const isSelectedCorrect = selectedCorrectOptionId === option.id;
             const wasSelectedWrong = wrongOptionIds.includes(option.id);
             const isSelected =
               isSelectedCorrect ||
@@ -413,18 +297,7 @@ export function ChoiceQuestionDialogContent({
                     return;
                   }
 
-                  if (option.isCorrect) {
-                    setActiveWrongOptionId(null);
-                    setSelectedOptionId(option.id);
-                    return;
-                  }
-
-                  setActiveWrongOptionId(option.id);
-                  setWrongOptionIds((current) =>
-                    current.includes(option.id)
-                      ? current
-                      : [...current, option.id]
-                  );
+                  onSelectOption(option);
                 }}
                 style={({ pressed }) => ({
                   minHeight: 48,
@@ -484,7 +357,11 @@ export function ChoiceQuestionDialogContent({
         </View>
 
         {answerDetailToShow ? (
-          <ChoiceQuestionAnswerDetailReveal answerDetail={answerDetailToShow} />
+          <ChoiceQuestionAnswerDetailPanel
+            answerDetail={answerDetailToShow}
+            answerDetailActionLabel={answerDetailActionLabel}
+            onAnswerDetailActionPress={onAnswerDetailActionPress}
+          />
         ) : null}
       </View>
     </View>

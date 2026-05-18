@@ -26,5 +26,6 @@
 - page 不直接实现播放器细节
 - page 不拥有视频卡 JSX 本体；卡片复合视图由 `widgets/media-feature-card` 提供
 - page 负责派生当前列表展示字段，例如 `statsLabel / tagLabel / fallbackTone`
+- `tagLabel` 来自当前 `VideoListItem.learningUnits` 的文本列表，使用 `, ` 拼接；超过最大长度时保留可完整展示的前缀并用 `...` 表示后续省略
 - page 不在 route 文件里展开路由参数解析
 - page 不定义 `dangerouslySingular`；这属于 `app/_layout.tsx` 的导航层职责

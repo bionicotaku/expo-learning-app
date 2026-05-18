@@ -59,20 +59,32 @@ describe('word detail dialog data', () => {
     });
   });
 
-  it('keeps optional sentence audio metadata when provided by the caller', () => {
+  it('keeps optional word and sentence audio metadata when provided by the caller', () => {
     expect(
       createWordDetailDialogDataFromTranscriptToken(createToken(108404), {
-        endMs: 2400,
-        startMs: 1200,
         videoUrl: 'https://example.com/video.m3u8',
+        word: {
+          endMs: 1220,
+          startMs: 1000,
+        },
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       })
     ).toEqual({
       title: 'Making',
       subtitle: 'make',
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        word: {
+          endMs: 1220,
+          startMs: 1000,
+        },
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
       sections: [
         {

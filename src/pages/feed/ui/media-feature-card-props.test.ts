@@ -26,6 +26,26 @@ function createVideoListItem(overrides: Partial<VideoListItem> = {}): VideoListI
         evidenceStartMs: 31493,
         evidenceEndMs: 31670,
       },
+      {
+        coarseUnitId: 138446,
+        text: 'sacred',
+        role: 'new_now',
+        isPrimary: false,
+        evidenceSentenceIndex: 14,
+        evidenceSpanIndex: 17,
+        evidenceStartMs: 17621,
+        evidenceEndMs: 30899,
+      },
+      {
+        coarseUnitId: 72360,
+        text: 'earlier',
+        role: 'new_now',
+        isPrimary: false,
+        evidenceSentenceIndex: 13,
+        evidenceSpanIndex: 5,
+        evidenceStartMs: 16659,
+        evidenceEndMs: 16868,
+      },
     ],
     ...overrides,
   };
@@ -39,8 +59,42 @@ describe('createVideoMediaFeatureCardProps', () => {
       coverImageUrl: 'https://example.com/cover.webp',
       fallbackTone: 'peach',
       statsLabel: '7.8k · 1:12',
-      tagLabel: 'give',
+      tagLabel: 'give, sacred, earlier',
       title: 'A useful phrase that still sounds natural in daily conversation.',
+    });
+  });
+
+  it('omits later learning units with an ellipsis when the tag label exceeds the maximum length', () => {
+    expect(
+      createVideoMediaFeatureCardProps(
+        createVideoListItem({
+          learningUnits: [
+            ...createVideoListItem().learningUnits,
+            {
+              coarseUnitId: 37192,
+              text: 'acupuncture',
+              role: 'soft_review',
+              isPrimary: false,
+              evidenceSentenceIndex: 27,
+              evidenceSpanIndex: 7,
+              evidenceStartMs: 69032,
+              evidenceEndMs: 75044,
+            },
+            {
+              coarseUnitId: 109520,
+              text: 'massage',
+              role: 'hard_review',
+              isPrimary: false,
+              evidenceSentenceIndex: 27,
+              evidenceSpanIndex: 9,
+              evidenceStartMs: 69032,
+              evidenceEndMs: 75044,
+            },
+          ],
+        })
+      )
+    ).toMatchObject({
+      tagLabel: 'give, sacred, earlier, acupuncture...',
     });
   });
 

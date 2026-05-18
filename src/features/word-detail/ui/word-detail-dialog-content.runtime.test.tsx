@@ -146,6 +146,12 @@ function findSentenceAudioButtons(renderer: TestRenderer.ReactTestRenderer) {
     .filter((node) => String(node.type) === 'Pressable');
 }
 
+function findWordAudioButtons(renderer: TestRenderer.ReactTestRenderer) {
+  return renderer.root
+    .findAllByProps({ accessibilityLabel: '播放单词音频' })
+    .filter((node) => String(node.type) === 'Pressable');
+}
+
 function findFavoriteButtons(renderer: TestRenderer.ReactTestRenderer) {
   return renderer.root
     .findAll(
@@ -172,7 +178,31 @@ describe('WordDetailDialogContent runtime', () => {
     expect(findTextNodes(renderer, '认识')).toHaveLength(0);
     expect(findTextNodes(renderer, '模糊')).toHaveLength(0);
     expect(findTextNodes(renderer, '不认识')).toHaveLength(0);
+    expect(findWordAudioButtons(renderer)).toHaveLength(0);
     expect(findSentenceAudioButtons(renderer)).toHaveLength(0);
+    expect(useVideoPlayerMock).not.toHaveBeenCalled();
+  });
+
+  it('labels word and sentence audio buttons with visible scope badges', () => {
+    const renderer = renderContent({
+      ...basePayload,
+      audio: {
+        videoUrl: 'https://example.com/video.m3u8',
+        word: {
+          endMs: 1350,
+          startMs: 1100,
+        },
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
+      },
+    });
+
+    expect(findWordAudioButtons(renderer)).toHaveLength(1);
+    expect(findSentenceAudioButtons(renderer)).toHaveLength(1);
+    expect(findTextNodes(renderer, '词')).toHaveLength(1);
+    expect(findTextNodes(renderer, '句')).toHaveLength(1);
   });
 
   it('toggles the local favorite button color state only', () => {
@@ -195,18 +225,21 @@ describe('WordDetailDialogContent runtime', () => {
   it('renders an optional sentence audio button beside the subtitle', () => {
     const renderer = renderContent({
       ...basePayload,
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
     });
 
     expect(findTextNodes(renderer, 'make')).toHaveLength(1);
+    expect(findWordAudioButtons(renderer)).toHaveLength(0);
     expect(findSentenceAudioButtons(renderer)).toHaveLength(1);
   });
 
-  it('reuses one headless player and restarts from the sentence start on repeated presses', () => {
+  it('renders word and sentence audio buttons that share one headless player', () => {
     const player = {
       currentTime: 0,
       pause: playerPause,
@@ -217,19 +250,33 @@ describe('WordDetailDialogContent runtime', () => {
     useVideoPlayerMock.mockReturnValue(player);
     const renderer = renderContent({
       ...basePayload,
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        word: {
+          endMs: 1350,
+          startMs: 1100,
+        },
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
     });
-    const [button] = findSentenceAudioButtons(renderer);
+    const [wordButton] = findWordAudioButtons(renderer);
+    const [sentenceButton] = findSentenceAudioButtons(renderer);
 
     act(() => {
-      button!.props.onPress();
+      wordButton!.props.onPress();
     });
+    expect(player.currentTime).toBe(1.1);
+
     act(() => {
-      button!.props.onPress();
+      sentenceButton!.props.onPress();
+    });
+    expect(player.currentTime).toBe(1.2);
+
+    act(() => {
+      wordButton!.props.onPress();
     });
 
     expect(useVideoPlayerMock).toHaveBeenCalledWith(
@@ -239,9 +286,10 @@ describe('WordDetailDialogContent runtime', () => {
       },
       expect.any(Function)
     );
+    expect(findWordAudioButtons(renderer)).toHaveLength(1);
     expect(findSentenceAudioButtons(renderer)).toHaveLength(1);
-    expect(player.currentTime).toBe(1.2);
-    expect(playerPlay).toHaveBeenCalledTimes(2);
+    expect(player.currentTime).toBe(1.1);
+    expect(playerPlay).toHaveBeenCalledTimes(3);
   });
 
   it('shows an audio load failure toast once for an errored play request', () => {
@@ -256,10 +304,12 @@ describe('WordDetailDialogContent runtime', () => {
     useVideoPlayerMock.mockReturnValue(player);
     const payload: WordDetailDialogData = {
       ...basePayload,
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
     };
     const renderer = renderContent(payload);
@@ -292,10 +342,12 @@ describe('WordDetailDialogContent runtime', () => {
     useVideoPlayerMock.mockReturnValue(player);
     const renderer = renderContent({
       ...basePayload,
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
     });
     const [button] = findSentenceAudioButtons(renderer);
@@ -322,10 +374,12 @@ describe('WordDetailDialogContent runtime', () => {
     useVideoPlayerMock.mockReturnValue(player);
     const renderer = renderContent({
       ...basePayload,
-      sentenceAudio: {
-        endMs: 2400,
-        startMs: 1200,
+      audio: {
         videoUrl: 'https://example.com/video.m3u8',
+        sentence: {
+          endMs: 2400,
+          startMs: 1200,
+        },
       },
     });
     const [button] = findSentenceAudioButtons(renderer);

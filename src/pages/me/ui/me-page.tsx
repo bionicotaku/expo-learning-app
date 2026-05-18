@@ -4,8 +4,8 @@ import type { SFSymbol } from 'expo-symbols';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
-  usePresentChoiceQuestionDialog,
-  type ChoiceQuestionDialogData,
+  usePresentChoiceQuestionSetDialog,
+  type ChoiceQuestionData,
 } from '@/features/choice-question';
 import { usePresentPlaybackSettingsSheet } from '@/features/playback-settings';
 import {
@@ -69,13 +69,14 @@ const hardcodedChoiceQuestions: {
   id: string;
   buttonLabel: string;
   accessibilityLabel: string;
-  payload: ChoiceQuestionDialogData;
+  payload: ChoiceQuestionData;
 }[] = [
   {
     id: 'context-meaning',
     buttonLabel: '语境释义选择题',
     accessibilityLabel: 'Open context meaning question',
     payload: {
+      id: 'context-meaning',
       kind: 'context_meaning',
       title: 'barely',
       targetText: 'barely',
@@ -117,6 +118,7 @@ const hardcodedChoiceQuestions: {
     buttonLabel: '通用释义选择题',
     accessibilityLabel: 'Open general meaning question',
     payload: {
+      id: 'general-meaning',
       kind: 'general_meaning',
       title: 'barely',
       targetText: 'barely',
@@ -157,6 +159,7 @@ const hardcodedChoiceQuestions: {
     buttonLabel: '语境填空选择题',
     accessibilityLabel: 'Open context cloze question',
     payload: {
+      id: 'context-cloze',
       kind: 'context_cloze',
       targetText: 'barely',
       contextText: 'I _____ made it to the meeting on time.',
@@ -197,6 +200,7 @@ const hardcodedChoiceQuestions: {
     buttonLabel: '反向识别题',
     accessibilityLabel: 'Open reverse recognition question',
     payload: {
+      id: 'reverse-recognition',
       kind: 'reverse_recognition',
       prompt: '哪个词最接近“勉强、几乎不”？',
       answerDetail: {
@@ -813,7 +817,7 @@ function WordDetailDialogTestCard() {
 
 function ChoiceQuestionDialogTestPanel() {
   const { tokens } = useEditorialPaperTheme();
-  const presentChoiceQuestionDialog = usePresentChoiceQuestionDialog();
+  const presentChoiceQuestionSetDialog = usePresentChoiceQuestionSetDialog();
 
   return (
     <RaisedSurface
@@ -844,7 +848,10 @@ function ChoiceQuestionDialogTestPanel() {
             accessibilityRole="button"
             key={item.id}
             onPress={() => {
-              presentChoiceQuestionDialog(item.payload);
+              presentChoiceQuestionSetDialog({
+                questions: [item.payload],
+                showProgress: false,
+              });
             }}
             style={({ pressed }) => ({
               opacity: pressed ? 0.9 : 1,
@@ -875,6 +882,43 @@ function ChoiceQuestionDialogTestPanel() {
             </RaisedSurface>
           </Pressable>
         ))}
+        <Pressable
+          accessibilityLabel="Open multi-question choice set"
+          accessibilityRole="button"
+          onPress={() => {
+            presentChoiceQuestionSetDialog({
+              questions: hardcodedChoiceQuestions.map((item) => item.payload),
+              showProgress: true,
+            });
+          }}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.9 : 1,
+          })}
+        >
+          <RaisedSurface
+            radius="pill"
+            tone="softActionSky"
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 44,
+              paddingHorizontal: tokens.spacing.lg,
+              paddingVertical: tokens.spacing.sm,
+            }}
+          >
+            <Text
+              numberOfLines={1}
+              style={{
+                color: tokens.color.ink,
+                fontSize: 13,
+                fontWeight: '800',
+                lineHeight: 17,
+              }}
+            >
+              Multi-question demo
+            </Text>
+          </RaisedSurface>
+        </Pressable>
       </View>
     </RaisedSurface>
   );

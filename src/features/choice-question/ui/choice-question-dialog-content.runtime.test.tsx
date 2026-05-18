@@ -1,11 +1,9 @@
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  ChoiceQuestionDialogContent,
-  type ChoiceQuestionDialogData,
-} from './choice-question-dialog-content';
+import type { ChoiceQuestionData } from '../model/types';
+import { ChoiceQuestionSetDialogContent } from './choice-question-set-dialog-content';
 
 vi.mock('react-native', async () => {
   const ReactModule = await import('react');
@@ -50,12 +48,6 @@ vi.mock('react-native-reanimated', async () => {
     return Component;
   }
 
-  const chainableAnimation = {
-    delay: () => chainableAnimation,
-    duration: () => chainableAnimation,
-    easing: () => chainableAnimation,
-  };
-
   return {
     __esModule: true,
     default: {
@@ -65,8 +57,6 @@ vi.mock('react-native-reanimated', async () => {
       cubic: 'cubic',
       out: (value: unknown) => value,
     },
-    FadeIn: chainableAnimation,
-    LinearTransition: chainableAnimation,
     useAnimatedStyle: (updater: () => Record<string, unknown>) => updater(),
     useSharedValue: <T,>(value: T) => ({ value }),
     withDelay: <T,>(_delayMs: number, value: T) => value,
@@ -89,7 +79,8 @@ vi.mock('@/shared/theme/editorial-paper', () => ({
         surface: '#FBF7EE',
       },
       radius: {
-        cardSm: 12,
+        control: 16,
+        pill: 999,
       },
       spacing: {
         lg: 24,
@@ -112,38 +103,71 @@ vi.mock('@/shared/ui/editorial-paper', async () => {
   };
 });
 
-const basePayload: ChoiceQuestionDialogData = {
-  kind: 'context_meaning',
-  title: 'barely',
-  prompt: '这里的 “barely” 最接近什么意思？',
-  contextText: 'I barely made it to the meeting on time.',
-  targetText: 'barely',
-  answerDetail: {
-    label: 'barely',
-    pos: 'adv.',
-    chineseLabel: '几乎不 / 勉强',
-    explanation: '在这个句子里，barely 表示勉强赶上，强调差一点没做到。',
+const questions: ChoiceQuestionData[] = [
+  {
+    id: 'context-meaning',
+    kind: 'context_meaning',
+    title: 'barely',
+    prompt: '这里的 “barely” 最接近什么意思？',
+    contextText: 'I barely made it to the meeting on time.',
+    targetText: 'barely',
+    answerDetail: {
+      label: 'barely',
+      pos: 'adv.',
+      chineseLabel: '几乎不 / 勉强',
+      explanation: '在这个句子里，barely 表示勉强赶上，强调差一点没做到。',
+    },
+    options: [
+      {
+        id: 'q1-correct',
+        label: '几乎不 / 勉强',
+        isCorrect: true,
+      },
+      {
+        id: 'q1-wrong',
+        label: '非常快',
+        isCorrect: false,
+      },
+    ],
   },
-  options: [
-    {
-      id: 'correct',
-      label: '几乎不 / 勉强',
-      isCorrect: true,
+  {
+    id: 'context-cloze',
+    kind: 'context_cloze',
+    prompt: '根据语境选回被隐去的词。',
+    contextText: 'I _____ made it to the meeting on time.',
+    answerDetail: {
+      label: 'barely',
+      pos: 'adv.',
+      chineseLabel: '几乎不 / 勉强',
+      explanation: '空格里需要 barely，因为它表达勉强准时赶到。',
     },
-    {
-      id: 'wrong',
-      label: '非常快',
-      isCorrect: false,
-    },
-  ],
-};
+    options: [
+      {
+        id: 'q2-correct',
+        label: 'barely',
+        isCorrect: true,
+      },
+      {
+        id: 'q2-wrong',
+        label: 'loudly',
+        isCorrect: false,
+      },
+    ],
+  },
+];
 
-function renderContent(payload: ChoiceQuestionDialogData) {
+function renderSet(
+  payload: {
+    questions: ChoiceQuestionData[];
+    showProgress?: boolean;
+  },
+  props: { onDismiss?: () => void } = {}
+) {
   let renderer: TestRenderer.ReactTestRenderer;
 
   act(() => {
     renderer = TestRenderer.create(
-      <ChoiceQuestionDialogContent payload={payload} />
+      <ChoiceQuestionSetDialogContent payload={payload} {...props} />
     );
   });
 
@@ -163,11 +187,38 @@ function findOption(
   return renderer.root.findByProps({ testID: `choice-option-${optionId}` });
 }
 
-describe('ChoiceQuestionDialogContent runtime', () => {
-  it('renders the question kind, title, prompt, context, and options', () => {
-    const renderer = renderContent(basePayload);
+function findButtonByLabel(
+  renderer: TestRenderer.ReactTestRenderer,
+  accessibilityLabel: string
+) {
+  return renderer.root.findByProps({ accessibilityLabel });
+}
+
+function findAllByTestID(
+  renderer: TestRenderer.ReactTestRenderer,
+  testID: string
+) {
+  return renderer.root
+    .findAllByProps({ testID })
+    .filter((node) => typeof node.type === 'string');
+}
+
+describe('ChoiceQuestionSetDialogContent runtime', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
+
+  it('renders the current question with kind, title, prompt, context, numbered options, and close button', () => {
+    const renderer = renderSet({ questions, showProgress: true });
 
     expect(findNodesWithText(renderer, '语境释义选择题')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '1/2')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '×')).toHaveLength(1);
     expect(findNodesWithText(renderer, 'barely')).toHaveLength(1);
     expect(findNodesWithText(renderer, '这里的 “barely” 最接近什么意思？')).toHaveLength(1);
     expect(findNodesWithText(renderer, 'I barely made it to the meeting on time.')).toHaveLength(1);
@@ -177,118 +228,179 @@ describe('ChoiceQuestionDialogContent runtime', () => {
     expect(findNodesWithText(renderer, '2')).toHaveLength(1);
   });
 
-  it('omits the large title when the question payload has no title', () => {
-    const renderer = renderContent({
-      ...basePayload,
-      kind: 'context_cloze',
-      title: undefined,
-      contextText: 'I _____ made it to the meeting on time.',
-      prompt: '根据语境选回被隐去的词。',
+  it('omits progress when showProgress is false', () => {
+    const renderer = renderSet({ questions, showProgress: false });
+
+    expect(findNodesWithText(renderer, '1/2')).toHaveLength(0);
+  });
+
+  it('calls the provided dismiss handler from the top-right close button', () => {
+    const onDismiss = vi.fn();
+    const renderer = renderSet({ questions, showProgress: true }, { onDismiss });
+
+    act(() => {
+      findButtonByLabel(renderer, '关闭题目弹窗').props.onPress();
     });
 
-    expect(
-      renderer.root.findAll((node) => String(node.type) === 'EditorialTitle')
-    ).toHaveLength(0);
-    expect(findNodesWithText(renderer, 'I _____ made it to the meeting on time.')).toHaveLength(1);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('auto-advances after a first-try correct answer', () => {
+    const renderer = renderSet({ questions, showProgress: true });
+
+    act(() => {
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+
+    expect(findOption(renderer, 'q1-correct').props.accessibilityState).toEqual({
+      disabled: true,
+      selected: true,
+    });
+    expect(findNodesWithText(renderer, '根据语境选回被隐去的词。')).toHaveLength(0);
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(findNodesWithText(renderer, '2/2')).toHaveLength(1);
     expect(findNodesWithText(renderer, '根据语境选回被隐去的词。')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '答案解析')).toHaveLength(0);
   });
 
-  it('keeps every option neutral before selection', () => {
-    const renderer = renderContent(basePayload);
+  it('keeps the dialog chrome stable and makes previous question content inert during crossfade', () => {
+    const renderer = renderSet({ questions, showProgress: true });
 
-    expect(findOption(renderer, 'correct').props.accessibilityState).toEqual({
-      disabled: false,
-      selected: false,
-    });
-    expect(findOption(renderer, 'wrong').props.accessibilityState).toEqual({
-      disabled: false,
-      selected: false,
-    });
-  });
-
-  it('locks every option after a correct selection', () => {
-    const renderer = renderContent(basePayload);
+    expect(findAllByTestID(renderer, 'choice-question-dialog-chrome')).toHaveLength(1);
 
     act(() => {
-      findOption(renderer, 'correct').props.onPress();
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
     });
 
-    expect(findOption(renderer, 'correct').props.accessibilityState).toEqual({
-      disabled: true,
-      selected: true,
-    });
-    expect(findOption(renderer, 'correct').props.accessibilityLabel).toContain(
-      '回答正确'
+    expect(findAllByTestID(renderer, 'choice-question-dialog-chrome')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '2/2')).toHaveLength(1);
+
+    const previousContent = findAllByTestID(
+      renderer,
+      'question-content-previous'
     );
-    expect(findOption(renderer, 'wrong').props.accessibilityState).toEqual({
-      disabled: true,
-      selected: false,
-    });
-    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(0);
-    expect(findNodesWithText(renderer, '在这个句子里，barely 表示勉强赶上，强调差一点没做到。')).toHaveLength(0);
+
+    expect(previousContent).toHaveLength(1);
+    expect(previousContent[0].props.pointerEvents).toBe('none');
+    expect(previousContent[0].props.accessibilityElementsHidden).toBe(true);
+    expect(previousContent[0].props.importantForAccessibility).toBe(
+      'no-hide-descendants'
+    );
   });
 
-  it('marks only the wrong selected option and keeps choices enabled after a wrong selection', () => {
-    const renderer = renderContent(basePayload);
+  it('dismisses after a first-try correct answer on the final single question', () => {
+    const onDismiss = vi.fn();
+    const renderer = renderSet(
+      { questions: [questions[0]], showProgress: false },
+      { onDismiss }
+    );
 
     act(() => {
-      findOption(renderer, 'wrong').props.onPress();
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
     });
 
-    expect(findOption(renderer, 'wrong').props.accessibilityState).toEqual({
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('marks a wrong option without revealing the correct answer and keeps choices enabled', () => {
+    const renderer = renderSet({ questions, showProgress: true });
+
+    act(() => {
+      findOption(renderer, 'q1-wrong').props.onPress();
+    });
+
+    expect(findOption(renderer, 'q1-wrong').props.accessibilityState).toEqual({
       disabled: false,
       selected: true,
     });
-    expect(findOption(renderer, 'wrong').props.accessibilityLabel).toContain(
+    expect(findOption(renderer, 'q1-wrong').props.accessibilityLabel).toContain(
       '回答错误'
     );
-    expect(findOption(renderer, 'correct').props.accessibilityState).toEqual({
+    expect(findOption(renderer, 'q1-correct').props.accessibilityState).toEqual({
       disabled: false,
       selected: false,
     });
-    expect(findOption(renderer, 'correct').props.accessibilityLabel).not.toContain(
-      '正确答案'
-    );
+    expect(findNodesWithText(renderer, '答案解析')).toHaveLength(0);
+
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
+
+    expect(findNodesWithText(renderer, '这里的 “barely” 最接近什么意思？')).toHaveLength(1);
   });
 
-  it('allows retrying after wrong selections until the correct option locks the dialog', () => {
-    const renderer = renderContent(basePayload);
+  it('shows answer detail after wrong then correct and waits for the manual next button', () => {
+    const renderer = renderSet({ questions, showProgress: true });
 
     act(() => {
-      findOption(renderer, 'wrong').props.onPress();
+      findOption(renderer, 'q1-wrong').props.onPress();
     });
     act(() => {
-      findOption(renderer, 'correct').props.onPress();
+      findOption(renderer, 'q1-correct').props.onPress();
     });
 
-    expect(findOption(renderer, 'wrong').props.accessibilityState).toEqual({
-      disabled: true,
+    expect(findNodesWithText(renderer, '答案解析')).toHaveLength(1);
+    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '在这个句子里，barely 表示勉强赶上，强调差一点没做到。')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '下一个')).toHaveLength(1);
+
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
+
+    expect(findNodesWithText(renderer, '这里的 “barely” 最接近什么意思？')).toHaveLength(1);
+
+    act(() => {
+      findButtonByLabel(renderer, '下一个').props.onPress();
+    });
+
+    expect(findNodesWithText(renderer, '2/2')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '这里的 “barely” 最接近什么意思？')).toHaveLength(1);
+    expect(findNodesWithText(renderer, '根据语境选回被隐去的词。')).toHaveLength(1);
+    expect(findAllByTestID(renderer, 'question-content-previous')).toHaveLength(1);
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    expect(findNodesWithText(renderer, '答案解析')).toHaveLength(0);
+    expect(findAllByTestID(renderer, 'question-content-previous')).toHaveLength(0);
+    expect(findOption(renderer, 'q2-correct').props.accessibilityState).toEqual({
+      disabled: false,
       selected: false,
     });
-    expect(findOption(renderer, 'correct').props.accessibilityState).toEqual({
-      disabled: true,
-      selected: true,
-    });
-    expect(findOption(renderer, 'correct').props.accessibilityLabel).toContain(
-      '回答正确'
-    );
   });
 
-  it('shows answer detail only after a wrong attempt is followed by the correct option', () => {
-    const renderer = renderContent(basePayload);
+  it('closes from the final answer detail action', () => {
+    const onDismiss = vi.fn();
+    const renderer = renderSet(
+      { questions: [questions[0]], showProgress: false },
+      { onDismiss }
+    );
 
     act(() => {
-      findOption(renderer, 'wrong').props.onPress();
+      findOption(renderer, 'q1-wrong').props.onPress();
     });
-    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(0);
+    act(() => {
+      findOption(renderer, 'q1-correct').props.onPress();
+    });
+
+    expect(findNodesWithText(renderer, '完成')).toHaveLength(1);
 
     act(() => {
-      findOption(renderer, 'correct').props.onPress();
+      findButtonByLabel(renderer, '完成').props.onPress();
     });
 
-    expect(findNodesWithText(renderer, 'barely')).toHaveLength(2);
-    expect(findNodesWithText(renderer, 'adv.')).toHaveLength(1);
-    expect(findNodesWithText(renderer, '几乎不 / 勉强')).toHaveLength(2);
-    expect(findNodesWithText(renderer, '在这个句子里，barely 表示勉强赶上，强调差一点没做到。')).toHaveLength(1);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });

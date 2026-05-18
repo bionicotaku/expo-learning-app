@@ -114,7 +114,7 @@ FullscreenVideoPager
   - 基础字幕文本高度变化只向上增长，不重新布局 title / description；description 展开导致内容列上移时，字幕仍跟随锚点上移
   - 基础字幕优先渲染当前 `TranscriptSentence.tokens`；没有 token 时才 fallback 到整句 `TranscriptSentence.text`
   - 当前播放 token 使用纯色高亮；高亮只改变 token 的 `color` 与 `textShadow`，不改变字号、行高、字重、间距或换行模型
-  - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog；dialog data 包含 title、subtitle、展示 sections 和可选句子音频信息
+  - 所有 token 都可点击；点击后经 row 层打开 `features/word-detail` 的 shared dialog；dialog data 包含 title、subtitle、展示 sections 和可选单词/句子音频信息
   - 字幕 presenter 不直接 import modal hook，只通过 `onSubtitleTokenPress` 向 row 组合层发出 token 与当前 sentence 事件
   - 字幕显示由 `features/playback-settings` 的 `subtitleDisplayMode` 全局 session 偏好控制：`off` 不显示，`english` 只显示英文，`bilingual` 在英文下方显示当前句 `explanation`
   - 字幕显示模式只控制 UI 展示，不停止 fullscreen video resources 读取或缓存
@@ -125,7 +125,7 @@ FullscreenVideoPager
   - 基础字幕不限制为固定两行，当前句文本按实际长度自然换行显示
   - 基础字幕复用 row-local `seekBarStore` 的 `progressSnapshot.currentTimeSeconds` 做时间同步，不直接监听播放器
   - 当前句显示时间来自 `entities/transcript` 在缓存前完成的 sentence timing normalization；当前 token 高亮仍使用原始 token 时间
-  - 点击字幕 token 不 seek、不触发 pause HUD；word detail dialog 打开期间只通过 session playback hold 临时暂停 active row；dialog 内句子音频按钮使用独立临时无头播放器播放当前句 HLS 片段，加载或播放失败时由 word detail 显示 `音频加载失败` toast
+  - 点击字幕 token 不 seek、不触发 pause HUD；word detail dialog 打开期间只通过 session playback hold 临时暂停 active row；dialog 内单词/句子音频按钮共用独立临时无头播放器播放对应 HLS 片段，加载或播放失败时由 word detail 显示 `音频加载失败` toast
   - 字幕空白区不拦截背景手势
   - 从 widget-level overlay theme 取 title 样式与 description lane 几何，并显式关闭字体缩放；该约束只作用于 row-owned overlay 自身
   - 父层只负责 title + description 区整体向上/向下的布局动画，不持有 description 的内部展开态

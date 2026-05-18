@@ -13,6 +13,9 @@ const fallbackTones: readonly MediaFeatureCardFallbackTone[] = [
   'rose',
 ] as const;
 
+const learningUnitTagLabelMaxLength = 40;
+const defaultTagLabel = 'ENGLISH STUDY';
+
 function resolveStableIndex(videoId: string) {
   const trailingNumber = videoId.match(/(\d+)$/)?.[1];
 
@@ -50,11 +53,48 @@ function resolveFallbackTone(videoId: string): MediaFeatureCardFallbackTone {
   return fallbackTones[((stableIndex % fallbackTones.length) + fallbackTones.length) % fallbackTones.length];
 }
 
+function truncateLongLearningUnitText(text: string) {
+  if (text.length <= learningUnitTagLabelMaxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, learningUnitTagLabelMaxLength - 3)}...`;
+}
+
+function resolveLearningUnitTagLabel(item: VideoListItem) {
+  const unitTexts = item.learningUnits
+    .map((unit) => unit.text.trim())
+    .filter((text) => text.length > 0);
+
+  if (unitTexts.length === 0) {
+    return defaultTagLabel;
+  }
+
+  let label = '';
+
+  for (const text of unitTexts) {
+    const nextLabel = label.length === 0 ? text : `${label}, ${text}`;
+
+    if (nextLabel.length <= learningUnitTagLabelMaxLength) {
+      label = nextLabel;
+      continue;
+    }
+
+    if (label.length === 0) {
+      return truncateLongLearningUnitText(text);
+    }
+
+    return `${label}...`;
+  }
+
+  return label;
+}
+
 export function createVideoMediaFeatureCardProps(item: VideoListItem): MediaFeatureCardProps {
   return {
     title: item.title,
     statsLabel: `${formatViewCount(item.viewCount)} · ${formatDuration(item.durationSeconds)}`,
-    tagLabel: item.learningUnits[0]?.text ?? 'ENGLISH STUDY',
+    tagLabel: resolveLearningUnitTagLabel(item),
     coverImageUrl: item.coverImageUrl ?? null,
     fallbackTone: resolveFallbackTone(item.videoId),
     accessibilityLabel: `Open video: ${item.title}`,

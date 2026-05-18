@@ -1,18 +1,18 @@
 import type { TranscriptToken } from '@/entities/transcript';
 
 import type {
+  WordDetailDialogAudio,
   WordDetailDialogData,
-  WordDetailSentenceAudio,
 } from '../ui/word-detail-dialog-content';
 
 export function createWordDetailDialogDataFromTranscriptToken(
   token: TranscriptToken,
-  sentenceAudio?: WordDetailSentenceAudio
+  audio?: WordDetailDialogAudio
 ): WordDetailDialogData {
   return {
     title: token.text,
     subtitle: token.semanticElement.baseForm,
-    ...(sentenceAudio ? { sentenceAudio } : {}),
+    ...(audio ? { audio } : {}),
     sections: [
       {
         id: 'context',

@@ -17,16 +17,21 @@ export type WordDetailDialogSection = {
   body: string;
 };
 
-export type WordDetailSentenceAudio = {
+export type WordDetailAudioClip = {
   endMs: number;
   startMs: number;
+};
+
+export type WordDetailDialogAudio = {
+  sentence?: WordDetailAudioClip;
   videoUrl: string;
+  word?: WordDetailAudioClip;
 };
 
 export type WordDetailDialogData = {
   title: string;
   subtitle?: string;
-  sentenceAudio?: WordDetailSentenceAudio;
+  audio?: WordDetailDialogAudio;
   sections: WordDetailDialogSection[];
 };
 
@@ -66,19 +71,31 @@ function WordDetailSection({
   );
 }
 
-function WordDetailSentenceAudioPlayer({
-  playRequestToken,
-  sentenceAudio,
+type WordDetailAudioPlayRequest = {
+  clip: WordDetailAudioClip;
+  token: number;
+};
+
+function isPlayableAudioClip(
+  videoUrl: string,
+  clip: WordDetailAudioClip | undefined
+): clip is WordDetailAudioClip {
+  return Boolean(clip && videoUrl.length > 0 && clip.endMs > clip.startMs);
+}
+
+function WordDetailHeadlessAudioPlayer({
+  playRequest,
+  videoUrl,
 }: {
-  playRequestToken: number;
-  sentenceAudio: WordDetailSentenceAudio;
+  playRequest: WordDetailAudioPlayRequest;
+  videoUrl: string;
 }) {
   const source = useMemo(
     () => ({
       contentType: 'hls' as const,
-      uri: sentenceAudio.videoUrl,
+      uri: videoUrl,
     }),
-    [sentenceAudio.videoUrl]
+    [videoUrl]
   );
   const player = useVideoPlayer(source, (instance) => {
     instance.loop = false;
@@ -89,8 +106,8 @@ function WordDetailSentenceAudioPlayer({
     status: player.status,
     error: undefined,
   });
-  const startSeconds = Math.max(0, sentenceAudio.startMs / 1000);
-  const endSeconds = Math.max(startSeconds, sentenceAudio.endMs / 1000);
+  const startSeconds = Math.max(0, playRequest.clip.startMs / 1000);
+  const endSeconds = Math.max(startSeconds, playRequest.clip.endMs / 1000);
   const lastErrorToastRequestRef = useRef(0);
   const showAudioErrorToast = useCallback(
     (requestToken: number) => {
@@ -111,12 +128,8 @@ function WordDetailSentenceAudioPlayer({
   );
 
   useEffect(() => {
-    if (playRequestToken <= 0) {
-      return;
-    }
-
     if (status === 'error') {
-      showAudioErrorToast(playRequestToken);
+      showAudioErrorToast(playRequest.token);
       return;
     }
 
@@ -128,12 +141,12 @@ function WordDetailSentenceAudioPlayer({
       player.currentTime = startSeconds;
       player.play();
     } catch {
-      showAudioErrorToast(playRequestToken);
+      showAudioErrorToast(playRequest.token);
     }
-  }, [playRequestToken, player, showAudioErrorToast, startSeconds, status]);
+  }, [playRequest.token, player, showAudioErrorToast, startSeconds, status]);
 
   useEventListener(player, 'timeUpdate', (payload) => {
-    if (playRequestToken <= 0 || payload.currentTime < endSeconds) {
+    if (payload.currentTime < endSeconds) {
       return;
     }
 
@@ -144,68 +157,139 @@ function WordDetailSentenceAudioPlayer({
   return null;
 }
 
-function WordDetailSentenceAudioButton({
-  sentenceAudio,
+function WordDetailAudioButton({
+  accessibilityLabel,
+  badgeLabel,
+  disabled,
+  onPress,
 }: {
-  sentenceAudio: WordDetailSentenceAudio;
+  accessibilityLabel: string;
+  badgeLabel: string;
+  disabled?: boolean;
+  onPress: () => void;
+}) {
+  const { tokens } = useEditorialPaperTheme();
+
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: Boolean(disabled) }}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        borderRadius: tokens.radius.pill,
+        backgroundColor: 'rgba(255,255,255,0.42)',
+        opacity: disabled ? 0.48 : pressed ? 0.72 : 1,
+      })}
+    >
+      <SymbolView
+        fallback={
+          <Text
+            selectable={false}
+            style={{
+              color: tokens.color.inkMute,
+              fontSize: 15,
+              fontWeight: '800',
+              lineHeight: 18,
+            }}
+          >
+            ▶
+          </Text>
+        }
+        name={{ ios: 'speaker.wave.2.fill' }}
+        size={16}
+        tintColor={tokens.color.inkMute}
+        type="hierarchical"
+        weight="semibold"
+      />
+      <Text
+        selectable={false}
+        style={{
+          position: 'absolute',
+          right: 2,
+          bottom: 2,
+          minWidth: 12,
+          height: 12,
+          overflow: 'hidden',
+          borderRadius: 6,
+          backgroundColor: 'rgba(28,26,23,0.78)',
+          color: tokens.color.surface,
+          fontSize: 8,
+          fontWeight: '800',
+          lineHeight: 12,
+          textAlign: 'center',
+        }}
+      >
+        {badgeLabel}
+      </Text>
+    </Pressable>
+  );
+}
+
+function WordDetailAudioControls({
+  audio,
+}: {
+  audio: WordDetailDialogAudio;
 }) {
   const { tokens } = useEditorialPaperTheme();
   const [isPlayerMounted, setIsPlayerMounted] = useState(false);
-  const [playRequestToken, setPlayRequestToken] = useState(0);
-  const isAudioPlayable =
-    sentenceAudio.videoUrl.length > 0 && sentenceAudio.endMs > sentenceAudio.startMs;
-  const handlePress = useCallback(() => {
-    if (!isAudioPlayable) {
-      return;
-    }
-
+  const [playRequest, setPlayRequest] =
+    useState<WordDetailAudioPlayRequest | null>(null);
+  const wordClip = isPlayableAudioClip(audio.videoUrl, audio.word)
+    ? audio.word
+    : null;
+  const sentenceClip = isPlayableAudioClip(audio.videoUrl, audio.sentence)
+    ? audio.sentence
+    : null;
+  const handlePlayClip = useCallback((clip: WordDetailAudioClip) => {
     setIsPlayerMounted(true);
-    setPlayRequestToken((currentToken) => currentToken + 1);
-  }, [isAudioPlayable]);
+    setPlayRequest((currentRequest) => ({
+      clip,
+      token: (currentRequest?.token ?? 0) + 1,
+    }));
+  }, []);
+
+  if (!wordClip && !sentenceClip) {
+    return null;
+  }
 
   return (
     <>
-      <Pressable
-        accessibilityLabel="播放本句音频"
-        accessibilityRole="button"
-        accessibilityState={{ disabled: !isAudioPlayable }}
-        disabled={!isAudioPlayable}
-        onPress={handlePress}
-        style={({ pressed }) => ({
-          width: 30,
-          height: 30,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: tokens.radius.pill,
-          backgroundColor: 'rgba(255,255,255,0.42)',
-          opacity: !isAudioPlayable ? 0.48 : pressed ? 0.72 : 1,
-        })}
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: tokens.spacing.xs,
+        }}
       >
-        <SymbolView
-          fallback={
-            <Text
-              selectable={false}
-              style={{
-                color: tokens.color.inkMute,
-                fontSize: 15,
-                fontWeight: '800',
-                lineHeight: 18,
-              }}
-            >
-              ▶
-            </Text>
-          }
-          name={{ ios: 'speaker.wave.2.fill' }}
-          size={16}
-          tintColor={tokens.color.inkMute}
-          type="hierarchical"
-          weight="semibold"
-        />
-      </Pressable>
-      {isPlayerMounted ? (
-        <WordDetailSentenceAudioPlayer
-          playRequestToken={playRequestToken}
-          sentenceAudio={sentenceAudio}
+        {wordClip ? (
+          <WordDetailAudioButton
+            accessibilityLabel="播放单词音频"
+            badgeLabel="词"
+            onPress={() => {
+              handlePlayClip(wordClip);
+            }}
+          />
+        ) : null}
+        {sentenceClip ? (
+          <WordDetailAudioButton
+            accessibilityLabel="播放本句音频"
+            badgeLabel="句"
+            onPress={() => {
+              handlePlayClip(sentenceClip);
+            }}
+          />
+        ) : null}
+      </View>
+      {isPlayerMounted && playRequest ? (
+        <WordDetailHeadlessAudioPlayer
+          playRequest={playRequest}
+          videoUrl={audio.videoUrl}
         />
       ) : null}
     </>
@@ -310,10 +394,8 @@ export function WordDetailDialogContent({
             >
               {payload.subtitle}
             </Text>
-            {payload.sentenceAudio ? (
-              <WordDetailSentenceAudioButton
-                sentenceAudio={payload.sentenceAudio}
-              />
+            {payload.audio ? (
+              <WordDetailAudioControls audio={payload.audio} />
             ) : null}
           </View>
         ) : null}
