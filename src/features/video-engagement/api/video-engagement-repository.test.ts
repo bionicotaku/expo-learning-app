@@ -32,16 +32,16 @@ describe('video engagement repository', () => {
 
   it('resolves like and favorite writes for valid mock video ids', async () => {
     await expect(
-      setVideoLiked('the-office-health-care-video-1', true)
+      setVideoLiked('00000000-0000-4000-8000-000000000001', true)
     ).resolves.toBeUndefined();
     await expect(
-      setVideoLiked('the-office-health-care-video-1', false)
+      setVideoLiked('00000000-0000-4000-8000-000000000001', false)
     ).resolves.toBeUndefined();
     await expect(
-      setVideoFavorited('the-office-health-care-video-1', true)
+      setVideoFavorited('00000000-0000-4000-8000-000000000001', true)
     ).resolves.toBeUndefined();
     await expect(
-      setVideoFavorited('the-office-health-care-video-1', false)
+      setVideoFavorited('00000000-0000-4000-8000-000000000001', false)
     ).resolves.toBeUndefined();
   });
 

@@ -1,18 +1,37 @@
-import type { FeedItem } from '@/entities/feed';
+import type { FeedItem, FeedLearningUnit } from '@/entities/feed';
 
-import type { VideoListItem } from './types';
+import type { VideoLearningUnit, VideoListItem } from './types';
 
-export function mapFeedItemToVideoListItem(item: FeedItem): VideoListItem {
+function mapFeedLearningUnitToVideoLearningUnit(
+  unit: FeedLearningUnit
+): VideoLearningUnit {
   return {
-    videoId: item.videoId,
+    coarseUnitId: unit.coarse_unit_id,
+    text: unit.text,
+    role: unit.role,
+    isPrimary: unit.is_primary,
+    evidenceSentenceIndex: unit.evidence_sentence_index,
+    evidenceSpanIndex: unit.evidence_span_index,
+    evidenceStartMs: unit.evidence_start_ms,
+    evidenceEndMs: unit.evidence_end_ms,
+  };
+}
+
+export function mapFeedItemToVideoListItem(
+  item: FeedItem,
+  recommendationRunId: string
+): VideoListItem {
+  return {
+    videoId: item.video_id,
     title: item.title,
     description: item.description,
-    videoUrl: item.videoUrl,
-    coverImageUrl: item.coverImageUrl ?? null,
-    durationSeconds: item.durationSeconds,
-    favoriteCount: item.favoriteCount,
-    likeCount: item.likeCount,
-    viewCount: item.viewCount,
-    tags: item.tags,
+    videoUrl: item.video_url,
+    coverImageUrl: item.cover_image_url ?? null,
+    durationSeconds: item.duration_seconds,
+    favoriteCount: item.favorite_count,
+    likeCount: item.like_count,
+    viewCount: item.view_count,
+    recommendationRunId,
+    learningUnits: item.learning_units.map(mapFeedLearningUnitToVideoLearningUnit),
   };
 }

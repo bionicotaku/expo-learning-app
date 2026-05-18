@@ -4,8 +4,8 @@ import { fetchVideoMeta } from './video-meta-repository';
 
 describe('video meta repository', () => {
   it('returns current user flags and transcript url for a video id', async () => {
-    await expect(fetchVideoMeta('the-office-health-care-video-1')).resolves.toMatchObject({
-      videoId: 'the-office-health-care-video-1',
+    await expect(fetchVideoMeta('00000000-0000-4000-8000-000000000001')).resolves.toMatchObject({
+      videoId: '00000000-0000-4000-8000-000000000001',
       isLiked: expect.any(Boolean),
       isFavorited: expect.any(Boolean),
       transcriptUrl:
@@ -14,8 +14,8 @@ describe('video meta repository', () => {
   });
 
   it('keeps transcript urls aligned with the shared mock clip catalog', async () => {
-    const first = await fetchVideoMeta('the-office-health-care-video-1');
-    const ninth = await fetchVideoMeta('the-office-health-care-video-9');
+    const first = await fetchVideoMeta('00000000-0000-4000-8000-000000000001');
+    const ninth = await fetchVideoMeta('00000000-0000-4000-8000-000000000009');
 
     expect(first.transcriptUrl).toBe(ninth.transcriptUrl);
   });

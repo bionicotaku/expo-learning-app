@@ -54,7 +54,7 @@ export function createVideoMediaFeatureCardProps(item: VideoListItem): MediaFeat
   return {
     title: item.title,
     statsLabel: `${formatViewCount(item.viewCount)} · ${formatDuration(item.durationSeconds)}`,
-    tagLabel: item.tags[0] ?? 'ENGLISH STUDY',
+    tagLabel: item.learningUnits[0]?.text ?? 'ENGLISH STUDY',
     coverImageUrl: item.coverImageUrl ?? null,
     fallbackTone: resolveFallbackTone(item.videoId),
     accessibilityLabel: `Open video: ${item.title}`,

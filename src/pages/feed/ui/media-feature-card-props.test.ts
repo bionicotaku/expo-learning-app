@@ -14,7 +14,19 @@ function createVideoListItem(overrides: Partial<VideoListItem> = {}): VideoListI
     viewCount: 7800,
     likeCount: 420,
     favoriteCount: 36,
-    tags: ['PHRASAL VERB', 'LISTENING CUE'],
+    recommendationRunId: '00000000-0000-4000-8000-000000000000',
+    learningUnits: [
+      {
+        coarseUnitId: 89008,
+        text: 'give',
+        role: 'near_future',
+        isPrimary: true,
+        evidenceSentenceIndex: 15,
+        evidenceSpanIndex: 1,
+        evidenceStartMs: 31493,
+        evidenceEndMs: 31670,
+      },
+    ],
     ...overrides,
   };
 }
@@ -27,18 +39,18 @@ describe('createVideoMediaFeatureCardProps', () => {
       coverImageUrl: 'https://example.com/cover.webp',
       fallbackTone: 'peach',
       statsLabel: '7.8k · 1:12',
-      tagLabel: 'PHRASAL VERB',
+      tagLabel: 'give',
       title: 'A useful phrase that still sounds natural in daily conversation.',
     });
   });
 
-  it('falls back to a stable tone and default tag when the feed item has no cover or tags', () => {
+  it('falls back to a stable tone and default tag when the feed item has no cover or learning units', () => {
     expect(
       createVideoMediaFeatureCardProps(
         createVideoListItem({
           videoId: 'the-office-health-care-clip-4',
           coverImageUrl: null,
-          tags: [],
+          learningUnits: [],
           viewCount: 12450,
           durationSeconds: 160,
         })

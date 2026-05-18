@@ -1,3 +1,16 @@
+import type { FeedLearningUnitRole } from '@/entities/feed';
+
+export type VideoLearningUnit = {
+  coarseUnitId: number;
+  text: string;
+  role: FeedLearningUnitRole;
+  isPrimary: boolean;
+  evidenceSentenceIndex: number;
+  evidenceSpanIndex: number;
+  evidenceStartMs: number;
+  evidenceEndMs: number;
+};
+
 export type VideoListItem = {
   videoId: string;
   title: string;
@@ -8,5 +21,6 @@ export type VideoListItem = {
   favoriteCount: number;
   likeCount: number;
   viewCount: number;
-  tags: string[];
+  recommendationRunId: string;
+  learningUnits: VideoLearningUnit[];
 };

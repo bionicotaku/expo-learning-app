@@ -2,25 +2,50 @@ import { QueryClient } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as feedEntity from '@/entities/feed';
-import type { FeedItem } from '@/entities/feed';
+import type { FeedItem, FeedResponse } from '@/entities/feed';
 import { mapFeedItemToVideoListItem, type VideoListItem } from '@/entities/video';
 import { useVideoRuntimeStore } from '@/features/video-runtime';
 import { toast } from '@/shared/lib/toast';
 
 import * as feedSource from './feed-source';
 
+function createVideoId(index: number) {
+  return `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`;
+}
+
 function createFeedItem(index: number): FeedItem {
   return {
-    videoId: `the-office-health-care-video-${index + 1}`,
+    video_id: createVideoId(index),
     title: `Clip ${index + 1}`,
     description: `Description ${index + 1}`,
-    videoUrl: `https://example.com/${index + 1}.m3u8`,
-    coverImageUrl: `https://example.com/${index + 1}.webp`,
-    durationSeconds: 70 + index,
-    viewCount: 7000 + index * 100,
-    likeCount: 300 + index,
-    favoriteCount: 40 + index,
-    tags: [`TAG ${index + 1}`],
+    video_url: `https://example.com/${index + 1}.m3u8`,
+    cover_image_url: `https://example.com/${index + 1}.webp`,
+    duration_seconds: 70 + index,
+    view_count: 7000 + index * 100,
+    like_count: 300 + index,
+    favorite_count: 40 + index,
+    learning_units: [
+      {
+        coarse_unit_id: 89008 + index,
+        text: `unit ${index + 1}`,
+        role: 'near_future',
+        is_primary: true,
+        evidence_sentence_index: 15,
+        evidence_span_index: 1,
+        evidence_start_ms: 31493,
+        evidence_end_ms: 31670,
+      },
+    ],
+  };
+}
+
+function createFeedResponse(
+  items: FeedItem[],
+  recommendationRunId = '00000000-0000-4000-8000-000000000000'
+): FeedResponse {
+  return {
+    recommendation_run_id: recommendationRunId,
+    items,
   };
 }
 
@@ -48,17 +73,17 @@ describe('feed source helpers', () => {
   });
 
   it('lets the initial successful feed fetch register membership without replacing local runtime overrides', async () => {
-    const fetchFeedSpy = vi.spyOn(feedEntity, 'fetchFeed').mockResolvedValue({
-      items: [createFeedItem(0), createFeedItem(1)],
-    });
+    const fetchFeedSpy = vi
+      .spyOn(feedEntity, 'fetchFeed')
+      .mockResolvedValue(createFeedResponse([createFeedItem(0), createFeedItem(1)]));
 
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-1',
+      '00000000-0000-4000-8000-000000000001',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-3',
+      '00000000-0000-4000-8000-000000000003',
       { isFavorited: true },
       { isLiked: false, isFavorited: false }
     );
@@ -66,21 +91,27 @@ describe('feed source helpers', () => {
     const snapshot = await feedSource.fetchInitialFeedSourceSnapshot();
 
     expect(snapshot.items).toEqual([
-      mapFeedItemToVideoListItem(createFeedItem(0)),
-      mapFeedItemToVideoListItem(createFeedItem(1)),
+      mapFeedItemToVideoListItem(
+        createFeedItem(0),
+        '00000000-0000-4000-8000-000000000000'
+      ),
+      mapFeedItemToVideoListItem(
+        createFeedItem(1),
+        '00000000-0000-4000-8000-000000000000'
+      ),
     ]);
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
-      'the-office-health-care-video-1': {
+      '00000000-0000-4000-8000-000000000001': {
         isLiked: true,
       },
-      'the-office-health-care-video-3': {
+      '00000000-0000-4000-8000-000000000003': {
         isFavorited: true,
       },
     });
     expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
       feed: {
-        'the-office-health-care-video-1': true,
-        'the-office-health-care-video-2': true,
+        '00000000-0000-4000-8000-000000000001': true,
+        '00000000-0000-4000-8000-000000000002': true,
       },
       history: {},
     });
@@ -92,7 +123,7 @@ describe('feed source helpers', () => {
     let releaseRequest!: () => void;
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
-        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+        fetchFeed: () => Promise<FeedResponse>;
       }) => {
         requestMore: (queryClient: QueryClient) => Promise<void>;
       };
@@ -104,11 +135,9 @@ describe('feed source helpers', () => {
     }).createFeedSourceController({
       fetchFeed: vi.fn(
         () =>
-          new Promise<{ items: FeedItem[] }>((resolve) => {
+          new Promise<FeedResponse>((resolve) => {
             releaseRequest = () => {
-              resolve({
-                items: [createFeedItem(0), createFeedItem(1)],
-              });
+              resolve(createFeedResponse([createFeedItem(0), createFeedItem(1)]));
             };
           })
       ),
@@ -143,8 +172,14 @@ describe('feed source helpers', () => {
       }).getFeedSourceSnapshot(queryClient)
     ).toEqual({
       items: [
-        mapFeedItemToVideoListItem(createFeedItem(0)),
-        mapFeedItemToVideoListItem(createFeedItem(1)),
+        mapFeedItemToVideoListItem(
+          createFeedItem(0),
+          '00000000-0000-4000-8000-000000000000'
+        ),
+        mapFeedItemToVideoListItem(
+          createFeedItem(1),
+          '00000000-0000-4000-8000-000000000000'
+        ),
       ],
       isExtending: false,
       isRefreshing: false,
@@ -153,23 +188,24 @@ describe('feed source helpers', () => {
 
   it('deduplicates concurrent requestMore calls and refresh replaces the assembled source after the in-flight append settles', async () => {
     const fetchFeed = vi
-      .fn<() => Promise<{ items: FeedItem[] }>>()
+      .fn<() => Promise<FeedResponse>>()
       .mockImplementationOnce(
         () =>
           new Promise((resolve) => {
             setTimeout(() => {
-              resolve({
-                items: [createFeedItem(0), createFeedItem(1)],
-              });
+              resolve(createFeedResponse([createFeedItem(0), createFeedItem(1)]));
             }, 0);
           })
       )
-      .mockResolvedValueOnce({
-        items: [createFeedItem(8)],
-      });
+      .mockResolvedValueOnce(
+        createFeedResponse(
+          [createFeedItem(8)],
+          '00000000-0000-4000-8000-000000000008'
+        )
+      );
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
-        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+        fetchFeed: () => Promise<FeedResponse>;
       }) => {
         requestMore: (queryClient: QueryClient) => Promise<void>;
         refresh: (queryClient: QueryClient) => Promise<void>;
@@ -197,7 +233,12 @@ describe('feed source helpers', () => {
         };
       }).getFeedSourceSnapshot(queryClient)
     ).toEqual({
-      items: [mapFeedItemToVideoListItem(createFeedItem(8))],
+      items: [
+        mapFeedItemToVideoListItem(
+          createFeedItem(8),
+          '00000000-0000-4000-8000-000000000008'
+        ),
+      ],
       isExtending: false,
       isRefreshing: false,
     });
@@ -206,7 +247,7 @@ describe('feed source helpers', () => {
   it('lets append union returned ids into feed membership without replacing local runtime overrides for those ids', async () => {
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
-        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+        fetchFeed: () => Promise<FeedResponse>;
       }) => {
         requestMore: (queryClient: QueryClient) => Promise<void>;
         refresh: (queryClient: QueryClient) => Promise<void>;
@@ -214,21 +255,17 @@ describe('feed source helpers', () => {
     }).createFeedSourceController({
       fetchFeed: vi
         .fn()
-        .mockResolvedValueOnce({
-          items: [createFeedItem(0), createFeedItem(1)],
-        })
-        .mockResolvedValueOnce({
-          items: [createFeedItem(0)],
-        }),
+        .mockResolvedValueOnce(createFeedResponse([createFeedItem(0), createFeedItem(1)]))
+        .mockResolvedValueOnce(createFeedResponse([createFeedItem(0)])),
     });
 
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-1',
+      '00000000-0000-4000-8000-000000000001',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-3',
+      '00000000-0000-4000-8000-000000000003',
       { isFavorited: true },
       { isLiked: false, isFavorited: false }
     );
@@ -236,31 +273,31 @@ describe('feed source helpers', () => {
     await controller.requestMore(queryClient);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
-      'the-office-health-care-video-1': {
+      '00000000-0000-4000-8000-000000000001': {
         isLiked: true,
       },
-      'the-office-health-care-video-3': {
+      '00000000-0000-4000-8000-000000000003': {
         isFavorited: true,
       },
     });
     expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
       feed: {
-        'the-office-health-care-video-1': true,
-        'the-office-health-care-video-2': true,
+        '00000000-0000-4000-8000-000000000001': true,
+        '00000000-0000-4000-8000-000000000002': true,
       },
       history: {},
     });
 
     useVideoRuntimeStore
       .getState()
-      .acceptFetchedIds('history', ['the-office-health-care-video-2']);
+      .acceptFetchedIds('history', ['00000000-0000-4000-8000-000000000002']);
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-2',
+      '00000000-0000-4000-8000-000000000002',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-1',
+      '00000000-0000-4000-8000-000000000001',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
@@ -268,22 +305,22 @@ describe('feed source helpers', () => {
     await controller.refresh(queryClient);
 
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
-      'the-office-health-care-video-1': {
+      '00000000-0000-4000-8000-000000000001': {
         isLiked: true,
       },
-      'the-office-health-care-video-2': {
+      '00000000-0000-4000-8000-000000000002': {
         isLiked: true,
       },
-      'the-office-health-care-video-3': {
+      '00000000-0000-4000-8000-000000000003': {
         isFavorited: true,
       },
     });
     expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
       feed: {
-        'the-office-health-care-video-1': true,
+        '00000000-0000-4000-8000-000000000001': true,
       },
       history: {
-        'the-office-health-care-video-2': true,
+        '00000000-0000-4000-8000-000000000002': true,
       },
     });
   });
@@ -292,7 +329,7 @@ describe('feed source helpers', () => {
     const toastSpy = vi.spyOn(toast, 'show');
     const controller = (feedSource as typeof feedSource & {
       createFeedSourceController: (repository: {
-        fetchFeed: () => Promise<{ items: FeedItem[] }>;
+        fetchFeed: () => Promise<FeedResponse>;
       }) => {
         requestMore: (queryClient: QueryClient) => Promise<void>;
       };
@@ -302,9 +339,9 @@ describe('feed source helpers', () => {
 
     useVideoRuntimeStore
       .getState()
-      .acceptFetchedIds('feed', ['the-office-health-care-video-1']);
+      .acceptFetchedIds('feed', ['00000000-0000-4000-8000-000000000001']);
     useVideoRuntimeStore.getState().setFlags(
-      'the-office-health-care-video-1',
+      '00000000-0000-4000-8000-000000000001',
       { isLiked: true },
       { isLiked: false, isFavorited: false }
     );
@@ -316,13 +353,13 @@ describe('feed source helpers', () => {
       title: '加载更多视频失败',
     });
     expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
-      'the-office-health-care-video-1': {
+      '00000000-0000-4000-8000-000000000001': {
         isLiked: true,
       },
     });
     expect(useVideoRuntimeStore.getState().sourceVideoIds).toEqual({
       feed: {
-        'the-office-health-care-video-1': true,
+        '00000000-0000-4000-8000-000000000001': true,
       },
       history: {},
     });

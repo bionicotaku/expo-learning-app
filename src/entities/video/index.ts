@@ -5,5 +5,6 @@ export {
   mapFeedItemToVideoListItem,
 } from './model/map-feed-item-to-video-list-item';
 export type {
+  VideoLearningUnit,
   VideoListItem,
 } from './model/types';

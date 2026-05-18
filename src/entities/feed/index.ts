@@ -1,2 +1,7 @@
 export { fetchFeed } from './api/feed-repository';
-export type { FeedItem, FeedResponse } from './model/types';
+export type {
+  FeedItem,
+  FeedLearningUnit,
+  FeedLearningUnitRole,
+  FeedResponse,
+} from './model/types';

@@ -65,7 +65,7 @@ function Harness({
     baseIsLiked,
     baseLikeCount: 100,
     isEnabled,
-    videoId: 'the-office-health-care-video-1',
+    videoId: '00000000-0000-4000-8000-000000000001',
   });
 
   return null;
@@ -148,7 +148,7 @@ describe('useVideoEngagementState runtime', () => {
       expect(latestResult?.isLikePending).toBe(true);
     });
 
-    expect(setVideoLikedMock).toHaveBeenCalledWith('the-office-health-care-video-1', true);
+    expect(setVideoLikedMock).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000001', true);
 
     await act(async () => {
       likeRequest.resolve();
@@ -158,7 +158,7 @@ describe('useVideoEngagementState runtime', () => {
     await waitForAssertion(() => {
       expect(latestResult?.isLikePending).toBe(false);
       expect(useVideoRuntimeStore.getState().overridesByVideoId).toEqual({
-        'the-office-health-care-video-1': {
+        '00000000-0000-4000-8000-000000000001': {
           isLiked: true,
         },
       });

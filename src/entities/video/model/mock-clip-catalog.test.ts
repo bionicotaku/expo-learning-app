@@ -24,22 +24,22 @@ describe('mock clip catalog', () => {
     expect(resolveMockClipAssetBySequenceNumber(9)).toMatchObject({
       clipNumber: 1,
     });
-    expect(resolveMockClipAssetByVideoId('the-office-health-care-video-1')).toMatchObject({
+    expect(resolveMockClipAssetByVideoId('00000000-0000-4000-8000-000000000001')).toMatchObject({
       clipNumber: 1,
     });
-    expect(resolveMockClipAssetByVideoId('the-office-health-care-video-8')).toMatchObject({
+    expect(resolveMockClipAssetByVideoId('00000000-0000-4000-8000-000000000008')).toMatchObject({
       clipNumber: 8,
     });
-    expect(resolveMockClipAssetByVideoId('the-office-health-care-video-9')).toMatchObject({
+    expect(resolveMockClipAssetByVideoId('00000000-0000-4000-8000-000000000009')).toMatchObject({
       clipNumber: 1,
     });
-    expect(resolveMockClipAssetByVideoId('the-office-health-care-video-16')).toMatchObject({
+    expect(resolveMockClipAssetByVideoId('00000000-0000-4000-8000-000000000016')).toMatchObject({
       clipNumber: 8,
     });
   });
 
   it('returns null when the video id does not end with a positive integer', () => {
     expect(resolveMockClipAssetByVideoId('the-office-health-care-video')).toBeNull();
-    expect(resolveMockClipAssetByVideoId('the-office-health-care-video-zero')).toBeNull();
+    expect(resolveMockClipAssetByVideoId('00000000-0000-4000-8000-not-a-sequence')).toBeNull();
   });
 });

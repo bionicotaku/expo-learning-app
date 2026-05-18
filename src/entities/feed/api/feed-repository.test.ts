@@ -12,20 +12,37 @@ describe('feed repository facade', () => {
     const response = await fetchFeed();
 
     expect(response).toMatchObject({
+      recommendation_run_id: expect.stringMatching(
+        /^00000000-0000-4000-8000-[0-9a-f]{12}$/
+      ),
       items: expect.arrayContaining([
         expect.objectContaining({
-          videoId: 'the-office-health-care-video-1',
+          video_id: '00000000-0000-4000-8000-000000000001',
           title: expect.any(String),
           description: expect.any(String),
-          videoUrl: expect.stringContaining('playlist.m3u8'),
-          durationSeconds: expect.any(Number),
-          viewCount: expect.any(Number),
-          likeCount: expect.any(Number),
-          favoriteCount: expect.any(Number),
-          tags: expect.any(Array),
+          video_url: expect.stringContaining('playlist.m3u8'),
+          duration_seconds: expect.any(Number),
+          view_count: expect.any(Number),
+          like_count: expect.any(Number),
+          favorite_count: expect.any(Number),
+          learning_units: expect.arrayContaining([
+            expect.objectContaining({
+              coarse_unit_id: expect.any(Number),
+              text: expect.any(String),
+              role: expect.stringMatching(
+                /^(hard_review|new_now|soft_review|near_future)$/
+              ),
+              is_primary: expect.any(Boolean),
+              evidence_sentence_index: expect.any(Number),
+              evidence_span_index: expect.any(Number),
+              evidence_start_ms: expect.any(Number),
+              evidence_end_ms: expect.any(Number),
+            }),
+          ]),
         }),
       ]),
     });
+    expect(response.items[0]).not.toHaveProperty('tags');
     expect(response.items[0]).not.toHaveProperty('isLiked');
     expect(response.items[0]).not.toHaveProperty('isFavorited');
   });
@@ -34,10 +51,10 @@ describe('feed repository facade', () => {
     const response = await fetchFeed();
 
     for (const item of response.items) {
-      expect(item.likeCount).toBeGreaterThanOrEqual(8000);
-      expect(item.likeCount).toBeLessThanOrEqual(12000);
-      expect(item.favoriteCount).toBeGreaterThanOrEqual(8000);
-      expect(item.favoriteCount).toBeLessThanOrEqual(12000);
+      expect(item.like_count).toBeGreaterThanOrEqual(8000);
+      expect(item.like_count).toBeLessThanOrEqual(12000);
+      expect(item.favorite_count).toBeGreaterThanOrEqual(8000);
+      expect(item.favorite_count).toBeLessThanOrEqual(12000);
     }
   });
 

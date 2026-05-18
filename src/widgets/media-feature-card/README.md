@@ -33,6 +33,6 @@
 
 边界约束：
 
-- widget 不直接派生 `viewCount / duration / tags` 等业务展示字段
+- widget 不直接派生 `viewCount / duration / tagLabel` 等业务展示字段
 - widget 不直接依赖 feed repository、query 逻辑或恢复滚动逻辑
 - widget 不回流到 `shared/ui`，因为它带有明确的视频卡业务语义

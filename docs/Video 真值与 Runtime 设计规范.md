@@ -17,9 +17,9 @@
 当前代码已经完成这套结构的核心落地：
 
 - `entities/video` 已正式化
-- `features/feed-source` 已输出 canonical `VideoListItem[]`
+- `features/feed-source` 已输出 `VideoListItem[]`
 - `features/video-runtime` 已用 `Zustand` 承担 `videoId` 维度 runtime override
-- `FeedPage`、`VideoDetailPage`、`Fullscreen Video` 已改成消费 canonical/effective video 模型
+- `FeedPage`、`VideoDetailPage`、`Fullscreen Video` 已改成消费 list/effective video 模型
 
 本文进一步锁定的 **source membership / source-scoped cleanup**，是这套结构在多 source 场景下的长期标准。
 
@@ -39,25 +39,25 @@
 
 1. `feed` 只是一个 **source**，不是 fullscreen 和视频交互的长期真值模型。
 2. `entities/feed` 只负责描述“feed 这个来源返回了什么”。
-3. `entities/video` 负责描述“一个视频本身是什么”，它是 source-agnostic 的 canonical truth。
+3. `entities/video` 负责描述前端列表可消费的视频模型；当前 `VideoListItem` 包含视频展示字段和本轮 feed learning context。
 4. `features/feed-source` 负责 feed source 的读取、缓存、续接与 source 级编排。
 5. `features/video-runtime` 负责 `videoId` 维度的本地 runtime override，以及 source membership registry。
 6. UI 直接消费的不是 `FeedItem`，而是：
 
 ```ts
-effectiveVideoItem = canonicalVideoItem + runtimeOverride
+effectiveVideoItem = videoListItem + runtimeOverride
 ```
 
-7. `effectiveVideoItem` 只由 canonical truth 与 runtime override 合成，source membership 不直接并入 UI 模型。
+7. `effectiveVideoItem` 只由 `VideoListItem` 与 runtime override 合成，source membership 不直接并入 UI 模型。
 8. 当前状态层固定采用：
    - `React Query` 管 source/server state cache
    - `Zustand` 管 client/runtime state store
-9. 当前用户态属于 `VideoMeta` 读取；feed 和 canonical video item 不保存 `isLiked / isFavorited`。
+9. 当前用户态属于 `VideoMeta` 读取；feed 和 `VideoListItem` 不保存 `isLiked / isFavorited`。
 10. transcript 属于由 `VideoMeta.transcriptUrl` 定位的 asset-read 资源，应走 React Query cache，而不是 `video-runtime`。
 
 一句话收口：
 
-当前结构必须从 “`feed` 直接驱动 UI” 收口成 “`source truth -> canonical video truth + video meta -> runtime override -> UI`”，并通过独立的 source membership 机制管理 cleanup。
+当前结构必须从 “`feed` 直接驱动 UI” 收口成 “`source truth -> frontend video list model + video meta -> runtime override -> UI`”，并通过独立的 source membership 机制管理 cleanup。
 
 ## 3. 概念边界
 
@@ -78,7 +78,7 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 - 一个视频本身的稳定、可复用语义
 - 不依赖它是从 `feed`、`history`、还是其他来源进入 UI
 
-它是 source-agnostic canonical truth。
+它是 source-specific truth，会先被映射成前端列表消费模型，再进入 UI。
 
 ### 3.3 `Source state`
 
@@ -130,7 +130,7 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverride
 `Effective video state` 指 UI 真正消费的最终状态：
 
 ```ts
-effectiveVideoItem = canonicalVideoItem + runtimeOverrideByVideoId[videoId]
+effectiveVideoItem = videoListItem + runtimeOverrideByVideoId[videoId]
 ```
 
 它既不是原始 source snapshot，也不是单独的 runtime map，而是两者合成后的结果。
@@ -160,23 +160,27 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverrideByVideoId[videoId]
 
 典型字段：
 
-- `videoId`
+- `recommendation_run_id`
+- `video_id`
 - `title`
 - `description`
-- `videoUrl`
-- `coverImageUrl`
-- `durationSeconds`
-- `viewCount`
-- `likeCount`
-- `favoriteCount`
-- `tags`
+- `video_url`
+- `cover_image_url`
+- `duration_seconds`
+- `view_count`
+- `like_count`
+- `favorite_count`
+- `learning_units`
 
 这里需要特别强调：
 
 - `FeedItem` 不包含当前用户态 `isLiked / isFavorited`
 - 这些字段属于 `VideoMeta`
-- `likeCount / favoriteCount` 是全局统计字段，fullscreen action rail 会用它们和本地 runtime override 派生显示值
+- `FeedItem` 不包含 `tags`
+- `FeedItem` 不暴露 `rank / score / reason_codes / explanation` 等推荐系统内部解释字段
+- `like_count / favorite_count` 是全局统计字段，映射到 `VideoListItem.likeCount / favoriteCount` 后，fullscreen action rail 会用它们和本地 runtime override 派生显示值
 - 派生后的显示值不写回 feed truth；like / favorite 写 API 只确认成功或失败，不返回 count
+- `recommendation_run_id` 是 response 级字段，会在 `FeedItem -> VideoListItem` 映射时写入每个 item，方便后续上报关联本轮推荐
 
 `entities/feed` 不负责：
 
@@ -192,18 +196,19 @@ effectiveVideoItem = canonicalVideoItem + runtimeOverrideByVideoId[videoId]
 
 ## 4.2 `entities/video`
 
-`entities/video` 负责 canonical video truth。
+`entities/video` 负责前端列表消费模型。
 
 它的职责固定为：
 
-- 定义 source-agnostic 的 `VideoListItem` 或等价 canonical video type
-- 提供 source item -> canonical video item 的 mapper
-- 承载多个来源都能复用的视频本体字段
+- 定义 UI 列表、详情和 fullscreen 可以共同消费的 `VideoListItem`
+- 提供 `FeedItem -> VideoListItem` 的唯一 mapper
+- 承载视频展示字段
+- 承载本轮 feed learning context：`recommendationRunId` 和 `learningUnits`
 
 它回答的问题是：
 
-- 一个视频本身是什么
-- 不管这个视频来自 `feed`、`history` 还是未来其他来源，UI 可以稳定依赖什么字段
+- 前端展示一个列表视频时可以稳定依赖什么字段
+- 当前这条视频来自 feed 时，本轮推荐希望学习哪些 learning units
 
 典型字段：
 
@@ -218,17 +223,19 @@ type VideoListItem = {
   viewCount: number;
   likeCount: number;
   favoriteCount: number;
-  tags: string[];
+  recommendationRunId: string;
+  learningUnits: VideoLearningUnit[];
 };
 ```
 
 这里的重点不是字段名本身，而是它的语义：
 
-- 这是一个 canonical video item
+- 这是一个前端列表消费 item
 - 不是 `feed item`
 - 不是 `history item`
+- 当前包含 feed learning context；未来如果出现 history/source 混排，再进一步拆 `VideoCore` 和 source-specific list item
 
-当前 `src/entities/video` 已经正式化为 canonical video entity；mock clip catalog 仍然保留在该 entity 内，作为 feed / video-meta mock 的共享资源目录。
+当前 `src/entities/video` 已经正式化为前端视频列表 entity；mock clip catalog 仍然保留在该 entity 内，作为 feed / video-meta mock 的共享资源目录。
 
 ## 4.3 `feed entity` 和 `video entity` 的区别
 
@@ -258,7 +265,7 @@ type VideoListItem = {
 - `feed` 来源的 React Query 入库
 - refresh / append / merge
 - `id -> index` 等 source 级辅助能力
-- 把 `FeedItem[]` 映射成 canonical `VideoListItem[]`
+- 把 `FeedResponse` 映射成 `VideoListItem[]`，其中 response 级 `recommendation_run_id` 会写入每个 list item
 
 它是 source state 层，不是 runtime state 层。
 
@@ -455,12 +462,23 @@ sourceVideoIds[source]
 
 ## 7. 真值与合成模型
 
-## 7.1 Canonical video item
+## 7.1 Video list item
 
 UI 不再长期依赖 `FeedItem`。  
-当前统一依赖 canonical `VideoListItem`：
+当前统一依赖前端消费模型 `VideoListItem`：
 
 ```ts
+type VideoLearningUnit = {
+  coarseUnitId: number;
+  text: string;
+  role: 'hard_review' | 'new_now' | 'soft_review' | 'near_future';
+  isPrimary: boolean;
+  evidenceSentenceIndex: number;
+  evidenceSpanIndex: number;
+  evidenceStartMs: number;
+  evidenceEndMs: number;
+};
+
 type VideoListItem = {
   videoId: string;
   title: string;
@@ -471,7 +489,8 @@ type VideoListItem = {
   viewCount: number;
   likeCount: number;
   favoriteCount: number;
-  tags: string[];
+  recommendationRunId: string;
+  learningUnits: VideoLearningUnit[];
 };
 ```
 
@@ -517,7 +536,7 @@ UI 消费的最终模型固定为：
 
 ```ts
 effectiveVideoItem = {
-  ...canonicalVideoItem,
+  ...videoListItem,
   ...runtimeOverrideByVideoId[videoId],
 }
 ```
@@ -541,7 +560,7 @@ effectiveVideoItem = {
 
 - `video-runtime` 不直接绑死 `FEED_QUERY_KEY`
 - UI 不自己拼装 source + override
-- 要有明确的一层负责把 canonical video item 与 runtime override 合成
+- 要有明确的一层负责把 `VideoListItem` 与 runtime override 合成
 
 这里要明确：
 
@@ -604,7 +623,7 @@ append / requestMore 的固定语义是：
 - `feed repository`
 - `feed-source`
 
-它的输出会被映射到 canonical `VideoListItem`。
+它的输出会被映射到 `VideoListItem`，并携带本轮 `recommendationRunId` 与 `learningUnits`。
 
 ## 8.2 `history`
 
@@ -614,7 +633,7 @@ append / requestMore 的固定语义是：
 - `history repository`
 - `history-source`
 
-它的输出同样会被映射到 canonical `VideoListItem`。
+它的输出后续也应映射到前端统一消费的视频列表模型；如果 history 不具备 feed learning context，再拆分 `VideoCore` 与 source-specific list item。
 
 ## 8.3 为什么 runtime override 必须和 source 解耦
 
@@ -769,7 +788,7 @@ append / requestMore 的固定语义是：
 
 fullscreen 当前和后续都应依赖：
 
-- canonical `VideoListItem`
+- `VideoListItem`
 - `video-runtime` 合成后的 `effectiveVideoItem`
 
 ## 10. 成功标准
@@ -777,13 +796,13 @@ fullscreen 当前和后续都应依赖：
 当前代码结构只有同时满足以下条件，才算真正对齐这套设计：
 
 1. `feed` 只是 source，而不是 fullscreen 的长期真值模型
-2. `entities/video` 已经正式化为 canonical video entity
+2. `entities/video` 已经正式化为前端视频列表 entity
 3. `features/feed-source` 只负责 feed source state，不负责 runtime override
 4. `features/video-runtime` 已经独立承载 `videoId` 维度的本地 runtime override 与 source membership registry
 5. 状态层固定采用 `React Query + Zustand`
 6. UI 统一消费 `effectiveVideoItem`
-7. `effectiveVideoItem` 明确只由 canonical truth 与 override 合成，source membership 不直接并入 UI 模型
+7. `effectiveVideoItem` 明确只由 `VideoListItem` 与 override 合成，source membership 不直接并入 UI 模型
 8. full refresh 与 append / requestMore 的 authority handoff 规则已经定义清楚
-9. `feed`、`history`、未来其他来源都能映射到同一套 canonical video truth，并复用同一套 source-scoped cleanup 机制
+9. `feed`、`history`、未来其他来源都能映射到同一套前端视频列表模型，并复用同一套 source-scoped cleanup 机制
 10. 文档明确拒绝“runtime item 内嵌 source tags”方案
 11. `video-runtime` 不再直接绑定 `FEED_QUERY_KEY` 这类 source-specific key
